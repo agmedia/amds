@@ -6415,6 +6415,8 @@ justify-content: center;
 
 
 
+
+
 	.support {
 
 		font-size: 12px;
@@ -6692,6 +6694,23 @@ justify-content: center;
 .product-style4 .grid .single-product .image {
 	margin-bottom:0;
 }
+
+	.shortcut-wrapper .counter {
+		position: absolute;
+		top: 2px;
+		right: 10px!important;
+		width: 18px;
+		height: 18px;
+		line-height: 18px;
+		text-align: center;
+		border-radius: 50%;
+		background-color: #040707;
+		z-index: 1;
+		font-size: 12px;
+		font-weight: bold;
+		color: #fff;
+		font-family: "Risingsun",Arial,Helvetica,sans-serif;
+	}
 
 .product-style4 .grid .single-product .caption {
 	position:absolute;
