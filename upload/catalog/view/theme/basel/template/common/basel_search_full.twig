@@ -1,0 +1,34 @@
+<div class="full-search-wrapper">
+<div class="search-field search-main">
+<input type="text" name="search" value="{{ search }}" placeholder="{{ basel_text_search }}" class="form-control main-search-input" />
+</div>
+<div class="search-category">
+<select name="category_id" class="form-control">
+<option value="0">{{ basel_text_category }}</option>
+{% for category_1 in categories %}
+    {% if category_1.category_id == category_id %}
+    <option value="{{ category_1.category_id }}" selected="selected">{{ category_1.name }}</option>
+    {% else %}
+    <option value="{{ category_1.category_id }}">{{ category_1.name }}</option>
+    {% endif %}
+    {% for category_2 in category_1.children %}
+        {% if category_2.category_id == category_id %}
+        <option value="{{ category_2.category_id }}" selected="selected">&nbsp;&nbsp;&nbsp;{{ category_2.name }}</option>
+        {% else %}
+        <option value="{{ category_2.category_id }}">&nbsp;&nbsp;&nbsp;{{ category_2.name }}</option>
+        {% endif %}
+        {% for category_3 in category_2.children %}
+        {% if category_3.category_id == category_id %}
+        <option value="{{ category_3.category_id }}" selected="selected">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ category_3.name }}</option>
+        {% else %}
+        <option value="{{ category_3.category_id }}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ category_3.name }}</option>
+        {% endif %}
+        {% endfor %}
+    {% endfor %}
+{% endfor %}
+</select>
+</div>
+<div class="search-button do-search main">
+<a class="icon-magnifier icon"></a>
+</div>
+</div>

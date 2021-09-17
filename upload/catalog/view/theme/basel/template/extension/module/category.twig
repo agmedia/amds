@@ -1,0 +1,61 @@
+<div class="widget" style="margin-bottom:43px">
+
+<ul class="plain-menu cat">
+{% for category in categories %}
+	{% if category.category_id == category_id %}
+	<li class="open active"><a href="{{ category.href }}" >{{ category.name }}</a>
+	{% else %}
+	<li><a href="{{ category.href }}" >{{ category.name }}</a> 
+	{% endif %}
+      {% if category.children %}
+  <div class="sign"><i class="icon-arrow-right"></i></div>
+      <ul>
+		  {% for child in category.children %}
+		  		{% if child.grandchildren %}
+					{% if child.category_id == child_id %}
+					<li class="open active"><a href="{{ child.href }}">{{ child.name }}</a>
+					{% else %}
+					<li><a href="{{ child.href }}">{{ child.name }}</a>
+					{% endif %}
+
+					<span class="toggle-icon"><span></span></span>
+					<ul>
+						{% for grandchild in child.grandchildren %}
+							<li><a href="{{ grandchild.href }}">{{ grandchild.name }}</a></li>
+						{% endfor %}
+					</ul>
+			</li>
+				{% else %}
+			<li class=""><a href="{{ child.href }}">{{ child.name }}</a></li>
+				{% endif %}
+		  {% endfor %}
+      </ul>
+      {% endif %}
+   </li>
+{% endfor %}
+</ul>
+</div>
+
+<script>        
+	$('.plain-menu.cat > li').bind().click(function(e) {
+	$(this).toggleClass("open").find('>ul').stop(true, true).slideToggle(350)
+	.end().siblings().find('>ul').slideUp().parent().removeClass("open");
+	e.stopPropagation();
+	});
+	$('.plain-menu.cat li a').click(function(e) {
+	e.stopPropagation();
+	});
+	
+	$('.plain-menu.cat > li > ul > li').bind().click(function(e) {
+	$(this).toggleClass("open").find('>ul').stop(true, true).slideToggle(350)
+	.end().siblings().find('>ul').slideUp().parent().removeClass("open");
+	e.stopPropagation();
+	});
+	
+	$('.plain-menu.cat li ul li a').click(function(e) {
+	e.stopPropagation();
+	});
+	
+
+	
+</script>

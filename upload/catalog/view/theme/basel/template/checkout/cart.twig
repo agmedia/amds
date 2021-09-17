@@ -1,0 +1,187 @@
+{{ header }}
+<div class="container">
+
+  
+
+  
+  <div class="row">
+  
+  {{ column_left }}
+    
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-md-9 col-sm-8' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+    
+    <div id="content" class="{{ class }}">
+        <div class="wrapper">
+
+    {{ content_top }}
+
+
+        
+        <div class="row">
+        
+        <div class="col-sm-8">
+
+            <h1 id="page-title">{{ heading_title }}{% if weight %} ({{ weight }}){% endif %}</h1>
+
+            {% if attention %}
+                <div class="alert alert-info"><i class="fa fa-info-circle"></i> {{ attention }}
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                </div>
+            {% endif %}
+            {% if success %}
+                <div class="alert alert-success"><i class="fa fa-check"></i> {{ success }}
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                </div>
+            {% endif %}
+            {% if error_warning %}
+                <div class="alert alert-danger"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                </div>
+            {% endif %}
+            <form action="{{ action }}" method="post" enctype="multipart/form-data">
+
+                <table class="table table-bordered border-bottom">
+
+
+                    <tbody>
+                    {% for product in products %}
+                        <tr>
+                            <td class="remove-cell hidden-xs hidden-sm text-center">
+                                <a onclick="cart.remove('{{ product.cart_id }}');" data-toggle="tooltip" title="{{ button_remove }}" class="product-remove"><i class="fa fa-times"></i></a>
+                            </td>
+                            <td class="image">
+                                {% if product.thumb %}
+                                    <a href="{{ product.href }}"><img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" /></a>
+                                {% endif %}
+                            </td>
+                            <td class="name"><h2 class="wp-title"><a class="hover_uline" href="{{ product.href }}">{{ product.name }}</a></h2>
+
+                                {% if not product.stock %}
+                                    <span class="text-danger">***</span>
+                                {% endif %}<div class="wp-code">{{ product.model }}</div>
+
+                                {% if product.option %}
+                                    <div class="wp-variations">
+                                    {% for option in product.option %}
+
+                                            <div class="wp-variation">{{ option.name }}: {{ option.value }}</div>
+
+                                    {% endfor %}
+                                    </div>
+                                {% endif %}
+
+                                <small class="hidden-md hidden-lg"> {{ product.price }}</small>
+                                <a class="btn btn-default btn-tiny hidden-md hidden-lg" style="margin-top:5px;" onclick="cart.remove('{{ product.cart_id }}');">{{ button_remove }}</a>
+
+                            </td>
+
+                            <td>
+                                <input type="number" min="1" step="1" name="quantity[{{ product.cart_id }}]" value="{{ product.quantity }}" class="form-control qty-form" />
+                            </td>
+
+                            <td class="text-right total-cell hidden-xs hidden-sm">
+
+                                <div class="wp-total">
+                                    <div class="wp-price-discount wp-price-current product_total">{{ product.total }}</div>
+                                    <div class="wp-qty-count ">
+                                        <span class="product_qty">{{ product.quantity }}</span> x {{ product.price }}
+                                    </div>
+                                </div>
+
+
+                            </td>
+
+                        </tr>
+                    {% endfor %}
+                    {% for voucher in vouchers %}
+                        <tr>
+                            <td class="text-center hidden-xs hidden-sm">
+                                <a onclick="voucher.remove('{{ voucher.key }}');" data-toggle="tooltip" title="{{ button_remove }}" class="product-remove"><i class="fa fa-times"></i></a>
+                            </td>
+                            <td colspan="2" class="text-left">
+                                {{ voucher.description }}<br>
+                                <a class="btn btn-default btn-tiny hidden-md hidden-lg" style="margin-top:5px;" onclick="voucher.remove('{{ voucher.key }}');">{{ button_remove }}</a>
+                            </td>
+                            <td class="hidden-xs hidden-sm"></td>
+                            <td class="text-left"><div class="input-group btn-block" style="max-width: 200px;">
+                                    <input type="number" value="1" disabled="disabled" class="form-control qty-form" />
+                            </td>
+                            <td class="hidden-xs hidden-sm"></td>
+
+                            <td class="text-right total-cell">{{ voucher.amount }}</td>
+                        </tr>
+                    {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+                <div class="row margin-b30">
+                    <div class="col-xs-12 ">
+
+                        <div class="panel-group nullpad" id="accordion">
+
+                            <div class="panel panel-default basket">
+
+                                <div class="panel-heading">
+                                    <h5 class="panel-title"><a href="#collapse-locationKako" class="accordion-toggle l-title basket" data-toggle="collapse" data-parent="#accordion" aria-expanded="true">Kako izvršiti narudžbu?<span class="toggle-icon"></span></a></h5>
+                                </div>
+                                <div class="panel-collapse collapse in" id="collapse-locationKako" aria-expanded="true" style="">
+                                    <div class="panel-body basket">
+
+                                            <p>Narudžbu izvršite dodavanjem željenog artikla u košaricu na stranici proizvoda te klikom na gumb "Na blagajnu". Stranica će vas potom odvesti na zaključivanje kupnje gdje popunjavanjem traženih podataka u 2 koraka zaključite kupnju. Svakako prije dovršetka kupovine preporučamo čitanje naših uvjeta kupnje.</p>
+
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                     <!--   <button type="submit" class="btn btn-primary">{{ button_update }}</button> -->
+
+                    </div>
+                </div>
+
+
+            </form>
+            <div class="row cart-modules">
+                {% if modules %}
+                    {% for module in modules %}
+                        <div class="col-sm-6 margin-b30">
+                        	{{ module }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="col-sm-4">
+            <div class="totals-slip">
+            	<div class="table-holder margin-b25">
+                <table class="table table-bordered total-list margin-b0">
+                {% for total in totals %}
+                <tr>
+                <td><b>{{ total.title }}:</b></td>
+                <td class="text-right">{{ total.text }}</td>
+                </tr>
+                {% endfor %}
+                </table>
+                </div>
+                <a href="{{ checkout }}" class="btn btn-lg btn-contrast btn-block">Dovrši kupnju</a>
+            </div>
+        </div>
+        
+        </div>
+        </div>
+      
+      </div>
+   </div>
+</div>
+{{ footer }} 

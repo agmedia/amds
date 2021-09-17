@@ -1,0 +1,84 @@
+<div class="item single-product">
+<div class="image" {% if columns == 'list' %}style="width:{{ img_width }}px"{% endif %}>
+    <a href="{{ product.href }}">
+    <img loading="lazy" src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" />
+    {% if product.thumb2 %}
+    <img loading="lazy" class="thumb2" src="{{ product.thumb2 }}" alt="{{ product.name }}" title="{{ product.name }}" />
+    {% endif %}
+    </a>
+{% if product.price and product.special and salebadge_status %}
+    <div class="sale-counter id{{ product.product_id }}"></div>
+    <span class="badge sale_badge"><i>{{ product.sale_badge }}</i></span>
+{% endif %}
+{% if product.new_label %}
+    <span class="badge new_badge"><i>{{ basel_text_new }}</i></span>
+{% endif %}
+{% if ((product.quantity < 1) and (stock_badge_status)) %}
+    <span class="badge out_of_stock_badge"><i>{{ basel_text_out_of_stock }}</i></span>
+    {% set button_cart = basel_text_out_of_stock %}
+{% else %}
+	{% set button_cart = default_button_cart %}
+{% endif %}
+<a class="img-overlay" href="{{ product.href }}"></a>
+
+<div class="icons-wrapper">
+
+<a class="icon is_wishlist" data-toggle="tooltip" data-placement="{{ tooltip_align }}"  data-title="{{ button_wishlist }}" onclick="wishlist.add('{{ product.product_id }}');"><span class="icon-heart"></span></a>
+
+</div> <!-- .icons-wrapper -->
+
+    <div class="cp-sizes">
+        <div class="cp-sizes-label">Dostupne veličine</div>
+        <div class="cp-sizes-items">
+            <a href="https://amds.hr/hlace-z-k-crna-b21kzh56-proizvod-4680/#variationattribute46" class="cp-size">VB 36</a>
+            <a href="https://amds.hr/hlace-z-k-crna-b21kzh56-proizvod-4680/#variationattribute47" class="cp-size">VB 38</a>
+            <a href="https://amds.hr/hlace-z-k-crna-b21kzh56-proizvod-4680/#variationattribute48" class="cp-size">VB 40</a>
+            <a href="https://amds.hr/hlace-z-k-crna-b21kzh56-proizvod-4680/#variationattribute49" class="cp-size">VB 42</a>
+
+        </div>
+    </div>
+</div><!-- .image ends -->
+<div class="caption">
+<a class="product-name" href="{{ product.href }}">{{ product.name }}</a>
+{% if product.rating %}      
+    <div class="rating">
+    <span class="rating_stars rating r{{ product.rating }}">
+    <i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
+    </span>
+    </div>
+{% endif %}
+<div class="price-wrapper">
+{% if product.price %}
+<div class="price">
+    {% if product.special %}
+    <span class="price-old">{{ product.price }}</span><span class="price-new">{{ product.special }}</span>
+    {% else %}
+    <span>{{ product.price }}</span>
+    {% endif %}
+    {% if product.tax %}
+    <span class="price-tax">{{ text_tax }} {{ product.tax }}</span>
+    {% endif %}
+</div><!-- .price -->
+{% endif %}
+<p class="description">{% if product.description %}{{ product.description }}{% endif %}</p>
+
+</div><!-- .price-wrapper -->
+<div class="plain-links">
+<a class="icon is_wishlist link-hover-color" onclick="wishlist.add('{{ product.product_id }}');"><span class="icon-heart"></span> {{ button_wishlist }}</a>
+</div><!-- .plain-links-->
+</div><!-- .caption-->
+{% if product.sale_end_date and countdown_status %}
+<script>
+  $(function() {
+	$(".sale-counter.id{{ product.product_id }}").countdown("{{ product.sale_end_date }}").on('update.countdown', function(event) {
+  var $this = $(this).html(event.strftime(''
+    + '<div>'
+    + '%D<i>{{ basel_text_days }}</i></div><div>'
+    + '%H <i>{{ basel_text_hours }}</i></div><div>'
+    + '%M <i>{{ basel_text_mins }}</i></div><div>'
+    + '%S <i>{{ basel_text_secs }}</i></div></div>'));
+});
+});
+</script>
+{% endif %}
+</div><!-- .single-product ends -->

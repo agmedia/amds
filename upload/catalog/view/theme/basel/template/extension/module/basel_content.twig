@@ -1,0 +1,133 @@
+{% if block_full_width %}
+</div>
+{% endif %}
+<div class="widget cm_module" style="{{ module_margins }}">
+{% if block_title %}
+<!-- Block Title -->
+<div class="widget-title">
+{% if title_preline %}<p class="pre-line">{{ title_preline }}</p>{% endif %}
+{% if title %}
+<p class="main-title"><span>{{ title }}</span></p>
+<p class="widget-title-separator"><i class="icon-line-cross"></i></p>
+{% endif %}
+{% if title_subline %}
+<p class="sub-line"><span>{{ title_subline }}</span></p>
+{% endif %}
+</div>
+{% endif %}
+<div class="cm_block_wrapper">
+{% if bg_video %}<div class="vid-holder"></div>{% endif %}
+<div class="cm_block {{ module }}" style="{{ block_style }};">
+<div class="{% if not content_full_width and block_full_width %}container{% endif %}">
+{% if columns %}
+<div class="cm_content" style="{{ content_style }};">
+<div class="row {% if content_no_margin %}marginless{% endif %}">
+{% for column in columns %}
+<div class="{{ column.column_class }} type-{{ column.type }} cm_column {% if equal_height %}eq_height{% endif %}">    
+{% if column.type == "img" %}
+    {% if column.data2 %}
+    <!-- Banner type -->
+    <div class="banner_wrap">
+    <div class="zoom_image_wrap"><img class="zoom_image" src="{{ column.data2 }}" alt="" /></div>
+    <div class="effect-holder"></div>
+    <div class="banner_overlay">
+        <div class="cm_item_wrapper {% if column.data5 %}pointer" onclick="location.href='{{ column.data5 }}';{% endif %}">
+            <div class="cm_item {{ column.data7 }}">
+                {{ column.data1 }}
+            </div>
+        </div>
+    </div>
+    </div>
+    {% endif %}
+    {% if column.data4 %}
+    <div class="banner_wrap">
+    <div class="zoom_image_wrap"><img class="zoom_image" src="{{ column.data4 }}" alt="" /></div>
+    <div class="effect-holder"></div>
+    <div class="banner_overlay">
+        <div class="cm_item_wrapper {% if column.data6 %}pointer" onclick="location.href='{{ column.data6 }}';{% endif %}">
+            <div class="cm_item {{ column.data8 }}">
+                {{ column.data3 }}
+            </div>
+        </div>
+    </div>
+    </div>
+    {% endif %}
+{% elseif column.type == "tm" %}
+    <!-- Testimonial type -->
+    {% if testimonials %}
+    <div class="grid-holder {{ column.data8 }} tm_module grid{{ column.data7 }}">
+    {% for testimonial in testimonials %}
+    <div class="item single-testimonial">
+        <div class="testimonial-wrap">
+        {% if testimonial.image %}
+        <p><img src="{{ testimonial.image }}" alt=""/></p>
+        {% endif %}
+        <p>{{ testimonial.description }}</p>
+        <p><b>{{ testimonial.name }}</b>{% if testimonial.org %} - {{ testimonial.org }}{% endif %}</p> 
+        </div>    
+    </div>
+    {% endfor %}
+    </div>
+    {% else %}
+    No testimonials found
+    {% endif %}
+{% else %}
+    <!-- HTML/Newsletter type -->
+    <div class="cm_item_wrapper">
+        <div class="cm_item {{ column.data7 }}">
+            {{ column.data1 }}
+        </div>
+    </div>
+{% endif %}
+</div>    
+{% endfor %}
+</div>
+</div>
+{% endif %}
+</div>
+</div>
+</div>
+</div>
+{% if block_full_width %}
+<div class="container">
+{% endif %}
+{% if para_status and bg_img %}
+<script>
+$(window).load(function(){
+$('.cm_block.{{ module }}').parallax("50%", 0.{{ para_status }});
+})
+</script>
+{% endif %}
+{% if bg_video %}
+<script>
+$('.vid-holder').tuber({
+videoId: '{{ video_id }}',
+isBackground: false
+});
+</script>
+{% endif %}
+
+{% if columns %}
+{% for column in columns %}
+{% if column.type == "tm" %}
+<script><!--
+$('.grid-holder.tm_module').slick({
+adaptiveHeight:true,
+dots:true,
+{% if direction == 'rtl' %}
+rtl: true,
+{% endif %}
+arrows: false,
+respondTo:'min',
+{% if column.data7 == '3' %}
+slidesToShow:3,slidesToScroll:3,responsive:[{breakpoint:960,settings:{slidesToShow:1,slidesToScroll:1}}],
+{% elseif column.data7 == '2' %}
+slidesToShow:2,slidesToScroll:2,responsive:[{breakpoint:960,settings:{slidesToShow:1,slidesToScroll:1}}]
+{% elseif column.data7 == '1' %}
+slidesToShow:1,slidesToScroll:1,responsive:[]
+{% endif %}
+}).parents('.cm_block_wrapper').addClass('has-testimonials');
+//--></script>
+{% endif %}
+{% endfor %}
+{% endif %}

@@ -1,0 +1,303 @@
+{{ header }}
+
+{% if basel_map_lat and basel_map_lon and basel_map_style == "full_width" %}
+<div id="gmap" class="map-full-width">
+    <div class="address-holder col-sm-5 col-md-4 col-lg-3">
+    <h3 class="contrast-heading">{{ store }}</h3>
+    <p>{{ address }}</p>
+    <a class="uline_link to_form">{{ heading_title }}</a>
+    </div>
+</div>
+{% endif %}
+    
+    <div class="container">
+    
+        <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+        </ul>
+  
+  <div class="row">
+  
+    {% if basel_map_lat and basel_map_lon and basel_map_style == "inline" %}
+    <div id="gmap" class="col-sm-12 map-inline"></div>
+    {% endif %}
+  
+  {{ column_left }}
+    
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-md-9 col-sm-8' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+    
+    <div id="content" class="{{ class }}">
+    {{ content_top }}
+      <h1 id="page-title">{{ heading_title }}</h1>
+      
+      <div class="wrapper">
+
+             <div class="panel-group nullpad" id="accordion">
+
+                  <div class="panel panel-default">
+                      {% set count = 0 %}
+                      {% for location in locations %}
+                          {% if location.geocode=='Regija Dalmacija' %}
+                              {% set count = count + 1 %}
+                          {% endif %}
+                      {% endfor %}
+                      <div class="panel-heading">
+                          <h4 class="panel-title"><a href="#collapse-locationDalmacija" class="accordion-toggle l-title collapsed" data-toggle="collapse" data-parent="#accordion">Regija Dalmacija <span class="l-counter">({{ count }})</span><span class="toggle-icon"></span></a></h4>
+                      </div>
+                      <div class="panel-collapse collapse" id="collapse-locationDalmacija">
+                              <div class="panel-body">
+                                  <div class="row">
+
+                                  {% for location in locations %}
+                                      {% if location.geocode=='Regija Dalmacija' %}
+
+                                         <div class="col-md-3 lp">
+                                    <h3 class="lp-title">{{ location.name }}</h3>
+                                              {{ location.address }}<br>
+
+                                      {{ location.telephone }}<br>
+                                      {% if location.fax %}
+                                          {{ location.fax }}
+                                      {% endif %}
+                                    <br>
+                                      {% if location.open %}
+
+                                                  {{ location.open }}
+
+                                      {% endif %}
+                                    <br>
+                                    {% if location.comment %}
+                                        {{ location.comment }}
+                                    {% endif %}
+
+
+
+
+                                </div>
+
+                                    {% endif %}
+                                      {% endfor %}
+
+                                  </div>
+                              </div>
+
+                          </div>
+                  </div>
+
+
+                 <div class="panel panel-default">
+                     {% set count = 0 %}
+                     {% for location in locations %}
+                         {% if location.geocode=='Regija Rijeka, Istra i Lika' %}
+                             {% set count = count + 1 %}
+                         {% endif %}
+                     {% endfor %}
+                     <div class="panel-heading">
+                         <h4 class="panel-title"><a href="#collapse-locationLika" class="accordion-toggle l-title collapsed" data-toggle="collapse" data-parent="#accordion">Regija Rijeka, Istra i Lika <span class="l-counter">({{ count }})</span><span class="toggle-icon"></span></a></h4>
+                     </div>
+                     <div class="panel-collapse collapse" id="collapse-locationLika">
+                         <div class="panel-body">
+                             <div class="row">
+
+                                 {% for location in locations %}
+                                     {% if location.geocode=='Regija Rijeka, Istra i Lika' %}
+
+                                         <div class="col-md-3 lp">
+                                             <h3 class="lp-title">{{ location.name }}</h3>
+                                             {{ location.address }}<br>
+
+                                             {{ location.telephone }}<br>
+                                             {% if location.fax %}
+                                                 {{ location.fax }}
+                                             {% endif %}
+                                             <br>
+                                             {% if location.open %}
+
+                                                 {{ location.open }}
+
+                                             {% endif %}
+                                             <br>
+                                             {% if location.comment %}
+                                                 {{ location.comment }}
+                                             {% endif %}
+
+
+
+
+                                         </div>
+
+                                     {% endif %}
+                                 {% endfor %}
+
+                             </div>
+                         </div>
+
+                     </div>
+                 </div>
+
+
+                 <div class="panel panel-default">
+                     {% set count = 0 %}
+                     {% for location in locations %}
+                         {% if location.geocode=='Regija Sjeverna Hrvatska i Slavonija' %}
+                             {% set count = count + 1 %}
+                         {% endif %}
+                     {% endfor %}
+                     <div class="panel-heading">
+                         <h4 class="panel-title"><a href="#collapse-locationSlavonija" class="accordion-toggle l-title collapsed" data-toggle="collapse" data-parent="#accordion">Regija Sjeverna Hrvatska i Slavonija <span class="l-counter">({{ count }})</span><span class="toggle-icon"></span></a></h4>
+                     </div>
+                     <div class="panel-collapse collapse" id="collapse-locationSlavonija">
+                         <div class="panel-body">
+                             <div class="row">
+
+                                 {% for location in locations %}
+                                     {% if location.geocode=='Regija Sjeverna Hrvatska i Slavonija' %}
+
+                                         <div class="col-md-3 lp">
+                                             <h3 class="lp-title">{{ location.name }}</h3>
+                                             {{ location.address }}<br>
+
+                                             {{ location.telephone }}<br>
+                                             {% if location.fax %}
+                                                 {{ location.fax }}
+                                             {% endif %}
+                                             <br>
+                                             {% if location.open %}
+
+                                                 {{ location.open }}
+
+                                             {% endif %}
+                                             <br>
+                                             {% if location.comment %}
+                                                 {{ location.comment }}
+                                             {% endif %}
+
+
+
+
+                                         </div>
+
+                                     {% endif %}
+                                 {% endfor %}
+
+                             </div>
+                         </div>
+
+                     </div>
+                 </div>
+
+
+                 <div class="panel panel-default">
+
+                     {% set count = 0 %}
+                     {% for location in locations %}
+                         {% if location.geocode=='Regija Zagreb' %}
+                             {% set count = count + 1 %}
+                         {% endif %}
+                     {% endfor %}
+                     <div class="panel-heading">
+                         <h4 class="panel-title"><a href="#collapse-locationZagreb" class="accordion-toggle l-title collapsed" data-toggle="collapse" data-parent="#accordion">Regija Zagreb <span class="l-counter">({{ count }})   </span><span class="toggle-icon"></span></a></h4>
+                     </div>
+                     <div class="panel-collapse collapse" id="collapse-locationZagreb">
+                         <div class="panel-body">
+                             <div class="row">
+
+                                 {% for location in locations %}
+
+                                     {% if location.geocode=='Regija Zagreb' %}
+                                     <div class="col-md-3 lp">
+                                         <h3 class="lp-title">{{ location.name }}</h3>
+                                         {{ location.address }}<br>
+
+                                         {{ location.telephone }}<br>
+                                         {% if location.fax %}
+                                             {{ location.fax }}
+                                         {% endif %}
+                                         <br>
+                                         {% if location.open %}
+
+                                             {{ location.open }}
+
+                                         {% endif %}
+                                         <br>
+                                         {% if location.comment %}
+                                             {{ location.comment }}
+                                         {% endif %}
+
+
+
+
+                                     </div>
+                                     {% endif %}
+
+                                 {% endfor %}
+
+                             </div>
+                         </div>
+
+                     </div>
+                 </div>
+
+
+
+                
+             </div>
+
+
+
+      
+      </div> <!-- .row ends -->
+      
+      
+      
+      
+      
+      {{ content_bottom }}</div>
+    {{ column_right }}</div>
+</div>
+
+{% if basel_map_style %}
+<script>
+	$(document).ready(function() {
+		new Maplace({
+			locations: [
+				{
+					lat: {{ basel_map_lat }},
+					lon: {{ basel_map_lon }},
+				}
+			],
+			controls_on_map: true,
+			start: 1,
+			map_options: {
+				zoom: 15,
+				scrollwheel: false}
+		}).Load();
+		
+		{% if basel_map_lat and basel_map_lon and basel_map_style == "full_width" %}
+		$('body').addClass('full-width-map');
+		{% endif %}
+		 
+	});
+</script>
+{% endif %}
+
+
+<script>
+	$(document).ready(function() {
+$(".to_form").click(function() {
+    $('html, body').animate({
+        scrollTop: ($(".form-vertical").offset().top - 200)
+    }, 1000);
+});
+});
+</script>
+
+{{ footer }}

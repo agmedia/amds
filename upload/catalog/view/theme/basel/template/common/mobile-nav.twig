@@ -1,0 +1,55 @@
+<div class="main-menu-wrapper hidden-md hidden-lg">
+
+    <div class="closemenu">
+        <div class="icon-element mnu close">
+
+            <a class="shortcut-wrapper menu-closer hidden-md hidden-lg ">
+                <i class="icon-line-cross icon"></i>
+            </a>
+
+        </div>
+        <span class="menu-title-m">Izbornik</span>
+    </div>
+<ul class="mobile-top">
+    <li class="mobile-lang-curr"></li>
+    {% if header_search %}
+    <li class="search">
+        <div class="search-holder-mobile">
+        <input type="text" name="search-mobile" value="" placeholder="" class="form-control trazi" /><a class="fa fa-search"></a>
+        </div>
+    </li>
+    {% endif %}
+</ul>
+{% if primary_menu %}
+<ul class="categories">
+{% if primary_menu == 'oc' %}
+<!-- Default menu -->
+{{ default_menu }}
+{% elseif primary_menu is defined %}
+<!-- Mega menu -->
+{% for key, row in primary_menu_mobile %}
+{% include 'basel/template/common/menus/mega_menu.twig' %}
+{% endfor %}
+{% endif %}
+</ul>
+{% endif %}
+{% if secondary_menu %}
+<ul class="categories">
+    {% if secondary_menu == 'oc' %}
+        <!-- Default menu -->
+        {{ default_menu }}
+    {% elseif secondary_menu is defined %}
+        <!-- Mega menu -->
+        {% for key, row in secondary_menu_mobile %}
+        	{% include 'basel/template/common/menus/mega_menu.twig' %}
+        {% endfor %}
+    {% endif %}
+</ul>
+{% endif %}
+<ul class="categories">
+    {% include 'basel/template/common/static_links.twig' %}
+</ul>
+    <div class="m-menu-contact"><a href="tel:0916651808">091 665 18 08</a> ili <a href="mailto:webshop@amds.hr">webshop@amds.hr</a></div>
+</div>
+
+<span class="body-cover menu-closer"></span>
