@@ -6128,6 +6128,7 @@ justify-content: center;
 	div.closemenu{
 		height:20px;
 		background-color: white;
+		margin-bottom:20px;
 	}
 
 	.cd-header {
@@ -6232,11 +6233,13 @@ justify-content: center;
 
 	}
 	.main-menu-wrapper{
-		background-color: #040707;
+		background-color: #fff;
 	}
 
 	ul.categories{
 		background-color: white;
+		border-top: 1px solid;
+		border-color: #ececec;
 	}
 
 	.main-menu-wrapper > ul > li{
