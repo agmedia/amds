@@ -62,5 +62,4 @@
 # IDE Project files
 /.idea
 /upload/.idea
-/upload/env.php
-#/upload/image/catalog/
+/upload/env.php/upload/image/catalog/
