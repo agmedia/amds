@@ -26,8 +26,6 @@
 <a class="icon is_wishlist" data-toggle="tooltip" data-placement="{{ tooltip_align }}"  data-title="{{ button_wishlist }}" onclick="wishlist.add('{{ product.product_id }}');"><span class="icon-heart"></span></a>
 
 </div> <!-- .icons-wrapper -->
-
-
     {% if product.options %}
         {% for option in product.options %}
             {% if option.type == 'radio' %}
