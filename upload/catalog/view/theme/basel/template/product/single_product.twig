@@ -27,16 +27,22 @@
 
 </div> <!-- .icons-wrapper -->
 
+
+    {% if product.options %}
+        {% for option in product.options %}
+            {% if option.type == 'radio' %}
     <div class="cp-sizes">
         <div class="cp-sizes-label">Dostupne veličine</div>
         <div class="cp-sizes-items">
-            <a href="https://amds.hr/hlace-z-k-crna-b21kzh56-proizvod-4680/#variationattribute46" class="cp-size">VB 36</a>
-            <a href="https://amds.hr/hlace-z-k-crna-b21kzh56-proizvod-4680/#variationattribute47" class="cp-size">VB 38</a>
-            <a href="https://amds.hr/hlace-z-k-crna-b21kzh56-proizvod-4680/#variationattribute48" class="cp-size">VB 40</a>
-            <a href="https://amds.hr/hlace-z-k-crna-b21kzh56-proizvod-4680/#variationattribute49" class="cp-size">VB 42</a>
+            {% for option_value in option.product_option_value %}
+            <a href="{{ product.href }}/#{{ option_value.name }}" class="cp-size">{{ option_value.name }}</a>
 
+            {% endfor %}
         </div>
     </div>
+            {% endif %}
+    {% endfor %}
+    {% endif %}
 </div><!-- .image ends -->
 <div class="caption">
 <a class="product-name" href="{{ product.href }}">{{ product.name }}</a>
