@@ -1,5 +1,5 @@
 {{ header }}
-<div class="container">
+<div class="container-fluid bglogin">
   <ul class="breadcrumb">
     {% for breadcrumb in breadcrumbs %}
     <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
@@ -17,13 +17,14 @@
     <div id="content" class="{{ class }} no-min-height">
     {{ content_top }}
       <h1 id="page-title">{{ heading_title }}</h1>
-      
+        <div class="wrapper">
       <div class="login-area">
       <div class="row">
       
         <div class="col-sm-6 left">
-            <h2><i class="icon-login"></i>{{ button_login }}</h2>
-			
+            <div class="a-col a-col1 a-login-col1">
+            <h3 class="mb-0 fs-24">Prijavite se</h3>
+                <p class="lead fs-16">Prijavite se putem emaila i lozinke.</p>
             {% if success %}
             <div class="alert alert-success"><i class="fa fa-check-circle"></i> {{ success }}</div>
             {% endif %}
@@ -41,24 +42,36 @@
                 <a href="{{ forgotten }}" class="label-link pull-right">{{ text_forgotten }}</a>
                 <input type="password" name="password" value="{{ password }}" placeholder="{{ entry_password }}" id="input-password" class="form-control" />
                 </div>
-              <input type="submit" value="{{ button_login }}" class="btn btn-outline btn-block" />
+              <input type="submit" value="{{ button_login }}" class="btn btn-amds btn-block" />
               {% if redirect %}
               <input type="hidden" name="redirect" value="{{ redirect }}" />
               {% endif %}
             </form>
+
+            </div>
         </div>
         
         <div class="col-sm-6 right">
-            <h2 class="lg">{{ text_new_customer }}</h2>
-            <div class="register-text">
-            <p class="margin-b20">{{ text_register_account }}</p>
-            <a href="{{ register }}" class="btn btn-primary">{{ button_continue }}</a>
+            <div class="a-col a-col2 a-login-col2">
+            <h3 class="lg white">Novi ste na amds.hr?</h3>
+
+                <p>Registracijom na amds.hr moći ćete brže i lakše kupovati, pratiti stanje svojih narudžbi te steći mnoge druge pogodnosti.</p>
+
+                <ul>
+                    <li>Brža i jednostavnija narudžba</li>
+                    <li>Bolje korištenje na više uređaja</li>
+                    <li>Posebne ponude</li>
+                </ul>
+
+
+
+            <a href="{{ register }}" class=" btn btn-amdswh ">Registracija</a>
             </div>
         </div>
         
       </div>
       </div>
-      
+        </div>
       {{ content_bottom }}</div>
     {{ column_right }}</div>
 </div>

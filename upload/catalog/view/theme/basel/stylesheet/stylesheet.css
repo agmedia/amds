@@ -69,6 +69,150 @@ body, .product-name.main-font, .gridlist .single-product .product-name, .gridlis
 	opacity: .6;
 }
 
+@media (min-width: 1300px) {
+
+	.account-login #footer {
+		margin-top: 0px;
+		padding-top: 0px;
+
+	}
+}
+
+.account-login #footer {
+	margin-top: 0px;
+	padding-top: 50px;
+
+}
+
+.account-login .breadcrumb-holder {
+
+	margin-bottom: 0px;
+
+}
+
+.fs-24{font-size:24px}
+.fs-16{font-size:16px}
+
+
+.btn-amds{
+	font-size: 16px!important;
+	color: #fff;
+	background: #040707;
+	text-decoration: none !important;
+	position: relative;
+	overflow: hidden;
+	font-weight: bold;
+	height: 59px;
+text-transform:unset!important;
+	transition: all .3s;
+	-webkit-backface-visibility: hidden;
+}
+
+.btn-amdswh{
+	font-size: 16px!important;
+	color: #fff;
+	background: #040707;
+	text-decoration: none !important;
+	position: relative;
+	overflow: hidden;
+	font-weight: bold;
+	height: 59px;
+	text-transform:unset!important;
+	transition: all .3s;
+	-webkit-backface-visibility: hidden;
+	width:100%;
+	padding: 16px 60px!important;
+	margin-top:30px
+
+}
+
+
+
+
+.btn-amds:hover, .btn-amdswh:hover {
+	color: #fff;
+	background: #333;
+}
+
+@media (min-width: 981px) {
+
+	.bglogin{
+
+		background: url('../../../../../image/bglogin.jpg') no-repeat;
+		background-position-x: 0%;
+		background-position-y: 0%;
+		background-size: auto;
+		background-size: cover;
+		background-position: top left;
+	}
+
+	.a-col1 {
+		height: 100%;
+		flex-shrink: 0;
+		background: #fff;
+		padding: 45px 70px 50px;
+		box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.2);
+	}
+
+
+	.a-col2 {
+		flex-grow: 1;
+		padding: 50px 0 50px 50px;
+		font-size: 16px;
+		line-height: 24px;
+		color: #fff;
+	}
+
+	.a-col2 h2, .a-col2 h3 {
+		font-size: 24px;
+		line-height: 28px;
+		font-weight: normal;
+		text-transform: none;
+		padding: 0 0 10px;
+		color: #fff;
+	}
+
+	.a-col2 ul li {
+		position: relative;
+		padding: 2px 0 2px 20px;
+	}
+
+	.a-col2 ul > li::before {
+		top: 12px;
+	}
+
+	.a-col2 ul li::before {
+		content: "";
+		position: absolute;
+		display: block;
+		width: 10px;
+		height: 3px;
+		background: #ececec;
+		top: 14px;
+		left: 0;
+	}
+
+	.btn-amdswh{
+		font-size: 16px!important;
+		color: #040707!important;
+		background: #fff!important;
+		text-decoration: none !important;
+		position: relative;
+		padding: 16px 60px!important;
+		overflow: hidden;
+		font-weight: bold;
+		height: 59px;
+		text-transform:unset!important;
+		transition: all .3s;
+		-webkit-backface-visibility: hidden;
+		border: 1px solid #ECECEC;
+		margin-top: 30px;
+		box-shadow: 0 10px 40px 0 rgba(0,0,0,0.2);
+
+	}
+
+}
+
 
 
 
@@ -7546,9 +7690,7 @@ justify-content: center;
 .login-area .col-sm-6 {
 	padding-bottom:30px;
 }
-.login-area .col-sm-6.right {
-	text-align:center;
-}
+
 .title_in_bc .login-area h2 {
 	font-size:2.43em;
 	margin-bottom:20px;
@@ -7572,15 +7714,7 @@ a.label-link:not(:hover) {
 	padding-left:40px;
 	padding-right:40px;
 }
-.login-area:before {
-	content:" ";
-	background:#e5e5e5;
-	width:1px;
-	position:absolute;
-	top:15px;
-	bottom:0;
-	left:50%;
-}
+
 .login-area .col-sm-6.left {
 	padding-right:60px;
 }
