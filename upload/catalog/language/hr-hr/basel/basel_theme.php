@@ -19,7 +19,7 @@ $_['basel_text_view_details'] 			= 'View Details';
 $_['basel_text_select_option'] 			= 'Select Options';
 
 // Live Search
-$_['basel_text_search']     			= 'Pretraga';
+$_['basel_text_search']     			= 'Pretraživanje...';
 $_['basel_text_view_all'] 				= 'Pogledaj sve rezultate ';
 $_['basel_text_no_result'] 				= 'Nema rezutata';
 $_['basel_text_category']     			= 'Sve kategorije';
