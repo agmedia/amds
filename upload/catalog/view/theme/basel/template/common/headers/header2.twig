@@ -67,17 +67,13 @@
         
         {% if header_search %}
         <div class="icon-element">
-        <div class="dropdown-wrapper-click from-top hidden-sx hidden-sm hidden-xs">
-        <a class="shortcut-wrapper search-trigger from-top clicker">
+        <div class=" from-top hidden-sx hidden-sm hidden-xs">
+        <a class="shortcut-wrapper  from-top clicker" data-toggle="modal" data-target="#modal-fullscreen">
         <i class="icon-magnifier icon"></i>
         </a>
-        <div class="dropdown-content dropdown-right">
-        <div class="search-dropdown-holder">
-        <div class="search-holder">
-        {{ basel_search }}
-        </div>
-        </div>
-        </div>
+
+
+
         </div>
         </div>
         {% endif %}
@@ -129,3 +125,31 @@
 </div> <!-- .sticky ends -->
 
 </div> <!-- .header_wrapper ends -->
+
+
+<!-- Modal Fullscreen -->
+<div class="modal fade modal-fullscreen" id="modal-fullscreen" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+
+        <div class="modal-content">
+            <div class="searchlogo">
+           <img src="{{ logo }}" title="{{ name }}" alt="{{ name }}" />
+            </div>
+            <div class="modal-body">
+
+
+                <div class="sw-wrapper">
+
+                        {{ basel_search }}
+
+
+                    <button type="button" href="javascript:;" data-dismiss="modal" class="sw-btn-close">Zatvori</button>
+
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+</div>
