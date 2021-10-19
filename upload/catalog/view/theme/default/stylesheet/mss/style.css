@@ -68,7 +68,7 @@
 	display: block;
 	text-align: center;
 	font-weight: bold;
-	padding: 5px 0;
+	padding: 10px 0;
 	border: 1px solid #ccc;
 	border-top: none;
 	border-bottom-left-radius: 3px;
@@ -77,7 +77,7 @@
 	background: #f8f8f8;
 }
 .msmart-search-live-filter .mss-button-more:hover{
-    color: #23a1d1;
+    color: #3e3e3e;
 }
 .msmart-search-live-filter .mss-header {
 	text-align: center;

@@ -1,5 +1,6 @@
 {{ header }}
 <div class="container">
+    <div class="wrapper wrapper-catalog">
   
   <ul class="breadcrumb">
     {% for breadcrumb in breadcrumbs %}
@@ -24,57 +25,6 @@
       <h1 id="page-title">{{ heading_title }}</h1>
       
       <legend>{{ entry_search }}</legend>
-          
-      <div class="row">
-        <div class="col-sm-6 margin-b10">
-          <input type="text" name="search" value="{{ search }}" placeholder="{{ text_keyword }}" id="input-search" class="form-control" />
-        </div>
-        <div class="col-sm-6 margin-b10">
-          <select name="category_id" class="form-control">
-            <option value="0">{{ text_category }}</option>
-            {% for category_1 in categories %}
-                {% if category_1.category_id == category_id %}
-                <option value="{{ category_1.category_id }}" selected="selected">{{ category_1.name }}</option>
-                {% else %}
-                <option value="{{ category_1.category_id }}">{{ category_1.name }}</option>
-                {% endif %}
-                {% for category_2 in category_1.children %}
-                    {% if category_2.category_id == category_id %}
-                    <option value="{{ category_2.category_id }}" selected="selected">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ category_2.name }}</option>
-                    {% else %}
-                    <option value="{{ category_2.category_id }}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ category_2.name }}</option>
-                    {% endif %}
-                        {% for category_3 in category_2.children %}
-                            {% if category_3.category_id == category_id %}
-                            <option value="{{ category_3.category_id }}" selected="selected">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ category_3.name }}</option>
-                            {% else %}
-                            <option value="{{ category_3.category_id }}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{ category_3.name }}</option>
-                            {% endif %}
-                        {% endfor %}
-                {% endfor %}
-            {% endfor %}
-          </select>
-        </div>
-        </div>
-        <div class="form-group">
-          
-        <label class="checkbox-inline">
-          {% if description %}
-          <input type="checkbox" name="description" value="1" id="description" checked="checked" />
-          {% else %}
-          <input type="checkbox" name="description" value="1" id="description" />
-          {% endif %}
-          {{ entry_description }}</label>
-       <label class="checkbox-inline">
-            {% if sub_category %}
-            <input type="checkbox" name="sub_category" value="1" checked="checked" />
-            {% else %}
-            <input type="checkbox" name="sub_category" value="1" />
-            {% endif %}
-            {{ text_sub_category }}</label>
-      </div>
-      
-      <input type="button" value="{{ button_search }}" id="button-search" class="btn btn-primary margin-b30" />
       
       {% if products %}
       <div id="product-view" class="grid">
@@ -141,7 +91,8 @@
       {{ content_bottom }}</div>
     {{ column_right }}</div>
 </div>
-<script>-->
+</div>
+<script>
 $('#button-search').bind('click', function() {
 	url = 'index.php?route=product/search';
 
@@ -187,5 +138,5 @@ $('select[name=\'category_id\']').on('change', function() {
 });
 
 $('select[name=\'category_id\']').trigger('change');
---></script>
+</script>
 {{ footer }}
