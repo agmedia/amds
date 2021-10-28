@@ -8,15 +8,10 @@
     {% endfor %}
   </ul>
   
-  <div class="row">{{ column_left }}
-    
-    {% if column_left and column_right %}
-    {% set class = 'col-sm-6' %}
-    {% elseif column_left or column_right %}
-    {% set class = 'col-md-9 col-sm-8' %}
-    {% else %}
+  <div class="row">
+
     {% set class = 'col-sm-12' %}
-    {% endif %}
+
     
     <div id="content" class="{{ class }}">
     
@@ -72,7 +67,7 @@
       
       </div>
       
-      <div class="grid-holder product-holder grid{{ basel_prod_grid }}">
+      <div class="grid-holder product-holder grid4">
         {% for product in products %}
         {% include 'basel/template/product/single_product.twig' %}
         {% endfor %}

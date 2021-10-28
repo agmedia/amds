@@ -1,5 +1,6 @@
 {{ header }}
 <div class="container">
+  <div class="wrapper">
   <ul class="breadcrumb">
     {% for breadcrumb in breadcrumbs %}
     <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
@@ -36,24 +37,13 @@
       <legend>{{ text_my_orders }}</legend>
       <ul class="list-unstyled margin-b30">
         <li><a href="{{ order }}">{{ text_order }}</a></li>
-        <li><a href="{{ download }}">{{ text_download }}</a></li>
-        {% if reward %}
-        <li><a href="{{ reward }}">{{ text_reward }}</a></li>
-        {% endif %}
+
+
         <li><a href="{{ return }}">{{ text_return }}</a></li>
-        <li><a href="{{ transaction }}">{{ text_transaction }}</a></li>
-        <li><a href="{{ recurring }}">{{ text_recurring }}</a></li>
+
       </ul>
 	  
-	  <legend>{{ text_my_affiliate }}</legend>
-      <ul class="list-unstyled margin-b30">
-        {% if not tracking %}
-        <li><a href="{{ affiliate }}">{{ text_affiliate_add }}</a></li>
-        {% else %}
-        <li><a href="{{ affiliate }}">{{ text_affiliate_edit }}</a></li>
-        <li><a href="{{ tracking }}">{{ text_tracking }}</a></li>
-        {% endif %}
-      </ul>
+
 	  
       <legend>{{ text_my_newsletter }}</legend>
       <ul class="list-unstyled margin-b30">
@@ -61,5 +51,6 @@
       </ul>
       {{ content_bottom }}</div>
     {{ column_right }}</div>
+</div>
 </div>
 {{ footer }} 

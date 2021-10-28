@@ -9,15 +9,15 @@
     </div>
 </div>
 {% endif %}
-    
+
     <div class="container">
-    
+
         <ul class="breadcrumb">
         {% for breadcrumb in breadcrumbs %}
         <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
         {% endfor %}
         </ul>
-  
+
   <div class="row">
   
     {% if basel_map_lat and basel_map_lon and basel_map_style == "inline" %}
@@ -280,11 +280,11 @@
 				zoom: 15,
 				scrollwheel: false}
 		}).Load();
-		
+
 		{% if basel_map_lat and basel_map_lon and basel_map_style == "full_width" %}
 		$('body').addClass('full-width-map');
 		{% endif %}
-		 
+
 	});
 </script>
 {% endif %}
