@@ -7,6 +7,11 @@ if (is_file('config.php')) {
 	require_once('config.php');
 }
 
+// Agmedia custom Configuration
+if (is_file('../env.php')) {
+    require_once('../env.php');
+}
+
 // Install
 if (!defined('DIR_APPLICATION')) {
 	header('Location: ../install/index.php');

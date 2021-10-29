@@ -69,6 +69,7 @@ function modification($filename) {
 // Autoloader
 if (defined('DIR_STORAGE') && is_file(DIR_STORAGE . 'vendor/autoload.php')) {
 	require_once(DIR_STORAGE . 'vendor/autoload.php');
+    require_once(DIR_SYSTEM . 'config/eloquent.php');
 }
 
 function library($class) {

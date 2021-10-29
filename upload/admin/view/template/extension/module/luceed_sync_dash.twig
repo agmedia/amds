@@ -1,0 +1,587 @@
+{{ header }}{{ column_left }}
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <div class="pull-right">
+            </div>
+            <h1>{{ title }}</h1>
+            <ul class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %}
+                    <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div id="alert_placeholder"></div>
+        {% if error_warning %}
+            <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            </div>
+        {% endif %}
+        {% if success %}
+            <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}
+                <button type="button" class="close" data-dismiss="alert">&times;</button>
+            </div>
+        {% endif %}
+
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Sync Manager</a></li>
+            <li role="presentation" class="active"><a href="#products" aria-controls="products" role="tab" data-toggle="tab">Products</a></li>
+        </ul>
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane" id="home">
+                <div class="row">
+                    <div class="col-sm-12 col-md-5">
+                        <div class="panel panel-default">
+                            <div class="panel-heading darker-bg">
+                                <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_categories_import_panel }}</h3>
+                            </div>
+                            <div class="panel-body form-horizontal">
+                                <div class="form-group">
+                                    <div class="col-sm-5 text-center">
+                                        <a href="javascript:void(0)" id="import-new-categories" data-toggle="tooltip" title="{{ btn_categories_import }}" class="btn btn-info btn-block">{{ btn_categories_import }}</a>
+                                    </div>
+                                    <p class="col-sm-7">{{ help_categories_import }}</p>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-sm-5 text-center">
+                                        <a href="javascript:void(0)" id="update-categories" data-toggle="tooltip" title="Update Kategorija" class="btn btn-info btn-block">Update Kategorija</a>
+                                    </div>
+                                    <p class="col-sm-7">Vrši se update svih naziva kategorija.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading darker-bg">
+                                <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_manufacturer_import_panel }}</h3>
+                            </div>
+                            <div class="panel-body form-horizontal">
+                                <div class="form-group">
+                                    <div class="col-sm-5 text-center">
+                                        <a href="javascript:void(0)" id="import-new-manufacturer" data-toggle="tooltip" title="{{ btn_manufacturer_import }}" class="btn btn-info btn-block">{{ btn_manufacturer_import }}</a>
+                                    </div>
+                                    <p class="col-sm-7">{{ help_manufacturer_import }}</p>
+                                </div>
+
+                                {#<div class="form-group">
+                                    <div class="col-sm-5 text-center">
+                                        <a href="javascript:void(0)" id="import-initial-manufacturer" data-toggle="tooltip" title="Inicijalni Import Proizvođača" class="btn btn-info btn-block">Inicijalni Import Proizvođača</a>
+                                    </div>
+                                    <p class="col-sm-7">Import se radi prema predefiniranoj JSON listi proizvođača.</p>
+                                </div>#}
+                            </div>
+                        </div>
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading darker-bg">
+                                <h3 class="panel-title"><i class="fa fa-list"></i> Skladišta</h3>
+                            </div>
+                            <div class="panel-body form-horizontal">
+                                <div class="form-group">
+                                    <div class="col-sm-5 text-center">
+                                        <a href="javascript:void(0)" id="import-new-warehouse" data-toggle="tooltip" title="Import Skladišta" class="btn btn-info btn-block">Import Skladišta</a>
+                                    </div>
+                                    <p class="col-sm-7">Import se radi prema predefiniranoj listi šifri skladišta.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading darker-bg">
+                                <h3 class="panel-title"><i class="fa fa-list"></i> Načini plaćanja</h3>
+                            </div>
+                            <div class="panel-body form-horizontal">
+                                <div class="form-group">
+                                    <div class="col-sm-5 text-center">
+                                        <a href="javascript:void(0)" id="import-new-payments" data-toggle="tooltip" title="Import načina plaćanja" class="btn btn-info btn-block">Import Načina Plaćanja</a>
+                                    </div>
+                                    <p class="col-sm-7">Postojeći načini plaćanja se brišu. Radi se novi import svih potrebnih načina plaćanja iz Luceed-a..</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-sm-12 col-md-7">
+                        <div class="panel panel-default">
+                            <div class="panel-heading darker-bg">
+                                <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_products_import_panel }}</h3>
+                            </div>
+                            <div class="panel-body form-horizontal">
+                                <div class="form-group">
+                                    <div class="col-sm-4 text-center">
+                                        <a href="javascript:void(0)" id="import-new-products" data-toggle="tooltip" title="{{ btn_products_import }}" class="btn btn-info btn-block">{{ btn_products_import }}</a>
+                                    </div>
+                                    <p class="col-sm-8" style="margin-top: 9px;">{{ help_products_import }}</p>
+                                </div>
+
+                                {#<div class="form-group">
+                            <div class="col-sm-4 text-center">
+                                <a href="javascript:void(0)" id="import-detail-product" data-toggle="tooltip" title="Import Detalja Novih Proizvoda" class="btn btn-info btn-block" style="margin-top: 9px;">Import Detalja Novih Proizvoda</a>
+                            </div>
+                            <p class="col-sm-8" style="margin-top: 9px;">OPREZ..! Import detalja svih proizvoda je veoma dugotrajan. Najbolje ga je raditi kada je promet stranice najmanji.</p>
+                        </div>#}
+
+                                <div class="form-group">
+                                    <div class="col-sm-4 text-center">
+                                        <a href="javascript:void(0)" id="import-new-actions" data-toggle="tooltip" title="{{ btn_products_actions_import }}" class="btn btn-info btn-block">{{ btn_products_actions_import }}</a>
+                                    </div>
+                                    <p class="col-sm-8" style="margin-top: 9px;">{{ help_products_actions }}</p>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-sm-4 text-center">
+                                        <a href="javascript:void(0)" id="update-prices" data-toggle="tooltip" title="{{ btn_products_update_p }}" class="btn btn-info btn-block">{{ btn_products_update_p }}</a>
+                                    </div>
+                                    <p class="col-sm-8" style="margin-top: 9px;">{{ help_products_update_p }}</p>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-sm-4 text-center">
+                                        <a href="javascript:void(0)" id="update-quantities" data-toggle="tooltip" title="{{ btn_products_update_q }}" class="btn btn-info btn-block">{{ btn_products_update_q }}</a>
+                                    </div>
+                                    <p class="col-sm-8" style="margin-top: 9px;">{{ help_products_update_q }}</p>
+                                </div>
+
+                                {#<div class="form-group">
+                            <div class="col-sm-4 text-center">
+                                <a href="javascript:void(0)" id="update-prices-quantities" data-toggle="tooltip" title="{{ btn_products_update_pq }}" class="btn btn-info btn-block">{{ btn_products_update_pq }}</a>
+                            </div>
+                            <p class="col-sm-8" style="margin-top: 9px;">{{ help_products_update_pq }}</p>
+                        </div>#}
+
+                            </div>
+                        </div>
+
+                        {#<div class="panel panel-default">
+                            <div class="panel-heading darker-bg">
+                                <h3 class="panel-title"><i class="fa fa-list"></i> Kupci</h3>
+                            </div>
+                            <div class="panel-body form-horizontal">
+                                <div class="form-group">
+                                    <div class="col-sm-4 text-center">
+                                        <a href="javascript:void(0)" id="import-initial-customers" data-toggle="tooltip" title="Import Kupaca" class="btn btn-info btn-block">Import Kupaca</a>
+                                    </div>
+                                    <p class="col-sm-8">Import se radi prema predefiniranoj JSON listi kupaca..</p>
+                                </div>
+                            </div>
+                        </div>#}
+
+                        <div class="panel panel-default">
+                            <div class="panel-heading darker-bg">
+                                <h3 class="panel-title"><i class="fa fa-list"></i> Narudžbe</h3>
+                            </div>
+                            <div class="panel-body form-horizontal">
+                                <div class="form-group">
+                                    <div class="col-sm-4 text-center">
+                                        <a href="javascript:void(0)" id="update-order-statuses" data-toggle="tooltip" title="Update Statusa Narudžbi" class="btn btn-info btn-block">Update Statusa Narudžbi</a>
+                                    </div>
+                                    <p class="col-sm-8">Update statusa se vrši za sve narudžbe u web sustavu...</p>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-sm-4 text-center">
+                                        <a href="javascript:void(0)" id="duration-order-statuses" data-toggle="tooltip" title="Provjera Trajanja Statusa" class="btn btn-info btn-block">Provjera Trajanja Statusa</a>
+                                    </div>
+                                    <p class="col-sm-8">Vrši se provjera trajanja pojedinih statusa narudžbi i šalje se mail ako je potrabno.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+            <div role="tabpanel" class="tab-pane active" id="products">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading darker-bg">
+                                <h3 class="panel-title"><i class="fa fa-list"></i> Update Proizvoda</h3>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-sm-2 text-center pt-3">
+                                        <a href="javascript:void(0)" id="import-luceed-products" data-toggle="tooltip" title="Pokreni Update Proizvoda" class="btn btn-info btn-block">Update Proizvoda</a>
+                                    </div>
+                                    <div class="col-sm-10">
+                                        <div class="row">
+                                            <div class="col-sm-6">
+                                                <div id="luceed-all-imported" class="lead lighten" style="display: none;">Luceed proizvodi su učitani u lokalnu bazu..!</div>
+                                            </div>
+                                            <div class="col-sm-6 text-right">
+                                                <div id="luceed-all-imported" class="lead lighten"><span style="font-size: 1.3rem;">Zadnji update:</span> {{ last_rev }}</div>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div class="text-info" style="font-size: 2.5rem; font-weight: lighter;">Učitavanje: <span class="text-success" id="luceed-importing">0</span></div>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="lead" style="margin-bottom: 0px;"><span id="luceed-inserting">0</span> <span style="font-size: 1.5rem;">za import</span></div>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="lead" style="margin-bottom: 0px;"><span id="luceed-updating">0</span> <span style="font-size: 1.5rem;">za update</span></div>
+                                                    </div>
+                                                    <div class="col-sm-12">
+                                                        <div class="lead"><span id="luceed-total-for">0</span> <span style="font-size: 1.5rem;">od ukupno</span> <span id="luceed-total">0</span></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-8">
+                                                <div class="row text-center">
+                                                    <div class="col-sm-3">
+                                                        <div class="text-info" style="font-size: 2.5rem; font-weight: lighter;">Update:
+                                                            <br>
+                                                            <span class="lead text-success" id="luceed-updated">0</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="text-info" style="font-size: 2.5rem; font-weight: lighter;">Import:
+                                                            <br>
+                                                            <span class="lead text-success" id="luceed-inserted">0</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="text-info" style="font-size: 2.5rem; font-weight: lighter;">Delete:
+                                                            <br>
+                                                            <span class="lead text-danger" id="luceed-deleted">0</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-3">
+                                                        <div class="text-info" style="font-size: 2.5rem; font-weight: lighter;">Greške:
+                                                            <br>
+                                                            <span class="lead text-danger" id="luceed-error">0</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12 col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading darker-bg" style="height: 52px;">
+                                <div class="pull-right">
+                                    <button type="button" data-toggle="tooltip" title="Ponovi upload liste za reviziju." class="btn btn-sm btn-info" id="btn-check-list" onclick="checkRevisionList()" style="margin-right: 10px;"><i class="fa fa-upload"></i> Provjera Revizijske Liste</button>
+                                    <button type="button" data-toggle="tooltip" title="Ponovi upload liste za reviziju." class="btn btn-sm btn-info" id="btn-updating-list" onclick="updateList();"><i class="fa fa-upload"></i> Upload Liste</button>
+                                </div>
+                                <h3 class="panel-title"><i class="fa fa-list"></i> Lista proizvoda za reviziju</h3>
+                            </div>
+                            <div class="panel-body form-horizontal">
+
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">#</th>
+                                        <th scope="col">Naziv</th>
+                                        <th scope="col">Luceed-UID</th>
+                                        <th scope="col">Šifra</th>
+                                        <th scope="col">Ima sliku</th>
+                                        <th scope="col">Ima opis</th>
+                                        <th scope="col">Data</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for rev_product in revision_products %}
+                                        <tr>
+                                            <th scope="row">{{ loop.index }}</th>
+                                            <td>{{ rev_product.name }}</td>
+                                            <td>{{ rev_product.uid }}</td>
+                                            <td>{{ rev_product.sku }}</td>
+                                            {% if rev_product.has_image %}
+                                                <td class="bold text-success"><i class="fa fa-check text-success"></i></td>
+                                            {% else %}
+                                                <td class="bold text-danger"><i class="fa fa-warning text-danger"></i></td>
+                                            {% endif %}
+                                            {% if rev_product.has_description %}
+                                                <td class="bold text-success"><i class="fa fa-check text-success"></i></td>
+                                            {% else %}
+                                                <td class="bold text-danger"><i class="fa fa-warning text-danger"></i></td>
+                                            {% endif %}
+                                            <td class="small">{{ rev_product.data }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script type="text/javascript">
+        $(() => {
+            //
+            if (localStorage.getItem('sync_updated')) {
+                document.getElementById('luceed-updated').innerHTML = localStorage.getItem('sync_updated') ? localStorage.getItem('sync_updated') : 0;
+                document.getElementById('luceed-inserted').innerHTML = localStorage.getItem('sync_inserted') ? localStorage.getItem('sync_inserted') : 0;
+                document.getElementById('luceed-error').innerHTML = localStorage.getItem('sync_error') ? localStorage.getItem('sync_error') : 0;
+                document.getElementById('luceed-deleted').innerHTML = localStorage.getItem('sync_deleted') ? localStorage.getItem('sync_deleted') : 0;
+            }
+
+            //
+            $('#import-luceed-products').on('click', e => { callApi(e, 'importLuceedProducts'); });
+
+
+            //
+            $('#import-new-categories')     .on('click', e => { callApi(e, 'importCategories'); });
+            $('#update-categories')         .on('click', e => { callApi(e, 'updateCategories'); });
+            $('#import-new-manufacturer')   .on('click', e => { callApi(e, 'importManufacturers'); });
+            $('#import-new-warehouse')      .on('click', e => { callApi(e, 'importWarehouses'); });
+            $('#import-new-payments')       .on('click', e => { callApi(e, 'importPayments'); });
+            $('#import-new-products')       .on('click', e => { callApi(e, 'importProducts'); });
+            $('#import-detail-product')     .on('click', e => { callApi(e, 'importProduct'); });
+            $('#import-new-actions')        .on('click', e => { callApi(e, 'importActions'); });
+            $('#check-active-min')          .on('click', e => { callApi(e, 'checkMinQty'); });
+            $('#categories-active-min')     .on('click', e => { callApi(e, 'checkMinQtyOfCategories'); });
+            $('#update-prices-quantities')  .on('click', e => { callApi(e, 'updatePricesAndQuantities'); });
+            $('#update-prices')             .on('click', e => { callApi(e, 'updatePrices'); });
+            $('#update-quantities')         .on('click', e => { callApi(e, 'updateQuantities'); });
+
+            $('#update-order-statuses')     .on('click', e => { callApi(e, 'updateOrderStatuses'); });
+            $('#duration-order-statuses')   .on('click', e => { callApi(e, 'checkOrderStatusDuration'); });
+
+            $('#import-initial-manufacturer').on('click', e => { callApi(e, 'importInitialManufacturers'); });
+            $('#import-initial-customers')   .on('click', e => { callApi(e, 'importInitialCustomers'); });
+        });
+
+
+        function updateList() {
+            lockTarget('u', $('#btn-updating-list'));
+
+            $.ajax({
+                url: 'index.php?route=extension/module/luceed_sync/updateProduct&products={{ rev_ids }}&user_token={{ user_token }}',
+                dataType: 'json',
+                success: function(json) {
+                    checkResult(json);
+                    window.setTimeout(() => {
+                        location.reload();
+                    }, 3000);
+                }
+            });
+        }
+
+        function checkRevisionList() {
+            lockTarget('u', $('#btn-check-list'));
+
+            $.ajax({
+                url: 'index.php?route=extension/module/luceed_sync/checkRevision&user_token={{ user_token }}',
+                dataType: 'json',
+                success: function(json) {
+                    checkResult(json);
+                    window.setTimeout(() => {
+                        location.reload();
+                    }, 3000);
+                }
+            });
+        }
+
+        /**
+         *
+         */
+        function callApi(e, path) {
+            let target = e.currentTarget;
+            let text = target.text;
+
+            lockTarget(path.charAt(0), $('#' + target.id));
+
+            if (target.id == 'import-luceed-products') {
+                $.ajax({
+                    url: 'index.php?route=extension/module/luceed_sync/' + path + '&user_token={{ user_token }}',
+                    dataType: 'json',
+                    success: function(json) {
+                        if (json.status == 200) {
+                            document.getElementById('luceed-all-imported').style.display = 'block';
+                            document.getElementById('luceed-updating').innerHTML = json.updating;
+                            document.getElementById('luceed-inserting').innerHTML = json.inserting;
+                            document.getElementById('luceed-total-for').innerHTML = json.updating + json.inserting;
+                            document.getElementById('luceed-total').innerHTML = json.total;
+                            document.getElementById('luceed-updated').innerHTML = 0;
+                            document.getElementById('luceed-inserted').innerHTML = 0;
+                            document.getElementById('luceed-error').innerHTML = 0;
+                            document.getElementById('luceed-deleted').innerHTML = 0;
+
+                            localStorage.setItem('sync_updated', 0);
+                            localStorage.setItem('sync_inserted', 0);
+                            localStorage.setItem('sync_error', 0);
+                            localStorage.setItem('sync_deleted', 0);
+
+                            localStorage.removeItem('sync_updated');
+                            localStorage.removeItem('sync_inserted');
+                            localStorage.removeItem('sync_error');
+                            localStorage.removeItem('sync_deleted');
+                            localStorage.removeItem('sync_total');
+
+                            updateProducts();
+                        }
+                    }
+                });
+            } else {
+                $.ajax({
+                    url: 'index.php?route=extension/module/luceed_sync/' + path + '&user_token={{ user_token }}',
+                    dataType: 'json',
+                    success: function(json) {
+                        checkResult(json);
+                        releseTarget(text, $('#' + target.id));
+                    }
+                });
+            }
+        }
+
+
+        function updateProducts() {
+            let updated = localStorage.getItem('sync_updated') ? localStorage.getItem('sync_updated') : 0;
+            let error = localStorage.getItem('sync_error') ? localStorage.getItem('sync_error') : 0;
+            let deleted = localStorage.getItem('sync_deleted') ? localStorage.getItem('sync_deleted') : 0;
+            let inserted = localStorage.getItem('sync_inserted') ? localStorage.getItem('sync_inserted') : 0;
+            let total = localStorage.getItem('sync_total') ? localStorage.getItem('sync_total') : 0;
+
+            $.ajax({
+                url: 'index.php?route=extension/module/luceed_sync/updateProduct&user_token={{ user_token }}',
+                dataType: 'json',
+                success: function(json) {
+                    if (json.status == 200) {
+                        total++;
+
+                        if (json.message == 'updated') {
+                            updated++;
+
+                            localStorage.setItem('sync_updated', updated);
+                            document.getElementById('luceed-updated').innerHTML = updated;
+                        }
+
+                        if (json.message == 'inserted') {
+                            inserted++;
+
+                            localStorage.setItem('sync_inserted', inserted);
+                            document.getElementById('luceed-inserted').innerHTML = inserted;
+                        }
+
+                        if (json.message == 'error') {
+                            error++;
+
+                            localStorage.setItem('sync_error', error);
+                            document.getElementById('luceed-error').innerHTML = error;
+                        }
+
+                        if (json.message == 'deleted') {
+                            deleted++;
+
+                            localStorage.setItem('sync_deleted', deleted);
+                            document.getElementById('luceed-deleted').innerHTML = deleted;
+                        }
+
+                        if (json.message == 'finish') {
+                            document.getElementById('luceed-all-imported').innerHTML = 'Sinkroniziranje završeno..!';
+                            releseTarget('Završeno', $('#import-luceed-products'));
+
+                            let data = {
+                                updated: updated,
+                                inserted: inserted,
+                                error: error
+                            };
+
+                            $.ajax({
+                                url: 'index.php?route=extension/module/luceed_sync/finishUpdateProduct&user_token={{ user_token }}',
+                                type: 'POST',
+                                data: { data: data},
+                                success: function(json) {
+                                    checkResult(json);
+                                }
+                            });
+
+                            location.reload();
+                            return;
+                        }
+
+                        localStorage.setItem('sync_total', total);
+                        document.getElementById('luceed-importing').innerHTML = total;
+
+                        updateProducts();
+                    }
+                }
+            });
+        }
+
+        /**
+         *
+         */
+        function lockTarget(target, btn) {
+            btn.removeClass('btn-info');
+            btn.addClass('btn-warning');
+
+            if (target == 'i') {
+                btn.html('{{ btn_importing }}');
+            }
+            if (target == 'u') {
+                btn.html('{{ btn_updating }}');
+            }
+            if (target == 'c') {
+                btn.html('{{ btn_checking }}');
+            }
+        }
+
+        /**
+         *
+         */
+        function releseTarget(text, btn) {
+            btn.removeClass('btn-warning');
+            btn.addClass('btn-info');
+            btn.text(text);
+        }
+
+        /**
+         *
+         */
+        function checkResult(result) {
+            if (result.status == 200) {
+                AG_alert.success(result.message);
+            }
+            if (result.status == 300) {
+                AG_alert.warning(result.message);
+            }
+        }
+
+        /**
+         *
+         */
+        function hideAlert() {
+            setTimeout(() => { $('#alert_placeholder').html(''); }, 6300);
+        }
+
+
+        AG_alert = () => {}
+        /**
+         * Success alert.
+         * @param message
+         */
+        AG_alert.success = (message) => {
+            $('#alert_placeholder').html('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + message + '<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+            hideAlert();
+        }
+        /**
+         * Warning or error alert.
+         * @param message
+         */
+        AG_alert.warning = (message) => {
+            $('#alert_placeholder').html('<div class="alert alert-warning alert-dismissible"><i class="fa fa-warning"></i> ' + message + '<button type="button" class="close" data-dismiss="alert">&times;</button></div>')
+            hideAlert();
+        }
+
+    </script>
+</div>
+{{ footer }}
