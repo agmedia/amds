@@ -1,1 +1,0 @@
-## Opencart illuminate/database package.
