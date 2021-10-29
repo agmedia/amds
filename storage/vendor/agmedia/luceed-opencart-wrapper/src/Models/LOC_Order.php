@@ -72,6 +72,11 @@ class LOC_Order
     private $discount;
 
     /**
+     * @var int
+     */
+    private $installments = 0;
+
+    /**
      * @var string
      */
     private $query_update_status = '';
@@ -92,6 +97,7 @@ class LOC_Order
         $this->oc_order = $order;
         $this->service  = new Luceed();
 
+        $this->checkInstallments();
         $this->resolveCouponDiscount();
     }
 
@@ -170,8 +176,8 @@ class LOC_Order
         $this->items_available = false;//$this->setAvailability();
 
         $this->order = [
-            'nalog_prodaje_b2b'         => $this->oc_order['order_id'],
-            'na_uvid'                   => $this->oc_order['order_id'] . '-' . Carbon::now()->year,
+            'nalog_prodaje_b2b'         => $this->oc_order['order_id']. '-' . Carbon::now()->year.'-web',
+            'narudzba'                   => $this->oc_order['order_id'] . '-' . Carbon::now()->year,
             'datum'                     => Carbon::make($this->oc_order['date_added'])->format(agconf('luceed.date')),
             'skladiste'                 => '001',
             'sa__skladiste'             => '001',
@@ -459,6 +465,21 @@ class LOC_Order
         return count($this->collection);
     }
 
+    /*******************************************************************************
+    *                                Copyright : AGmedia                           *
+    *                              email: filip@agmedia.hr                         *
+    *******************************************************************************/
+
+    /**
+     *
+     */
+    private function checkInstallments(): void
+    {
+        if ($this->oc_order['installment'] != '0000') {
+            $this->installments = (int) substr($this->oc_order['installment'], 0, 2);
+        }
+    }
+
 
     /**
      * Get order payment type UID.
@@ -509,20 +530,27 @@ class LOC_Order
         $order_products = OrderProduct::where('order_id', $this->oc_order['order_id'])->get();
 
         $this->log('$order_products', $order_products->toArray());
+        $this->log('$this->installments', $this->installments);
 
         if ($order_products->count()) {
             foreach ($order_products as $order_product) {
-                $price = $this->getItemPrices($order_product->product_id, $order_product->price);
+                /*$price = $this->getItemPrices($order_product->product_id, $order_product->price);
 
                 if ( ! $price['rabat']) {
                     $price['rabat'] = $this->applyCouponDiscount();
+                }*/
+
+                $price = $order_product->price;
+
+                if ($this->installments > 12) {
+                    $price = $order_product->price * 1.07;
                 }
 
                 $response[] = [
                     'artikl'   => $order_product->model,
-                    'kolicina' => isset($price['quantity']) ? $price['quantity'] : (int) $order_product->quantity,
-                    'cijena'   => (float) $price['cijena'],
-                    'rabat'    => (float) number_format($price['rabat'], 2),
+                    'kolicina' => (int) $order_product->quantity,
+                    'cijena'   => (float) number_format($price, 2, '.', ''),
+                    'rabat'    => 0 //(float) number_format($price['rabat'], 2),
                 ];
             }
         }
@@ -569,26 +597,7 @@ class LOC_Order
 
         if ($price < $product->price) {
             $cijena       = number_format($product->price, 2, '.', '');
-            $rabat        = (($price / $product->price) * 100) - 100;
-            $return_rabat = number_format((($price / $product->price) * 100 - 100), 2);
-
-            $B = [50, 75, 90];
-
-            if ($product->scale == 'B' && in_array($rabat, $B)) {
-                return [
-                    'cijena'   => $cijena,
-                    'rabat'    => 0,
-                    'quantity' => 1 - ($rabat / 100),
-                ];
-            }
-
-            if ($product->scale == 'C' && $rabat = 50) {
-                return [
-                    'cijena'   => $cijena,
-                    'rabat'    => 0,
-                    'quantity' => 1 - ($rabat / 100),
-                ];
-            }
+            $return_rabat = number_format((($price / $product->price) * 100 - 100), 4);
 
             return [
                 'cijena' => $cijena,

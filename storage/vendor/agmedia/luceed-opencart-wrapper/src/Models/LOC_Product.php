@@ -270,9 +270,10 @@ class LOC_Product
 
         foreach ($luceed_products as $product) {
             $product_array = ProductHelper::collectLuceedData($product);
-            $data = collect($product_array)->toJson();
+            $hash = ProductHelper::hashLuceedData($product_array);
+            //$data = collect($product_array)->toJson();
 
-            $query_str .= '("' . $product->artikl_uid . '", "' . $product->artikl . '", "' . base64_encode(serialize($product_array)) . '", "' . sha1($data) . '"),';
+            $query_str .= '("' . $product->artikl_uid . '", "' . $product->artikl . '", "' . base64_encode(serialize($product_array)) . '", "' . $hash . '"),';
 
             $count++;
         }
@@ -322,10 +323,13 @@ class LOC_Product
     }
 
 
+    /**
+     * @return mixed
+     */
     public function checkRevisionTable()
     {
         $db = new Database(DB_DATABASE);
-        $descriptions = ProductDescription::where('description', '')->orWhere('description', '=')->pluck('product_id');
+        $descriptions = ProductDescription::where('description', '')->where('description', 'NOT LIKE', '% ')->pluck('product_id');
         $images = Product::where('image', '')->orWhere('image', 'catalog/products/no-image.jpg')->pluck('product_id');
         $insert = [];
 

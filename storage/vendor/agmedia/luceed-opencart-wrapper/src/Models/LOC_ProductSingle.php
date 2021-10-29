@@ -103,15 +103,21 @@ class LOC_ProductSingle
     /**
      * @param \stdClass $product
      */
-    public function setForUpdate(array $product)
+    public function setForUpdate(\stdClass $product = null)
     {
-        $this->hash = sha1(collect($product)->toJson());
-        $this->product_to_update = Product::where('luceed_uid', $product['artikl_uid'])->first();
+        $product_array = $this->product;
+
+        if ($product) {
+            $product_array = ProductHelper::collectLuceedData($product);
+        }
+
+        $this->hash = ProductHelper::hashLuceedData($product_array);
+        $this->product_to_update = Product::where('luceed_uid', $product_array['artikl_uid'])->first();
 
         if ($this->product_to_update) {
-            $this->product = collect($product);
+            $this->product = collect($product_array);
         } else {
-            $this->product_to_insert = collect($product);
+            $this->product_to_insert = collect($product_array);
         }
 
         return $this;
@@ -461,12 +467,16 @@ class LOC_ProductSingle
      *
      * @param $products
      *
-     * @return array
+     * @return array|\stdClass
      */
-    private function setProduct($product): array
+    private function setProduct($product)
     {
         $prods = json_decode($product);
 
-        return $prods->result[0]->artikli[0];
+        if (is_array($prods->result[0]->artikli[0])) {
+            return $prods->result[0]->artikli[0];
+        }
+
+        return collect($prods->result[0]->artikli[0])->toArray();
     }
 }

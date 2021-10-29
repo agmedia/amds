@@ -78,13 +78,15 @@ class LOC_Places
      */
     public function find(string $request = '', string $target = 'cityname')
     {
+        $second_target = ($target == 'cityname') ? 'zipcode' : 'cityname';
         if ($request != '') {
-            $this->places = $this->places->filter(function ($item) use ($request, $target) {
+            $this->places = $this->places->sortBy($second_target)->filter(function ($item) use ($request, $target) {
                 return stripos($item[$target], $request) !== false;
             });
         }
 
         return $this;
+
     }
 
 

@@ -104,7 +104,7 @@ class LOC_Action
         $manufacturers = collect();
 
         foreach ($action->stavke as $item) {
-            if ($item->grupa_artikla && $item->mpc_rabat) {
+            if ($item->grupa_artikla && ! is_null($item->mpc_rabat)) {
 
                 if ($categories->has($item->grupa_artikla)) {
                     if ($item->grupa_artikla > $categories[$item->grupa_artikla]) {
@@ -115,7 +115,7 @@ class LOC_Action
                 }
             }
 
-            if ($item->robna_marka && $item->mpc_rabat) {
+            if ($item->robna_marka && ! is_null($item->mpc_rabat)) {
                 if ($manufacturers->has($item->robna_marka)) {
                     if ($item->robna_marka > $manufacturers[$item->robna_marka]) {
                         $manufacturers->put($item->robna_marka, $item->mpc_rabat);
@@ -229,8 +229,12 @@ class LOC_Action
             if ($category) {
                 foreach ($action->stavke as $item) {
                     $item->category = $category;
-                    $item->start = $action->start_date;
-                    $item->end = $action->end_date;
+
+                    $start_time = $this->checkTime($action->start_time);
+                    $end_time = $this->checkTime($action->end_time);
+
+                    $item->start = $action->start_date . ' ' . $start_time;
+                    $item->end = $action->end_date . ' ' . $end_time;
 
                     $specials->push($item);
                 }
@@ -248,10 +252,10 @@ class LOC_Action
             }
 
             if ($product && $mpc) {
-                $start = Carbon::createFromFormat('d.m.Y', $item->first()->start)->format('Y-m-d');
-                $end   = Carbon::createFromFormat('d.m.Y', $item->first()->end)->format('Y-m-d');
+                $start = Carbon::createFromFormat('d.m.Y H:i:s', $item->first()->start)->format('Y-m-d H:i:s');
+                $end   = Carbon::createFromFormat('d.m.Y H:i:s', $item->first()->end)->format('Y-m-d H:i:s');
 
-                $end = date('Y-m-d', strtotime("+1 day", strtotime($end)));
+                //$end = date('Y-m-d', strtotime("+1 day", strtotime($end)));
 
                 $this->insert_query .= '(' . $product->product_id . ', 1, 0, ' . $mpc . ', "' . $start . '", "' . $end . '"),';
                 $this->insert_query_category .= '(' . $product->product_id . ',' . $item->first()->category . '),';
@@ -323,6 +327,21 @@ class LOC_Action
 
 
     /**
+     * @param string $time
+     *
+     * @return string
+     */
+    private function checkTime(string $time): string
+    {
+        if (substr($time, 0, 1) == '0') {
+            return '00:00:01';
+        }
+
+        return $time;
+    }
+
+
+    /**
      * Return the corrected response from luceed service.
      * Without unnecessary tags.
      *
@@ -383,6 +402,10 @@ class LOC_Action
      */
     private function calculateDiscountPrice(float $price, int $discount)
     {
+        if ( ! $discount) {
+            return $price;
+        }
+
         return $price - ($price * ($discount / 100));
     }
 }

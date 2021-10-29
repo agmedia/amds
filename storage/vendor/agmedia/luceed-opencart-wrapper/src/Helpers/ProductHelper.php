@@ -92,17 +92,11 @@ class ProductHelper
      */
     public static function getDescription(Collection $product, $old_description = null): array
     {
-        Log::store('getDescription:: 3.01', 'product');
         // Check if description exist.
         //If not add title for description.
         $naziv = $product['naziv'];
         $description = static::setDescription($product['opis']);
         $spec = static::setDescription($product['specifikacija']);
-
-        Log::store('3.02', 'product');
-        /*if ( ! $product['opis']) {
-            $description = $naziv;
-        }*/
 
         if ($old_description) {
             if ( ! $old_description['update_name']) {
@@ -112,8 +106,6 @@ class ProductHelper
                 $description = $old_description['description'];
             }
         }
-
-        Log::store('3.03', 'product');
 
         $response[agconf('import.default_language')] = [
             'name'              => $naziv,
@@ -128,8 +120,6 @@ class ProductHelper
             'meta_keyword'      => $naziv,
         ];
 
-        Log::store('3.04', 'product');
-
         return $response;
     }
 
@@ -139,18 +129,12 @@ class ProductHelper
      */
     public static function getAttributes(Collection $product): array
     {
-        Log::store('getAttributes:: 3.21.', 'product');
-
         $response   = [];
         $attributes = collect($product['atributi']);
-
-        Log::store('3.22.', 'product');
 
         foreach ($attributes as $attribute) {
             $attribute = collect($attribute);
             if (static::checkAttributeForImport($attribute)) {
-                Log::store('3.22.', 'product');
-
                 $has = Attribute::where('luceed_uid', $attribute['atribut_uid'])->first();
 
                 if ($has && $has->count()) {
@@ -158,8 +142,6 @@ class ProductHelper
                 } else {
                     $id = static::makeAttribute($attribute);
                 }
-
-                Log::store('3.23.', 'product');
 
                 if ($id) {
                     $response[] = [
@@ -173,8 +155,6 @@ class ProductHelper
                 }
             }
         }
-
-        Log::store('3.24.', 'product');
 
         return $response;
     }
@@ -202,10 +182,10 @@ class ProductHelper
      *
      * @return string
      */
-    public static function getImagePath($product, string $naziv): string
+    public static function getImagePath($product, string $naziv, string $uid): string
     {
         if ($product) {
-            $image_path = agconf('import.image_path');
+            $image_path = agconf('import.image_path') . $uid . '/';
             // Check if the image path exist.
             // Create it if not.
             if ( ! is_dir(DIR_IMAGE . $image_path)) {
@@ -257,23 +237,6 @@ class ProductHelper
         $docs  = collect($product['dokumenti']);
 
         if ($docs->count()) {
-            /*for ($i = 0; $i < $docs->count(); $i++) {
-                if (isset($product['dokumenti'][$i]['filename']) && substr($product['dokumenti'][$i]['filename'], -3) == 'pdf') {
-                    if (isset($product['dokumenti'][$i]['file_uid'])) {
-                        $uid = $product['dokumenti'][$i]['file_uid'];
-                    } else {
-                        $uid = $product['dokumenti'][$i]['file_uid'];
-                    }
-
-                    $response[] = [
-                        'uid'        => $uid,
-                        'image'      => static::getImagePath($product, $i),
-                        'sort_order' => $i
-                    ];
-                }
-            }*/
-
-            $count = 0;
             foreach ($docs as $doc) {
                 $doc = collect($doc)->toArray();
 
@@ -286,12 +249,11 @@ class ProductHelper
 
                     $response[] = [
                         'uid'        => $uid,
-                        'image'      => static::getImagePath($doc, $product['naziv']),
-                        'sort_order' => $count
+                        'md5'        => $doc['md5'],
+                        'image'      => static::getImagePath($doc, $product['naziv'], $product['artikl_uid']),
+                        'sort_order' => isset($doc['redoslijed']) ? $doc['redoslijed'] : 0
                     ];
                 }
-
-                $count++;
             }
         }
 
@@ -355,6 +317,21 @@ class ProductHelper
             'atributi' => $atributi,
             'dokumenti' => $dokumenti,
         ];
+    }
+
+
+    /**
+     * @param array $product
+     *
+     * @return string
+     */
+    public static function hashLuceedData(array $product): string
+    {
+        unset($product['stanje_kol']);
+
+        return sha1(
+            collect($product)->toJson()
+        );
     }
 
 
