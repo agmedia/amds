@@ -13,6 +13,11 @@ class Order extends Model
      * @var string
      */
     protected $table = 'order';
+
+    /**
+     * @var bool
+     */
+    public $timestamps = false;
     
     /**
      * @var string

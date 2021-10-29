@@ -4,6 +4,8 @@
 namespace Agmedia\Models\Category;
 
 
+use Agmedia\Models\Product\Product;
+use Agmedia\Models\Product\ProductCategory;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 
@@ -45,6 +47,12 @@ class Category extends Model
     public function description($language_id)
     {
         return $this->hasOne(CategoryDescription::class, 'category_id', 'category_id')->where('language_id', $language_id);
+    }
+
+
+    public function products()
+    {
+        return $this->hasManyThrough(Product::class, ProductCategory::class, 'product_id', 'product_id', 'category_id', 'category_id');
     }
     
     /**

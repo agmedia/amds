@@ -18,6 +18,11 @@ class Customer extends Model
      * @var string
      */
     protected $primaryKey = 'customer_id';
+
+    /**
+     * @var bool
+     */
+    public $timestamps = false;
     
     /**
      * @var array
