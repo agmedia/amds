@@ -66,5 +66,3 @@
 # Custom
 /upload/env.php/upload/image/catalog/
 /upload/test_api.php
-/storage/vendor/*
-!/storage/vendor/agmedia/*
