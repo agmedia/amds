@@ -1,0 +1,34 @@
+{
+    "result": [
+        {
+            "artikli_dobavljaci": [
+                {
+                    "sifra": "D1551030",
+                    "naziv": null,
+                    "dobavljac_info": null,
+                    "main": "N",
+                    "dobavljac_stanje": 0,
+                    "dobavljac_nc": 15.5,
+                    "dobavljac_valuta": "EUR",
+                    "sifra_dobavljac": "01933",
+                    "naziv_dobavljaca": "VOXX Electronics GmbH",
+                    "sifra_artikla": "8999120827",
+                    "naziv_artikla": "360Fly Handlebar Mount nosa\u010D za kameru"
+                },
+                {
+                    "sifra": null,
+                    "naziv": null,
+                    "dobavljac_info": null,
+                    "main": "D",
+                    "dobavljac_stanje": 0,
+                    "dobavljac_nc": 0,
+                    "dobavljac_valuta": null,
+                    "sifra_dobavljac": "FOCUS",
+                    "naziv_dobavljaca": "FOCUS - dobavlja\u010D za web",
+                    "sifra_artikla": "8999120827",
+                    "naziv_artikla": "360Fly Handlebar Mount nosa\u010D za kameru"
+                }
+            ]
+        }
+    ]
+}

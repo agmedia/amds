@@ -60,13 +60,13 @@ class ControllerExtensionModuleLuceedSync extends Controller
     public function index()
     {
         $this->load->language('extension/module/luceed_sync');
-
+        
         $this->document->setTitle($this->language->get('heading_title'));
 
         $data['revision_products'] = LuceedProductForRevision::with('product')->get();
         $data['rev_ids']           = $data['revision_products']->pluck('sku')->take(200)->flatten();
         $last_rev                  = LuceedProductForRevisionData::orderBy('last_revision_date', 'desc')->first();
-
+        
         $data['last_rev'] = 'Nepoznato';
         if ($last_rev) {
             $data['last_rev'] = Carbon::make($last_rev->last_revision_date)->diffForHumans();

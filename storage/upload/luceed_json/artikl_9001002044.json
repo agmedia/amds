@@ -1,0 +1,96 @@
+{
+  "result": [
+    {
+      "artikli": [
+        {
+          "artikl_uid": "148398-1063",
+          "artikl": "9001002044",
+          "naziv": "Dron DJI Mavic Mini Fly More Combo",
+          "naziv_kratki": null,
+          "barcode": "6958265192784",
+          "jm": "kom",
+          "opis": "\r\nDron DJI Mavic Mini Fly More Combo\r\n\r\nIzuzetno lagan 249 g \r\nVrijeme leta 30 min. \r\n- HD Video Prijenos 2 km \r\n- Senzor vida + GPS Precizno lebdjenje \r\n- 3-osna Gimbal 2.7K kamera \r\n- Pojednostavljeno snimanje i ure\u0111ivanje\r\n\r\n",
+          "pakiranje": null,
+          "vpc": 2479.2,
+          "mpc": 3099,
+          "enabled": "D",
+          "usluga": "N",
+          "eol": "N",
+          "webshop": "D",
+          "specifikacija": null,
+          "kataloski_broj": "CP.MA.00000124.01",
+          "deklaracija": null,
+          "redoslijed": "ICECAT=NOTFOUND",
+          "upozorenje": null,
+          "stopa_pdv": 25,
+          "nadgrupa_artikla": "336516",
+          "nadgrupa_artikla_naziv": "GADGETI",
+          "grupa_artikla": "412010",
+          "grupa_artikla_naziv": "Dronovi",
+          "robna_marka": "10100457",
+          "robna_marka_naziv": "DJI",
+          "boja": null,
+          "boja_naziv": null,
+          "jamstvo": "720",
+          "jamstvo_naziv": "2 godine",
+          "stanje_kol": 0,
+          "raspolozivo_kol": 0,
+          "stanje": "N",
+          "raspolozivo": "N",
+          "atributi": [],
+          "dokumenti": [
+            {
+              "file_uid": "103917-1063",
+              "naziv": null,
+              "filename": "combo.jpg",
+              "opis": null,
+              "redoslijed": null,
+              "md5": "5cd8d234677d74631509cd7d4d014627"
+            },
+            {
+              "file_uid": "103918-1063",
+              "naziv": null,
+              "filename": "photo-1_1.jpg",
+              "opis": null,
+              "redoslijed": null,
+              "md5": "c70712235eb41ec816a65f4afa1f456f"
+            },
+            {
+              "file_uid": "103919-1063",
+              "naziv": null,
+              "filename": "photo-2_1.jpg",
+              "opis": null,
+              "redoslijed": null,
+              "md5": "c11494031a0075f03dc41c31f3b0ff26"
+            },
+            {
+              "file_uid": "103920-1063",
+              "naziv": null,
+              "filename": "photo-3_1.jpg",
+              "opis": null,
+              "redoslijed": null,
+              "md5": "351994693619b3075e5b31a8522d6459"
+            },
+            {
+              "file_uid": "103921-1063",
+              "naziv": null,
+              "filename": "photo-5_1.jpg",
+              "opis": null,
+              "redoslijed": null,
+              "md5": "452ccc91bada612363c6584c83d0dfeb"
+            },
+            {
+              "file_uid": "103922-1063",
+              "naziv": null,
+              "filename": "Screenshot_1.jpg",
+              "opis": null,
+              "redoslijed": null,
+              "md5": "aba08aa4661d7b186efc8888c6e8a53d"
+            }
+          ],
+          "jezici": []
+        }
+      ]
+    }
+  ]
+}

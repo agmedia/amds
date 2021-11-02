@@ -1,0 +1,68 @@
+{
+  "result": [
+    {
+      "artikli": [
+        {
+          "artikl_uid": "1346-1063",
+          "artikl": "0730161301",
+          "naziv": "2N1613                               ",
+          "naziv_kratki": null,
+          "barcode": "",
+          "jm": "kom",
+          "opis": null,
+          "pakiranje": 0,
+          "vpc": 3.28,
+          "mpc": 4.06,
+          "enabled": "D",
+          "usluga": "N",
+          "eol": "D",
+          "webshop": "D",
+          "specifikacija": null,
+          "kataloski_broj": null,
+          "deklaracija": null,
+          "redoslijed": null,
+          "upozorenje": null,
+          "stopa_pdv": 25,
+          "nadgrupa_artikla": "130000",
+          "nadgrupa_artikla_naziv": "ELEKTRONI\u010CKE KOMPONENTE",
+          "grupa_artikla": "130534",
+          "grupa_artikla_naziv": "Tranzistori, tiristori i triaci",
+          "robna_marka": "10100291",
+          "robna_marka_naziv": "Razno",
+          "boja": null,
+          "boja_naziv": null,
+          "jamstvo": null,
+          "jamstvo_naziv": null,
+          "stanje_kol": 0,
+          "raspolozivo_kol": 0,
+          "stanje": "N",
+          "raspolozivo": "N",
+          "atributi": [
+            {
+              "atribut": null,
+              "atribut_uid": "31-1063",
+              "b2b_atribut": null,
+              "naziv": "Tip",
+              "atribut_tip": "Tekst",
+              "aktivan": "D",
+              "redoslijed": 1,
+              "vidljiv": "D",
+              "vrijednost": "2N"
+            }
+          ],
+          "dokumenti": [
+            {
+              "file_uid": "6369-1063",
+              "naziv": null,
+              "filename": "0730161301.jpg",
+              "opis": null,
+              "redoslijed": null,
+              "md5": "0a6b68760fa5ebad1fdca9f9da8f8b3c"
+            }
+          ],
+          "jezici": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,143 @@
+{
+    "result": [
+      {
+        "vrsta_placanja": [
+          {
+            "vrsta_placanja_uid": "1-1063",
+            "naziv": "GOTOVINA",
+            "fiskalna_oznaka": "G"
+          },
+          {
+            "vrsta_placanja_uid": "5-1063",
+            "naziv": "VIRMAN MP",
+            "fiskalna_oznaka": "T"
+          },
+          {
+            "vrsta_placanja_uid": "38-1063",
+            "naziv": "Predra\u010Dun\/ponuda VP",
+            "fiskalna_oznaka": "T"
+          },
+          {
+            "vrsta_placanja_uid": "40-1063",
+            "naziv": "Kompenzacija",
+            "fiskalna_oznaka": "O"
+          },
+          {
+            "vrsta_placanja_uid": "70-1063",
+            "naziv": "AMERICAN CARD",
+            "fiskalna_oznaka": "K"
+          },
+          {
+            "vrsta_placanja_uid": "73-1063",
+            "naziv": "AMEX RATE",
+            "fiskalna_oznaka": "K"
+          },
+          {
+            "vrsta_placanja_uid": "74-1063",
+            "naziv": "DINERS",
+            "fiskalna_oznaka": "K"
+          },
+          {
+            "vrsta_placanja_uid": "75-1063",
+            "naziv": "DINERS RATE",
+            "fiskalna_oznaka": "K"
+          },
+          {
+            "vrsta_placanja_uid": "76-1063",
+            "naziv": "MAESTRO RATE",
+            "fiskalna_oznaka": "K"
+          },
+          {
+            "vrsta_placanja_uid": "77-1063",
+            "naziv": "MAESTRO",
+            "fiskalna_oznaka": "K"
+          },
+          {
+            "vrsta_placanja_uid": "78-1063",
+            "naziv": "MASTERCARD",
+            "fiskalna_oznaka": "K"
+          },
+          {
+            "vrsta_placanja_uid": "80-1063",
+            "naziv": "VISA",
+            "fiskalna_oznaka": "K"
+          },
+          {
+            "vrsta_placanja_uid": "81-1063",
+            "naziv": "VISA RATE",
+            "fiskalna_oznaka": "K"
+          },
+          {
+            "vrsta_placanja_uid": "82-1063",
+            "naziv": "MASTERCARD RATE",
+            "fiskalna_oznaka": "K"
+          },
+          {
+            "vrsta_placanja_uid": "83-1063",
+            "naziv": "UGOVOR PBZ",
+            "fiskalna_oznaka": "K"
+          },
+          {
+            "vrsta_placanja_uid": "84-1063",
+            "naziv": "UGOVOR ZABA",
+            "fiskalna_oznaka": "K"
+          },
+          {
+            "vrsta_placanja_uid": "85-1063",
+            "naziv": "UGOVOR STB",
+            "fiskalna_oznaka": "K"
+          },
+          {
+            "vrsta_placanja_uid": "87-1063",
+            "naziv": "GOTOVINA VP",
+            "fiskalna_oznaka": "G"
+          },
+          {
+            "vrsta_placanja_uid": "88-1063",
+            "naziv": "Kartice ",
+            "fiskalna_oznaka": "K"
+          },
+          {
+            "vrsta_placanja_uid": "96-1063",
+            "naziv": "Virman",
+            "fiskalna_oznaka": "T"
+          },
+          {
+            "vrsta_placanja_uid": "97-1063",
+            "naziv": "T\/T",
+            "fiskalna_oznaka": "T"
+          },
+          {
+            "vrsta_placanja_uid": "104-1063",
+            "naziv": "MUP RATE - OBUSTAVA",
+            "fiskalna_oznaka": "O"
+          },
+          {
+            "vrsta_placanja_uid": "105-1063",
+            "naziv": "PREDRA\u010CUN\/PONUDA MP",
+            "fiskalna_oznaka": "T"
+          },
+          {
+            "vrsta_placanja_uid": "106-1063",
+            "naziv": "Po ugovoru",
+            "fiskalna_oznaka": "T"
+          },
+          {
+            "vrsta_placanja_uid": "107-1063",
+            "naziv": "SINDIKAT MED. SESTARA - OBUSTAVA",
+            "fiskalna_oznaka": "O"
+          },
+          {
+            "vrsta_placanja_uid": "108-1063",
+            "naziv": "GLS POUZE\u0106E",
+            "fiskalna_oznaka": "T"
+          },
+          {
+            "vrsta_placanja_uid": "109-1063",
+            "naziv": "POUZE\u0106E DOSTAVNOM SLU\u017DBOM",
+            "fiskalna_oznaka": "T"
+          }
+        ]
+      }
+    ]
+  }

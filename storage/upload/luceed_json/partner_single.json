@@ -1,0 +1,46 @@
+{
+    "result": [
+        {
+            "partner": [
+                {
+                    "partner_uid": "61259-2987",
+                    "b2b_partner": null,
+                    "partner": "85832",
+                    "naziv": "Sana delikatese d.o.o.",
+                    "ime": "",
+                    "prezime": "",
+                    "enabled": "D",
+                    "tip_komitenta": "P",
+                    "mobitel": null,
+                    "adresa": "Dravska 17",
+                    "oib": "99472149338",
+                    "pdv_broj": null,
+                    "telefon": null,
+                    "mjesto_uid": "734-2987",
+                    "mjesto": "48000",
+                    "naziv_mjesta": "Koprivnica",
+                    "postanski_broj": "48000",
+                    "b2b_mjesto": null,
+                    "drzava_uid": "1-2987",
+                    "drzava": "HR",
+                    "naziv_drzave": "Hrvatska",
+                    "b2b_drzava": null,
+                    "b2b_valuta": null,
+                    "e_mail": null,
+                    "napomena": null,
+                    "tip_cijene": "V",
+                    "spol": null,
+                    "grupacija_uid": null,
+                    "grupacija": null,
+                    "parent__partner_uid": null,
+                    "parent__partner": null,
+                    "parent__partner_b2b": null,
+                    "grupa_mjesta_uid": "6-2987",
+                    "grupa_mjesta": "48",
+                    "naziv_grupe_mjesta": "KOPRIVNI\u010CKO-KRI\u017DEVA\u010CKA",
+                    "atributi": []
+                }
+            ]
+        }
+    ]
+}

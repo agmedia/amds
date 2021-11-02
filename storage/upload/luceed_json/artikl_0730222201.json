@@ -1,0 +1,68 @@
+{
+  "result": [
+    {
+      "artikli": [
+        {
+          "artikl_uid": "1355-1063",
+          "artikl": "0730222201",
+          "naziv": "2N2222A = BSS40...41, BSW61...64, 2N4014",
+          "naziv_kratki": null,
+          "barcode": "y",
+          "jm": "kom",
+          "opis": "SI-N UNI 60V 0,8A >250MHZ B>100",
+          "pakiranje": 0,
+          "vpc": 4.02,
+          "mpc": 5.04,
+          "enabled": "D",
+          "usluga": "N",
+          "eol": "N",
+          "webshop": "D",
+          "specifikacija": null,
+          "kataloski_broj": "y",
+          "deklaracija": null,
+          "redoslijed": "ICECAT=NOTFOUND",
+          "upozorenje": null,
+          "stopa_pdv": 25,
+          "nadgrupa_artikla": "130000",
+          "nadgrupa_artikla_naziv": "ELEKTRONI\u010CKE KOMPONENTE",
+          "grupa_artikla": "130534",
+          "grupa_artikla_naziv": "Tranzistori, tiristori i triaci",
+          "robna_marka": "10100291",
+          "robna_marka_naziv": "Razno",
+          "boja": null,
+          "boja_naziv": null,
+          "jamstvo": "0",
+          "jamstvo_naziv": "0",
+          "stanje_kol": 433,
+          "raspolozivo_kol": 431,
+          "stanje": "D",
+          "raspolozivo": "D",
+          "atributi": [
+            {
+              "atribut": null,
+              "atribut_uid": "31-1063",
+              "b2b_atribut": null,
+              "naziv": "Tip",
+              "atribut_tip": "Tekst",
+              "aktivan": "D",
+              "redoslijed": 1,
+              "vidljiv": "D",
+              "vrijednost": "2N"
+            }
+          ],
+          "dokumenti": [
+            {
+              "file_uid": "6375-1063",
+              "naziv": null,
+              "filename": "0730222201.jpg",
+              "opis": null,
+              "redoslijed": null,
+              "md5": "0a6b68760fa5ebad1fdca9f9da8f8b3c"
+            }
+          ],
+          "jezici": []
+        }
+      ]
+    }
+  ]
+}
