@@ -37,10 +37,10 @@ class ProductHelper
     {
         $lc = new LOC_Category();
         $response = [0 => agconf('import.default_category')];
-        $actual   = Category::where('luceed_uid', $product['grupa_artikla'])->first();
+        $actual   = Category::where('luceed_uid', $product['spol'] . '-' . $product['grupa_artikla'])->first();
 
         if ( ! $actual) {
-            $parent = Category::where('luceed_uid', $product['nadgrupa_artikla'])->first();
+            $parent = Category::where('luceed_uid', $product['spol'] . '-' . $product['nadgrupa_artikla'])->first();
 
             if ( ! $parent) {
                 $main = Category::where('luceed_uid', $product['spol_uid'])->first();
@@ -55,7 +55,7 @@ class ProductHelper
                 }
 
                 $parent_category = [];
-                $parent_category['grupa_artikla'] = $product['nadgrupa_artikla'];
+                $parent_category['grupa_artikla'] = $product['spol'] . '-' . $product['nadgrupa_artikla'];
                 $parent_category['naziv'] = $product['nadgrupa_artikla_naziv'];
 
                 $parent_id = $lc->save($parent_category, $main->category_id);
@@ -63,7 +63,7 @@ class ProductHelper
             }
 
             $actual_category = [];
-            $actual_category['grupa_artikla'] = $product['grupa_artikla'];
+            $actual_category['grupa_artikla'] = $product['spol'] . '-' . $product['grupa_artikla'];
             $actual_category['naziv'] = $product['grupa_artikla_naziv'];
 
             $actual_id = $lc->save($actual_category, $parent->category_id);
