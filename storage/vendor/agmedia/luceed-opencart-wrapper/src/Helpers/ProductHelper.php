@@ -6,10 +6,13 @@ use Agmedia\Helpers\Log;
 use Agmedia\Kaonekad\AttributeHelper;
 use Agmedia\Kaonekad\ScaleHelper;
 use Agmedia\Luceed\Facade\LuceedProduct;
+use Agmedia\LuceedOpencartWrapper\Models\LOC_Category;
 use Agmedia\Models\Attribute\Attribute;
 use Agmedia\Models\Attribute\AttributeDescription;
 use Agmedia\Models\Category\Category;
 use Agmedia\Models\Manufacturer\Manufacturer;
+use Agmedia\Models\Option\OptionValue;
+use Agmedia\Models\Option\OptionValueDescription;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -32,8 +35,40 @@ class ProductHelper
      */
     public static function getCategories(Collection $product): array
     {
+        $lc = new LOC_Category();
         $response = [0 => agconf('import.default_category')];
         $actual   = Category::where('luceed_uid', $product['grupa_artikla'])->first();
+
+        if ( ! $actual) {
+            $parent = Category::where('luceed_uid', $product['nadgrupa_artikla'])->first();
+
+            if ( ! $parent) {
+                $main = Category::where('luceed_uid', $product['spol_uid'])->first();
+
+                if ( ! $main) {
+                    $main_category = [];
+                    $main_category['grupa_artikla'] = $product['spol_uid'];
+                    $main_category['naziv'] = $product['spol_naziv'];
+
+                    $main_id = $lc->save($main_category);
+                    $main = Category::where('category_id', $main_id)->first();
+                }
+
+                $parent_category = [];
+                $parent_category['grupa_artikla'] = $product['nadgrupa_artikla'];
+                $parent_category['naziv'] = $product['nadgrupa_artikla_naziv'];
+
+                $parent_id = $lc->save($parent_category, $main->category_id);
+                $parent = Category::where('category_id', $parent_id)->first();
+            }
+
+            $actual_category = [];
+            $actual_category['grupa_artikla'] = $product['grupa_artikla'];
+            $actual_category['naziv'] = $product['grupa_artikla_naziv'];
+
+            $actual_id = $lc->save($actual_category, $parent->category_id);
+            $actual   = Category::where('category_id', $actual_id)->first();
+        }
 
         if ($actual && $actual->count()) {
             $response[0] = $actual->category_id;
@@ -258,6 +293,77 @@ class ProductHelper
 
 
     /**
+     * @param Collection $product
+     *
+     * @return array
+     */
+    public static function getOptions(Collection $product): array
+    {
+        $options_response = [];
+        // Resolve option_id from scale. This is fixed and maped with OC_options DB.
+        $option_id = 13;//ScaleHelper::resolveOptionId($scale);
+        // Get the options with that option_id to compare it by name for option_value_id.
+        // Also fixed and mapped with OC_options DB.
+        $options = OptionValueDescription::where('option_id', $option_id)->get();
+
+        $response[0] = [
+            'value'     => '',
+            'option_id' => $option_id,
+            'type'      => 'radio',
+            'required'  => 1
+        ];
+
+        // Sorting options and calculations for it's price.
+        // Depending on scale option property
+        // and it's default value.
+        if (isset($product['opcije'])) {
+            foreach ($product['opcije'] as $item) {
+                // Find the option_value_id by it's name.
+                $option_value_id = $options->where('name', $item['velicina_naziv'])->first();
+                // If option not exist, make it.
+                if ( ! $option_value_id) {
+                    $oid = OptionValue::insertGetId([
+                        'option_id' => 13,
+                        'image' => '',
+                        'sort_order' => 0
+                    ]);
+
+                    $ovid = OptionValueDescription::insertGetId([
+                        'option_value_id' => $oid,
+                        'language_id' => 2,
+                        'option_id' => 13,
+                        'name' => $item['velicina_naziv']
+                    ]);
+
+                    if ($ovid) {
+                        $option_value_id = OptionValueDescription::where('name', $item['velicina_naziv'])->first();
+                    }
+                }
+
+                if ($option_value_id) {
+                    $options_response[] = [
+                        'option_value_id' => $option_value_id->option_value_id,
+                        'quantity'        => $item['raspolozivo_kol'],
+                        'subtract'        => 0,
+                        'price_prefix'    => '+',
+                        'price'           => 0,
+                        'points_prefix'   => '',
+                        'points'          => '',
+                        'weight_prefix'   => '+',
+                        'sku'             => $item['uid'],
+                        'weight'          => 0,
+                    ];
+                }
+            }
+        }
+
+        $response[0]['product_option_value'] = $options_response;
+
+        return $response;
+    }
+
+
+    /**
      * @param \stdClass $product
      *
      * @return array
@@ -331,10 +437,51 @@ class ProductHelper
     }
 
 
+    /**
+     * @param array $products
+     *
+     * @return array
+     */
+    public static function sortOptions(array $products): array
+    {
+        $response = [];
+
+        foreach ($products as $product) {
+            $response[] = [
+                'uid' => $product->artikl_uid,
+                'artikl' => $product->artikl,
+                'barcode' => $product->barcode,
+                'mpc' => $product->mpc,
+                'velicina_uid' => $product->velicina_uid,
+                'velicina' => $product->velicina,
+                'velicina_naziv' => $product->velicina_naziv,
+                'raspolozivo_kol' => $product->raspolozivo_kol
+            ];
+        }
+
+        return $response;
+    }
+
+
     /*******************************************************************************
     *                                Copyright : AGmedia                           *
     *                              email: filip@agmedia.hr                         *
     *******************************************************************************/
+
+    /**
+     * @param Collection $product
+     *
+     * @return array
+     */
+    private static function setCategoryForImport(Collection $product): array
+    {
+        $response = [];
+        $response['grupa_artikla'] = $product['spol_uid'];
+        $response['naziv'] = $product['spol_naziv'];
+
+        return $response;
+    }
+
 
     /**
      * @param string|null $text
