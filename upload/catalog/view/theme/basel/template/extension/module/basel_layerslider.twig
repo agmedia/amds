@@ -2,7 +2,7 @@
 </div>
 {% endif %}
 <div class="widget" style="margin-bottom:{{ margin_bottom }};">
-<div id="masterslider{{ module }}" class="master-slider widget {{ nav_buttons }}" style="min-height:{{ height }}px">
+<div id="masterslider{{ module }}" class="master-slider widget {{ nav_buttons }}" style="min-height:auto">
 {% for section in sections %}
 {% if section.sort_order > 0 %}
 <div class="ms-slide {% if section.slide_kenburn is defined %} kenburn {{ section.slide_kenburn }}{% endif %}" data-delay="{{ section.duration }}" {% if section.bg_color|length %} style="background-color:{{ section.bg_color }}"{% endif %}>
