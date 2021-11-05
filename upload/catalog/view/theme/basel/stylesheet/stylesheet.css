@@ -6006,8 +6006,8 @@ h3.lp-title {
 	transition:margin-top 300ms;
 }
 .grid .single-product .price span:not(.price-new) {
-	color:#040707;
-font-weight: normal;
+	color: #040707;
+	font-weight: 700;
 }
 .single-product .price .price-old {
 	margin-right:5px;
