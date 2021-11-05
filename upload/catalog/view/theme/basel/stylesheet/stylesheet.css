@@ -8059,8 +8059,9 @@ a.label-link:not(:hover) {
 	line-height: 56px;
 	margin-bottom:7px;
 	color:#040707;
+	font-weight:300;
 	position:relative;
-	text-transform:uppercase;
+	text-transform:unset;
 }
 
 
