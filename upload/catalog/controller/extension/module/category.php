@@ -29,10 +29,10 @@ class ControllerExtensionModuleCategory extends Controller {
 
 		$categories = $this->model_catalog_category->getCategories(0);
 
+
+
+
 		foreach ($categories as $category) {
-
-		    if($category['top'] == 1){
-
 
                 $children_data = array();
 
@@ -62,7 +62,7 @@ class ControllerExtensionModuleCategory extends Controller {
                     'href'        => $this->url->link('product/category', 'path=' . $category['category_id'])
                 );
 
-            }
+
 		}
 
 		return $this->load->view('extension/module/category', $data);
