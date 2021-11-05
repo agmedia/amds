@@ -2416,13 +2416,13 @@ div.required .control-label:after {
 	padding-bottom:10px;
 	display:block;
 }
-.main-menu .dropdown-inner .static-menu > ul > li > ul > li > a:before, 
+/*.main-menu .dropdown-inner .static-menu > ul > li > ul > li > a:before,
 .main-menu .dropdown-inner .static-menu > ul > li > ul > li > ul > li > a:before {
 	content:"-";
 	color:#bbbbbb;
 	display:inline-block;
 	margin-right:6px;
-}
+}*/
 .dropdown-inner .static-menu > ul > li > ul > li > ul > li > a:before {
 	margin-left:12px;
 }
