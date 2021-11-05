@@ -5947,8 +5947,8 @@ h3.lp-title {
 .single-product .image .icons-wrapper {
 	position:absolute;
 	text-align:center;
-	right:3px;
-	top:1px;
+	right: 15px;
+	top: 6px;
 }
 .single-product .image .icons-wrapper .icon {
 	font-size:18px;
