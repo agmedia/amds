@@ -5,7 +5,7 @@
 	{% if category.category_id == category_id %}
 	<li class="open active"><a href="{{ category.href }}" >{{ category.name }}</a>
 	{% else %}
-	<!--<li><a href="{{ category.href }}" >{{ category.name }}</a> -->
+  		<li><a href="{{ category.href }}" >{{ category.name }}</a>
 	{% endif %}
       {% if category.children %}
   <div class="sign"><i class="icon-arrow-right"></i></div>
