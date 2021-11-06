@@ -6420,7 +6420,7 @@ h3.lp-title {
 		visibility: visible;
 		opacity: 1;
 		transition: visibility 300ms, opacity 300ms, margin 300ms;
-		box-shadow: 0 40px 40px 0 rgba(0,0,0,0.3);
+		box-shadow:none;
 	}
 
 	.c-col1 {
