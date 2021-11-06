@@ -1503,7 +1503,7 @@ div.required .control-label:after {
 	visibility: visible;
 	opacity: 1;
 	transition: visibility 300ms, opacity 300ms, margin 300ms;
-	box-shadow: 0 40px 40px 0 rgba(0,0,0,0.3);
+
 }
 .dropdown-wrapper.from-top > .dropdown-content, 
 .dropdown-wrapper-click.from-top > .dropdown-content {
@@ -6414,6 +6414,14 @@ h3.lp-title {
 		.footer-wrapper {
 			padding: 20px 0;
 		}
+
+	.dropdown-wrapper:hover > .dropdown-content,
+	.dropdown-wrapper-click.opened > .dropdown-content {
+		visibility: visible;
+		opacity: 1;
+		transition: visibility 300ms, opacity 300ms, margin 300ms;
+		box-shadow: 0 40px 40px 0 rgba(0,0,0,0.3);
+	}
 
 	.c-col1 {
 		display: none;
