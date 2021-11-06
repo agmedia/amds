@@ -6600,7 +6600,7 @@ justify-content: center;
 
 
 
-	.main-menu-wrapper .dropdown-inner .menu-item:before {
+	.main-menu-wrapper .dropdown-inner .menu-item:first:before {
 		content: "";
 		position: absolute;
 		display: block;
