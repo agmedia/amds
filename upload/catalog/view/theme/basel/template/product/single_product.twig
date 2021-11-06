@@ -29,14 +29,14 @@
     {% if product.options %}
         {% for option in product.options %}
             {% if option.type == 'radio' %}
-    <div class="cp-sizes">
-        <div class="cp-sizes-label">Dostupne veličine</div>
-        <div class="cp-sizes-items">
-            {% for option_value in option.product_option_value %}
-            <a href="{{ product.href }}/#{{ option_value.name }}" class="cp-size">{{ option_value.name }}</a>
-            {% endfor %}
-        </div>
-    </div>
+                <div class="cp-sizes hidden-xs">
+                    <div class="cp-sizes-label">Dostupne veličine</div>
+                    <div class="cp-sizes-items">
+                        {% for option_value in option.product_option_value %}
+                        <a href="{{ product.href }}/#{{ option_value.name }}" class="cp-size">{{ option_value.name }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
             {% endif %}
     {% endfor %}
     {% endif %}
