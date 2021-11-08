@@ -6507,6 +6507,25 @@ h3.lp-title {
 	}
 }
 
+h3.modalh{
+	font-weight:900;
+}
+
+.modal-header .close-modal {
+	margin-top: -15px;
+}
+
+.close-modal {
+	float: right;
+	font-size: 40px;
+	font-weight: 700;
+	line-height: 1;
+	color: #000;
+	text-shadow: 0 1px 0 #fff;
+	filter: alpha(opacity=20);
+	opacity: unset;
+}
+
 @media (max-width:760px){
 	.hp-promo-cnt {
 		font-size: 16px;
