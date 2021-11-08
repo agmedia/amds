@@ -5727,6 +5727,20 @@ h3.lp-title {
 	display: inline-block;
 }
 
+.panel-group .panel-heading h5.panel-title > .l-title {
+	width: 100%;
+	font-size: 18px;
+	line-height: 21px;
+	padding: 15px 25px 15px 0;
+	position: relative;
+	cursor: pointer;
+	font-weight: 400;
+	text-transform: none;
+	display: inline-block;
+}
+
+
+
 .panel-group .panel-heading .panel-title > .l-title.basket {
 	width: 100%;
 	font-size: 18px;
@@ -5765,10 +5779,64 @@ h3.lp-title {
 	top: 27px;
 }
 
+.sm .toggle-icon {
+	position: absolute;
+	right: 0;
+	top: 15px;
+}
+
+.modal-body .cd-store-title {
+	font-size: 18px;
+	line-height: 21px;
+	font-weight: bold;
+}
+h4.tstores {
+	font-size: 24px;
+	line-height: 28px;
+	font-weight: bold;
+	padding-left:30px
+}
+span.code{
+	color: #8c8c8c;
+}
+
+h4.tstores::before {
+	content: "\e911";
+	font: 21px/21px "icomoon";
+	color: #040707;
+	position: absolute;
+	left: 15px;
+	top: 18px;
+	transition: color .3s;
+	-webkit-backface-visibility: hidden;
+	-webkit-tap-highlight-color: transparent;
+}
+.modal-body .cd-store-header {
+	font-size: 14px;
+	line-height: 16px;
+	position: relative;
+}
+
+.modal-body .cd-store-header.special {
+	margin-bottom: 15px;
+	margin-top:10px;
+}
+
 .toggle-icon {
 	position: absolute;
 	width: 15px;
 	height: 15px;
+}
+
+.lp.lpp {
+	font-size: 14px;
+	line-height: 21px;
+}
+
+.panel-body.smp{
+
+	padding: 0 0 15px 0!important;
+
 }
 
 .toggle-icon::before, .toggle-icon::after {
