@@ -6493,6 +6493,20 @@ h3.lp-title {
 	justify-content: center;
 }
 
+
+@media (max-width:1300px){
+	.hp-promo-cnt .btn, .hp-promo-cnt button {
+		min-width: 120px;
+		height: 50px;
+		font-size: 14px;
+		line-height: 17px;
+		margin: 10px 5px 0;
+	}
+	.hp-promo-cnt {
+		font-size: 2vw;
+	}
+}
+
 @media (max-width:760px){
 	.hp-promo-cnt {
 		font-size: 16px;
@@ -6506,18 +6520,6 @@ h3.lp-title {
 	.fstxt{    font-size: 14px;
 		line-height: 20px;
 		padding:0 20px;
-	}
-}
-@media (max-width:1300px){
-	.hp-promo-cnt .btn, .hp-promo-cnt button {
-		min-width: 120px;
-		height: 50px;
-		font-size: 14px;
-		line-height: 17px;
-		margin: 10px 5px 0;
-	}
-	.hp-promo-cnt {
-		font-size: 2vw;
 	}
 }
 
