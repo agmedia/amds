@@ -78,6 +78,34 @@ body, .product-name.main-font, .gridlist .single-product .product-name, .gridlis
 	padding: 0 0 8px;
 }
 
+.sw-popular {
+	padding: 50px 25px;
+}
+
+.sw-popular-title {
+	display: block;
+	font-size: 14px;
+	line-height: 18px;
+	font-weight: bold;
+	text-transform: uppercase;
+	padding-bottom: 15px;
+}
+.sw-popular-cnt {
+	width: calc(100% - -25px);
+	display: grid;
+	grid-template-rows: repeat(5,0fr);
+	grid-auto-flow: column;
+	list-style: none;
+	font-size: 14px;
+	line-height: 18px;
+	column-count: 3;
+}
+.sw-popular-cnt > li {
+	min-width: 140px;
+	max-width: 250px;
+	padding: 0 15px 8px 0;
+}
+
 a.kontakt {
 	font-size: 24px;
 	line-height: 28px;
@@ -392,6 +420,7 @@ text-transform:unset!important;
 	-webkit-backface-visibility: hidden;
 	-webkit-tap-highlight-color: transparent;
 	border:none;
+	padding:0px!important;
 }
 
 .wp-qty-count {
@@ -7029,9 +7058,9 @@ justify-content: center;
 	}
 	.footer-menu {
 		padding: 0 15px;
-		padding-bottom: 0px;
-		max-height: 0;
-		overflow: hidden;
+		padding-bottom: 15px;
+		max-height: 100%;
+		overflow: visible;
 		transition: max-height .3s,padding .3s;
 	}
 	.wrapper {

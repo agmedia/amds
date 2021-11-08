@@ -12,7 +12,10 @@
       <div class="footer-col1">
           <div class="footer-menu-cnt">
               <div class="footer-menu-item">
-                  <h3 class="footer-menu-title">AMDS Jeans</h3>
+                  <a role="button" data-toggle="collapse" href="#collapse1" aria-expanded="false" aria-controls="collapse1">   <h3 class="footer-menu-title">
+
+                      AMDS Jeans</h3></a>
+                  <div class="collapse" id="collapse1">
                   <ul class="footer-menu">
                     <li><a href="/" title="Početna" class="active">Početna</a></li>
                     <li><a href="/amds-life/" title="AMDS blog">AMDS blog</a></li>
@@ -23,9 +26,11 @@
                     <li><a href="/prodajna-mjesta/" title="Prodajna mjesta">Prodajna mjesta</a></li>
                     <li><a href="/kontakt/" title="Kontakt">Kontakt</a></li>
                 </ul>
+                  </div>
               </div>
               <div class="footer-menu-item">
-                  <h3 class="footer-menu-title">Uvjeti kupnje</h3>
+                  <a role="button" data-toggle="collapse" href="#collapse2" aria-expanded="false" aria-controls="collapse2"> <h3 class="footer-menu-title">Uvjeti kupnje</h3></a>
+                  <div class="collapse" id="collapse2">
                   <ul class="footer-menu">
                       <li><a href="/uvjeti-kupnje/#narucivanje" title="Naručivanje">Naručivanje</a></li>
                       <li><a href="/uvjeti-kupnje/#placanje" title="Plaćanje">Plaćanje</a></li>
@@ -34,8 +39,9 @@
                       <li><a href="/uvjeti-kupnje/#zamjene" title="Zamjene">Zamjene</a></li>
                       <li><a href="/uvjeti-kupnje/#privatnost" title="Privatnost i sigurnost">Privatnost i sigurnost</a></li>
                       <li><a href="/uvjeti-kupnje/#akcije" title="Promotivne akcije">Promotivne akcije</a></li>
-                      <li><a href="javascript:void(0);" class="gdpr_configurator_button" id="gdpr_configurator_button">Uredi privole</a></li>
+
                   </ul>
+                  </div>
       </div>
           </div>
       </div>
@@ -137,6 +143,17 @@
 <link href="catalog/view/theme/basel/js/lightgallery/css/lightgallery.css" rel="stylesheet" />
 <script src="catalog/view/theme/basel/js/jquery.matchHeight.min.js"></script>
 <script src="catalog/view/theme/basel/js/featherlight.js"></script>
+
+<script>
+    $(document).ready(function(){
+        if ($(window).width() <= 768) {
+            $("#collapse1").removeClass("in");
+            $("#collapse2").removeClass("in");
+        }
+    });
+</script>
+
+
 {% if view_popup %}
 <!-- Popup -->
 <script>
@@ -171,11 +188,6 @@ $('#column-left, #column-right').theiaStickySidebar({containerSelector:$(this).c
 </div>
 </div>
 {% endif %}
-<!--
-OpenCart is open source software and you are free to remove the powered by OpenCart if you want, but its generally accepted practise to make a small donation.
-Please donate via PayPal to donate@opencart.com
-BASEL VERSION {{ basel_version }} - OPENCART VERSION 3 ({{ VERSION }}) 
-//-->
 </div><!-- .outer-container ends -->
 <a class="scroll-to-top primary-bg-color hidden-sm hidden-xs" onclick="$('html, body').animate({scrollTop:0});"></a>
 <div id="featherlight-holder"></div>
