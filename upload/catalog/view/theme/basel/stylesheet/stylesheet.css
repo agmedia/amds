@@ -6571,7 +6571,8 @@ h3.lp-title {
 	}
 
 	.c-col1 {
-		display: none;
+		width: 0px;
+		margin-right: 0px;
 	}
 
 	#product .options {
