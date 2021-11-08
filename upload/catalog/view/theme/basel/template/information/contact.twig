@@ -264,6 +264,15 @@
     {{ column_right }}</div>
 </div>
 
+<script type="text/javascript">
+    $(document).ready(function () {
+        if(location.hash != null && location.hash != ""){
+            $('.collapse').removeClass('in');
+            $(location.hash + '.collapse').collapse('show');
+        }
+    });
+</script>
+
 {% if basel_map_style %}
 <script>
 	$(document).ready(function() {
