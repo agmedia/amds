@@ -6559,7 +6559,7 @@ h3.lp-title {
 			padding: 20px 0;
 		}
 	.pmob .pannel-body{
-		padding:0 15px 15px 15px
+		padding:0 15px 15px 15px!important;
 	}
 
 	.dropdown-wrapper:hover > .dropdown-content,
