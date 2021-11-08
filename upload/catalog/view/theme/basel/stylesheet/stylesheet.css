@@ -6409,11 +6409,158 @@ h3.lp-title {
 
 }
 
+.dropdown-inner ul > li > ul > li > a {
+	display: inline-block;
+	padding: 3px 0px;
+	transition: padding-left 300ms, opacity 300ms, color 300ms;
+	position: relative;
+}
+
+.fstxt{    font-size: 18px;
+
+
+}
+
+.hp-promo-cnt {
+	font-size: 24px;
+	font-size: 1.2vw;
+	line-height: 1.2;
+	font-weight: bold;
+	text-align: center;
+	color: #fff;
+	padding: 0 20px;
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 15%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.hp-promo-cnt .btn-wh {
+	color: #040707;
+	border: none;
+	transition: all .3s;
+	-webkit-backface-visibility: hidden;
+	-webkit-tap-highlight-color: transparent;
+}
+.hp-promo-cnt .btn, .hp-promo-cnt button {
+	min-width: 180px;
+	margin: 25px 10px 0;
+	padding: 0 10px;
+	text-transform: uppercase;
+	font-weight: 900;
+}
+
+.btn-wh {
+	background: #fff;
+	border: 1px solid #ECECEC;
+	color: #040707;
+	height: 59px;
+	font-size: 16px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+@media (max-width:760px){
+	.hp-promo-cnt {
+		font-size: 16px;
+		line-height: 19px;
+		font-size: 4.5vw;
+		line-height: 1.4;
+	}
+	.hp-promo-cnt .btn, .hp-promo-cnt button {
+		height: 44px;
+	}
+	.fstxt{    font-size: 14px;
+		line-height: 20px;
+		padding:0 20px;
+	}
+}
+@media (max-width:1300px){
+	.hp-promo-cnt .btn, .hp-promo-cnt button {
+		min-width: 120px;
+		height: 50px;
+		font-size: 14px;
+		line-height: 17px;
+		margin: 10px 5px 0;
+	}
+	.hp-promo-cnt {
+		font-size: 2vw;
+	}
+}
+
+
+.sm-content {
+
+	padding: 20px 30px;
+	display: flex;
+	justify-content: space-between;
+	position: relative;
+	background: url('https://shop.amdshr.lin75.host25.com/image/catalog/logo-sitemap.png') no-repeat center bottom 40px;
+}
+.sm-item-2 {
+	text-align: right;
+}
+.sm-item-1 {
+	text-align:left;
+}
+.sm-social {
+	position: absolute;
+	bottom: 0px;
+	left: 30px;
+	right: 30px;
+
+}
+.sm-social p {
+	display: flex;
+	justify-content: space-between;
+	padding: 0;
+}
+.sm-list {
+	list-style: none;
+	font-size: 17px;
+	line-height: 21px;
+	margin-bottom:100px
+}
+.sm-list li {
+	margin-bottom: 7px;
+}
+.sm-list .gap {
+	margin-top: 26px;
+}
+.sm-social a {
+	width: 49%;
+}
+
+.sm-social .btn, input[type="submit"], button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0 40px;
+	height: 59px;
+	font-size: 16px;
+	color: #fff;
+	background: #040707;
+	text-decoration: none !important;
+	position: relative;
+	overflow: hidden;
+	font-weight: bold;
+	transition: all .3s;
+	-webkit-backface-visibility: hidden;
+	-webkit-tap-highlight-color: transparent;
+}
+
 @media (max-width: 980px) {
 
 		.footer-wrapper {
 			padding: 20px 0;
 		}
+	.pmob{
+		padding:0 15px 15px 15px
+	}
 
 	.dropdown-wrapper:hover > .dropdown-content,
 	.dropdown-wrapper-click.opened > .dropdown-content {
