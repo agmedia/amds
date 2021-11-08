@@ -4847,7 +4847,7 @@ a.scroll-to-top:not(:hover) {
 .alert .close {
 	position:absolute;
 	right:18px;
-	top: 50%;
+	top: 20%;
 	margin-top:-9px;
 	color:inherit;
 	opacity:0.9;
