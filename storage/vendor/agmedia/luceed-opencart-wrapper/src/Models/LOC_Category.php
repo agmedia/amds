@@ -414,14 +414,18 @@ class LOC_Category
 
 
     /**
-     * @param string $naziv
+     * @param string|null $naziv
      *
      * @return string
      */
-    private function resolveNaziv(string $naziv): string
+    private function resolveNaziv(string $naziv = null): string
     {
         if (substr($naziv, 0, 1) == '-') {
             return substr($naziv, 1);
+        }
+
+        if ( ! $naziv) {
+            $naziv = 'Bez naziva';
         }
 
         return $naziv;

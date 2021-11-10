@@ -142,7 +142,7 @@ class LOC_Product
             $response[$products_to_add[$i]->artikl] = $products_to_add[$i];
         }
         
-        $this->products_to_add = collect($response);
+        $this->products_to_add = $response;
         
         return $this;
     }

@@ -60,7 +60,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
     public function index()
     {
         $this->load->language('extension/module/luceed_sync');
-        
+
         $this->document->setTitle($this->language->get('heading_title'));
 
         $data['revision_products'] = LuceedProductForRevision::with('product')->get();
@@ -213,6 +213,8 @@ class ControllerExtensionModuleLuceedSync extends Controller
         $count = 0;
 
         $new_products = $_loc->checkDiff()->getProductsToAdd();
+
+        Log::store($new_products->count(), 'importing');
 
         if ($new_products->count()) {
             $this->load->model('catalog/product');
