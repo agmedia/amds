@@ -37,7 +37,7 @@ class ProductHelper
     {
         $lc = new LOC_Category();
         $response = [0 => agconf('import.default_category')];
-        $actual   = Category::where('luceed_uid', $product['spol'] . '-' . $product['grupa_artikla'])->first();
+        $actual   = Category::where('luceed_uid', $product['spol'] . '-' . $product['grupa_artikla_uid'])->first();
 
         if ( ! $actual) {
             $parent = Category::where('luceed_uid', $product['spol'] . '-' . $product['nadgrupa_artikla'])->first();
@@ -63,7 +63,7 @@ class ProductHelper
             }
 
             $actual_category = [];
-            $actual_category['grupa_artikla'] = $product['spol'] . '-' . $product['grupa_artikla'];
+            $actual_category['grupa_artikla'] = $product['spol'] . '-' . $product['grupa_artikla_uid'];
             $actual_category['naziv'] = $product['grupa_artikla_naziv'];
 
             $actual_id = $lc->save($actual_category, $parent->category_id);
@@ -410,7 +410,7 @@ class ProductHelper
             'stopa_pdv' => $product->stopa_pdv,
             'nadgrupa_artikla' => $product->nadgrupa_artikla,
             'nadgrupa_artikla_naziv' => $product->nadgrupa_artikla_naziv,
-            'grupa_artikla' => $product->grupa_artikla,
+            'grupa_artikla' => $product->grupa_artikla_uid,
             'grupa_artikla_naziv' => $product->grupa_artikla_naziv,
             'robna_marka' => $product->robna_marka,
             'robna_marka_naziv' => $product->robna_marka_naziv,
