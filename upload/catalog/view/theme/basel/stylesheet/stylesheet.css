@@ -4985,6 +4985,8 @@ a.scroll-to-top:not(:hover) {
 	padding-top:7px;
 	display: inline-block;
 }
+
+	.crelated{padding:0px!important;margin-top:30px}
 }
 
 
@@ -6653,7 +6655,7 @@ h3.modalh{
 	width: 49%;
 }
 
-.sm-social .btn, input[type="submit"], button {
+.sm-social .btn, input[type="submit"] {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -8669,9 +8671,26 @@ a.label-link:not(:hover) {
 		text-align: center;
 		display: none;
 		position: absolute;
-		bottom: 40px;
+		bottom: 20px;
 		line-height: 0;
+
 	}
+
+	.crelated .slick-dots {
+		list-style: none;
+		padding: 0;
+		text-align: center;
+		display: none;
+		position: absolute;
+		bottom: 20px;
+		line-height: 0;
+		left: 0;
+		right: 0;
+		margin-left: auto;
+		margin-right: auto;
+		width: 100px;
+	}
+
 
 	.slick-dots .slick-active button::before {
 		opacity: 1;
@@ -8778,6 +8797,101 @@ a.label-link:not(:hover) {
 	}
 
 }
+
+.slick-dots {
+	list-style: none;
+	padding: 0;
+	text-align: center;
+	display: none;
+	position: absolute;
+	bottom: 20px;
+	line-height: 0;
+
+}
+
+.crelated .slick-dots {
+	list-style: none;
+	padding: 0;
+	text-align: center;
+	display: none;
+	position: absolute;
+	bottom: 20px;
+	line-height: 0;
+	left: 0;
+	right: 0;
+	margin-left: auto;
+	margin-right: auto;
+	width: 100px;
+}
+
+
+.slick-dots .slick-active button::before {
+	opacity: 1;
+}
+
+.slick-dots button::before {
+	width: 11px;
+	height: 11px;
+	top: unset;
+	left: unset;
+}
+
+
+.slick-dots button::before {
+	content: "";
+	position: absolute;
+	display: block;
+	width: 16px;
+	height: 16px;
+	top: 6px;
+	left: 6px;
+	border-radius: 100%;
+	background: #040707;
+	opacity: 0;
+	transition: all .3s;
+	-webkit-backface-visibility: hidden;
+	-webkit-tap-highlight-color: transparent;
+}
+
+.slick-dots button::before {
+	width: 11px;
+	height: 11px;
+	top: unset;
+	left: unset;
+}
+
+
+
+.slick-dots button {
+	background: #fff!important;
+	border-radius: 100px;
+	padding: 0;
+	min-width: 0;
+	width: 28px;
+	height: 28px;
+	display: block;
+	font-size: 0;
+	border-radius: 100%;
+	position: relative;
+	border: unset;
+}
+
+.slick-dots button {
+	width: 17px;
+	height: 17px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+slick-dots .slick-active button::before {
+	opacity: 1;
+}
+
+.slick-dots li {
+	margin: 0 4px;
+}
+
 
 @media (max-width: 767px) {#digitalElephantFilter_box {padding:15px;}}
 

@@ -251,6 +251,7 @@ background-color:
 #column-left {
 	left: 0px;
 }
+
 #column-left + #content, #column-left + #content + #footer {
 	left: 0px;
 	margin-left: 235px;

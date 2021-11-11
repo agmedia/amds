@@ -275,9 +275,47 @@
         </div>
     
     </div> <!-- .product-info ends -->
-    
+
 </div>
+
+
+
 </div>
+
+
+<!-- Related Products -->
+
+
+
+
+
+{% if products %}
+
+<div class="container crelated" >
+    <div class="widget widget-related">
+
+        <div class="widget-title">
+            <p class="main-title"><span>{{ text_related }}</span></p>
+            <p class="widget-title-separator"><i class="icon-line-cross"></i></p>
+        </div>
+
+        <div class="grid grid-holder related carousel grid{{ basel_rel_prod_grid }}">
+            {% for product in products %}
+                {% include 'basel/template/product/single_product.twig' %}
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+{% endif %}
+
+
+
+
+
+
+
+
 
 
 
