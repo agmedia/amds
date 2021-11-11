@@ -5,7 +5,7 @@ class ControllerExtensionModuleDigitalElephantFilterCachePanel extends Controlle
     
 	// -------------- //
 	// TOKEN PASSWORD //
-	const TOKEN = 'enter_your_token_password_here';
+	const TOKEN = 'kjukjukju';
 
     /**
      * @var Cache
