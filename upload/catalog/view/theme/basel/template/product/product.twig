@@ -20,7 +20,7 @@
                  <ul class="cd-images" id="gallery" >
                      {% if thumb %}
                      <li class="cd-image">
-                         <a href="{{ popup }}" class="product-gallery cloud-zoom link" rel="position:'inside', showTitle: false" title="" data-attributeids="">
+                         <a href="{{ popup }}" class="link product-gallery cloud-zoom "  rel="position:'inside', showTitle: false" >
                              <picture>
                                  <source srcset="{{ thumb }}" media="(max-width: 760px)">
                                  <img src="{{ thumb }}" alt="{{ heading_title }}" data-product_main_image="1" width="610" height="915">
@@ -31,7 +31,7 @@
                          {% if images %}
                              {% for image in images %}
                              <li class="cd-image {% if loop.first %} {% else %}extra{% endif %}">
-                                 <a href="{{ image.popup }}" class="product-gallery cloud-zoom link" title="" data-attributeids=""  rel="position:'inside', showTitle: false">
+                                 <a href="{{ image.popup }}" class="product-gallery cloud-zoom link" title=""  rel="position:'inside', showTitle: false">
                                      <picture>
                                          <source srcset="{{ image.thumb }}" media="(max-width: 760px)">
                                          <img src="{{ image.thumb }}" alt="{{ heading_title }}"  >
@@ -923,28 +923,15 @@ $('.vk_share').attr("href", 'http://vkontakte.ru/share.php?url=' + share_url + '
 });
 //--></script>
 
-{% if product_layout != "full-width" %}
+
 <script>
 $(document).ready(function() {
-$('.image-additional a.link').click(function (e) {
-	if ($(this).hasClass("locked")) {
-  		e.stopImmediatePropagation();
-	}
-	$('.image-additional a.link.active').removeClass('active');
-	$(this).addClass('active')
+
+$('.cloud-zoom-wrap').click(function (e) {
+	e.preventDefault();
+    $('img', this).trigger('click');
 });
 
-{% if images %}
-$('.cloud-zoom-wrap').click(function (e) {
-	e.preventDefault();
-	$('.image-additional a.link.active').removeClass('locked').trigger('click').addClass('locked');
-});
-{% else %}
-$('.cloud-zoom-wrap').click(function (e) {
-	e.preventDefault();
-	$('#main-image').trigger('click');
-});
-{% endif %}
 
 $('.image-additional').slick({
 prevArrow: "<a class=\"icon-arrow-left\"></a>",
@@ -974,16 +961,22 @@ verticalSwiping:false
 
 });
 //--></script>
-{% endif %}
+
 <script>
-$(document).ready(function() {
+
+    $(document).ready(function() {
 // Image Gallery
-$("#gallery").lightGallery({
-	selector: '.link',
-	download:false,
-	hideBarsDelay:99999
-});
-});
+        $("#gallery").lightGallery({
+            selector: '.link',
+            download:false,
+            hideBarsDelay:99999
+        });
+    });
+
+
+
+
+
 //--></script>
 <script type="application/ld+json">
 {
