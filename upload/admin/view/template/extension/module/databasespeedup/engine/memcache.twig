@@ -1,0 +1,27 @@
+<div class="row">
+    <div class="col-xs-12 col-sm-6 col-md-4">
+        <h5><span class="required">*</span> <strong>{{ text_isense_db_cache_memcache_settings }}</strong></h5>
+        <span class="help">{{ text_isense_db_cache_memcache_settings_helper }}</span>
+    </div>
+    <div class="col-xs-12 col-sm-6 col-md-4">
+        <div class="form-group">
+            <label for="redis_hostname">{{ text_hostname }}</label>
+            <input type="text" class="form-control" id="memcache_hostname" name="{{ moduleName }}[engine_memcache][memcache_hostname]" value="{{ moduleData.engine_memcache.memcache_hostname ? moduleData.engine_memcache.memcache_hostname : 'localhost' }}" />
+        </div>
+
+        <div class="form-group">
+             <label for="redis_port">{{ text_port }}</label>
+             <input class="form-control" type="text" id="memcache_port"  name="{{ moduleName }}[engine_memcache][memcache_port]" value="{{ moduleData.engine_memcache.memcache_port ? moduleData.engine_memcache.memcache_port : '11211' }}" />
+        </div>
+
+        <div class="form-group">
+             <label for="redis_port">{{ text_prefix }}</label>
+             <input class="form-control" type="text" id="memcache_prefix"  name="{{ moduleName }}[engine_memcache][memcache_prefix]" value="{{ moduleData.engine_memcache.memcache_prefix ? moduleData.engine_memcache.memcache_prefix : db_prefix }}" />
+        </div>
+
+        <div class="form-group">
+             <label for="redis_port">{{ text_expire }}</label>
+             <input class="form-control" type="text" id="memcache_prefix"  name="{{ moduleName }}[engine_memcache][memcache_expire]" value="{{ moduleData.engine_memcache.memcache_expire ? moduleData.engine_memcache.memcache_expire : '99999' }}" />
+        </div>
+    </div>
+</div>

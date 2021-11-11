@@ -1,0 +1,18 @@
+; Main settings go here
+
+[main]
+
+status=1
+engine=file
+
+cache_product_counts=1
+cache_product_queries=1
+cache_category_counts=1
+cache_category_queries=1
+cache_seo_urls=1
+
+; File system engine
+
+[engine_file]
+
+max_files=10000

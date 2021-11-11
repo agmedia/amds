@@ -1,0 +1,155 @@
+<div class="container-fluid">
+    <div class="row">
+    <h3>{{ text_settings }}</h3>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+            <h5><span class="required">*</span> <strong>{{ text_isense_db_cache_status }}</strong></h5>
+            <span class="help">{{ text_isense_db_cache_status_helper }}</span>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+             <select name="{{ moduleName }}[status]" class="form-control">
+                  <option value="1" {{ (moduleData.status is not empty and moduleData.status == '1') ? 'selected=selected' : '' }}> {{ text_enabled }}</option>
+                  <option value="0" {{ (moduleData.status is empty or moduleData.status == '0') ? 'selected=selected' : '' }}>{{ text_disabled }}</option>
+             </select>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+			<h5><span class="required">*</span> <strong>{{ text_isense_db_cache_queries }}</strong></h5>
+			<span class="help">{{ text_isense_db_cache_queries_helper }}</span>
+		</div>
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+            <div class="form-check">
+                <input type="hidden" name="{{ moduleName }}[cache_product_queries]" value="0" />
+                <input id="ProductQueries" class="form-check-input" type="checkbox" name="{{ moduleName }}[cache_product_queries]" value="1" {{ (moduleData.cache_product_queries is not empty and moduleData.cache_product_queries != '0') ? 'checked' : '' }} />
+                <label class="form-check-label" for="ProductQueries">{{ text_product_queries }}</label>
+            </div>
+            <div class="form-check">
+                <input type="hidden" name="{{ moduleName }}[cache_category_queries]" value="0" />
+                <input id="CategoryQueries" class="form-check-input" type="checkbox" name="{{ moduleName }}[cache_category_queries]" value="1" {{(moduleData.cache_category_queries is not empty and moduleData.cache_category_queries != '0')  ? 'checked' : '' }} />
+                <label class="form-check-label" for="CategoryQueries">{{ text_category_queries }}</label>
+            </div>
+            <div class="form-check">
+                <input type="hidden" name="{{ moduleName }}[cache_manufacturer_queries]" value="0" />
+                <input id="ManufacturerQueries" class="form-check-input" type="checkbox" name="{{ moduleName }}[cache_manufacturer_queries]" value="1" {{(moduleData.cache_manufacturer_queries is not empty and moduleData.cache_manufacturer_queries != '0')  ? 'checked' : '' }}  />
+                <label class="form-check-label" for="ManufacturerQueries">{{ text_manufacturer_queries }}</label>
+            </div>
+            <div class="form-check">
+                <input type="hidden" name="{{ moduleName }}[cache_information_queries]" value="0" />
+                <input id="InformationQueries" class="form-check-input" type="checkbox" name="{{ moduleName }}[cache_information_queries]" value="1" {{(moduleData.cache_information_queries is not empty and moduleData.cache_information_queries != '0')  ? 'checked' : '' }}  />
+                <label class="form-check-label" for="InformationQueries">{{ text_information_queries }}</label>
+            </div>
+            <div class="form-check">
+                <input type="hidden" name="{{ moduleName }}[cache_product_counts]" value="0" />
+                <input id="ProductsCount" class="form-check-input" type="checkbox" name="{{ moduleName }}[cache_product_counts]" value="1" {{(moduleData.cache_product_counts is not empty and moduleData.cache_product_counts != '0')  ? 'checked' : '' }}  />
+                <label class="form-check-label" for="ProductsCount">{{ text_products_count }}</label>
+            </div>
+            <div class="form-check">
+                <input type="hidden" name="{{ moduleName }}[cache_category_counts]" value="0" />
+                <input id="CategoriesCount" class="form-check-input" type="checkbox" name="{{ moduleName }}[cache_category_counts]" value="1" {{(moduleData.cache_category_counts is not empty and moduleData.cache_category_counts != '0')  ? 'checked' : '' }}  />
+                <label class="form-check-label" for="CategoriesCount">{{ text_categories_count }}</label>
+            </div>
+            <div class="form-check">
+                <input type="hidden" name="{{ moduleName }}[cache_manufacturer_counts]" value="0" />
+                <input id="ManufacturerCount" class="form-check-input" type="checkbox" name="{{ moduleName }}[cache_manufacturer_counts]" value="1" {{(moduleData.cache_manufacturer_counts is not empty and moduleData.cache_manufacturer_counts != '0')  ? 'checked' : '' }}  />
+                <label class="form-check-label" for="ManufacturersCount">{{ text_manufacturer_count }}</label>
+            </div>
+            <div class="form-check">
+                <input type="hidden" name="{{ moduleName }}[cache_information_counts]" value="0" />
+                <input id="InformationCount" class="form-check-input" type="checkbox" name="{{ moduleName }}[cache_information_counts]" value="1" {{(moduleData.cache_information_counts is not empty and moduleData.cache_information_counts != '0')  ? 'checked' : '' }}  />
+                <label class="form-check-label" for="InformationCount">{{ text_information_count }}</label>
+            </div>
+            <div class="form-check">
+                <input type="hidden" name="{{ moduleName }}[cache_seo_urls]" value="0" />
+                <input id="SeoQueries" class="form-check-input" type="checkbox" name="{{ moduleName }}[cache_seo_urls]" value="1" {{(moduleData.cache_seo_urls is not empty and moduleData.cache_seo_urls != '0')  ? 'checked' : '' }} />
+                <label class="form-check-label" for="SeoQueries">{{ text_seo_urls }}</label>
+            </div>
+        </div>
+	</div>
+    <br/>
+    <div class="row">
+		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+			<h5><span class="required">*</span> <strong>{{ text_isense_db_missing_orders }}</strong></h5>
+			<span class="help">{{ text_isense_db_missing_orders_helper }}</span>
+		</div>
+		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+            <input class="form-control" type="text"  disabled value="{{ missing_orders_count ?  missing_orders_count : '0' }}" />
+		</div>
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+            <button type="button" onclick="clearMisingOrders();" id="clear_missing_orders" data-toggle="tooltip" title="{{ text_isense_db_cache_button_clear_missing_orders }}" class="btn btn-primary" {{ have_missing_order ? '' : 'disabled' }}>{{ text_isense_db_cache_button_clear_missing_orders }}</button>
+        </div>
+	</div>
+	<br/>
+	<div class="row">
+		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+			<h5><span class="required">*</span> <strong>{{ text_isense_db_cache_engine }}</strong></h5>
+			<span class="help">{{ text_isense_db_cache_engine_helper }}</span>
+		</div>
+		<div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+            <select name="{{ moduleName }}[engine]" class="form-control">
+                <option value="file" {{ (moduleData.engine is not empty and moduleData.engine == 'file') ? 'selected=selected' : '' }}>{{ text_file }}</option>
+                <option value="memcache" {{ (moduleData.engine is not empty and moduleData.engine == 'memcache') ? 'selected=selected' : '' }} {{ (memcache_engine_exists == false) ? 'disabled=disabled style="color:#aaa;"' }}>{{ text_memcache }}</option>
+                <option value="memcached" {{ (moduleData.engine is not empty and moduleData.engine == 'memcached') ? 'selected=selected' : '' }} {{ (memcached_engine_exists == false) ? 'disabled=disabled style="color:#aaa;"' }}>{{ text_memcached }}</option>
+                <option value="redis" {{ (moduleData.engine is not empty and moduleData.engine == 'redis') ? 'selected=selected' : '' }} {{ (redis_engine_exists == false) ? 'disabled=disabled style="color:#aaa;"' }}>{{ text_redis }}</option>
+            </select>
+		</div>
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+            <button type="button" onclick="clearCache();" id="clearcache" data-toggle="tooltip" title="{{ text_isense_db_cache_button_clear_cache }}" class="btn btn-primary">{{ text_isense_db_cache_button_clear_cache }}</button>
+        </div>
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3">
+			<span class="help">{{ text_isense_db_cache_button_clear_cache_helper }}</span>
+		</div>
+	</div>
+
+    <hr /><br />
+    <div id="engine_dashboard"></div>
+</div>
+
+<script type="text/javascript">
+
+function clearCache() {
+
+	var cache_engine = {
+		'engine' : "{{ moduleData.engine is not empty ? moduleData.engine : '' }}",
+        'status' : "{{ moduleData.status is not empty ? moduleData.status : '' }}"
+	};
+
+	$.ajax({
+      url: 'index.php?route={{ modulePath }}/clearCache&user_token=' + user_token,
+	  method: 'post',
+	  data: cache_engine,
+      success: function(json) {
+            location.reload();
+      }
+    });
+}
+
+function clearMisingOrders() {
+
+	$.ajax({
+      url: 'index.php?route={{ modulePath }}/clearMissingOrders&user_token=' + user_token,
+	  method: 'post',
+      success: function(json) {
+            location.reload();
+      }
+    });
+}
+
+$(document).ready(function(){
+    $('select[name="{{ moduleName }}[engine]"]').on('change', function(){
+        engine = $(this).val();
+        $("#engine_dashboard").html("Loading...");
+        $.ajax({
+          url: 'index.php?route={{ modulePath }}/loadEngineTemplates&user_token=' + user_token +'&engine=' + engine,
+    	  method: 'get',
+          dataType: 'html',
+          success: function(data) {
+
+            $("#engine_dashboard").html(data);
+          }
+        });
+    });
+    $('select[name="{{ moduleName }}[engine]"]').trigger('change');
+
+});
+</script>
