@@ -3205,6 +3205,7 @@ div.required .control-label:after {
 .grid-holder.sm-grid3 .item.insta-item {width:33.333% !important;}
 .grid-holder.sm-grid2 .item.insta-item {width:50% !important;}
 .grid-holder.sm-grid1 .item.insta-item {width:100% !important;}
+
 }
 /* Blog */
 .blog .main_description {
@@ -9947,6 +9948,18 @@ ul.sitemap > li > ul > li > ul > li > a {margin-left:28px;opacity:0.8;}
     white-space: nowrap;
     text-overflow:ellipsis;
 	max-width:100%;
+}
+
+@media (max-width: 589px) {
+
+	.blog h1 {
+		font-size: 20px;
+		line-height: 23px;
+		padding: 0 0 20px;
+		padding-bottom: 20px;
+		letter-spacing: normal;
+		text-transform: none;
+	}
 }
 /* Catalog mode */
 .catalog_mode .catalog_hide {
