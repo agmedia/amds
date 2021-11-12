@@ -3,10 +3,10 @@
 	<div class="alert alert-warning"><i class="fa fa-check-circle"></i> {{ warning }}</div>
 	{% endif %}
   
-	<div class="social_login pull-right">
+	<div class="social_login t">
 	{% if fbstatus %}
-	<a class="socalicon"  href="{{ fblink }}">
-	<img  class="img-responsive" src="{{ fbimage }}" data-toggle="tooltip" title="{{ fbtitle }}" alt="{{ fbtitle }}" title="{{ fbtitle }}">
+	<a class="socalicon btn btn-amds btn-block"  href="{{ fblink }}">
+	{{ fbtitle }}
 	</a>
 	{% endif %}
 	{% if twitstatus %}
