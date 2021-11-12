@@ -1,0 +1,33 @@
+<div class="row">
+	{% if warning %}
+	<div class="alert alert-warning"><i class="fa fa-check-circle"></i> {{ warning }}</div>
+	{% endif %}
+  
+	<div class="social_login pull-right">
+	{% if fbstatus %}
+	<a class="socalicon"  href="{{ fblink }}">
+	<img  class="img-responsive" src="{{ fbimage }}" data-toggle="tooltip" title="{{ fbtitle }}" alt="{{ fbtitle }}" title="{{ fbtitle }}">
+	</a>
+	{% endif %}
+	{% if twitstatus %}
+	<a class="socalicon"  href="{{ twitlink }}">
+	<img  class="img-responsive" src="{{ twitimage }}" data-toggle="tooltip" title="{{ twittertitle }}" alt="{{ twittertitle }}" alt="{{ twittertitle }}" title="{{ twittertitle }}">
+	</a>
+	{% endif %}
+	{% if goglestatus %}
+	<a class="socalicon"  href="{{ goglelink }}">
+	<img  class="img-responsive" src="{{ gogleimage }}" data-toggle="tooltip" title="{{ googletitle }}" alt="{{ googletitle }}" alt="{{ googletitle }}" title="{{ googletitle }}">
+	</a>
+	{% endif %}
+	{% if linkstatus %}
+	<a class="socalicon"  href="{{ linkdinlink }}">
+	<img  class="img-responsive" src="{{ linkdinimage }}" data-toggle="tooltip" title="{{ linkedintitle }}" alt="{{ linkedintitle }}" alt="{{ linkedintitle }}" title="{{ linkedintitle }}">
+	</a>
+	{% endif %}
+	</div>
+</div>
+
+<style>
+.social_login{}
+.socalicon{margin-right:10px;margin-bottom:10px;float:right}
+</style>
