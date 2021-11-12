@@ -9973,6 +9973,22 @@ ul.sitemap > li > ul > li > ul > li > a {margin-left:28px;opacity:0.8;}
 		letter-spacing: normal;
 		margin-top: 15px;
 	}
+	.grid .single-product .product-name, .grid .single-product .product-name:hover, .list .single-product .product-name {
+		display: inline-block;
+		color: #040707;
+		font-size: 13px;
+		padding: 1px 0;
+		margin-bottom: 4px;
+	}
+	.btn-load-more {
+
+		font-size: 15px !important;
+
+		height: 49px;
+		color: #fff;
+		background: #040707;
+
+	}
 }
 /* Catalog mode */
 .catalog_mode .catalog_hide {
