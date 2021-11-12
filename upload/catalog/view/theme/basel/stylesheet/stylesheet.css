@@ -9966,6 +9966,13 @@ ul.sitemap > li > ul > li > ul > li > a {margin-left:28px;opacity:0.8;}
 		line-height: 23px;
 		font-family: "Risingsun",Arial,Helvetica,sans-serif;
 	}
+	.title_in_bc .breadcrumb-holder #title-holder #page-title {
+		font-size: 24px;
+		line-height: 28px;
+		padding: 0px;
+		letter-spacing: normal;
+		margin-top: 15px;
+	}
 }
 /* Catalog mode */
 .catalog_mode .catalog_hide {
