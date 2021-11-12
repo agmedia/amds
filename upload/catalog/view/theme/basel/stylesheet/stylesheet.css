@@ -9960,6 +9960,12 @@ ul.sitemap > li > ul > li > ul > li > a {margin-left:28px;opacity:0.8;}
 		letter-spacing: normal;
 		text-transform: none;
 	}
+	.blog .main_description p {
+		color: #040707;
+		font-size: 16px;
+		line-height: 23px;
+		font-family: "Risingsun",Arial,Helvetica,sans-serif;
+	}
 }
 /* Catalog mode */
 .catalog_mode .catalog_hide {
