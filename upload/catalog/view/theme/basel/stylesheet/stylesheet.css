@@ -2350,7 +2350,7 @@ div.required .control-label:after {
 }
 /* Sub item arrow */
 .main-menu ul > li.dropdown-wrapper > a {
-	padding-right:23px;
+	/*padding-right:23px;*/
 }
 .main-menu > ul > li.dropdown-wrapper > a .fa-angle-down {
 	position:absolute;
@@ -2606,7 +2606,14 @@ div.required .control-label:after {
 }
 .main-menu.vertical > ul > li:hover .dropdown-content {
 	margin-left:0px !important
-}	
+}
+	.main-menu .dropdown-inner {
+		display: table;
+		width:100%;
+		padding:27px 26px 33px;
+		border-top: 1px solid #ececec;
+		box-shadow: 0 40px 40px 0 rgba(0,0,0,0.3);
+	}
 }
 .main-menu.vertical > ul > li > a .icon {
 	margin-right:10px;
