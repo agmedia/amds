@@ -48,7 +48,7 @@ class ControllerExtensionFeedFacebookstore extends Controller {
                 $output .= '<g:description>' . $this->wrapInCDATA($description) . '</g:description>';
                 $output .= '<g:link>' . $this->url->link('product/product', 'product_id=' . $product['product_id']) . '</g:link>';
                 $output .= '<g:image_link>' . $this->wrapInCDATA(HTTPS_SERVER.'image/' . $product['image']) . '</g:image_link>';
-                $output .= '<g:brand>' . $this->wrapInCDATA($product['manufacturer']) . '</g:brand>';
+                $output .= '<g:brand>' . $this->wrapInCDATA('AMDS JEANS') . '</g:brand>';
                 $output .= '<g:condition>new</g:condition>';
                 $output .= '<g:availability>in stock</g:availability>';
 
