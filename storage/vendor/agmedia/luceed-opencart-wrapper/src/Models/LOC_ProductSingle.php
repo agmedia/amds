@@ -329,9 +329,8 @@ class LOC_ProductSingle
             $status = 0;
         }
 
-        $attributes = ProductHelper::getAttributes($this->product);
         $images = ProductHelper::getImages($this->product);
-        $image_path = isset($images[0]['image']) ? $images[0]['image'] : 'image/placeholder.png';
+        $image_path = isset($images[0]['image']) ? $images[0]['image'] : agconf('import.image_placeholder');
         unset($images[0]);
 
         $prod = [
@@ -367,10 +366,10 @@ class LOC_ProductSingle
             'filter'              => '',
             'download'            => '',
             'related'             => '',
-            'image'               => ! empty($this->product['dokumenti']) ? $image_path : agconf('import.image_placeholder'),
+            'image'               => $image_path,
             'points'              => '',
             'product_store'       => [0 => 0],
-            'product_attribute'   => $attributes,
+            //'product_attribute'   => ProductHelper::getAttributes($this->product),
             'product_description' => $description,
             'product_image'       => $images,
             'product_layout'      => [0 => ''],

@@ -403,10 +403,9 @@ class LOC_Product
         if ($product['enabled'] == 'N') {
             $status = 0;
         }
-        
-        $attributes = ProductHelper::getAttributes($product);
+
         $images = ProductHelper::getImages($product);
-        $image_path = isset($images[0]['image']) ? $images[0]['image'] : 'image/placeholder.png';
+        $image_path = isset($images[0]['image']) ? $images[0]['image'] : agconf('import.image_placeholder');
         unset($images[0]);
         
         $prod = [
@@ -441,10 +440,10 @@ class LOC_Product
             'filter'              => '',
             'download'            => '',
             'related'             => '',
-            'image'               => ! empty($product['dokumenti']) ? $image_path : agconf('import.image_placeholder'),
+            'image'               => $image_path,
             'points'              => '',
             'product_store'       => [0 => 0],
-            'product_attribute'   => $attributes,
+            //'product_attribute'   => ProductHelper::getAttributes($product),
             'product_description' => $description,
             'product_image'       => $images,
             'product_layout'      => [0 => ''],
