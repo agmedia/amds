@@ -395,7 +395,7 @@ class ModelCatalogProduct extends Model {
   */
 
         $getCat = $this->db->query("SELECT product_id, min(category_id) as category_id FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "' AND category_id not in (SELECT distinct parent_id as category_id FROM oc_category)");
-        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_to_category WHERE category_id = '" . (int)$getCat->row['category_id'] . "' AND product_id != '" . (int)$product_id . "'  LIMIT 0,4");
+        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_to_category WHERE category_id = '" . (int)$getCat->row['category_id'] . "' AND product_id != '" . (int)$product_id . "'  LIMIT 0,4 ORDER BY RAND()" );
 
         foreach ($query->rows as $result) {
             //$product_data[$result['related_id']] = $this->getProduct($result['related_id']);
