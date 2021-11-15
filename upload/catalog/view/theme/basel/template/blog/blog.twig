@@ -16,13 +16,29 @@
     <div id="content" class="{{ class }}">{{ content_top }}
     <div class="blog blog_post wrapper">
     <div class="row">
-        <div class="col-md-5">
+        <div class="col-md-5" id="gallery">
+
+
+
                 {% if main_thumb and blogsetting_post_thumb %}
                 <div class="main_thumb">
+                    <a href="{{ main_image }}" class="link" >
                 <img src="{{ main_thumb }}" alt="{{ heading_title }}" title="{{ heading_title }}" />
-
+                    </a>
                 </div>
                 {% endif %}
+
+            {% if images %}
+            <ul class="thumbsblog">
+                {% for image in images %}
+                    <li >
+                        <a href="{{ image.popup }}" class="link" >
+                                <img src="{{ image.thumb }}" style="max-height:150px" alt="{{ heading_title }}"  >
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
         </div>
         <div class="col-md-7">
                 <h1 id="page-title" class="contrast-font">{{ heading_title }}</h1>
@@ -170,6 +186,24 @@ $('.google_share').attr("href", 'https://plus.google.com/share?url=' + share_url
 $('.pinterest_share').attr("href", 'http://pinterest.com/pin/create/button/?url=' + share_url + '&media=' + thumb + '&description=' + page_title + '');
 $('.vk_share').attr("href", 'http://vkontakte.ru/share.php?url=' + share_url + '');
 </script>
+<script src="catalog/view/theme/basel/js/lightgallery/js/lightgallery.min.js"></script>
+<script src="catalog/view/theme/basel/js/lightgallery/js/lg-zoom.min.js"></script>
+<script>
+
+    $(document).ready(function() {
+// Image Gallery
+        $("#gallery").lightGallery({
+            selector: '.link',
+            download:false,
+            hideBarsDelay:99999
+        });
+    });
+
+
+
+
+
+    //--></script>
 
 <script type="application/ld+json">
 {

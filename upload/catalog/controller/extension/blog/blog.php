@@ -164,10 +164,24 @@ class ControllerExtensionBlogBlog extends Controller {
 	      	
 			if ($blog_info['image']) {
 			$data['main_thumb'] = $this->model_tool_image->resize($blog_info['image'], $data['img_width'], $data['img_height']);
+
+                $data['main_image'] = $this->model_tool_image->resize($blog_info['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_popup_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_popup_height'));
 			$this->document->addLink($data['main_thumb'], 'image');
 			} else {
 			$data['main_thumb'] = false;
 			}
+
+
+            $data['images'] = array();
+
+            $results = $this->model_extension_blog_blog->getBlogImages($this->request->get['blog_id']);
+
+            foreach ($results as $result) {
+                $data['images'][] = array(
+                    'popup' => $this->model_tool_image->resize($result['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_popup_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_popup_height')),
+                    'thumb' => $this->model_tool_image->resize($result['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_additional_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_additional_height'))
+                );
+            }
 			
 			$data['tags'] = array();
 

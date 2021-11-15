@@ -55,6 +55,17 @@ body, .product-name.main-font, .gridlist .single-product .product-name, .gridlis
 	color:#040707;
 }
 
+ul.thumbsblog{
+	display: flex;
+	flex-wrap: wrap;
+}
+
+ul.thumbsblog li {
+	display: block;
+	margin: 10px 10px 0 0;
+	max-width: calc(20% - 8px);
+}
+
 .logoutlink{
 font-size:14px;
 	float:right;
@@ -3378,7 +3389,7 @@ text-decoration: underline;
 /* Single Blog Page */
 .blog_post .main_thumb {
 	position:relative;
-	margin-bottom:20px;
+	margin-bottom:0px;
 }
 .blog_post h1#page-title {
 	margin-bottom:16px;
@@ -6617,6 +6628,10 @@ h3.modalh{
 		line-height: 19px;
 		font-size: 4.5vw;
 		line-height: 1.4;
+	}
+	ul.thumbsblog li {
+		margin: 5px 5px 0 0;
+		max-width: calc(20% - 5px);
 	}
 	.hp-promo-cnt .btn, .hp-promo-cnt button {
 		height: 44px;

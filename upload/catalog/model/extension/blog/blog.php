@@ -127,6 +127,12 @@ class ModelExtensionBlogBlog extends Model {
 		}
 		return $product_data;
 	}
+
+    public function getBlogImages($blog_id) {
+        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "blog_image WHERE blog_id = '" . (int)$blog_id . "' ORDER BY sort_order ASC");
+
+        return $query->rows;
+    }
 	
 
 	public function addComment($blog_id, $data) {
