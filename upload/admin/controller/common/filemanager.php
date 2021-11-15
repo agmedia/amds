@@ -261,9 +261,9 @@ class ControllerCommonFileManager extends Controller {
 						$json['error'] = $this->language->get('error_filetype');
 					}
 
-					if ($file['size'] > $this->config->get('config_file_max_size')) {
+			/*		if ($file['size'] > $this->config->get('config_file_max_size')) {
 						$json['error'] = $this->language->get('error_filesize');
-					}
+					}*/
 
 					// Return any upload error
 					if ($file['error'] != UPLOAD_ERR_OK) {
