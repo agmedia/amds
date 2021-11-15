@@ -90,7 +90,52 @@ class ProductHelper
             }
         }
 
+        $attributes = collect($product['atributi']);
+
+        if (static::hasOutletCategory($attributes)) {
+            $response = static::sortOutletCategory($response);
+        }
+
         return $response;
+    }
+
+
+    /**
+     * @param array $categories
+     *
+     * @return array
+     */
+    public static function sortOutletCategory(array $categories): array
+    {
+        $categories[3] = agconf('import.outlet_category');
+
+        if (isset($categories[2])) {
+            $categories[4] = $categories[2];
+            $categories[5] = $categories[1];
+
+            return $categories;
+        }
+
+        $categories[4] = $categories[1];
+
+        return array_values($categories);
+    }
+
+
+    /**
+     * @param Collection $attributes
+     *
+     * @return bool
+     */
+    public static function hasOutletCategory(Collection $attributes): bool
+    {
+        foreach ($attributes as $attribute) {
+            if ($attribute->atribut == 'outlet' && $attribute->aktivan == 'D') {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
