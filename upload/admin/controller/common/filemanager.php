@@ -257,12 +257,15 @@ class ControllerCommonFileManager extends Controller {
 						'image/gif'
 					);
 
+
+                    if ($file['size'] > $this->config->get('config_file_max_size')) {
+                        $json['error'] = $this->language->get('error_upload_2');
+                    }
+
 					if (!in_array($file['type'], $allowed)) {
 						$json['error'] = $this->language->get('error_filetype');
 					}
-					if ($file['size'] > $this->config->get('config_file_max_size')) {
-						$json['error'] = $this->language->get('error_filesize');
-					}
+
 
 					// Return any upload error
 					if ($file['error'] != UPLOAD_ERR_OK) {
