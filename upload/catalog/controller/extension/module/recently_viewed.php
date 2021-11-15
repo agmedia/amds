@@ -142,7 +142,6 @@ class ControllerExtensionModuleRecentlyViewed extends Controller {
                     );
                 }
 
-
                 $data['products'][] = array(
 					'product_id'  => $result['product_id'],
 					'thumb'       => $image,
