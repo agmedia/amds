@@ -10285,3 +10285,164 @@ ul.sitemap > li > ul > li > ul > li > a {margin-left:28px;opacity:0.8;}
 .icon-vynil:before {content: "\e92d";}
 .icon-truck:before {content: "\e92e";}
 .icon-world:before {content: "\e92f";}
+
+.information-information-8  .informationtypo p{
+	color: #040707;
+	font-size: 18px;
+	line-height: 26px;
+	font-family: "Risingsun",Arial,Helvetica,sans-serif;
+}
+
+.information-information-8 .breadcrumb-holder {display:none}
+
+.information-information-8  .informationtypo h2{
+	font-weight:700
+}
+
+.information-information-8  .informationtypo ul li {
+	position: relative;
+	padding: 2px 0 2px 20px;
+}
+
+.information-information-8  .informationtypo ul li::before {
+	content: "";
+	position: absolute;
+	display: block;
+	width: 10px;
+	height: 3px;
+	background: #ececec;
+	top: 14px;
+	left: 0;
+}
+
+.information-information-8  .informationtypo ul {
+	list-style: none;
+	padding: 0;
+	font-size: 18px;
+	margin: 0 0 15px 0;
+}
+
+
+
+.ln-text-content {
+	display: flex;
+	width: calc(100% - -80px);
+	margin-left: -40px;
+}
+
+.text-math-row {
+	display: flex;
+	justify-content: space-between;
+	margin: 30px 0;
+}
+
+.text-math-item {
+	display: block;
+	width: calc(100% / 3);
+	text-align: center;
+	position: relative;
+	padding: 0 40px;
+}
+
+.ln-text-content-column {
+	width: 50%;
+	margin: 0 40px;
+	flex-grow: 1;
+}
+.text-math-item:first-child::before {
+	content: '+';
+}
+.text-math-item:nth-child(2)::before {
+	content: '=';
+}
+.text-math-item::before {
+	content: '';
+	font-size: 60px;
+	line-height: 40px;
+	font-weight: 300;
+	position: absolute;
+	right: -12px;
+}
+.text-math-title {
+	font-size: 36px;
+	line-height: 42px;
+	font-weight: 900;
+	padding-bottom: 10px;
+}
+
+.text-math-item {
+	text-align: center;
+	font-size: 18px;
+}
+
+.ln-wrapper {
+	max-width: 1400px;
+	margin: 0 13%;
+	margin-bottom: 0px;
+}
+.ln-text-content {
+	display: flex;
+	width: calc(100% - -80px);
+	margin-left: -40px;
+}
+
+@media (max-width:1600px){
+	.ln-wrapper{
+		max-width:unset;
+		margin: 0 1%;
+	}
+
+	.text-math-item {
+		font-size: 16px;
+
+	}
+}
+
+@media (max-width:1300px){
+	.text-math-title {
+		font-size: 28px;
+		line-height: 33px;
+	}
+	.information-information-8  .informationtypo p{
+		color: #040707;
+		font-size: 16px;
+		line-height: 23px;
+		font-family: "Risingsun",Arial,Helvetica,sans-serif;
+	}
+
+	.information-information-8  .informationtypo ul {
+		list-style: none;
+		padding: 0;
+		font-size: 16px;
+		margin: 0 0 15px 0;
+	}
+}
+@media (max-width:980px){
+	.text-math-row {
+		display: block;
+		margin: 30px 0;
+		text-align: center;
+	}
+	.text-math-item {
+		width: 100%;
+		padding: 0 0 50px;
+	}
+	.text-math-item::before {
+		font-size: 50px;
+		line-height: 25px;
+		right: unset;
+		left: 50%;
+		bottom: 14px;
+		transform: translateX(-50%);
+	}
+	.text-math-title {
+		font-size: 24px;
+		line-height: 28px;
+		padding-bottom: 5px;
+	}
+	.text-math-item {
+		font-size: 14px;
+		line-height: 20px;
+
+	}
+}
