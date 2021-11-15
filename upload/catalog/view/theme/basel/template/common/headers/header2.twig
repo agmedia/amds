@@ -77,17 +77,27 @@
         </div>
         </div>
         {% endif %}
-           <div class="icon-element is_wishlist prijava">
+
 
                {% if logged %}
-                  <a class="logout shortcut-wrapper wishlist" title="Odjava" href="{{ logout }}"> <i class="icon-user icon margin-r10"></i> <span class="h1300">Odjava</span>
+           <div class="icon-element is_wishlist prijava">
+               <a class="shortcut-wrapper wishlist" title="Korisnički račun" href="{{ login }}">
+                     <div class="wishlist-hover"> <i class="icon-user icon margin-r10"></i><span class="h1300">Moj račun</span></div></a>
+           </div>
+                   <div class="icon-element is_wishlist prijava">
+                  <a class="logout shortcut-wrapper wishlist" title="Odjava" href="{{ logout }}"> <i class="icon-logout icon margin-r10"></i><span class="h1300">Odjava</span>
                </a>
+             </div>
+
+
                {% else %}
+           <div class="icon-element is_wishlist prijava">
                    <a class="shortcut-wrapper wishlist" title="Korisnički račun" href="{{ login }}">
                        <div class="wishlist-hover"><i class="icon-user icon margin-r10"></i> <span class="h1300">Moj račun</span></div>
                    </a>
-               {% endif %}
            </div>
+               {% endif %}
+
 
 
         

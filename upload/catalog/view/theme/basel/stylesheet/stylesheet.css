@@ -55,6 +55,13 @@ body, .product-name.main-font, .gridlist .single-product .product-name, .gridlis
 	color:#040707;
 }
 
+.logoutlink{
+font-size:14px;
+	float:right;
+	display:inline-block;
+	margin-top:5px
+}
+
 .informationtypo h2{
 	font-size: 32px;
 	line-height: 37px;

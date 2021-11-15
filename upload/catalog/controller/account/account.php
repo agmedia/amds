@@ -60,7 +60,9 @@ class ControllerAccountAccount extends Controller {
 			$data['reward'] = $this->url->link('account/reward', '', true);
 		} else {
 			$data['reward'] = '';
-		}		
+		}
+
+        $data['logout'] = $this->url->link('account/logout', '', true);
 		
 		$data['return'] = $this->url->link('account/return', '', true);
 		$data['transaction'] = $this->url->link('account/transaction', '', true);
