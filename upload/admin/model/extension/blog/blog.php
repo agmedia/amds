@@ -87,6 +87,12 @@ class ModelExtensionBlogBlog extends Model {
 				");
 			}
 		}
+
+        if (isset($data['product_image'])) {
+            foreach ($data['product_image'] as $product_image) {
+                $this->db->query("INSERT INTO " . DB_PREFIX . "blog_image SET blog_id = '" . (int)$blog_id . "', image = '" . $this->db->escape($product_image['image']) . "', sort_order = '" . (int)$product_image['sort_order'] . "'");
+            }
+        }
 		
 		if (isset($data['product_related'])) {
 			foreach ($data['product_related'] as $related_id) {
@@ -149,6 +155,14 @@ class ModelExtensionBlogBlog extends Model {
 				}
 			}
 		}
+
+        $this->db->query("DELETE FROM " . DB_PREFIX . "blog_image WHERE blog_id = '" . (int)$blog_id . "'");
+
+        if (isset($data['product_image'])) {
+            foreach ($data['product_image'] as $product_image) {
+                $this->db->query("INSERT INTO " . DB_PREFIX . "blog_image SET blog_id = '" . (int)$blog_id . "', image = '" . $this->db->escape($product_image['image']) . "', sort_order = '" . (int)$product_image['sort_order'] . "'");
+            }
+        }
 
 		
 		
@@ -222,7 +236,7 @@ class ModelExtensionBlogBlog extends Model {
 		} else {
 		$this->db->query("DELETE FROM " . DB_PREFIX . "url_alias WHERE query = 'blog_id=" . (int)$blog_id . "'");
 		}
-		
+        $this->db->query("DELETE FROM " . DB_PREFIX . "blog_image WHERE blog_id = '" . (int)$blog_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "blog_related WHERE parent_blog_id = '" . (int)$blog_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "blog_to_category WHERE blog_id = '" . (int)$blog_id . "'");
 		$this->db->query("DELETE FROM " . DB_PREFIX . "blog_comment WHERE blog_id = '" . (int)$blog_id . "'");
@@ -378,6 +392,13 @@ class ModelExtensionBlogBlog extends Model {
 
 		return $product_related_data;
 	}
+
+
+    public function getBlogImages($blog_id) {
+        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "blog_image WHERE blog_id = '" . (int)$blog_id . "' ORDER BY sort_order ASC");
+
+        return $query->rows;
+    }
 	
 	
 	public function getCommentsByBlogId($blog_id, $start = 0, $limit = 40) {

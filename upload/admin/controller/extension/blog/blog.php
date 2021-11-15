@@ -498,6 +498,35 @@ class ControllerExtensionBlogBlog extends Controller {
 			$data['thumb'] = $this->model_tool_image->resize('no_image.png', 100, 100);
 		}
 
+
+        // Images
+        if (isset($this->request->post['product_image'])) {
+            $product_images = $this->request->post['product_image'];
+        } elseif (isset($this->request->get['blog_id'])) {
+            $product_images =$this->model_extension_blog_blog->getBlogImages($this->request->get['blog_id']);
+        } else {
+            $product_images = array();
+        }
+        
+
+        $data['product_images'] = array();
+
+        foreach ($product_images as $product_image) {
+            if (is_file(DIR_IMAGE . $product_image['image'])) {
+                $image = $product_image['image'];
+                $thumb = $product_image['image'];
+            } else {
+                $image = '';
+                $thumb = 'no_image.png';
+            }
+
+            $data['product_images'][] = array(
+                'image'      => $image,
+                'thumb'      => $this->model_tool_image->resize($thumb, 100, 100),
+                'sort_order' => $product_image['sort_order']
+            );
+        }
+
 		$this->load->model('extension/blog/blog_category');
 		
 		if (isset($this->request->post['this_blog_category'])) {
