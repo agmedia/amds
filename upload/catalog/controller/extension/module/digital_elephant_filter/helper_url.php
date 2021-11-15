@@ -83,13 +83,13 @@ class ControllerExtensionModuleDigitalElephantFilterHelperUrl extends Controller
             if (isset($this->request->get['sort'])) {
                 $sort = $this->request->get['sort'];
             } else {
-                $sort = 'p.date_added-DESC';
+                $sort = 'p.date_added';
             }
 
             if (isset($this->request->get['order'])) {
                 $order = $this->request->get['order'];
             } else {
-                $order = 'ASC';
+                $order = 'DESC';
             }
 
             if (isset($this->request->get['page'])) {
