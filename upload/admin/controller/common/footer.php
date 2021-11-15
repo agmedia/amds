@@ -9,7 +9,7 @@ class ControllerCommonFooter extends Controller {
 			$data['text_version'] = '';
 		}
 		
-		$data['link'] = $this->url->link('extension/module/luceed_sync', 'user_token=' . $this->session->data['user_token'], true);
+	//	$data['link'] = $this->url->link('extension/module/luceed_sync', 'user_token=' . $this->session->data['user_token'], true);
 
 		return $this->load->view('common/footer', $data);
 	}
