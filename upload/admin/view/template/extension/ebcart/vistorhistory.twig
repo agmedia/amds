@@ -1,0 +1,27 @@
+<div id="vistorhistory" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+	<!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">Visitor History</h4>
+      </div>
+      <div class="modal-body">
+        <table class="table table-bordered">
+		 <tr>
+			<th>Page</th>
+			<th>Date & Time</th>
+			<th>No. of Visit</th>
+		 </tr>
+		 {% for history in visitor_hisorys %}
+		  <tr>
+			<td><a target="_new" href="{{history.link}}">../{{history.visit_page}}</a></td>
+			<td>{{history.visit_date}}</td>
+			<td>{{history.total_count}}</td>
+		  </tr>
+		  {% endfor %}
+		</table>
+      </div>
+    </div>
+  </div>
+</div>

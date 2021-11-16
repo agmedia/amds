@@ -1,0 +1,113 @@
+<div class="table-responsive">
+	<table class="table table-bordered table-hover">
+	  <thead>
+		<tr>
+		  <td style="width: 1px;" class="text-center"><input type="checkbox" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" /></td>
+		  <td class="text-center">{{ column_customerifno }}</td>
+		  <td class="text-center">{{ column_vistor_type }}</td>
+		  <td class="text-center">{{ column_cart_products }}</td>
+		  <td class="text-center">{{ entry_last_visited }}</td>
+		  <td class="text-center">{{ column_ip }}</td>
+		  <td class="text-center">{{ column_notify }}</td>
+		  <td class="text-center">{{ column_date_added }}</td>
+		  <td class="text-right">{{ column_action }}</td>
+		</tr>
+	  </thead>
+	  <tbody>
+	  {% if ebcarts %}
+			{% for ebcart in ebcarts %}
+		<tr id="{{ ebcart['ebabandonedcart_id'] }}">
+		  <td class="text-center">{% if ebcart['ebabandonedcart_id'] in selected %}
+			<input type="checkbox" name="selected[]" value="{{ ebcart['ebabandonedcart_id'] }}" checked="checked" />
+			{% else %}
+			<input type="checkbox" name="selected[]" value="{{ ebcart['ebabandonedcart_id'] }}" />
+			{% endif %}</td>
+		   <td style="width:250px;">
+			<table class="table table-bordered">
+			  <tr>
+				<td><i class="fa fa-user fw"></i> {{ ebcart['name'] ? ebcart['name'] : 'Unknown' }}</td>
+			  </tr>
+			  <tr>
+				<td><i class="fa fa-envelope-o"></i> {{ ebcart['email'] ? ebcart['email'] : 'Not Provided' }}</td>
+			  </tr>
+			  <tr>
+				<td><i class="fa fa-phone"></i> {{ ebcart['telephone'] ? ebcart['telephone'] : 'Not Provided' }}</td>
+			  </tr>
+			  <tr>
+				<td><i class="fa fa-map-marker" aria-hidden="true"></i>  {{ ebcart['store'] }}</td>
+			  </tr>
+			  <tr>
+				<td>{{ text_currency }} ({{ ebcart['currency'] }}) </td>
+			  </tr>
+			  <tr>
+				<td><img src="language/{{ ebcart['language_code'] }}/{{ ebcart['language_code'] }}.png" title="{{ ebcart['language'] }}" /> {{ ebcart['language'] }}</td>
+			  </tr>
+			</table>
+		  </td>
+		  <td class="text-center">{{ ebcart['visitor'] }}</td>
+		  <td>
+			<table class="table table-bordered">
+			 <tr>
+				<th class="text-center">{{ column_image }}</th>
+				<th>{{ column_product }}</th>
+				<th>{{ column_quantity }}</th>
+				<th>{{ column_price }}</th>
+				<th>{{ column_total }}</th>
+			 </tr>
+			 
+				 {% for ebproduct in ebcart['ebcart_products'] %}
+				<tr>
+				   <td class="text-center"><a href="{{ ebproduct['href'] }}"><img class="img-thumbnail" src="{{ ebproduct['image'] }}"/></a></td>
+				   <td>
+					<a href="{{ ebproduct['href'] }}">{{ ebproduct['name'] }}</a>
+					 {% if ebproduct['option_data'] %}
+					  {% for option in ebproduct['option_data'] %}
+					  <br />
+					   <small> - {{ option['name'] }}: {{ option['value'] }}</small>
+					 {% endfor %}
+					{% endif %}
+				   </td>
+				   <td>{{ ebproduct['quantity'] }}</td>
+				   <td>{{ ebproduct['price'] }}</td>
+				   <td>{{ ebproduct['total'] }}</td>
+				</tr>
+				
+				{% endfor %}
+			  <tr>
+				<td class="text-right" colspan="4"><b>{{ column_total }}</b></td>
+				<td class="text-left">{{ ebcart['cart_total'] }}</td>
+			  </tr>
+			</table>
+		  </td>
+		  <td>
+			<table class="table table-bordered">
+			  <tr>
+				<td><a target="_new" href="{{ebcart['visit_link']}}">../{{ebcart['visit_page']}}</a></td>
+			  </tr>
+			  <tr>
+				<td>{{ebcart['visit_date']}}</td>
+			  </tr>
+			</table>
+			<a onclick="vistorhistory('{{ebcart['ebabandonedcart_id']}}');" style="cursor:pointer;" class="btn-sm btn-success pull-right">View History</a>
+		  </td>
+		  <td>{{ ebcart['ip'] }}<br/> <br/> <a target="_blank" class="btn btn-sm btn-info" href="{{ ebcart['ip_href'] }}"><i class="fa fa-search" aria-hidden="true"></i> Check ip</a></td>
+		  <td class="text-center">{{ ebcart['notify_status'] }}</td>
+		  <td>{{ ebcart['date_added'] }}</td>
+		  <td style="width: 115px;">
+			<a {{ ebcart['email'] ? '' : 'disabled="disabled"'}}  rel="{{ ebcart['ebabandonedcart_id'] }}" class="btn btn-info {{ ebcart['email'] ? 'sendnotify' : ''}}"><i class="fa fa-envelope"></i></a>
+			<a rel="{{ ebcart['ebabandonedcart_id'] }}" class="btn btn-danger deletecart"><i class="fa fa-trash-o"></i></a>
+		  </td>
+		</tr>
+		{% endfor %}
+		{% else %}
+		<tr>
+		  <td class="text-center" colspan="9">{{ text_no_results }}</td>
+		</tr>
+		{% endif %}
+	  </tbody>
+	</table>
+</div>
+<div class="row">
+  <div class="col-sm-6 text-left">{{ pagination }}</div>
+  <div class="col-sm-6 text-right">{{ results }}</div>
+</div>

@@ -1,0 +1,310 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+		<button type="button" class="btn btn-success" data-toggle="modal" data-target="#ShortcutModal">{{ text_shortcuts }}</button>
+        <button type="submit" form="form-email_template" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i> {{ button_save }}</button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_form }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-email_template" class="form-horizontal">
+          <ul class="nav nav-tabs">
+            <li class="active"><a href="#tab-general" data-toggle="tab"><i class="fa fa-power-off" aria-hidden="true"></i> {{ tab_general }}</a></li>
+            <li><a href="#tab-coupon" data-toggle="tab"><i class="fa fa-gift" aria-hidden="true"></i> {{ tab_coupon }}</a></li>
+            <li><a href="#tab-shortcode" data-toggle="tab"><i class="fa fa-code" aria-hidden="true"></i> {{ tab_shortcode }}</a></li>
+            <li><a href="#tab-support" data-toggle="tab"><i class="fa fa-life-ring" aria-hidden="true"></i> {{ tab_support }}</a></li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane active" id="tab-general">
+              <ul class="nav nav-tabs" id="language">
+                {% for language in languages %}
+                <li>
+					<a href="#language{{ language['language_id'] }}" data-toggle="tab">
+						<img src="language/{{ language.code }}/{{ language.code }}.png" title="{{ language.name }}" /> {{ language.name }}
+					</a>
+				</li>
+                {% endfor %}
+              </ul>
+              <div class="tab-content">
+                {% for language in languages %}
+                <div class="tab-pane" id="language{{ language['language_id'] }}">
+                  <div class="form-group required">
+                    <label class="col-sm-2 control-label" for="input-title{{ language['language_id'] }}">{{ entry_title }}</label>
+                    <div class="col-sm-10">
+                      <input type="text" name="abandonedcart_email_template_description[{{ language['language_id'] }}][title]" value="{{ abandonedcart_email_template_description[language['language_id']] ? abandonedcart_email_template_description[language['language_id']]['title'] }}" placeholder="{{ entry_title }}" id="input-title{{ language['language_id'] }}" class="form-control" />
+                      {% if error_title[language['language_id']] %}
+                      <div class="text-danger">{{ error_title[language['language_id']] }}</div>
+                     {% endif %}
+                    </div>
+                  </div>
+				  <div class="form-group required">
+                    <label class="col-sm-2 control-label" for="input-subject{{ language['language_id'] }}">{{ entry_subject }}</label>
+                    <div class="col-sm-10">
+                      <input type="text" name="abandonedcart_email_template_description[{{ language['language_id'] }}][subject]" value="{{ abandonedcart_email_template_description[language['language_id']] ? abandonedcart_email_template_description[language['language_id']]['subject'] }}" placeholder="{{ entry_subject }}" id="input-subject{{ language['language_id'] }}" class="form-control" />
+					  {% if error_subject[language['language_id']] %}
+                      <div class="text-danger">{{ error_subject[language['language_id']] }}</div>
+                     {% endif %}
+                    </div>
+                  </div>
+                  <div class="form-group required">
+                    <label class="col-sm-2 control-label" for="input-description{{ language['language_id'] }}">{{ entry_description }}</label>
+                    <div class="col-sm-10">
+                      <textarea name="abandonedcart_email_template_description[{{ language['language_id'] }}][description]" placeholder="{{ entry_description }}" id="input-description{{ language['language_id'] }}" data-toggle="summernote" data-lang="{{ summernote }}" class="form-control">{{ abandonedcart_email_template_description[language['language_id']] ? abandonedcart_email_template_description[language['language_id']]['description'] }}</textarea>
+					  {% if error_description[language['language_id']] %}
+                      <div class="text-danger">{{ error_description[language['language_id']] }}</div>
+                     {% endif %}
+                    </div>
+                  </div>
+                </div>
+               {% endfor %}
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="input-sort-order">{{ entry_sort_order }}</label>
+					<div class="col-sm-10">
+					  <input type="text" name="sort_order" value="{{ sort_order }}" placeholder="{{ entry_sort_order }}" id="input-sort-order" class="form-control" />
+					</div>
+				</div>
+              </div>
+            </div>
+			<div class="tab-pane" id="tab-support">
+				<p class="text-center">For Support and Query Feel Free to contact:<br><strong>extensionsbazaar@gmail.com</strong></p>
+			</div>
+            <div class="tab-pane" id="tab-shortcode">
+				   <div class="table-responsive">
+						<table class="table table-bordered table-hover">
+						  <thead>
+							<tr>
+								<td>
+									<div class="col-sm-12">
+									   <fieldset>
+											<legend>Cart Products</legend>
+											<p>{cart_products} = cart Products</p>
+										</fieldset>
+									</div>
+								</td>
+								<td>
+									<div class="col-sm-12">
+									   <fieldset>
+											<legend>Coupon</legend>
+											<p>{coupon} = Coupon Code</p>
+											<p>{discount} = Discount Value</p>
+											<p>{currency} = Currency Symbol</p>
+											<p>{total_amount} = Total Amount</p>
+											<p>{date_end} = Date End</p>
+										</fieldset>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div class="col-sm-12">
+									   <fieldset>
+											<legend>Store Information</legend>
+											<p>{logo} = Store Logo</p>
+											<p>{Store_name} = Store Name</p>
+											<p>{Store_address} = Store Address</p>
+											<p>{Store_email} = Store Email</p>
+											<p>{Store_telephone} = Store Telephone</p>
+											<p>{store_url} = Store Link</p>
+										</fieldset>
+									</div>
+								</td>
+								<td>
+									<div class="col-sm-12">
+									   <fieldset>
+											<legend>Customer Information</legend>
+											<p>{firstname} = First Name</p>
+											<p>{lastname} = Last Name</p>
+											<p>{email} = E-Mail</p>
+											<p>{telephone} = Telephone</p>
+											<p>{date_end} = Date End</p>
+										</fieldset>
+									</div>
+								</td>
+							</tr>
+						   </thead>
+						 </table>
+					</div>
+			</div>
+            <div class="tab-pane" id="tab-coupon">
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+					<div class="col-sm-5">
+					  <select name="coupon_status" id="input-status" class="form-control">
+					  {% if coupon_status %}
+						<option value="1" selected="selected">{{ text_enabled }}</option>
+						<option value="0">{{ text_disabled }}</option>
+						{% else %}
+						<option value="1">{{ text_enabled }}</option>
+						<option value="0" selected="selected">{{ text_disabled }}</option>
+						{% endif %}
+					  </select>
+					</div>
+				</div>
+				<div class="form-group required">
+					<label class="col-sm-2 control-label" for="input-name">{{ entry_name }}</label>
+					<div class="col-sm-5">
+						<input type="text" name="coupon_name" value="{{ coupon_name }}" placeholder="{{ entry_name }}" id="input-name" class="form-control" />
+						{% if error_name %}
+						<div class="text-danger">{{ error_name }}</div>
+						{% endif %}
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="input-type"><span data-toggle="tooltip" title="{{ help_type }}">{{ entry_type }}</span></label>
+					<div class="col-sm-5">
+						<select name="coupon_type" id="input-type" class="form-control">
+							{% if coupon_type == 'P' %}
+							<option value="P" selected="selected">{{ text_percent }}</option>
+							{% else %}
+							<option value="P">{{ text_percent }}</option>
+							{% endif %}
+							{% if coupon_type == 'F' %}
+							<option value="F" selected="selected">{{ text_amount }}</option>
+							{% else %}
+							<option value="F">{{ text_amount }}</option>
+							{% endif %}
+						</select>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="input-discount">{{ entry_discount }}</label>
+					<div class="col-sm-5">
+						<input type="text" name="coupon_discount" value="{{ coupon_discount }}" placeholder="{{ entry_discount }}" id="input-discount" class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="input-total"><span data-toggle="tooltip" title="{{ help_total }}">{{ entry_total }}</span></label>
+					<div class="col-sm-5">
+						<input type="text" name="coupon_total" value="{{ coupon_total }}" placeholder="{{ entry_total }}" id="input-total" class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="input-product"><span data-toggle="tooltip" title="Coupon Can apply Only cart products Or Entrie Products">Apply Condition</span></label>
+					<div class="col-sm-5">
+						<label class="radio-inline"><input name="coupon_contion" value="1" {% if coupon_contion %} checked="checked" {% endif %} type="radio"> Coupon apply only carts products </label> <br/>
+						<label class="radio-inline"><input name="coupon_contion" {% if not coupon_contion %} checked="checked" {% endif %} value="0" type="radio"> All Products </label>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="input-uses-total"><span data-toggle="tooltip" title="{{ help_vaild }}">{{ entry_vaild }}</span></label>
+					<div class="col-sm-5">
+						<input type="text" name="coupon_vaild" value="{{ coupon_vaild }}" placeholder="{{ entry_vaild }}" id="input-uses-total" class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="input-uses-total"><span data-toggle="tooltip" title="{{ help_uses_total }}">{{ entry_uses_total }}</span></label>
+					<div class="col-sm-5">
+						<input type="text" name="coupon_uses_total" value="{{ coupon_uses_total }}" placeholder="{{ entry_uses_total }}" id="input-uses-total" class="form-control" />
+					</div>
+				</div>
+				<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-uses-customer"><span data-toggle="tooltip" title="{{ help_uses_customer }}">{{ entry_uses_customer }}</span></label>
+						<div class="col-sm-5">
+							<input type="text" name="coupon_uses_customer" value="{{ coupon_uses_customer }}" placeholder="{{ entry_uses_customer }}" id="input-uses-customer" class="form-control" />
+						</div>
+				</div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+	
+	<!-- Modal -->
+	<div id="ShortcutModal" class="modal fade" role="dialog">
+		<div class="modal-dialog">
+
+			<!-- Modal content-->
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					<h4 class="modal-title">{{ text_shortcuts }}</h4>
+				</div>
+				<div class="modal-body">
+					<div class="table-responsive">
+						<table class="table table-bordered table-hover">
+						  <thead>
+							<tr>
+								<td>
+									<div class="col-sm-12">
+									   <fieldset>
+											<legend>Cart Products</legend>
+											<p>{cart_products} = cart Products</p>
+										</fieldset>
+									</div>
+								</td>
+								<td>
+									<div class="col-sm-12">
+									   <fieldset>
+											<legend>Coupon</legend>
+											<p>{coupon} = Coupon Code</p>
+											<p>{discount} = Discount Value</p>
+											<p>{currency} = Currency Symbol</p>
+											<p>{total_amount} = Total Amount</p>
+											<p>{date_end} = Date End</p>
+										</fieldset>
+									</div>
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<div class="col-sm-12">
+									   <fieldset>
+											<legend>Store Information</legend>
+											<p>{logo} = Store Logo</p>
+											<p>{Store_name} = Store Name</p>
+											<p>{Store_address} = Store Address</p>
+											<p>{Store_email} = Store Email</p>
+											<p>{Store_telephone} = Store Telephone</p>
+											<p>{store_url} = Store Link</p>
+										</fieldset>
+									</div>
+								</td>
+								<td>
+									<div class="col-sm-12">
+									    <fieldset>
+											<legend>Customer Information</legend>
+											<p>{firstname} = First Name</p>
+											<p>{lastname} = Last Name</p>
+											<p>{email} = E-Mail</p>
+											<p>{telephone} = Telephone</p>
+										</fieldset>
+									</div>
+								</td>
+							</tr>
+						   </thead>
+						 </table>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
+<script type="text/javascript" src="view/javascript/summernote/summernote.js"></script>
+  <link href="view/javascript/summernote/summernote.css" rel="stylesheet" />
+  <script type="text/javascript" src="view/javascript/summernote/opencart.js"></script>
+<script type="text/javascript"><!--
+$('#language a:first').tab('show');
+//--></script>
+</div>
+{{ footer }}
