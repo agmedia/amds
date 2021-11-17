@@ -5026,7 +5026,7 @@ a.scroll-to-top:not(:hover) {
 	-webkit-appearance:none; /* Needed for iPad */
 	text-transform:uppercase;
 	text-align:center;
-	padding:8px 20px;
+	padding:15px 20px;
 	display:inline-block;
 	font-size:14px;
 	line-height:20px;
