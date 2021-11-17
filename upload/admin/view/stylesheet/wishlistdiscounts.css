@@ -1,0 +1,716 @@
+.iModuleContent h1 .iModulesTitle {
+	color: #333;
+	font-family: Trebuchet MS;
+	font-size: 15px;
+	display: block;
+	float: left;
+	margin-right: 20px;
+}
+.iModuleContent .box > .heading h1 {
+	width: 680px;
+}
+ul.iModuleAdminMenu {
+	width: 186px;
+	list-style: none;
+	background: #EDEDED;
+	min-height: 319px;
+	float: left;
+	font-family: Trebuchet MS;
+	border-left: 1px solid #CCC;
+	border-top: 1px solid #eee;
+	border-bottom: 1px solid #CCC;
+	margin: -10px 0 0 -30px;
+	padding: 0;
+}
+.iModuleAdminMenu li {
+	list-style: none;
+	display: block;
+	height: 38px;
+	line-height: 38px;
+	font-size: 14px;
+	cursor: pointer;
+	color: #333;
+	text-shadow: #fff 1px 1px 0;
+	margin: 0;
+	padding: 0 0 0 16px;
+}
+.iModuleAdminMenu li.selected {
+	background: #CFDE55;
+}
+.iModuleAdminMenu li:hover {
+	color: #000;
+}
+ul.iModuleAdminSuperMenu {
+	float: left;
+	margin-left: 60px;
+}
+.iModuleAdminSuperMenu li {
+	float: left;
+	font-size: 14px;
+	line-height: 23px;
+	cursor: pointer;
+	color: #333;
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+	font-weight: 400;
+	margin-top: -7px;
+	margin-right: 5px;
+	background: #DBDBDB;
+	-webkit-border-top-left-radius: 6px;
+	-webkit-border-top-right-radius: 6px;
+	-moz-border-radius-topleft: 6px;
+	-moz-border-radius-topright: 6px;
+	border-top-left-radius: 6px;
+	border-top-right-radius: 6px;
+	padding: 6px 10px;
+}
+
+.iModuleAdminSuperMenu li.selected {
+	background: #fff;
+	font-weight: 700;
+	color: #333;
+}
+.iModuleAdminWrappers li {
+	list-style: none;
+	height: 100%;
+	display: none;
+	margin: 0 0 15px;
+	padding: 10px;
+}
+.iModuleAdminWrappers hr {
+	border: none;
+	border-bottom: 1px dashed #ccc;
+}
+.iModuleAdminWrappers label {
+	min-width: 200px;
+	margin-top: 5px;
+	display: block;
+	float: left;
+	padding-right: 15px;
+}
+.iModuleAdminWrappers .iModuleFields > span {
+	float: left!important;
+}
+.iModuleAdminWrappers select, .iModuleAdminWrappers input, .iModuleAdminWrappers textarea {
+	min-width: 140px;
+}
+.iModuleAdminWrappers textarea {
+	min-height: 140px;
+	min-width: 400px;
+}
+.iModuleWrapperTitle {
+	font-size: 16px;
+	margin-bottom: 15px;
+}
+.iModuleAdminSuperWrappers .content {
+	margin-left: 160px;
+	min-height: 320px;
+	padding: 10px;
+}
+.iModuleContent .clearfix:after {
+	content: ".";
+	display: block;
+	clear: both;
+	visibility: hidden;
+	line-height: 0;
+	height: 0;
+}
+.iModuleContent .clearfix {
+	display: inline-block;
+}
+* html .iModuleContent .clearfix {
+	height: 1%;
+}
+.iModuleAdminSuperWrappers .iModuleWrapperTitle h2 {
+	color: #000;
+	font-family: Arial, Helvetica, sans-serif;
+	border-bottom: none;
+	text-transform: none;
+	font-size: 24px;
+}
+.iModuleAdminSuperWrappers .iModuleWrapperTitle h3 {
+	color: #000;
+	font-family: Arial, Helvetica, sans-serif;
+	border-bottom: none;
+	text-transform: none;
+	font-size: 18px;
+}
+.iModuleAdminSuperWrappers .iModuleWrapperText {
+	font-size: 12px;
+}
+.iModuleAdminSuperWrappers .supportUL, .iModuleAdminSuperWrappers .iModuleUL {
+	padding-left: 20px;
+}
+.iModuleAdminSuperWrappers .iModuleSupportButton {
+	background: #51AA68;
+	color: #FFF;
+	border: 2px solid #fff;
+	outline: 2px solid #4E9660;
+	text-decoration: none;
+	display: inline-block;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	font-size: 16px;
+	padding: 10px 20px;
+}
+.iModuleAdminSuperWrappers .iModuleSupportButton:hover {
+	background: #4E9660;
+}
+.iModuleContent .box .notActivatedContent {
+	border-left: 1px solid #CCC;
+	border-right: 1px solid #CCC;
+	border-bottom: 1px solid #CCC;
+	min-height: 300px;
+	overflow: auto;
+	text-align: center;
+	padding: 80px 10px 10px;
+}
+.iModuleContent .box .notActivatedContent h1 {
+	font-size: 28px;
+}
+.iModuleContent .iModuleActivateButton {
+	background: #069;
+	color: #FFF;
+	border: 4px solid #fff;
+	outline: 4px solid #ccc;
+	text-decoration: none;
+	display: inline-block;
+	margin-top: 20px;
+	margin-bottom: 20px;
+	font-size: 34px;
+	padding: 16px 28px;
+}
+.iModuleContent .iModuleActivateButton:hover {
+	background: #06d;
+}
+.colorsLi .colorPreview {
+	width: 18px;
+	height: 18px;
+	background: #ccc;
+	border: 1px solid #aaa;
+}
+.colorsLi tr th {
+	color: #333;
+	font-size: 13px;
+	font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+	text-align: left;
+	padding-left: 10px;
+}
+#searchedFound {
+	height: 400px;
+	padding: 0;
+}
+.iSimpleTable {
+	margin: 0 20px 20px;
+}
+.iSimpleTable td {
+	width: 100%;
+	text-align: center;
+	padding: 5px;
+}
+.iSimpleTable tr:first-child td {
+	border-bottom: 1px dotted #CCC;
+}
+div.content div.analytics {
+	width: 100%;
+	clear: both;
+	margin-bottom: 20px;
+}
+body {
+	font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+	font-size: 13px;
+	line-height: inherit;
+}
+.fadeInOnLoad {
+	visibility: hidden;
+}
+.breadcrumb {
+	padding: 12px 15px;
+}
+.breadcrumb a {
+	font-size: 14px;
+	color: #08c;
+}
+.breadcrumb .btn {
+	color: #FFF;
+	margin-left: 8px;
+	margin-bottom: 0;
+	margin-top: -6px;
+	font-size: 13px;
+	padding: 2px 12px;
+}
+.box-heading {
+	padding: 0 10px;
+}
+.box-heading h1 {
+	color: #666;
+	font-size: 15px;
+	line-height: 32px;
+	margin: 0;
+	padding: 3px 0 0;
+}
+.box-heading h1 i {
+	font-size: 17px;
+	font-weight: 400;
+	margin-right: 5px;
+}
+.box-content {
+	border-left: 1px solid #CCC;
+	border-right: 1px solid #CCC;
+	border-bottom: 1px solid #CCC;
+	overflow: auto;
+	padding: 10px;
+}
+.premium-widget {
+	overflow: hidden;
+}
+.breadcrumb li a:before {
+	font-family: FontAwesome;
+	font-style: normal;
+	font-weight: 400;
+	color: #000;
+	font-size: 16px;
+	padding-right: 5px;
+	text-decoration: none;
+}
+.breadcrumb li:first-child a:before {
+	content: "\f015";
+	font-family: FontAwesome;
+	font-style: normal;
+	font-weight: 400;
+	color: #000;
+	font-size: 16px;
+	padding-right: 5px;
+	text-decoration: none;
+}
+.buttons {
+	text-align: right;
+	border: 1px solid #DBDBDB;
+	margin-bottom: 15px;
+	padding: 5px;
+}
+.content .tab-content .box-heading {
+	background-color: #fff;
+	border: none;
+	border-bottom: 1px solid #dbdbdb;
+	padding: 4px 10px;
+}
+.content .tab-content .help {
+	padding: 10px;
+}
+.content .tab-content .box-heading h1 {
+	font-weight: 400;
+	font-size: 18px;
+	color: #454545;
+}
+.content .tab-content .box-content {
+	border-color: #DBDBDB;
+}
+.icon-pagespeed {
+	background: url(../image/ianalytics/google_pagespeed.png);
+	width: 77px;
+	height: 28px;
+	float: right;
+	display: block;
+	margin-right: 0!important;
+}
+.tab-navigation {
+	position: relative;
+}
+.tab-buttons {
+	position: absolute;
+	right: 0;
+	top: 0;
+}
+.icon-refresh {
+	cursor: pointer;
+}
+.icon-refresh:hover {
+	color: #9C0;
+}
+.performersSuccess {
+	font-size: 18px;
+	margin: 2px 25px 20px 20px;
+	padding: 12px 35px 12px 14px;
+}
+.text-greatscore {
+	line-height: 22px;
+	color: #444;
+	font-size: 12px;
+	margin: 26px;
+}
+.bigGauge {
+	width: 400px;
+	height: 320px;
+	display: block;
+	margin-top: -20px;
+}
+.smallGauge {
+	width: 150px;
+	height: 120px;
+	display: none;
+	margin: 1em;
+}
+.gaugeFilterUL {
+	display: inline-block;
+	margin-left: 25px;
+}
+.pagespeedMainTable h3 {
+	color: #757575;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 26px;
+	font-weight: 400;
+}
+.stepsToTake tr.disabled {
+	text-decoration: line-through;
+}
+.premiumServices {
+	width: 100%;
+}
+.premiumServices .price {
+	text-align: right;
+	width: 52px;
+}
+.premiumServices .buynow {
+	text-align: right;
+	width: 90px;
+}
+select.daysSelect {
+	width: 50px;
+}
+select#daysAfterSelect {
+	width: 60px;
+}
+div.daysSlider {
+	width: 160px;
+	display: inline-block;
+}
+div.daysSlider .ui-widget-header {
+	background: #75BAFF;
+	border-color: #0070A6;
+}
+div.daysSlider .ui-state-hover, div.daysSlider .ui-state-focus {
+	background: #CEE7FF;
+	border-color: #0070A6;
+}
+.browserCache h4 {
+	color: #757575;
+	font-family: Arial, Helvetica, sans-serif;
+	font-size: 16px;
+	font-weight: 400;
+}
+.bcHeaders td {
+	height: 20px;
+	line-height: 20px;
+	vertical-align: middle;
+	padding: 3px;
+}
+.bcHeaders td label {
+	line-height: 20px;
+	font-size: 12px;
+	display: inline-block;
+	margin: 0 5px 0 0;
+}
+.bcHeaders td input[type=checkbox] {
+	margin: 0;
+}
+.cacheDirLink {
+	color: #858585;
+	cursor: pointer;
+}
+.cacheDirLink:hover {
+	text-decoration: none;
+	color: #000;
+}
+.clearDbCache {
+	margin-bottom: 10px;
+}
+.center {
+	text-align: center;
+}
+.ftp-log, .amazon-log, .smush-log {
+	margin-top: 10px;
+	width: 100%;
+}
+.ftp-alert-error, .info-error {
+	color: #900;
+}
+.ftp-alert-success, .info-success {
+	color: #090;
+}
+.ftp-alert-warning, .info-warning {
+	color: #C90;
+}
+.ftp-upload, .ftp-cancel, .amazon-upload, .amazon-cancel, .rackspace-upload, .rackspace-cancel {
+	float: left;
+	margin-right: 10px;
+}
+.ftp-progress, .amazon-progress, .rackspace-progress {
+	height: 30px;
+	margin-bottom: 0;
+}
+.ftp-upload-label, .amazon-upload-label {
+	margin-left: 10px;
+}
+.ftp-upload-label input, .amazon-upload-label input {
+	margin-bottom: 5px;
+}
+.licenseAlerts {
+	margin-top: 10px;
+}
+.nav-tabs>li>a {
+	color: #08c;
+}
+a.btn:visited {
+	color: #333;
+}
+a.btn-primary:visited, a.btn-info:visited, a.btn-inverse:visited {
+	color: #FFF;
+}
+.supportThumbs .thumbnail {
+	border: none;
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
+	border-right: 1px solid #ddd;
+}
+.supportThumbs .span4:last-child .thumbnail {
+	border-right: none;
+}
+.registeredDomains {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+#calendar_widget_wrap {
+	width: 900px;
+	margin: 0 auto;
+}
+
+
+  	#colorbox .mailForm input, #colorbox .mailForm select, {
+ 		margin-bottom: 0;
+	}
+.form td input, .form td select {
+	margin-bottom: 0;
+}
+.form.mailForm label {
+	display: inline-block;
+}
+.form.mailForm .mailHeader {
+	display: inline-block;
+	margin: 0 0 10px 0;
+	color: #000;
+	font-size: 12px;
+}
+
+.form.mailForm .mailHeader .discountOption{
+	display: inline-block;
+	margin: 10px 30px 0 0;
+	color: #000;
+	font-size: 12px;
+}
+.form.mailForm .mailHeader .discountOption select, 
+.form.mailForm .mailHeader .discountOption .input-append{
+	margin-right:10px;
+
+}
+.form.mailForm .mailHeader .discountOption label {
+	margin-bottom:3px;
+}
+
+.form.mailForm .mailHeader label {
+	display:inline-block;
+	
+}
+.form.mailForm .mailHeader label {
+	color: #000;
+	font-size: 12px;
+}
+.form.mailForm .mailHeader{
+	padding: 10px 0 0 10px;
+}
+.form.notLicensedTable input {
+	margin-bottom: 10px;
+}
+select#daysSelect {
+	width: 60px;
+}
+.ui-timepicker-div .ui-widget-header {
+	margin-bottom: 8px;
+	background: #09F;
+}
+.ui-timepicker-div dl dt {
+	float: left;
+	clear: left;
+	padding: 0 0 0 5px;
+}
+.ui-timepicker-div dl dd {
+	margin: 0 10px 10px 40%;
+}
+.ui-timepicker-div td {
+	font-size: 90%;
+}
+.ui-tpicker-grid-label {
+	background: none;
+	border: none;
+	margin: 0;
+	padding: 0;
+}
+.ui-timepicker-rtl {
+	direction: rtl;
+}
+.ui-timepicker-rtl dl {
+	text-align: right;
+	padding: 0 5px 0 0;
+}
+.ui-timepicker-rtl dl dt {
+	float: right;
+	clear: right;
+}
+.ui-timepicker-rtl dl dd {
+	margin: 0 40% 10px 10px;
+}
+.iModuleContent ul, li, .iModuleAdminWrappers {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+.iModuleAdminWrappers li:first-child, .iModuleAdminSuperWrappers > li:first-child, html[xmlns] .iModuleContent .clearfix {
+	display: block;
+}
+.iModuleAdminSuperWrappers > li, .ftp-log-entries, .amazon-log-entries, .ftp-alert, .amazon-alert, .rackspace-alert {
+	display: none;
+}
+.colorsLi tr td, .iSimpleTable td:first-child, .ui-timepicker-div dl {
+	text-align: left;
+}
+.iSimpleTable td:last-child, .stepsToTake td:last-child {
+	text-align: right;
+}
+h1, h2, h3, li {
+	line-height: inherit;
+}
+.breadcrumb li a:hover, .bcHeaders td a:hover {
+	text-decoration: none;
+}
+.stepsToTake td, .premiumServices td, .mailForm .table td {
+	vertical-align: middle;
+}
+
+.brSmallField {
+	width: 50px;
+	text-align: center;
+}
+
+.table.wishList td {
+	vertical-align:middle;
+}
+
+div .customerInfo {
+	margin-left:20px;
+}
+
+.list tbody td {
+	padding: 8px;
+}
+.list thead td {
+	padding: 8px;
+}
+
+#customers .pagination {
+	display: block;
+}
+#customers .pull-right .btn.btn-success {
+	margin-bottom: 10px;
+}
+#customers .table.list td a {
+	text-decoration: none;
+}
+
+.ui-progressbar {
+ position: relative;
+}
+.progress-label {
+	position: absolute;
+	text-align: center;
+	top: 4px;
+	font-weight: bold;
+	text-shadow: 1px 1px 0 #fff;
+	width: 100%;
+}
+#colorbox .mailForm table tr td {
+ 	border-bottom: 0;
+ 	/*/*border-top: 0; **/
+ 	padding: 4px;
+}
+#colorbox .mailForm table tr td .input-append {
+	margin-bottom: 0;
+}
+
+#colorbox .mailForm  .table tbody+tbody {
+	border-top: 0;
+}
+#colorbox table.form > tbody > tr > td {
+	padding: 10px;
+	color: #000000;
+	border-top: none;
+	border-bottom: 1px dotted #CCCCCC;
+}
+#colorbox .progressBarHolder {
+	display: none;
+}
+#colorbox .ui-progressbar-value {
+	text-align: center;
+	line-height: 25px;
+}
+
+.storeSwitcherWidget .form-group {
+  margin-bottom: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.storeSwitcherWidget {
+  position: absolute;
+  right: 15px;
+  top: 8px;
+}
+
+.note-editor {
+	margin-bottom: 10px;
+}
+.userMessageLegend {
+	vertical-align:top !important;
+}
+
+#subject {
+	width: 93%;
+	display:inline-block;
+	margin-bottom:20px;
+}
+
+html[dir="rtl"] .pull-right {
+  float: left !important;
+}
+html[dir="rtl"] .pull-left, 
+html[dir="rtl"] .navbar-nav > li, 
+html[dir="rtl"] .nav-tabs > li {
+  float: right !important;
+}
+html[dir=rtl] .tab-content [class*='col-xs-'],
+html[dir=rtl] .tab-content [class*='col-sm-'],
+html[dir=rtl] .tab-content [class*='col-md-'] {
+  float: right;
+}
+html[dir=rtl] .tab-buttons {
+  right: auto;
+  left: 0;
+}
+html[dir=rtl] .storeSwitcherWidget {
+  right: auto;
+  left: 15px;
+}
+html[dir=rtl] .storeSwitcherWidget .form-group.open .dropdown-menu {
+  right: auto !important;
+  left: 0;
+}

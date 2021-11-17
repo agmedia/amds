@@ -1,0 +1,156 @@
+{{ header }}{{ column_left }}
+<div id="content">
+    <div class="page-header">
+        <div class="container-fluid">
+            <h1><i class="fa fa-gift"></i>&nbsp;{{ heading_title }}</h1>
+            <ul class="breadcrumb">
+                {% for breadcrumb in breadcrumbs %}
+                <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="container-fluid">
+        {{ not data.WishlistDiscounts.LicensedOn ? unlicensed_html }}
+        {% if error_warning %}
+        <div class="alert alert-danger autoSlideUp"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+        {% endif %}
+        {% if success %}
+        <div class="alert alert-success autoSlideUp"><i class="fa fa-check-circle"></i> {{ success }}
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+        </div>
+        <script>$('.autoSlideUp').delay(3000).fadeOut(600, function(){ $(this).show().css({'visibility':'hidden'}); }).slideUp(600);</script>
+        {% endif %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title"><i class="fa fa-list"></i>&nbsp;<span style="vertical-align:middle;font-weight:bold;">Module Settings</span></h3>
+                <div class="storeSwitcherWidget">
+                    <div class="form-group">
+                      <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">{{ store.name }}&nbsp;{{ store.store_id == 0 ? '<strong>(' ~ text_default ~ ')</strong>' }}&nbsp;<span class="caret"></span><span class="sr-only">Toggle Dropdown</span></button>
+                        <ul class="dropdown-menu" role="menu">
+                            {% for st in stores %}
+                            <li><a href="index.php?route={{ modulePath }}&store_id={{ st.store_id }}&user_token={{ user_token }}">{{ st.name }}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-body">
+                <form method="post" enctype="multipart/form-data" id="form">
+                    <input type="hidden" name="store_id" value="{{ store.store_id }}" />
+                    <input type="hidden" name="module_wishlistdiscounts_status" value="{{ module_wishlistdiscounts_status }}" />
+                    <div class="tabbable">
+                        <div class="tab-navigation">
+                            <ul class="nav nav-tabs mainMenuTabs">
+                                <li><a href="#settings"  data-toggle="tab" class="dropdown-toggle"><i class="icon-gear"></i>Settings</a></li>
+								<li><a href="#customers"  data-toggle="tab" class="dropdown-toggle"><i class="icon-gift"></i>Customer Wishlists</a></li>
+                                <li><a href="#template" data-toggle="tab"><i class="icon-envelope"></i> Mail</a></li>
+                                <li class="dropdown">
+                                    <a href="#"  data-toggle="dropdown" class="dropdown-toggle"><i class="icon-gift"></i> Coupons<b class="caret"></b></a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="#givenCoupons" data-toggle="tab"/><i class="icon-gift"></i>Given Coupons</a></li>
+                                        <li><a href="#usedCoupons" data-toggle="tab"/><i class="icon-ok"></i>Used Coupons</a></li>
+                                    </ul>
+                                </li>
+                                <li><a href="#isense-support" data-toggle="tab"><i class="icon-share"></i> Support</a></li>
+                            </ul>
+                            <div class="tab-buttons">
+                                <button type="submit" class="btn btn-success save-changes"><i class="icon-ok"></i> Save changes</button>
+                                <a onclick="location = '{{ cancel }}'" class="btn btn-warning" a>Cancel</a>
+                            </div>
+                        </div>
+                        <div class="tab-content">
+                            <div id="settings" class="tab-pane active">
+                                {{ tab_settings }}
+                            </div>
+                            <div id="customers" class="tab-pane">
+                                {{ tab_active_wishlists }}
+                            </div>
+                            <div id="template" class="tab-pane">
+                                {{ tab_template }}
+                            </div>
+                            <div id="givenCoupons" class="tab-pane"></div>
+                            <div id="usedCoupons" class="tab-pane"></div>
+                            <div id="isense-support" class="tab-pane">
+                                {{ tab_support }}
+                            </div>
+                        </div>
+                        <!-- /.tab-content -->
+                    </div>
+                    <!-- /.tabbable -->
+                </form>
+            </div>
+        </div>
+<script>
+var store_id = '{{ store_id ?: 0 }}';
+
+  if (window.localStorage && window.localStorage['currentTab']) {
+  	$('.mainMenuTabs a[href="'+window.localStorage['currentTab']+'"]').trigger('click');  
+  }
+  if (window.localStorage && window.localStorage['currentSubTab']) {
+  	$('a[href="'+window.localStorage['currentSubTab']+'"]').trigger('click');  
+
+  }
+
+  $('.fadeInOnLoad').css('visibility','visible');
+
+  $('.mainMenuTabs a[data-toggle="tab"]').click(function() {
+  	if (window.localStorage) {
+  		window.localStorage['currentTab'] = $(this).attr('href');
+		}
+  });
+  $('a[data-toggle="tab"]:not(.mainMenuTabs a[data-toggle="tab"])').click(function() {
+  	if (window.localStorage) {
+  		window.localStorage['currentSubTab'] = $(this).attr('href');
+	 	}
+  });
+	function validateNumber(input, theEvent) { 
+    var regex = /[0-9]|\./;
+    if(!regex.test(input.val())) {
+      input.css({'background':'#f2dede'});
+			theEvent.preventDefault();
+			$('.errorForm').show(200);
+
+		}
+  }
+
+
+$(document).ready(refreshData());
+  function refreshData(){
+		$.ajax({
+			 url: "index.php?route={{ modulePath }}/currentWishlists&user_token=" + getURLVar('user_token') + '&store_id=' + store_id +'&page=1',
+			 type: 'get',
+			 dataType: 'html',
+			 success: function(data) { 
+				  $('#active-wishlists').html(data);
+		  }
+		});
+	 // $.ajax({
+  //        url: "index.php?route={{ modulePath }}/archivedWishlists&user_token={{ user_token }}" + '&store_id=' + store_id +'&page=1',
+  //        type: 'get',
+  //        dataType: 'html',
+  //        success: function(data) { 
+  //         $('#archived-lists').html(data);
+  //        }
+  //     });
+      $.ajax({
+         url: "index.php?route={{ modulePath }}/givenCoupons&user_token={{ user_token }}" + '&store_id=' + store_id,
+         type: 'get',
+         dataType: 'html',
+         success: function(data) { 
+          $('#givenCoupons').html(data);
+         }
+      });
+      $.ajax({
+         url: "index.php?route={{ modulePath }}/usedCoupons&user_token={{ user_token }}" + '&store_id=' + store_id,
+         type: 'get',
+         dataType: 'html',
+         success: function(data) { 
+          $('#usedCoupons').html(data);
+         }
+      });
+    }
+</script> 
+{{ footer }}

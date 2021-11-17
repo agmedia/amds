@@ -1,0 +1,125 @@
+<div class="templateForm">
+  <div class="row">
+    <div class="col-sm-3 userMessageLegend">
+      <h5><strong><span class="required">*</span> {{ message_to_customer_heading }}</strong></h5>
+        <span class="help"><i class="fa fa-info-circle"></i>{{ message_to_customer_help }}</span>
+    </div>
+    <div class="col-sm-7">
+         <ul class="nav nav-tabs mainMenuTabs">
+          {% for language in languages %}
+            <li class="{{ loop.first ? 'active' }}"><a href="#email_{{ language.language_id }}" data-toggle="tab"><img src="{{ language.flag_url }}" title="{{ language.name }}" /></a></li>
+          {% endfor %}
+          </ul>
+          <div class="tab-content">
+            {% for language in languages %}
+                <div class="emailLanguageWrapper tab-pane {{ loop.first ? 'active' }}" id="email_{{ language.language_id }}">
+                  <label for="WishlistDiscounts[subject][{{ language.language_id }}]">
+                    <span class="required">*</span>Subject:
+                  </label>  
+                 <input placeholder="Mail subject" type="text" id="subject" class="form-control" name="WishlistDiscounts[discountSubject][{{ language.language_id }}]" value="{{ data.WishlistDiscounts.discountSubject[language.language_id] ?: default_subject }}" />
+                  {% if error_subject[language.language_id] %}
+                      <span class="error">{{ error_subject[language.language_id] }}</span>
+                  {% endif %} 
+                  <textarea name="WishlistDiscounts[message][{{ language.language_id }}]"  class="form-control" data-toggle="summernote" data-lang="" id="discount_message_{{ language.language_id }}">{{ data.WishlistDiscounts.message[language.language_id] ?: default_discount_message }}</textarea>
+                </div>
+            {% endfor %}
+          </div>
+    </div>
+  </div>
+</div>
+<script>
+    {% for language in languages %}
+    // $("#discount_message_{{ language.language_id }}").summernote({height: 300});
+    {% endfor %}
+</script> 
+
+<h3 style="margin-top:30px">Cron Settings</h3>
+<div class="container-fluid">
+  <div class="row form-group">
+    <div class="col-sm-3">
+      <label for="cron-status">{{ text_status }}</label>
+      <div class="help"><i class="fa fa-info-circle"></i> {{ text_cron_status_help }}</div>
+    </div>
+    <div class="col-sm-3">
+      <select id="cron-status" name="WishlistDiscounts[cron][status]" class="form-control">
+          <option value="yes" {{ data.WishlistDiscounts.cron.status == 'yes' ? 'selected="selected"' }}>{{ text_enabled }}</option>
+          <option value="no" {{ data.WishlistDiscounts.cron.status != 'yes' ? 'selected="selected"' }}>{{ text_disabled }}</option>
+        </select>
+    </div>
+  </div>
+  <div class="row form-group">
+    <div class="col-sm-3">
+      <label>{{ text_send_interval }}</label>
+      <div class="help"><i class="fa fa-info-circle"></i> {{ text_send_interval_help }}</div>
+    </div>
+    <div class="col-sm-3">
+      <div class="input-group"><input type="number" placeholder="Send interval" min="0" name="WishlistDiscounts[cron][interval]" value="{{ data.WishlistDiscounts.cron.interval is not empty ? data.WishlistDiscounts.cron.interval: 3 }}" class="form-control">
+      <span class="input-group-addon"><p style="margin-bottom:0;">{{ text_days }}</p></span></div>
+    </div>
+  </div>
+  <div class="row form-group">
+    <div class="col-sm-3">
+      <label>{{ text_discount_type }}</label>
+    </div>
+    <div class="col-sm-3">
+      <select id="cronDiscountType" name="WishlistDiscounts[cron][discount_type]" class="form-control">
+        <option value="P" {{ data.WishlistDiscounts.cron.discount_type == 'P' ? 'selected="selected"' }}>{{ text_percentage }}</option>
+        <option value="F"{{ data.WishlistDiscounts.cron.discount_type == 'F' ? 'selected="selected"' }}>{{ text_fixed_amount }}</option>
+      </select>
+    </div>
+  </div>
+  <div class="row form-group">
+    <div class="col-sm-3">
+      <label>{{ text_discount_value }}</label>
+    </div>
+    <div class="col-sm-3">
+      <div class="input-group">
+        <input id="cronTypeInput" name="WishlistDiscounts[cron][discount_value]" type="number" placeholder="Discount value" min="0" value="{{ data.WishlistDiscounts.cron.discount_value is not empty ? data.WishlistDiscounts.cron.discount_value : 10 }}" class="form-control">
+        <span class="input-group-addon" ><p style="display:none;margin-bottom: 0px;" id="cronCurrencyAddonForm">{{ currency }}</p><p style="display:none;margin-bottom: 0px;" id="cronPercentageAddonForm">%</p></span>
+      </div>
+    </div>
+  </div>
+  <div class="row form-group">
+    <div class="col-sm-3">
+      <label>{{ text_discount_duration }}</label>
+      <div class="help"><i class="fa fa-info-circle"></i> {{ text_discount_duration_help }}</div>
+    </div>
+    <div class="col-sm-3">
+      <div class="input-group"><input type="number" placeholder="Discount period" min="0" name="WishlistDiscounts[cron][discount_duration]" value="{{ data.WishlistDiscounts.cron.discount_duration is not empty ? data.WishlistDiscounts.cron.discount_duration: 7 }}" class="form-control">
+      <span class="input-group-addon"><p style="margin-bottom:0;">{{ text_days }}</p></span></div>
+    </div>
+  </div>
+
+  <div class="row form-group">
+    <div class="col-sm-12">
+      <h4 style="margin: 20px 0;"><b>How to set up the cron job?</b></h4>
+
+      <p>If your server supports cron jobs, you can use this line to set up the cron job for the module:</p>
+      <pre><code>{{ cronPhpPath }}</code></pre>
+      <p>The script will be executed every day at 00:00.</p>
+      <hr>
+      <p>If your server does not support cron jobs, you can try using services such as easycron.com, setcronjob.com or others which can provide you this feature.</p>
+      <p>In order to do that, you have to register in the selected service and use this URL for execution:</p>
+      <pre><code>{{ cronUrl }}</code></pre>
+    </div>
+  </div>
+</div>
+
+<script>
+if($('#cronDiscountType').val() == 'P'){
+  $('#cronPercentageAddonForm').show();
+} else {
+  $('#cronCurrencyAddonForm').show();
+}
+$('#cronDiscountType').on('change', function(e){
+  if($(this).val() == 'P') {
+    $('#cronPercentageAddonForm').show();
+    $('#cronTypeInput').attr('max','100');
+    $('#cronCurrencyAddonForm').hide();
+  } else {
+    $('#cronCurrencyAddonForm').show();
+    $('#cronTypeInput').attr('max','');
+    $('#cronPercentageAddonForm').hide();
+  }
+});
+</script>

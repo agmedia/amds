@@ -1,0 +1,224 @@
+	<div class="pull-right">
+		<a class="btn btn-info getMailForm" data-mode = "all" style="margin-bottom:20px"> 
+			{{ button_send_discount_to_all }}
+		</a>
+	</div>
+	
+	<table class="table list">
+		<thead>
+			<tr>
+				<td><input type="checkbox" name="selectAllCustomers"/></td>
+				<td class="left">
+					{% if sort == 'name' %}
+						<a href="{{ sort_name }}" class="{{ order|lower }}">{{ column_customer_name }}</a>
+						{% else %}
+						<a href="{{ sort_name }}">{{ column_customer_name }}</a>
+					{% endif %}
+				</td>
+				<td class="left">
+					{% if sort == 'email' %}
+						<a href="{{ sort_email }}" class="{{ order|lower }}">{{ column_customer_email }}</a>
+						{% else %}
+						<a href="{{ sort_email }}">{{ column_customer_email }}</a>
+					{% endif %}
+				</td>
+				<td class="left">
+					{% if sort == 'date_added' %}
+						<a href="{{ sort_date_added }}" class="{{ order|lower }}">{{ column_date_added }}</a>
+						{% else %}
+						<a href="{{ sort_date_added }}">{{ column_date_added }}</a>
+					{% endif %}
+				</td>
+				<td class="left">{% if sort == 'notified_count' %}
+          <a href="{{ sort_notified_count }}">{{ column_notified }}</a>
+					{% else %}
+          <a href="{{ sort_notified_count }}" class="{{ order|lower }}">{{ column_notified }}</a>
+				{% endif %}
+				</td>	
+				<td class="left" width="105px">{{ column_customer_wishlist  }}</td>	
+			</tr>
+		</thead>
+		<tbody>
+			{% if customers %}
+			 {% for customer in customers %}
+			   <tr id="{{ customer.customer_id }}">
+			     <td width="10px"><input type="checkbox" value="{{ customer.customer_id }}" id="customer{{ customer.customer_id }}"/></td>
+           <td><a href="{{ customers_url ~ '&customer_id=' ~ customer.customer_id }}">{{ customer.firstname ~  ' ' ~ customer.lastname }}</a></td>
+			     <td>{{ customer.email }}</td>
+			     <td>{{ customer.date_added_time|date('d.m.Y') }}</td>
+			     <td>{{ customer.notified_count }} times</td>
+			     <td><a id='{{ customer.customer_id }}' class="btn btn-primary btn-mini showWishList">{{ show_wishlist }}</a></td>
+			   </tr>
+			 {% endfor %}
+			{% else %}
+		      <tr><td class="center" colspan="5">{{ text_no_results }}</td></tr>
+      {% endif %}
+		</tbody>
+	</table>
+	<div class="pagination">{{ pagination }}</div>
+    
+ <!--ShowWishlistModal -->
+<div class="modal fade" id="show_wishlist_modal_active" tabindex="-1" role="dialog" aria-labelledby="show_wishlist_Modal_activeLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>   
+</div>
+
+ <!--SendDiscountModal -->
+<div class="modal fade" id="send_discount_modal_active" tabindex="-1" role="dialog" aria-labelledby="send_discount_Modal_activeLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="cronModalLabel">Send discount to all</h4>
+      </div>
+      <div class="modal-body" id="discount_modal_body">
+      </div>
+      <div class="modal-footer">
+      </div>
+    </div>
+  </div>
+</div>   
+</div>
+
+ <!--SendDiscountModalToSelected -->
+<div class="modal fade" id="send_selected_discount_modal_active_customers" tabindex="-1" role="dialog" aria-labelledby="send_selected_discount_modal_active_customers" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="cronModalLabel">Send discount to selected customers</h4>
+      </div>
+      <div class="modal-body" id="selected_discount_modal_body">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>   
+</div>
+<script>
+var store_id = '{{ store_id ?: 0 }}';
+$(document).on('click','.showWishList', function(e){
+	var cust_id = this.id;
+	var cust_name = '';
+	var modal = '';
+	cust_name = $('#customers .table.list tr[id="' + this.id + '"] td:nth-child(2)').text();
+	modalContent = $('#customers #show_wishlist_modal_active .modal-content');
+
+	$.ajax({
+		url: 'index.php?route={{ modulePath }}/wishlist&customer_name='+ encodeURIComponent(cust_name) +'&user_token=' + getURLVar('user_token') + '&store_id=' + store_id,
+		type: 'get',
+		data:{customer_id:cust_id,customer_name:cust_name},
+		dataType: 'html',
+		success: function(data) {				
+			modalContent.html(data);
+			$('#customers #show_wishlist_modal_active').modal('show');
+		}
+	});
+});
+
+$(document).on('click','.getMailForm', function(e){
+	
+	var selected_customer = new Array();
+	var modalBody = $('#customers #send_discount_modal_active .modal-body');
+	var mode = $(this).attr('data-mode');
+	if (mode != 'all') {
+		$.each($('#customers input[type="checkbox"][id^="customer"]:checked'), function(index, checkbox) {
+			selected_customer.push($(checkbox).val());
+		});
+	}
+
+	$.ajax({
+		url: 'index.php?route={{ modulePath }}/mailForm&user_token=' + getURLVar('user_token') + '&sendToAllCustomers=' + 1 + '&store_id=' + store_id,
+		type: 'get',
+		data:{mode:mode,customers:selected_customer},
+		dataType: 'html',
+		success: function(data) {				
+			modalBody.html(data);
+			$('#customers #send_discount_modal_active').modal('show');
+			{% for l in languages %}
+				$("#message{{ l.language_id }}").summernote({
+                    height: 300,
+                    toolbar: [
+                        ['style', ['style']],
+                        ['font', ['bold', 'underline', 'clear']],
+                        ['fontname', ['fontname']],
+                        ['fontsize', ['fontsize']],
+                        ['color', ['color']],
+                        ['para', ['ul', 'ol', 'paragraph']],
+                        ['view', ['codeview', 'help']]
+                    ]
+                });
+			{% endfor %}
+		}
+	});
+});
+
+var sendToAll;
+$('input[name="selectAllCustomers"]').on('click', function(e) { 
+	$('input[id^=\'customer\']').prop('checked', this.checked);
+	sendToAll = this.checked;
+});
+
+
+$('input[type="checkbox"][id^="customer"]').on('click', function(){
+	if($('input[type="checkbox"][id^="customer"]:checked').length != 0) {
+		$('.btn.btn-info.getMailForm').text('{{ button_send_discounts_to_selected }}');
+		$('.btn.btn-info.getMailForm').attr('data-mode','selected');
+		$('#cronModalLabel').text('{{ button_send_discounts_to_selected }}');
+	} else {
+		$('.btn.btn-info.getMailForm').text('{{ button_send_discount_to_all }}');	
+		$('.btn.btn-info.getMailForm').attr('data-mode','all');
+		$('#cronModalLabel').text('{{ button_send_discount_to_all }}');
+	}
+});
+
+$('input[type="checkbox"][name="selectAllCustomers"]').on('click', function(){
+	if($('input[type="checkbox"][id^="customer"]:checked').length != 0) {
+		$('.btn.btn-info.getMailForm').text('{{ button_send_discounts_to_selected }}');
+		$('#cronModalLabel').text('{{ button_send_discounts_to_selected }}');
+		$('.btn.btn-info.getMailForm').attr('data-mode','selected');
+	} else {
+		$('.btn.btn-info.getMailForm').text('{{ button_send_discount_to_all }}');	
+		$('.btn.btn-info.getMailForm').attr('data-mode','all');
+		$('#cronModalLabel').text('{{ button_send_discount_to_all }}');
+	}
+});
+
+	
+$(document).ready(function(){
+	$('#active-wishlists .pagination a').click(function(e){
+		e.preventDefault();
+		$.ajax({
+			url: this.href,
+			type: 'get',
+			dataType: 'html',
+			success: function(data) {				
+				$('#active-wishlists').html(data);
+			}
+		});
+	});
+});
+
+$(document).ready(function(){
+	$('#customers table thead tr td a').click(function(e){
+		e.preventDefault();
+		$.ajax({
+			url: this.href,
+			type: 'get',
+			dataType: 'html',
+			success: function(data) {				
+				$('#active-wishlists').html(data);
+			}
+		});
+	});
+});
+</script>

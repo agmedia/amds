@@ -1,0 +1,207 @@
+<div class="mailWrapper" style="padding:10px">
+	<div class="row">
+	<div class="col-xs-12">
+		<div class="progress" style="display:none">
+		  <div class="progress-bar" role="progressbar" aria-valuenow="70"
+		  aria-valuemin="0" aria-valuemax="100" style="width:2%">
+        <span id="progress-text" class="sr-only"><span id="mails-sent"></span> out of {{ total_mails_to_sent }}</span>
+		  </div>
+		</div>
+	</div>
+</div>
+<br>
+<div class="row">
+	<div class="col-xs-3">
+    <label data-toggle="tooltip" title="{{ text_tooltip_type }}" data-placement="bottom" ><span class="required">* </span>{{ text_type }} <i class="fa fa-info-circle"></i></label>
+	</div>
+	<div class="col-xs-6">
+		<select name="discount_type" class="form-control">
+			<option value="P">{{ text_percentage }}</option>
+			<option value="F">{{ text_fixed_amount }}</option>
+		</select>
+	</div>
+</div>
+<br>
+<div class="row">
+	<div class="col-xs-3">
+    <label data-toggle="tooltip" title="{{ text_tooltip_discount }}" data-placement="bottom"><span class="required">* </span>{{ text_discount }} <i class="fa fa-info-circle"></i></label>
+	</div>
+	<div class="col-xs-6">
+		<div class="input-group">
+			<input name="discount" value="" type="number"  placeholder="Discount value"  min="0" class="form-control">
+			<span class="input-group-addon" ><p style="display:none;margin-bottom: 0px;" id="currencyAddonForm">{{ currency }}</p><p style="display:none;margin-bottom: 0px;" id="percentageAddonForm">%</p></span>
+		</div>
+	</div>
+</div>
+<br>
+<div class="row">
+	<div class="col-xs-3">
+    <label data-toggle="tooltip" title="{{ text_tooltip_duration }}" data-placement="bottom"><span class="required">* </span>{{ text_duration }} <i class="fa fa-info-circle"></i></label>
+	</div>
+	<div class="col-xs-6">
+		<div class="input-group"><input required="required" type="number" placeholder="Discount period" min="0" name="duration" class="form-control">
+		<span class="input-group-addon"><p style="margin-bottom:0;">{{ text_days }}</p></span></div>
+	</div>
+</div>
+<br>
+<div class="row">
+	<div class="col-md-12">
+		<ul class="nav nav-tabs mainMenuTabs">
+			{% for language in languages %}
+			<li class="{{ loop.first ? 'active' }}"><a href="#email_{{ language.language_id }}" data-toggle="tab"><img src="{{ language.flag_url }}" title="{{ language.name }}" /></a></li>
+			{% endfor %}
+		</ul>
+		<div class="tab-content">
+		{% for language in languages %}
+		<div class="emailLanguageWrapper row-fluid tab-pane {{ loop.first ? 'active' }}" id="email_{{ language.language_id }}">
+			<div class="row">
+				<div class="col-xs-3">
+					<label><span class="required">* </span>{{ text_subject }}:</label>
+				</div>
+				<div class="col-xs-9">
+					<input placeholder="Mail subject..." class="form-control" type="text" id="subject{{ language.language_id }}" name="subject{{ language.language_id }}" value="{{ data.WishlistDiscounts.discountSubject[language.language_id] ?: default_subject }}" />
+				</div>
+			</div>
+			<br>
+			<div class="row">
+				<div class="col-md-12">
+				<textarea id="message{{ language.language_id }}" name="message[{{ language.language_id }}]">{{ data.WishlistDiscounts.message[language.language_id] ?: defaultMessage }}</textarea>
+			</div>
+			</div>
+		</div>
+    {% endfor %}
+	</div>
+	</div>
+</div>
+<br>
+<div class="row">
+	<div class="col-xs-12">
+		<button type="button" class="btn btn-danger pull-left" data-dismiss="modal">Close</button>
+		<button class="btn btn-success btn-large sendMessage pull-right" type="submit">{{ text_send }}</button>
+	</div>
+</div>
+</div>
+<script>
+	var durationValue, discountTypeValue, discountMessage, discountSubject, discountValue;
+	var customer_index = 0;
+	mailProgress = $.Deferred(); 
+	if($('select[name="discount_type"]').val() == 'P'){
+		$('#percentageAddonForm').show();
+	} else {
+		$('#currencyAddonForm').show();
+	}
+	$('select[name="discount_type"]').on('change', function(e){
+		if($(this).val() == 'P') {
+			$('#percentageAddonForm').show();
+			$('input[type="number"][name="discount"]').attr('max','100');
+			$('#currencyAddonForm').hide();
+		} else {
+			$('#currencyAddonForm').show();
+			$('input[type="number"][name="discount"]').attr('max','');
+			$('#percentageAddonForm').hide();
+		}
+	});
+	
+	$('.btn.btn-success.sendMessage').on('click', function(e) {
+		e.preventDefault();
+		var error= false;
+		var current_form = $(this).parents('.mailWrapper');
+
+		if(!validateNumber(current_form.find('input[name="discount"]'))) {
+			error = true;
+		} else if(current_form.find('select[name="discount_type"]').val() == 'P' && (current_form.find('input[name="discount"]').val() < 0 || current_form.find('input[name="discount"]').val() >= 100)) {
+			current_form.find('input[name="discount"]').css({'background':'#f2dede'});
+			error = true;
+		}
+
+		if(!validateNumber(current_form.find('input[name="duration"]'), e)) {
+			error = true;
+		} else if(current_form.find('input[name="duration"]').val() < 0) {
+			current_form.find('input[name="duration"]').css({'background':'#f2dede'});
+			error = true;
+		}
+		var content = new Array();
+		var subject = new Array();
+		{% for language in languages %}
+			subject[{{ language.language_id }}]= $('#subject{{ language.language_id }}').val();
+		    try {
+		       content[{{ language.language_id }}]= $('#message{{ language.language_id }}').code();
+		    } catch (err) {
+		      if(err.message.indexOf('is not a function') > -1) {
+		        content[{{ language.language_id }}]= $('#message{{ language.language_id }}').summernote('code');
+		      }
+		    }
+		{% endfor %}
+		discountValue = current_form.find('input[type="number"][name="discount"]').val();
+		durationValue = current_form.find('input[type="number"][name="duration"]').val();
+		discountTypeValue = current_form.find('select[name="discount_type"]').val();
+		discountMessage = content;
+		discountSubject = subject;
+
+		if(!error) {
+			try{
+				sendMail(discountValue,durationValue,discountTypeValue,discountSubject,discountMessage,mailProgress).done(function() {
+					$('.progress-bar').css('width','100%');
+					$('.progress-bar').attr('aria-valuenow', 100);
+					setTimeout(function(){
+						location.reload();
+					},800);
+				});
+			} catch(err) {
+				message = confirm('There was a problem sending the email.');
+				if (message) {
+					location.reload();
+				}
+			}
+			
+		}
+	});
+
+	function sendMail(discountValue,durationValue,discountTypeValue,discountSubject,discountMessage,mailProgress) {
+		json = {
+			discount: discountValue,
+			duration: durationValue,
+			discount_type : discountTypeValue,
+			subject: discountSubject,
+			message: discountMessage,
+		};
+		
+		$.ajax({
+			url: 'index.php?route={{ modulePath }}/sendMail&user_token={{ user_token }}',
+			dataType:"json",
+			data: json,
+			type: 'POST',
+			beforeSend: function(){
+				$('.progress').show();
+			},
+			success: function(json) {
+				if (json.status == 'success') {
+					if (json.data.customers_left != 0) {
+						$('#progress-text').removeClass('sr-only');
+						$('#mails-sent').html(json.data.mails_sent);
+						$('.progress-bar').css('width',json.data.persentage+'%');
+						$('.progress-bar').attr('aria-valuenow', json.data.persentage);
+						sendMail(discountValue,durationValue,discountTypeValue,discountSubject,discountMessage,mailProgress);
+					} else {
+						$('#progress-text').removeClass('sr-only');
+						$('#mails-sent').html(json.data.mails_sent);
+						mailProgress.resolve();
+					}
+				}
+			}
+		});
+		return mailProgress;
+	};
+
+	function validateNumber(input) {
+			var regex = /[0-9]|\./;
+			if(!regex.test(input.val())) {
+				input.css({'background':'#f2dede'});
+				return false;
+			} else {
+				input.css({'background':'#fff'});
+				return true;
+			}
+		}
+	
+</script>

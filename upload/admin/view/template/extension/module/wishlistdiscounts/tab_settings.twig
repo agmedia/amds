@@ -1,0 +1,29 @@
+<table class="table">
+  <tr>
+        <td class="col-xs-2"><h5><strong><span class="required">* </span>{{ entry_code }}</strong></h5>
+        </td>
+      <td>
+          <div class="col-xs-3">
+            <select name="WishlistDiscounts[Enabled]" class="WishlistDiscountsEnabled form-control">
+                <option value="yes" {{ data.WishlistDiscounts.Enabled == 'yes' ? 'selected' }}>Enabled</option>
+                <option value="no" {{ data.WishlistDiscounts.Enabled != 'yes' ? 'selected' }}>Disabled</option>
+             </select>
+           </div>
+        </td>
+  </tr>
+<tr>
+        <td class="col-xs-2">
+          <h5><strong><span class="required">* </span>{{ admin_notification }}</strong></h5>
+          <span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{ admin_notification_help|replace({'{email}': email}) }}</span>
+        </td>
+      <td>
+          <div class="col-xs-3">
+            <select name="WishlistDiscounts[admin_notification]" class="form-control" >
+                <option value="yes" {{ data.WishlistDiscounts.admin_notification == 'yes' ? 'selected' }}>Enabled</option>
+                <option value="no"  {{ data.WishlistDiscounts.admin_notification != 'yes' ? 'selected' }}>Disabled</option>
+              </select>
+           </div>
+        </td>
+  </tr>
+  <tr>
+</table>

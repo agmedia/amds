@@ -1,0 +1,49 @@
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+    <h4 class="modal-title">Viewing products for <a href="{{ customers_url ~ '&customer_id=' ~ customer_info.customer_id }}">{{ customer_info.name }}</a> wishlist</h4>
+</div>
+<div class="modal-body" id="show_wishlist_modal_active_body">
+    <div style="padding:20px">
+        <table class="table wishList">
+            <thead>
+                <tr>
+                    <th>{{ column_image }}</th>
+                    <th>{{ column_name }}</th>
+                    <th>{{ column_model }}</th>
+                    <th>{{ column_stock }}</th>
+                    <th>{{ column_price }}</th>
+                </tr>
+            </thead>
+            {% for product in products %}
+            <tbody >
+                <tr>
+                    <td>
+                        {% if product.thumb %}
+                        <a href="{{ product.href }}" target="_blank"> <img class="image" src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" /> </a>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{{ product.href }}" target="_blank">{{ product.name }}</a>
+                        <input type="hidden" name="product[]" value="{{ product.product_id }}" />
+                    </td>
+                    <td>{{ product.model }}</td>
+                    <td>{{ product.stock }}</td>
+                    <td>
+                        {% if product.price %}
+                        <div class="price">
+                            {% if not product.special %}
+                              {{ currencyLeft ~ product.price ~ currencyRight }}
+                            {% else %}
+                            <s>{{ currencyLeft ~ product.price ~ currencyRight }}</s><br />
+                            <b style="color:#F00">{{ currencyLeft ~ product.special ~ currencyRight }}</b>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </td>
+                </tr>
+            </tbody>
+            <input type="hidden" name="customer_id" value="{{ customer_info.customer_id }}"/>
+            {% endfor %}
+        </table>
+    </div>
+</div>
