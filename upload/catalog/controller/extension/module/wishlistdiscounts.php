@@ -60,7 +60,7 @@ class ControllerExtensionModuleWishlistDiscounts extends Controller {
             foreach ($products as $product) {
                 $wishlist[] = $product['product_id'];
                 $coupon_product[] = $product['wishlist_product_id'];
-                $images[$product['wishlist_product_id']] = $this->model_tool_image->resize($product['image'], 200, 200);
+                $images[$product['wishlist_product_id']] = $this->model_tool_image->resize($product['image'], 153, 230);
             }
 
             // Add coupon per customer
