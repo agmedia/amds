@@ -1316,13 +1316,11 @@ $(document).on('click', '.button-remove', function() {
 {% endif %}
 
 $('.date').datetimepicker({
-	format: 'YYYY-MM-DD'
+	format: 'YYYY-MM-DD',
+	pickTime: false,
+	language: 'hr'
 });
 
-$('.time').datetimepicker({
-	format: 'HH:mm'
-});
 
-$('.datetime').datetimepicker();
 //--></script>
 {{ footer }}
