@@ -563,7 +563,7 @@ class ControllerExtensionModuleWishlistDiscounts extends Controller {
             }
             $images   = array();
             foreach ($products as $product) {
-                $images[$product['wishlist_product_id']] = $this->model_tool_image->resize($product['image'], 200, 200);
+                $images[$product['wishlist_product_id']] = $this->model_tool_image->resize($product['image'], 153, 230);
             }
 
             $discountCode =  $this->generateUniqueRandomVoucherCode();
