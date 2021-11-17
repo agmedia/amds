@@ -4,11 +4,10 @@
     <tr>
     {% endif %}
       <td style="padding:5px 10px;">
-          <a  href="{{ storeURL }}index.php?route=product/product&product_id={{ product.wishlist_product_id }}" style="display:block;padding:0;margin:0 0 5px 0;font-size:0;text-align:center;">
-          <img src="{{ images[product.wishlist_product_id] }}" alt="{{ product.product_name }}" style="font-size:0;padding:0;margin:0;border:none;text-align:center;"/> </a>
-          <a style="text-decoration:none;color:#00B7FF;display:block;padding:0;margin:0 0 5px 0;font-size:14px;" href="{{ storeURL }}index.php?route=product/product&product_id={{ product.wishlist_product_id }}" target="_blank"> {{ product.product_name }} </a>
+          <a  href="{{ storeURL }}index.php?route=product/product&product_id={{ product.wishlist_product_id }}" style="display:block;padding:0;margin:0 0 5px 0;font-size:0;text-align:left;">
+          <img src="{{ images[product.wishlist_product_id] }}" alt="{{ product.product_name }}" style="font-size:0;padding:0;margin:0;border:none;text-align:left;"/> </a>
+          <a style="text-decoration:none;color:#000;display:block;padding:0;margin:0 0 5px 0;font-size:14px;" href="{{ storeURL }}index.php?route=product/product&product_id={{ product.wishlist_product_id }}" target="_blank"> {{ product.product_name }} </a>
           <span style="font-size:12px;color:#000;display:inline-block;margin:0 0 5px 0;"> {{ currencyLeft ~ product.regular_price ~ currencyRight }} </span>
-          <span style="font-size:11px;color:#999;margin:0;padding:0;display:block;"> The product is available from {{ product.date_available }}</span>
       </td>
     {% if loop.index0 % 2 == 0 %}
     </tr>
