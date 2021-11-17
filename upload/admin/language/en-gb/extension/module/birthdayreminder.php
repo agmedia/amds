@@ -15,13 +15,12 @@ $_['select_order_status']         = 'Select order status';
 
 $_['user_email']                  = 'Message to customer:';
 $_['discount_code_text'] = 'Discount code';									
-$_['default_message']             = '<p>Happy Birthday {firstname} {lastname},<br />
-										<br />
-										We want to help you celebrate your special date with a discount code <strong>{discount_code}</strong>. Enjoy a special {discount_value}% OFF. The discount code applies after you have spent ${total_amount}. The coupon expires on {date_end}.<br />
-										<br />
-										Happy birthday shopping!</p>
+$_['default_message']             = '<p>Sretan rođendan {firstname} {lastname},<br>
+										<br>
+									Želimo vam pomoći da proslavite svoj poseban datum uz kod za popust <strong>{discount_code}</strong>. </p><p>Uživajte u posebnom {discount_value}% POPUSTA. </p><p>Kod za popust se primjenjuje nakon što potrošite {total_amount} kn. </p><p>Kupon istječe {date_end}.
+										</p><p>Sve najbolje,</p><p><br></p><p>AMDS jeans TEAM<br></p>
 ';
-$_['default_subject']             = 'Happy birthday!';
+$_['default_subject']             = 'Sretan rođendan!';
 $_['error_subject']               = 'Subject must be between 3 and 128 characters!';
 $_['error_rule_name']             = 'Rule name must be between 3 and 128 characters!';
 $_['error_template_not_selected'] = 'Template not selected!';
