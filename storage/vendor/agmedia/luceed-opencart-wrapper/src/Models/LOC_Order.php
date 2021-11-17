@@ -180,7 +180,6 @@ class LOC_Order
             'narudzba'                   => $this->oc_order['order_id'] . '-' . Carbon::now()->year,
             'datum'                     => Carbon::make($this->oc_order['date_added'])->format(agconf('luceed.date')),
             'skladiste'                 => '001',
-            'sa__skladiste'             => '001',
             'status'                    => $this->getStatus(),
             'napomena'                  => $this->oc_order['comment'],
             'poruka_dolje'              => $this->oc_order['comment'],
@@ -201,10 +200,6 @@ class LOC_Order
             ],
             'stavke'                    => $this->getItems(),
         ];
-
-        if ($this->oc_order) {
-            $this->order['vezani_poziv_na_broj'] = $this->oc_order['poziv_na_broj'];
-        }
 
         if ($this->items_available) {
             $this->order['sa__skladiste'] = agconf('luceed.stock_warehouse_uid');
