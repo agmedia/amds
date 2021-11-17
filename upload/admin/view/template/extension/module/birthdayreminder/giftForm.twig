@@ -1,0 +1,258 @@
+<form class="form mailForm">
+    <div class="row form-group" style="text-align: center; font-size: 18px; padding: 5px 0;">
+        <div class="col-xs-6">
+            <div class="brCustomerMailInfo">
+                <label>To: </label>
+                <strong>{{ customerInfo.email ? customerInfo.email }}</strong>
+                <input  type="hidden" name="customer_id" value="{{ customerInfo.customer_id ? customerInfo.customer_id }}"  />
+                <input  type="hidden" name="to_mail" value="{{ customerInfo.email ? customerInfo.email }}"  />
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <div class="brCustomerMailInfo">
+                <label>Born:</label>
+                <strong>{{ customerInfo.birthday_date ? customerInfo.birthday_date }}</strong>
+            </div>
+        </div>
+        <div class="col-xs-3">  
+            <div class="brCustomerMailInfo">
+                <label>Age:</label>
+                <strong>{{ customer_birthday_date }}</strong>
+            </div>
+        </div>
+    </div>
+<div class="row form-group" style="padding: 5px 0;">
+    <div class="col-xs-3">
+        <h5><strong>{{ discount_code_text }}</strong></h5>
+    </div>
+    <div class="col-xs-9">
+        <strong>{{ discount_code }}</strong>
+        <input type="hidden" class="brSmallField form-control" name="discount_code" value="{{ discount_code }}">
+    </div>
+</div>
+<div class="row form-group" style="padding: 5px 0;">
+  <div class="col-xs-3"><h5><strong><span class="required">* </span>{{ type_of_discount }}</strong></h5></div>
+  <div class="col-xs-3">
+      <select class="form-control" name="discount_type" > 
+          <option value="P">{{ percentage_text }}</option>
+          <option value="F" {{ moduleData.discount_type == 'F' ? 'selected' }}>{{ fixed_amount }}</option>
+      </select>
+  </div>
+</div>
+<div class="row form-group" style="padding: 5px 0;">
+    <div class="col-xs-3"><h5><strong><span class="required">* </span>{{ discount_text }}</strong></h5></div>
+    <div class="col-xs-3">
+        <div class="input-group">
+            <input type="text" class="brSmallField form-control" name="discount" value="{{ moduleData.discount ? moduleData.discount }}">
+            <span class="input-group-addon" >%</span>
+        </div>
+    </div>
+  <div class="col-xs-3"><h5><strong><span class="required">* </span>{{ total_amount }}</strong></h5></div>
+  <div class="col-xs-3">
+      <div class="input-group">
+          <input type="text" class="brSmallField form-control" name="total_amount" value="{{ moduleData.total_amount }}">
+          <span class="input-group-addon" >{{ currency }}</span>
+      </div>
+  </div>
+</div>
+<div class="row form-group" style="padding: 5px 0;">
+    <div class="col-xs-3"><h5><strong><span class="required">* </span>Subject:</strong></h5></div>
+    <div class="col-xs-3">
+        <input placeholder="Mail subject" type="text" id="subject" class="form-control" name="subject" value="{{ moduleData.subject ? moduleData.subject : default_subject }}" />
+    </div>
+</div>
+<div class="row form-group" style="padding: 5px 0;">
+    <div class="col-xs-3"><h5><strong><span class="required">* </span>{{ user_email }}</strong></h5></div>
+    <div class="col-xs-9">
+        <textarea class="form-control" id="giftMessage">
+            {% if customerInfo %}
+                {% set wordTemplates = ['{firstname}', '{lastname}', '{discount_code}'] %}
+                {% set words = [customerInfo.firstname, customerInfo.lastname, discount_code ] %}
+                {% if moduleData.message[customerInfo.language_id] %}
+                    {% set message = moduleData.message.customerInfo['language_id']|replace({'{firstname}' : words[0], '{lastname}': words[1], '{discount_code}' : words[2]}) %}
+                    {{ message }}
+                {% else %}
+                    {% set default_message = default_message|replace({'{firstname}' : words[0], '{lastname}': words[1], '{discount_code}' : words[2]}) %}
+                    {{ default_message }}
+                {% endif %}
+            {% endif %}
+        </textarea>
+</div>
+</div>
+<div class="row form-group" style="padding: 5px 0;">
+    <div class="col-xs-4">&nbsp;</div>
+    <div class="col-xs-4" style="text-align: center"><button class="btn btn-lg btn-primary" id="sendGift">{{ send_gift_button }}</button></div>
+</div>
+</form>
+<script>
+var gettingOptions = function () {
+    $('textarea[id="giftMessage"]').each(function(index, element) {
+        $('#' + element.id).summernote({
+            disableDragAndDrop: true,
+		height: 150,
+		emptyPara: '',
+		codemirror: { // codemirror options
+			mode: 'text/html',
+			htmlMode: true,
+			lineNumbers: true,
+			theme: 'monokai'
+		},			
+		fontsize: ['8', '9', '10', '11', '12', '14', '16', '18', '20', '24', '30', '36', '48' , '64'],
+		toolbar: [
+			['style', ['style']],
+			['font', ['bold', 'underline', 'clear']],
+			['fontname', ['fontname']],
+			['fontsize', ['fontsize']],
+			['color', ['color']],
+			['para', ['ul', 'ol', 'paragraph']],
+			['table', ['table']],
+			['insert', ['link', 'image', 'video']],
+			['view', ['fullscreen', 'codeview', 'help']]
+		],
+		popover: {
+			image: [
+				['custom', ['imageAttributes']],
+				['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
+				['float', ['floatLeft', 'floatRight', 'floatNone']],
+				['remove', ['removeMedia']]
+			],
+		},			
+		buttons: {
+			image: function() {
+				var ui = $.summernote.ui;
+						
+				// create button
+				var button = ui.button({
+					contents: '<i class="note-icon-picture" />',
+					tooltip: $.summernote.lang[$.summernote.options.lang].image.image,
+					click: function () {
+						$('#modal-image').remove();
+						console.log(getURLVar('token'));
+						$.ajax({
+							url: 'index.php?route=common/filemanager&user_token={{ user_token }}',
+							dataType: 'html',
+							beforeSend: function() {
+								$('#button-image i').replaceWith('<i class="fa fa-circle-o-notch fa-spin"></i>');
+								$('#button-image').prop('disabled', true);
+							},
+							complete: function() {
+								$('#button-image i').replaceWith('<i class="fa fa-upload"></i>');
+								$('#button-image').prop('disabled', false);
+							},
+							success: function(html) {
+								$('body').append('<div id="modal-image" class="modal">' + html + '</div>');
+								
+								$('#modal-image').modal('show');
+								
+								$('#modal-image').delegate('a.thumbnail', 'click', function(e) {
+									e.preventDefault();
+									
+									$('#' + element.id).summernote('insertImage', $(this).attr('href'));
+																
+									$('#modal-image').modal('hide');
+								});
+							}
+						});						
+					}
+				});
+			
+				return button.render();
+			}
+		}
+        });
+      
+        $('.btn#sendGift').on('click', function(e){ 
+            e.preventDefault();
+            var currentYear  = new Date().getFullYear();
+            var errorInput = false;         
+        
+            if(!$('input[name="subject"]').val()){
+                e.preventDefault();
+                errorInput = true;
+                $('input[name="subject"]').css(
+                    {'background':'#f2dede'}
+                );
+            }
+  
+            if(!validateNumber($('input[name="discount"]'), e)) {
+               errorInput = true;
+            }
+        
+            if(!validateNumber($('input[name="total_amount"]'), e)) {
+                errorInput = true;
+            }
+         
+            if(!errorInput) {
+                var isSentGift = false;
+                var lastGift = "{% set date = customerInfo.last_gift_date|split('-') %} {{ customerInfo.last_gift_date ? date[0] : 0 }}";
+                if(currentYear == lastGift){
+                    isSentGift= true;
+                } 
+            
+                sentAgain = true;
+              
+                if(isSentGift) {
+                   var last_gift_date = "{{ customerInfo.last_gift_date ? customerInfo.last_gift_date }}";
+                   var sentAgain=confirm("A gift is sent to this customer on " + last_gift_date + ". Do you want to sent this again?");
+                }
+             
+                if(sentAgain){
+                    $.ajax({
+                        url:      'index.php?route={{modulePath}}/sendGift&user_token=' + getURLVar('user_token') ,
+                        dataType: 'html',
+                        data:{  
+                            discount_code: $("input[name='discount_code']").val(),
+                            discount: $("input[name='discount']").val(),
+                            total_amount: $("input[name='total_amount']").val(),
+                            discount_type: $("select[name='discount_type']").val(),
+                            customer_id: $("input[name='customer_id']").val(),
+                            to_mail: $("input[name='to_mail']").val(),
+                            subject: $("input[name='subject']").val(),
+                            gift_message: $('#'+element.id).summernote('code') },
+                        type:     'POST',
+                        dataType:"json",
+                        success: function(data){
+                            $('.messageHasBeenSent').show().delay(3000).fadeOut(600);
+                            $('.btn.btn-link.active').click();
+                        }
+                    });
+                }
+                $("#sendEmailModal").modal('hide');
+            } else { 
+                e.preventDefault();
+            }
+        });                      
+    });
+};
+  
+$("#sendEmailModal").on('shown.bs.modal', function (e) {
+    gettingOptions();  
+});
+ 
+if($('select[name="discount_type"]').val() == 'P'){
+    $('#percentageAddonForm').show();
+} else {
+    $('#currencyAddonForm').show();
+}
+ 
+$('select[name="discount_type"]').on('change', function(e){ 
+    if($(this).val() == 'P') {
+        $('#percentageAddonForm').show();
+        $('#currencyAddonForm').hide();
+
+    } else {
+        $('#currencyAddonForm').show();
+        $('#percentageAddonForm').hide();
+    } 
+});
+
+function validateNumber(input, theEvent) { 
+    var regex = /^[0-9]\d*$/;
+    if(!regex.test(input.val())) {
+        input.css({'background':'#f2dede'});
+        return false;
+    } else {
+        return true;
+    }
+}
+</script>

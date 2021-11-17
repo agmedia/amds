@@ -1,0 +1,71 @@
+<table class="table">
+    <tr>
+        <td class="col-xs-3">
+            <h5><span class="required">*</span> <strong>{{ entry_code }}</strong></h5>
+        </td>
+        <td class="col-xs-9">
+            <div class="col-xs-4">
+                <select name="BirthdayReminder[Enabled]" class="BirthdayReminderEnabled form-control">
+                    <option value="yes" {{ moduleData.Enabled == 'yes' ? 'selected' }}>{{ text_enabled }}</option>
+                    <option value="no"  {{ moduleData.Enabled != 'yes' ? 'selected' }}>{{ text_disabled }}</option>
+                </select>
+                <input type="hidden" name="BirthdayReminder[Default_Date_Format]" value="{{ default_date_format }}" />
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="col-xs-3">
+            <h5><strong>{{ admin_notification }}</strong></h5>
+            <span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{ 'Enabling this option will add ' ~ config_email ~ ' as BCC recepient'}}</span>
+        </td>
+        <td class="col-xs-9">
+            <div class="col-xs-4">
+                <select name="BirthdayReminder[admin_notification]" class="form-control">
+                    <option value="yes" {{ moduleData.admin_notification == 'yes' ? 'selected' }}>{{ text_enabled }}</option>
+                    <option value="no"  {{ moduleData.admin_notification != 'yes' ? 'selected' }}>{{ text_disabled }}</option>
+                </select>
+            </div>
+        </td>
+    </tr>
+  {# <tr> #}
+    <tr>
+        <td class="col-xs-3">
+            <h5>
+                <span class="required">*</span> 
+                <strong>{{ select_custom_field }}</strong>
+            </h5>
+            <span class="help"><i class="fa fa-info-circle"></i>&nbsp; {{ help_select_custom_field }} </span>
+        </td>
+ 
+        <td class="col-xs-9">
+            <div class="col-xs-4">
+                <select name="BirthdayReminder[custom_field]" class="form-control">
+                    {% for custom_field in custom_fields %}
+                        {% if custom_field.location == 'account' %}
+                            {% if custom_field.type == 'date' %}
+                            <option value="{{ custom_field.custom_field_id ? custom_field.custom_field_id : 0 }}" {{ moduleData.custom_field == custom_field.custom_field_id ? 'selected' }}>{{custom_field.name}}</option>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </select>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <td class="col-xs-3">
+            <h5>
+                <span class="required">*</span> 
+                <strong>{{ coupon_validity }}</strong>
+            </h5>
+            <span class="help"><i class="fa fa-info-circle"></i>&nbsp; {{ help_coupon_expire_date }} </span>
+        </td>
+        <td class="col-xs-9">
+            <div class="col-xs-2"  style="padding-left: 15px;">
+                <div class="input-group">
+                    <input type="text" required value="{{ moduleData.days_after ? moduleData.days_after : 7 }}" class="brSmallField form-control" name="BirthdayReminder[days_after]">
+                    <span class="input-group-addon">{{ text_days }}</span>
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>

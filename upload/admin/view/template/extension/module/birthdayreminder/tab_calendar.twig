@@ -1,0 +1,121 @@
+<div class="row-fluid calendar_span">
+    <div class="col-xs-9">
+        <div class="page-header">
+            <div class="pull-right form-inline">
+                <div class="btn-group" id="prev-next">
+                    <button class="btn btn-link" id="previousButton" data-calendar-nav="prev"><i class="icon-chevron-left"></i>&nbsp;{{ text_prev }}</button>
+                    <button class="btn btn-link" data-calendar-nav="today">{{ text_today }}</button>
+                    <button class="btn btn-link" id="nextButton" data-calendar-nav="next">{{ text_next }}&nbsp;<i class="icon-chevron-right"></i></button>
+                </div>
+                <div class="btn-group" id="period">
+                    <button class="btn btn-link active" data-calendar-view="year">{{ text_year }}</button>
+                    <button class="btn btn-link" data-calendar-view="month">&nbsp;{{ text_month }}</button>
+                    <button class="btn btn-link" data-calendar-view="week">&nbsp;{{ text_week }}</button>
+                    <button class="btn btn-link" data-calendar-view="day">&nbsp;{{ text_day }}</button>
+                </div>
+            </div>
+            <h3 id="calendarTitle"></h3>
+        </div>
+        <div id="calendar_widget"></div>
+        <div id="colorbox" style="display: none;"></div>
+    </div>
+    <div class="col-xs-3">
+        <div class="box-heading">
+            <h3><i class="fa fa-info-circle"></i> {{ text_calendar }}</h3>
+        </div>
+        <div class="box-content">
+            <p>{{ birthday_calendar_info }}</p>
+        </div>
+    </div>
+</div>
+
+<div id="sendEmailModal" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" >
+            <div class="modal-header">
+                <button type="button" class="close closepopup" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">Send e-mail</h4>
+            </div>
+            <div class="modal-body"></div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<script type="text/javascript">
+
+    if($('.cal-year-box')) {
+        $('#prev-next').hide(100);
+    } 
+
+    $(document).ready(function(e) {
+        $('#prev-next').hide();
+    });
+
+    $('#period button').bind('click', function(e){
+        switch($(this).attr('data-calendar-view')){
+            case 'year' : $('#prev-next').hide(100);
+            break;
+            default  : $('#prev-next').show(100); 
+        }
+    });
+
+    var date = new Date();
+    var dd = date.getDate();
+    dd = dd < 10 ? '0' + dd : dd; 
+    var mm = date.getMonth() + 1;
+    mm = mm < 10 ? '0' + mm : mm;
+    var yyyy = date.getFullYear();
+    var today = yyyy + '-' + mm + '-' + dd ;
+
+    var options = {
+        events_source: 'index.php?route={{ modulePath }}/getBirthdays&user_token='+ getURLVar('user_token'),
+        view: 'year',
+        tmpl_path: 'view/javascript/birthdayreminder/tmpls/',
+        tmpl_cache: false,
+        day: today,
+        first_day: 1,
+        onAfterEventsLoad: function(events) {
+            if(!events) {
+                return;
+            }
+            var list = $('#eventlist');
+            list.html('');
+            var i=10;   
+            $.each(events, function(key, val) {
+                $(document.createElement('li')).html('<a href="' + val.url + '">' + val.title + '</a>').appendTo(list);
+                if(!(i--)) {
+                    return false;
+                };
+            });
+        },
+        onAfterViewLoad: function(view) {
+            $('.page-header h3').text(this.getTitle());
+            $('.btn-group button').removeClass('active');
+            $('button[data-calendar-view="' + view + '"]').addClass('active');
+        },
+        classes: {
+            months: {
+              general: 'label'
+            }
+        }
+    };
+
+    var calendar = $('#calendar_widget').calendar(options);
+
+    $('.btn-group button[data-calendar-nav]').each(function() {
+        var $this = $(this);
+        $this.click(function(e) { 
+            e.preventDefault();
+            calendar.navigate($this.data('calendar-nav'));
+        });
+    });
+
+    $('.btn-group button[data-calendar-view]').each(function() {
+        var $this = $(this);
+        $this.click(function(e) {
+            e.preventDefault();
+            calendar.view($this.data('calendar-view'));
+        });
+    });
+</script>

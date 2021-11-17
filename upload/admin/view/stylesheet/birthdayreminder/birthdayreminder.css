@@ -1,0 +1,668 @@
+/* OpenCart Navigation Fixes */
+#menu, #menu * {
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+
+#menu > ul .top {
+  line-height: 14px;
+}
+
+#menu > ul li li a {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px;
+  line-height: 14px;
+}
+
+#menu > ul > li > ul {
+  display: none !important;
+  overflow: hidden !important;
+  visibility: hidden !important;
+}
+
+#menu > ul > li.sfHover > ul {
+  display: block !important;
+  overflow: visible !important;
+  visibility: visible !important;
+}
+
+/* ADMIN PANEL STYLES - BEGIN */
+.breadcrumb {
+  margin-top: 10px;
+  padding: 12px 15px;
+}
+
+.table>tbody>tr>td {
+  vertical-align: middle;
+}
+
+.table tr:first-child td {
+  border-top: none;
+}
+
+.pagination {
+  display: block;
+  padding-left: 0;
+  margin: 0;
+  border-radius: 0px;
+}
+
+#main_settings_sub_tab .input-group {
+  max-width: 137px;
+}
+
+.modulePositioning {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.modulePositioning label {
+  min-width: 90px;
+}
+
+.modulePositioning .form-control {
+  width: 50%;
+  display: inline-block;
+}
+
+.modulePositioning input[type="number"] {
+  width: 20%;
+}
+
+.messageSubject {
+  margin-bottom: 20px;
+}
+
+.list tbody td a {
+  text-decoration: none;
+}
+
+.tab-navigation {
+  position: relative;
+}
+
+.tab-navigation .nav {
+  margin-bottom: 20px;
+}
+
+.tab-buttons {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.center {
+  text-align: center;
+}
+
+.registeredDomains {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.licenseAlerts {
+  margin-top: 10px;
+}
+
+/* iModules */
+
+.iModuleContent .box .notActivatedContent {
+  padding: 10px;
+  border-left: 1px solid #CCC;
+  border-right: 1px solid #CCC;
+  border-bottom: 1px solid #CCC;
+  min-height: 300px;
+  overflow: auto;
+  text-align: center;
+  padding-top: 80px;
+}
+
+.iModuleContent .iModuleActivateButton {
+  background: #069;
+  padding: 16px 28px;
+  color: white;
+  border: 4px solid #fff;
+  outline: 4px solid #ccc;
+  text-decoration: none;
+  display: inline-block;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  font-size: 34px;
+}
+
+.iModuleContent .iModuleActivateButton:hover {
+  background: #06d;
+}
+
+/* ADMIN PANEL STYLES - END */
+
+/* BOOTSTRAP OVERRIDE - BEGIN */
+.col-xs-2 {
+  padding-left: 0px;
+}
+/* BOOTSTRAP OVERRIDE - END */
+
+.colorsLi .colorPreview {
+  width: 18px;
+  height: 18px;
+  background: #ccc;
+  border: 1px solid #aaa;
+}
+
+.colorsLi tr th {
+  color: #333;
+  font-size: 13px;
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  text-align: left;
+  padding-left: 10px;
+}
+
+.colorsLi tr td {
+  text-align: left;
+}
+
+#searchedFound {
+  height: 400px;
+  padding: 0;
+}
+
+div.content div.analytics {
+  width: 100%;
+  clear: both;
+  margin-bottom: 20px;
+}
+
+.iSimpleTable {
+  margin: 0 20px 20px 20px;
+}
+
+.iSimpleTable td {
+  padding: 5px;
+  width: 100%;
+  text-align: center;
+}
+
+.iSimpleTable td:first-child {
+  text-align: left;
+}
+
+.iSimpleTable td:last-child {
+  text-align: right;
+}
+
+.iSimpleTable tr:first-child td {
+  border-bottom: 1px dotted #CCC;
+}
+/*Support tab*/
+
+
+
+.panel-body .notLicensedTable, .panel-body .licensedTable {
+  table-layout: fixed;
+}
+
+.panel-body .notLicensedTable .form-group, .panel-body .licensedTable .form-group {
+  margin-bottom: 15px;
+}
+
+.panel-body .notLicensedTable ul, .panel-body .licensedTable ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.panel-body .notLicensedTable tr > td {
+  padding: 10px 0;
+}
+
+.panel-body .box-content {
+  padding: 10px;
+  border: 1px solid #DBDBDB;
+  min-height: 300px;
+  overflow: auto;
+}
+
+.notLicensedTable .small-link {
+  font-size: 12px;
+}
+
+.panel-body .thumbnail {
+  margin: 15px 0;
+}
+
+.widgetPositionOpenCart {
+  float: left;
+  min-width: 120px;
+}
+
+.widgetPositionOpenCart label {
+  font-weight: bold;
+}
+
+.widgetPositionOpenCart input[type="radio"] {
+  margin-top: 0;
+}
+
+.widgetPositionOpenCart img {
+  border: 1px solid #ddd;
+}
+
+div.checkbox {
+  margin-left: 20px;
+}
+
+.input-group[class*=col-] {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+
+.notificationMessageTabs {
+  margin: 20px 0;
+}
+
+input[type='text'], input[type='password'] {
+  padding: 6px 12px;
+}
+
+.form-control.customCss {
+  height: 80px;
+  min-height: 80px;
+}
+
+.panel-heading {
+  position: relative;
+  padding: 15px;
+}
+
+.storeSwitcherWidget {
+  position: absolute;
+  right: 15px;
+  top: 8px;
+}
+
+.storeSwitcherWidget .form-group {
+  margin-bottom: 0;
+}
+
+.storeSwitcherWidget .form-group.open .dropdown-menu {
+  right: 0;
+  left: auto;
+}
+
+.scheduledPriceForm .input-group .button b {
+    min-width: 13px;
+}
+
+.input-group #datetimepicker {
+    min-width: 145px;   
+} 
+.input-group .form-control {
+    z-index: 0;
+}
+
+#colorbox {
+    box-sizing: content-box !important;
+}
+
+.bs-example-bg-classes p {
+    padding: 15px;
+    font-size: 17px;
+    border-radius: 3px;
+}
+
+.table-header {
+    background: #EFEFEF;
+}
+
+select.daysSelect {
+    width: 50px;
+}
+
+select#daysAfterSelect {
+    width: 60px;
+}
+div.daysSlider {
+    width: 160px;
+    display: inline-block;
+}
+
+div.daysSlider .ui-widget-header {
+    background: #75BAFF;
+    border-color: #0070A6;
+}
+
+div.daysSlider .ui-state-hover,div.daysSlider .ui-state-focus {
+    background: #CEE7FF;
+    border-color: #0070A6;
+}
+
+.browserCache h4 {
+    color: #757575;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+.bcHeaders td {
+    height: 20px;
+    line-height: 20px;
+    vertical-align: middle;
+    padding: 3px;
+}
+
+.bcHeaders td label {
+    line-height: 20px;
+    font-size: 12px;
+    display: inline-block;
+    margin: 0 5px 0 0;
+}
+
+.bcHeaders td input[type=checkbox] {
+    margin: 0;
+}
+
+.cacheDirLink {
+    color: #858585;
+    cursor: pointer;
+}
+
+.cacheDirLink:hover {
+    text-decoration: none;
+    color: #000;
+}
+
+.clearDbCache {
+    margin-bottom: 10px;
+}
+
+.center {
+    text-align: center;
+}
+
+.ftp-log,.amazon-log,.smush-log {
+    margin-top: 10px;
+    width: 100%;
+}
+
+.ftp-alert-error,.info-error {
+    color: #900;
+}
+
+.ftp-alert-success,.info-success {
+    color: #090;
+}
+
+.ftp-alert-warning,.info-warning {
+    color: #C90;
+}
+
+.ftp-upload,.ftp-cancel,.amazon-upload,.amazon-cancel,.rackspace-upload,.rackspace-cancel {
+    float: left;
+    margin-right: 10px;
+}
+
+.ftp-progress,.amazon-progress,.rackspace-progress {
+    height: 30px;
+    margin-bottom: 0;
+}
+
+.ftp-upload-label,.amazon-upload-label {
+    margin-left: 10px;
+}
+
+.ftp-upload-label input,.amazon-upload-label input {
+    margin-bottom: 5px;
+}
+
+.licenseAlerts {
+    margin-top: 10px;
+}
+
+a.btn:visited {
+    color: #333;
+}
+
+a.btn-primary:visited,a.btn-info:visited,a.btn-inverse:visited {
+    color: #FFF;
+}
+
+.supportThumbs .thumbnail {
+    border: none;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    border-right: 1px solid #ddd;
+}
+
+.supportThumbs .span4:last-child .thumbnail {
+    border-right: none;
+}
+
+.registeredDomains {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+#calendar_widget_wrap {
+    width: 900px;
+    margin: 0 auto;
+}
+
+#colorbox .mailForm input,#colorbox .mailForm select, {
+    margin-bottom: 0;
+}
+.form td input, .form td select {
+  margin-bottom: 0;
+}
+
+.form.mailForm td label {
+  display:inline-block;
+}
+
+.form.mailForm td input, .form.mailForm td select {
+  margin-bottom: 0; 
+}
+
+.form.mailForm tr:first-child td {
+  background: #eee;
+  text-align: left; 
+}
+
+.form.mailForm td .brCustomerMailInfo {
+  display: inline-block;
+  margin: 0 30px 0 0;
+  color: #000;
+  font-size: 12px;  
+}
+
+.form.mailForm td .brCustomerMailInfo label {
+  color: #000;
+  font-size: 12px;  
+}
+
+.form.notLicensedTable input {
+  margin-bottom:10px;
+}
+
+#cronForm td label {
+    display: inline-block;
+  margin: 0 5px 0 0; 
+}
+
+#cronForm td input, #cronForm td select {
+   margin-bottom: 0;
+}
+
+#cronForm .input-append {
+    margin-bottom: 0;
+}
+
+#mailParamsWrapper {
+    background-color: #000;
+}
+
+select#daysSelect {
+    width: 60px;
+}
+
+.ui-timepicker-div .ui-widget-header {
+    margin-bottom: 8px;
+  background:#09F;
+}
+
+.ui-timepicker-div dl dt {
+    float: left;
+    clear: left;
+    padding: 0 0 0 5px;
+}
+
+.ui-timepicker-div dl dd {
+    margin: 0 10px 10px 40%;
+}
+
+.ui-timepicker-div td {
+    font-size: 90%;
+}
+
+.ui-tpicker-grid-label {
+    background: none;
+    border: none;
+    margin: 0;
+    padding: 0;
+}
+
+.ui-timepicker-rtl {
+    direction: rtl;
+}
+
+.ui-timepicker-rtl dl {
+    text-align: right;
+    padding: 0 5px 0 0;
+}
+
+.ui-timepicker-rtl dl dt {
+    float: right;
+    clear: right;
+}
+
+.ui-timepicker-rtl dl dd {
+    margin: 0 40% 10px 10px;
+}
+
+.iModuleContent ul,li,.iModuleAdminWrappers {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.iModuleAdminWrappers li:first-child,.iModuleAdminSuperWrappers > li:first-child,html[xmlns] .iModuleContent .clearfix {
+    display: block;
+}
+
+.iModuleAdminSuperWrappers > li,.ftp-log-entries,.amazon-log-entries,.ftp-alert,.amazon-alert,.rackspace-alert {
+    display: none;
+}
+
+.colorsLi tr td,.iSimpleTable td:first-child,.ui-timepicker-div dl {
+    text-align: left;
+}
+
+.iSimpleTable td:last-child,.stepsToTake td:last-child {
+    text-align: right;
+}
+
+h1,h2,h3,li {
+
+    line-height: inherit;
+}
+
+.breadcrumb li a:hover,.bcHeaders td a:hover {
+    text-decoration: none;
+}
+
+.stepsToTake td,.premiumServices td,.mailForm .table td {
+    vertical-align: middle;
+}
+
+input.timepicker {
+  width:60px;
+}
+
+input.timepicker:hover {
+  cursor:pointer;
+}
+
+#cronForm table td {
+  vertical-align:middle;
+}
+
+#cronForm table tr:first-child td {
+  border:0; 
+}
+
+#cronForm table tr:first-child td .alert {
+  margin-bottom:0;
+}
+
+.brSmallField {
+  width:50px;
+  text-align:center;
+}
+
+#prev-next button:hover, #period button:hover, #prev-next button:focus, #period button:focus  {
+  text-decoration: none;  
+}
+
+#prev-next button i {
+  font-size:11px;
+}
+
+
+#cronForm #daysSelect {
+  width: 50px;
+  text-align:center;
+}
+.row-fluid.calendar_span {
+  width:98%;
+  margin-left:20px;
+}
+
+.cal-event-list .event.pull-left.icon-ok {
+    margin-top: 6px;
+    color: lime; 
+}
+.cal-event-list .event.pull-left.icon-gift {
+    margin-top: 6px;
+    color: #FF00E1; 
+}
+
+
+html[dir="rtl"] .pull-right {
+  float: left !important;
+}
+html[dir="rtl"] .pull-left, 
+html[dir="rtl"] .navbar-nav > li, 
+html[dir="rtl"] .nav-tabs > li {
+  float: right !important;
+}
+html[dir=rtl] .tab-content [class*='col-xs-'],
+html[dir=rtl] .tab-content [class*='col-sm-'],
+html[dir=rtl] .tab-content [class*='col-md-'] {
+  float: right;
+}
+html[dir=rtl] .tab-buttons {
+  right: auto;
+  left: 0;
+}
+html[dir=rtl] .storeSwitcherWidget {
+  right: auto;
+  left: 15px;
+}
+html[dir=rtl] .storeSwitcherWidget .form-group.open .dropdown-menu {
+  right: auto !important;
+  left: 0;
+}

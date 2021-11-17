@@ -1,0 +1,133 @@
+<form id="cronForm">
+    <div class="container">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-xs-2">
+                    <h5><strong>{{ cron_select_admin_period }}</strong></h5>
+                    <span class="help"><i class="fa fa-info-circle"></i>&nbsp; {{ help_list_current_birthdays }} </span>
+                </div>
+                <div class="col-xs-3">
+                    <select name="admin_notification" class="form-control" style="margin-top: 25px;">
+                      <option value="W" {{ admin_notification == 'W' ? 'selected' }}>{{ every_week }}</option> 
+                      <option value="D" {{ admin_notification == 'D' ? 'selected' }}>{{ every_day }}</option>
+                  </select>
+                </div>
+                <div class="col-xs-3">
+                    <label>{{ cron_time }}</label>
+                    <input type="text" name="admin_time" class="date form-control timepicker" readonly placeholder="Time" value="{{ admin_time }}" />
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-xs-2">
+                     <h5><strong>{{ cron_select_customer_period }}</strong></h5>
+                    <span class="help"><i class="fa fa-info-circle"></i>&nbsp; {{ help_when_send_emails_to_customers }} </span>
+                </div>
+                <div class="col-xs-3">
+                    <select name="customer_notification" class="form-control" style="margin-top: 25px;">
+                        <option  value="before" {{ customer_notification == 'before' ? 'selected' }}>{{ before_birthday }}</option> 
+                        <option value="on" {{ customer_notification == 'on' ? 'selected' }}>{{ the_day_of_birthday }}</option>
+                    </select>
+                </div>
+                <div class="col-xs-1">
+                    <label>{{ cron_time }}</label>
+                    <input type="text" name="customer_time" class="date form-control timepicker" readonly placeholder="Time" value="{{ customer_time }}"/>
+                </div>
+                <div id="days_before_div" class="col-xs-2" style="display:none;">
+                    <label>{{ cron_days_before }}</label>
+                  <input type="text" class="brSmallField form-control" style="" value="{{ days_before_birthday }}"  name="days_before_birthday" id="daysSelect" />
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-xs-2">
+                    <h5><strong>{{ cron_current_crons }}</strong></h5>
+                </div>
+                <div class="col-xs-10">
+                    <div class="text">
+                         <small>{{ admin_command }}</small><br />
+                     <small>{{ customer_command }}</small>
+                    </div>
+                   
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-xs-10">
+                     <button id="setCronButton" class="btn btn-success">{{ start_cron_button }}</button>
+                    <button id="stopCronButton" class="btn btn-danger">{{ clear_cron_button }}</button>
+                </div>
+            </div>
+    </div>
+    </div>
+</form>
+<script>
+
+$('#setCronButton').on('click', function(e) {
+    e.preventDefault();
+    $.ajax({
+        url: "index.php?route={{ modulePath }}/cronJob&user_token=" + getURLVar('user_token'),
+        type: "POST",
+        data: $('#cronForm').serialize(),
+        dataType: "html",
+        success: function(data) {
+            $('#cronJob').modal('hide');
+            $("#cronJob").on('hidden.bs.modal', function () {
+                $(this).data('bs.modal', null);
+            });
+            //$('#cronJob').modal('hide');
+            $('.autoCronJobSlideUp').show().delay(5000).fadeOut(600).slideUp(600);
+            $('html, body').animate({ scrollTop: 0 }, 'slow');
+        } 
+    });
+});
+
+$('#stopCronButton').on('click', function(e) {
+    e.preventDefault();
+    if(confirm("Are you sure want to clear BirthdayReminder cron jobs?")) {
+        $.ajax({
+            url: "index.php?route={{ modulePath }}/stopCron&user_token=" + getURLVar('user_token'),
+            type: "POST",
+            dataType: "html",
+            success: function(data) {
+                $('#cronJob').modal('hide');
+                $("#cronJob").on('hidden.bs.modal', function () {
+                    $(this).data('bs.modal', null);
+                });
+                $('.autoCronJobSlideUp').show().delay(5000).fadeOut(600).slideUp(600);
+                $('html, body').animate({ scrollTop: 0 }, 'slow');
+            } 
+        });
+    }
+});
+
+$('.timepicker').timepicker();
+
+if($('select[name="admin_notification"]').val() == 'W'){
+    $('#week_day').show(200);
+}
+
+if($('select[name="customer_notification"]').val() == 'before'){
+    $('#days_before_div').show(200);
+} else {
+    $('#days_before_div').hide(200);
+}
+
+$('select[name="admin_notification"]').on('change', function(e){ 
+    if($(this).val() == 'W') {
+        $('#week_day').show(200);
+
+    } else {
+        $('#week_day').hide(200);
+    } 
+});
+
+$('select[name="customer_notification"]').on('change', function(e){ 
+    if($(this).val() == 'before') {
+        $('#days_before_div').show(200);
+
+    } else {
+        $('#days_before_div').hide(200);
+    } 
+});
+</script>
