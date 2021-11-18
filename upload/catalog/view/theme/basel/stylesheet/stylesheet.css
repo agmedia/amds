@@ -6536,14 +6536,12 @@ h4.tstores::before {
 
 .dropdown-inner ul > li > ul > li > a {
 	display: inline-block;
-	padding: 3px 0px;
+	padding: 0px 0px;
 	transition: padding-left 300ms, opacity 300ms, color 300ms;
 	position: relative;
 }
 
 .fstxt{    font-size: 18px;
-
-
 }
 
 .hp-promo-cnt {
