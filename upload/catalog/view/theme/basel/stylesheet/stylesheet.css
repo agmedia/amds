@@ -6539,6 +6539,7 @@ h4.tstores::before {
 	padding: 1px 0px;
 	transition: padding-left 300ms, opacity 300ms, color 300ms;
 	position: relative;
+	font-size: 14px;
 }
 
 .fstxt{    font-size: 18px;
