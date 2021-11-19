@@ -1,4 +1,8 @@
 <?php
+
+use Agmedia\LuceedOpencartWrapper\Models\LOC_Customer;
+use Agmedia\LuceedOpencartWrapper\Models\LOC_Order;
+
 class ControllerCheckoutSuccess extends Controller {
 	public function index() {
 		$this->load->language('checkout/success');
@@ -18,6 +22,31 @@ class ControllerCheckoutSuccess extends Controller {
 			unset($this->session->data['voucher']);
 			unset($this->session->data['vouchers']);
 			unset($this->session->data['totals']);
+
+            /*******************************************************************************
+             *                                Copyright : AGmedia                           *
+             *                              email: filip@agmedia.hr                         *
+             *******************************************************************************/
+            /*$this->load->model('checkout/order');
+
+            $order_id = $this->session->data['order_id'];
+            $oc_order = $this->model_checkout_order->getOrder($order_id);
+
+            $order    = new LOC_Order($oc_order);
+            $customer = new LOC_Customer($order->getCustomerData());
+
+            if ( ! $customer->exist()) {
+                $customer->store();
+            }
+
+            $sent = $order->setCustomerUid($customer->getUid())->store();
+
+            if ( ! $sent) {
+                $order->recordError();
+            }*/
+            /*******************************************************************************
+             *                              END Copyright : AGmedia                         *
+             *******************************************************************************/
 		}
 
 		$this->document->setTitle($this->language->get('heading_title'));

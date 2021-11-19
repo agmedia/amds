@@ -4,6 +4,7 @@ namespace Agmedia\LuceedOpencartWrapper\Models;
 
 use Agmedia\Helpers\Log;
 use Agmedia\Luceed\Facade\LuceedProduct;
+use Agmedia\Models\Location;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
@@ -55,8 +56,14 @@ class LOC_Warehouse
      */
     public function getWarehouses(): Collection
     {
-        return $this->getList()
-                    ->whereIn('skladiste', agconf('import.warehouse.included'));
+        $incl = agconf('import.warehouse.included');
+
+        if ( ! empty($incl)) {
+            return $this->getList()
+                        ->whereIn('skladiste', $incl);
+        }
+
+        return $this->getList();
     }
 
 
@@ -85,7 +92,7 @@ class LOC_Warehouse
      *
      * @return Collection
      */
-    public function getAvailabilityForProduct(string $product): Collection
+    public function getAvailabilityForProductTemp(string $product): Collection
     {
         $response = collect();
         $houses = $this->getAvailabilityViewWarehouses();
@@ -217,6 +224,48 @@ class LOC_Warehouse
             'address' => $btn,
             'qty'   => $date
         ]);
+
+        return $response;
+    }
+
+
+    public function getAvailabilityForProduct(string $product): Collection
+    {
+        $response = collect();
+        $locations = Location::all();
+        $houses = $locations->where('vidljivost', 1)->get();
+        $units = $locations->pluck('skladiste')->flatten();
+
+        $availables = collect($this->setAvailables(
+            LuceedProduct::stock($units, $product)
+        ));
+
+        // AVAILABILITY VIEW
+        foreach ($houses as $house) {
+            $has = $availables->where('skladiste_uid', $house['skladiste'])->first();
+
+            if ($has) {
+                $qty = $has->raspolozivo_kol;
+
+                if ($qty < 0) {
+                    $qty = 0;
+                }
+
+                $response->push([
+                    'title' => $house['naziv'],
+                    'address' => $house['adresa'],
+                    'qty'   => $qty
+                ]);
+
+            } else {
+                $response->push([
+                    'title' => $house['naziv'],
+                    'address' => $house['adresa'],
+                    'qty'   => 0
+                ]);
+            }
+        }
+
 
         return $response;
     }

@@ -704,6 +704,70 @@ $('[data-toggle=\'tooltip\']').tooltip({container: 'body'});
 </script>
 {% endif %}
 
+
+<script>
+    $(() => {
+        $.ajax({
+            type: 'get',
+            url: 'index.php?route=product/product/availability&sifra={{ model }}',
+            beforeSend: function() {
+                //$('#button-confirm').button('loading');
+                console.log('beforeSend: function()')
+            },
+            complete: function() {
+                //$('#button-confirm').button('reset');
+                console.log('complete: function()')
+            },
+            success: (json) => {
+                console.log(json);
+                /*let html = '';
+                let qty = '';
+
+                let title = '';
+                let subtitle = '';
+                let icon = '';
+                let btn_title = '';
+
+                for (key in json) {
+                    if (json.hasOwnProperty(key)) {
+                        if (!['Web', 'Dobavljač', 'Btn'].includes(json[key].title)) {
+                            if (json[key].qty) {
+                                qty = 'fa-check text-success';
+                            } else {
+                                qty = 'fa-times text-danger';
+                            }
+
+                            html += '<div class="d-flex poslov justify-content-between border-bottom py-3"><div><div class="fw-semibold text-dark"><a href="http://maps.google.com/?q=' + json[key].title + ' - ' + json[key].address + '" target="_blank">' + json[key].title + ' - ' + json[key].address + '</a></div></div><div><i class="fas ' + qty + ' me-2"></i></div></div>';
+
+                        }
+
+                        if (['Btn'].includes(json[key].title)) {
+                            title = json[key].address;
+                            if (json[key].qty) {
+                                subtitle = json[key].qty;
+                            }
+                            icon = json[key].btn;
+                            btn_title = json[key].button;
+                        }
+                    }
+                }
+
+                $('#availability-view').html(html);
+                $(".poslov").last().removeClass("border-bottom");
+
+                $('#availability-title').html(title);
+                $('#availability-subtitle').html(subtitle);
+                $('#availability-icon').addClass('text-' + icon);
+
+                if (title != 'DOSTUPNO ODMAH') {
+                    $('#button-cart,#button-cart2,#button-cart3').html(btn_title);
+                }*/
+            }
+        });
+    });
+</script>
+
+
 <script><!--
 $('select[name=\'recurring_id\'], input[name="quantity"]').change(function(){
 	$.ajax({
