@@ -255,9 +255,11 @@ class ControllerExtensionModuleBaselProducts extends Controller {
   	private function getSelectProducts( $tabInfo , $limit ){
   		$results = array();
 
+        $tabInfo['products'] = array_reverse($tabInfo['products'], true);
+
   		if(isset($tabInfo['products'])){
   			$limit_count = 0;
-			foreach ( rsort($tabInfo['products']) as $product ) {
+			foreach ( $tabInfo['products'] as $product ) {
 				if ($limit_count++ == $limit) break;
 				$product_info = $this->model_catalog_product->getProduct($product['product_id']);
 				if ($product_info) {
