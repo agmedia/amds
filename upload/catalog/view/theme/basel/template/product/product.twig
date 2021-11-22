@@ -144,7 +144,7 @@
                                 {% for option_value in option.product_option_value %}
 
                                         <label class="btn btn-outline btn-option ">
-                                    <input type="radio" name="option[{{ option.product_option_id }}]" value="{{ option_value.product_option_value_id }}" />
+                                    <input type="radio" name="option[{{ option.product_option_id }}]" value="{{ option_value.product_option_value_id }}" data-uid="{{ option_value.sku }}" />
                                     {% if option_value.image %}
                                     <img src="{{ option_value.image }}" alt="{{ option_value.name }}{% if option_value.price %}({{ option_value.price_prefix }}{{ option_value.price }}){% endif %}" data-toggle="tooltip" data-title="{{ option_value.name }}{% if option_value.price %} ({{ option_value.price_prefix }}{{ option_value.price }}){% endif %}" />
                                     {% endif %}
@@ -660,56 +660,15 @@
 <script src="index.php?route=extension/basel/live_options/js&product_id={{ product_id }}"></script>
 {% endif %}
 
-{% if products %}
-<script><!--
-$('.grid-holder.related').slick({
-prevArrow: "<a class=\"arrow-left icon-arrow-left\"></a>",
-nextArrow: "<a class=\"arrow-right icon-arrow-right\"></a>",
-dots:true,
-{% if direction == 'rtl' %}
-rtl: true,
-{% endif %}
-respondTo:'min',
-{% if basel_rel_prod_grid == '5' %}
-slidesToShow:5,slidesToScroll:5,responsive:[{breakpoint:1100,settings:{slidesToShow:4,slidesToScroll:4}},{breakpoint:960,settings:{slidesToShow:3,slidesToScroll:3}},{breakpoint:600,settings:{slidesToShow:2,slidesToScroll:2}},
-{% elseif basel_rel_prod_grid == '4' %}
-slidesToShow:4,slidesToScroll:4,responsive:[{breakpoint:960,settings:{slidesToShow:3,slidesToScroll:3}},{breakpoint:600,settings:{slidesToShow:2,slidesToScroll:2}},
-{% elseif basel_rel_prod_grid == '3' %}
-slidesToShow:3,slidesToScroll:3,responsive:[{breakpoint:600,settings:{slidesToShow:2,slidesToScroll:2}},
-{% elseif basel_rel_prod_grid == '2' %}
-slidesToShow:2,slidesToScroll:2,responsive:[
-{% endif %}
-{% if items_mobile_fw %}
-{breakpoint:320,settings:{slidesToShow:1,slidesToScroll:1}}
-{% endif %}
-]
-});
-$('.product-style2 .single-product .icon').attr('data-placement', 'top');
-$('[data-toggle=\'tooltip\']').tooltip({container: 'body'});
-//--></script>
-{% endif %}
-
-{% if sale_end_date and product_page_countdown %}
- <script>
-  $(function() {
-	$('#special_countdown').countdown('{{ sale_end_date }}').on('update.countdown', function(event) {
-  var $this = $(this).html(event.strftime(''
-    + '<div class=\"special_countdown\"></span><p><span class=\"icon-clock\"></span> {{ basel_text_offer_ends }}</p><div>'
-    + '%D<i>{{ basel_text_days }}</i></div><div>'
-    + '%H <i>{{ basel_text_hours }}</i></div><div>'
-    + '%M <i>{{ basel_text_mins }}</i></div><div>'
-    + '%S <i>{{ basel_text_secs }}</i></div></div>'));
-});
-  });
-</script>
-{% endif %}
-
 
 <script>
-    $(() => {
+    $(document).on('change', '.product-info input[type=\'radio\']:checked', function (e) {
+        console.log(e.currentTarget.getAttribute('data-uid'))
+        console.log({{ model }})
+
         $.ajax({
             type: 'get',
-            url: 'index.php?route=product/product/availability&sifra={{ model }}',
+            url: 'index.php?route=product/product/availability&sifra=' + e.currentTarget.getAttribute('data-uid'),
             beforeSend: function() {
                 //$('#button-confirm').button('loading');
                 console.log('beforeSend: function()')
@@ -766,6 +725,51 @@ $('[data-toggle=\'tooltip\']').tooltip({container: 'body'});
         });
     });
 </script>
+
+
+{% if products %}
+<script><!--
+$('.grid-holder.related').slick({
+prevArrow: "<a class=\"arrow-left icon-arrow-left\"></a>",
+nextArrow: "<a class=\"arrow-right icon-arrow-right\"></a>",
+dots:true,
+{% if direction == 'rtl' %}
+rtl: true,
+{% endif %}
+respondTo:'min',
+{% if basel_rel_prod_grid == '5' %}
+slidesToShow:5,slidesToScroll:5,responsive:[{breakpoint:1100,settings:{slidesToShow:4,slidesToScroll:4}},{breakpoint:960,settings:{slidesToShow:3,slidesToScroll:3}},{breakpoint:600,settings:{slidesToShow:2,slidesToScroll:2}},
+{% elseif basel_rel_prod_grid == '4' %}
+slidesToShow:4,slidesToScroll:4,responsive:[{breakpoint:960,settings:{slidesToShow:3,slidesToScroll:3}},{breakpoint:600,settings:{slidesToShow:2,slidesToScroll:2}},
+{% elseif basel_rel_prod_grid == '3' %}
+slidesToShow:3,slidesToScroll:3,responsive:[{breakpoint:600,settings:{slidesToShow:2,slidesToScroll:2}},
+{% elseif basel_rel_prod_grid == '2' %}
+slidesToShow:2,slidesToScroll:2,responsive:[
+{% endif %}
+{% if items_mobile_fw %}
+{breakpoint:320,settings:{slidesToShow:1,slidesToScroll:1}}
+{% endif %}
+]
+});
+$('.product-style2 .single-product .icon').attr('data-placement', 'top');
+$('[data-toggle=\'tooltip\']').tooltip({container: 'body'});
+//--></script>
+{% endif %}
+
+{% if sale_end_date and product_page_countdown %}
+ <script>
+  $(function() {
+	$('#special_countdown').countdown('{{ sale_end_date }}').on('update.countdown', function(event) {
+  var $this = $(this).html(event.strftime(''
+    + '<div class=\"special_countdown\"></span><p><span class=\"icon-clock\"></span> {{ basel_text_offer_ends }}</p><div>'
+    + '%D<i>{{ basel_text_days }}</i></div><div>'
+    + '%H <i>{{ basel_text_hours }}</i></div><div>'
+    + '%M <i>{{ basel_text_mins }}</i></div><div>'
+    + '%S <i>{{ basel_text_secs }}</i></div></div>'));
+});
+  });
+</script>
+{% endif %}
 
 
 <script><!--

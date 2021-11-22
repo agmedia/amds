@@ -233,12 +233,16 @@ class LOC_Warehouse
     {
         $response = collect();
         $locations = Location::all();
-        $houses = $locations->where('vidljivost', 1)->get();
+        $houses = $locations->where('vidljivost', 1)->all();
         $units = $locations->pluck('skladiste')->flatten();
 
+        Log::store($product);
+        Log::store($this->getUnitsQuery($units));
+
         $availables = collect($this->setAvailables(
-            LuceedProduct::stock($units, $product)
+            LuceedProduct::stock($this->getUnitsQuery($units), $product)
         ));
+
 
         // AVAILABILITY VIEW
         foreach ($houses as $house) {
@@ -311,7 +315,7 @@ class LOC_Warehouse
         $string = '[';
 
         foreach ($units as $unit) {
-            $string .= $unit['skladiste'] . ',';
+            $string .= $unit . ',';
         }
 
         $string = substr($string, 0, -1);
@@ -342,6 +346,8 @@ class LOC_Warehouse
     private function setAvailables($items): array
     {
         $json = json_decode($items);
+
+        Log::store($items);
 
         return $json->result[0]->stanje;
     }
