@@ -334,6 +334,7 @@ class ModelCatalogProduct extends Model {
 		return $product_attribute_group_data;
 	}
 
+
 	public function getProductOptions($product_id) {
 		$product_option_data = array();
 
