@@ -592,7 +592,7 @@
                 <div class="cd-store-title" data-product_title="1">{{ heading_title }}</div>
                 <span class="code">{{ model }}</span>
                 <div class="cd-store-header special">
-                    <div class="cd-store-attr-title"><strong>Veličina:</strong> VB 46</div>
+                    <div class="cd-store-attr-title"><strong>Veličina:</strong> <div id="option_selected" > </div></div>
                 </div>
                 <div class="panel-group" id="accordion-availability">
 
@@ -634,10 +634,6 @@
                             </div>
                         </div>
                     </div>#}
-
-
-
-
 
 
                 </div>
@@ -687,6 +683,9 @@
                 }
 
                 $('#accordion-availability').html(html);
+                let code = '';
+                code = getAttribute('data-uid');
+                $('#option_selected').html(code);
             }
         });
     });
