@@ -680,14 +680,12 @@
                         html += json[key].email + '<br>';
                         html += json[key].open + '</div></div></div></div>';
                     }
-                    else {
-                        html += 'Nije raspoloživo.';
-                    }
+
                 }
 
                 $('#accordion-availability').html(html);
                 let code = '';
-                code = getAttribute('data-uid');
+                code = e.currentTarget.getAttribute('data-uid');
                 $('#option_selected').html(code);
             }
         });
