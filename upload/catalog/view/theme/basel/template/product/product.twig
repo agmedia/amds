@@ -592,48 +592,10 @@
                 <div class="cd-store-title" data-product_title="1">{{ heading_title }}</div>
                 <span class="code">{{ model }}</span>
                 <div class="cd-store-header special">
-                    <div class="cd-store-attr-title"><strong>Veličina:</strong> <div id="option_selected" > </div></div>
+                    <div class="cd-store-attr-title"><strong>Veličina:</strong> </div>
                 </div>
                 <div class="panel-group" id="accordion-availability">
 
-                    {#<div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h5 class="panel-title"><a href="#collapse-locationDalmacija" class="accordion-toggle l-title sm collapsed" data-toggle="collapse" data-parent="#accordion" aria-expanded="false">Kaštel Sućurac (Regija Dalmacija) <span class="toggle-icon"></span></a></h5>
-                        </div>
-                        <div class="panel-collapse pmob collapse" id="collapse-locationDalmacija" aria-expanded="false" style="height: 0px;">
-                            <div class="panel-body smp">
-                                <div class="row">
-                                    <div class="col-md-12 lp lpp">
-                                        <h3 class="lp-title"></h3>
-                                        Franje Tuđmana 7, 21212<br>
-                                        021 224 185<br>
-                                        kastela@amds.hr
-                                        <br>
-                                        Radno vrijeme (pon-ned): 8 - 21h
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h5 class="panel-title"><a href="#collapse-locationDalmacija" class="accordion-toggle l-title sm collapsed" data-toggle="collapse" data-parent="#accordion" aria-expanded="false">Kaštel Sućurac (Regija Dalmacija) <span class="toggle-icon"></span></a></h5>
-                        </div>
-                        <div class="panel-collapse pmob collapse" id="collapse-locationDalmacija" aria-expanded="false" style="height: 0px;">
-                            <div class="panel-body smp">
-                                <div class="row">
-                                    <div class="col-md-12 lp lpp">
-                                        <h3 class="lp-title"></h3>
-                                        Franje Tuđmana 7, 21212<br>
-                                        021 224 185<br>
-                                        kastela@amds.hr
-                                        <br>
-                                        Radno vrijeme (pon-ned): 8 - 21h
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>#}
 
 
                 </div>
@@ -684,9 +646,6 @@
                 }
 
                 $('#accordion-availability').html(html);
-                let code = '';
-                code = e.currentTarget.getAttribute('data-uid');
-                $('#option_selected').html(code);
             }
         });
     });
