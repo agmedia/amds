@@ -590,6 +590,8 @@
             </div>
             <div class="modal-body" id="accordion-availability">
 
+                <p>Za provjeru dostupnosti odaberite veličinu.</p>
+
                 {#<div class="panel panel-default">
                         <div class="panel-heading">
                             <h5 class="panel-title"><a href="#collapse-locationDalmacija" class="accordion-toggle l-title sm collapsed" data-toggle="collapse" data-parent="#accordion" aria-expanded="false">Kaštel Sućurac (Regija Dalmacija) <span class="toggle-icon"></span></a></h5>
@@ -666,15 +668,11 @@
                 console.log(json);
                 var selectedoption = e.currentTarget.getAttribute('data-uid');
                 selectedoption = selectedoption.split("-").pop();
-
-
                 let html = '';
-
                 html += '<div class="cd-store-title" data-product_title="1">{{ heading_title }}</div> <span class="code">{{ model }}</span><div class="cd-store-header special"><div class="cd-store-attr-title"><strong>Veličina:</strong>' + selectedoption  + ' </div></div> <div class="panel-group">';
 
                 for (key in json) {
                     if (json.hasOwnProperty(key)) {
-
                         html += '<div class="panel panel-default"><div class="panel-heading"><h5 class="panel-title"><a href="#collapse-location-' + json[key].uid + '" class="accordion-toggle l-title sm collapsed" data-toggle="collapse" data-parent="#accordion" aria-expanded="false">' + json[key].name + ' (' + json[key].geocode + ') <span class="toggle-icon"></span></a></h5></div>';
                         html += '<div class="panel-collapse pmob collapse" id="collapse-location-' + json[key].uid + '" aria-expanded="false" style="height: 0px;">';
                         html += '<div class="panel-body smp"><div class="row"><div class="col-md-12 lp lpp">';
