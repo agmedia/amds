@@ -669,7 +669,7 @@
                 var selectedoption = e.currentTarget.getAttribute('data-uid');
                 selectedoption = selectedoption.split("-").pop();
                 let html = '';
-                html += '<div class="cd-store-title" data-product_title="1">{{ heading_title }}</div> <span class="code">{{ model }}</span><div class="cd-store-header special"><div class="cd-store-attr-title"><strong>Veličina:</strong>' + selectedoption  + ' </div></div> <div class="panel-group">';
+                html += '<div class="cd-store-title" data-product_title="1">{{ heading_title }}</div> <span class="code">{{ model }}</span><div class="cd-store-header special"><div class="cd-store-attr-title"><strong>Veličina: </strong>' + selectedoption  + ' </div></div> <div class="panel-group">';
 
                 for (key in json) {
                     if (json.hasOwnProperty(key)) {
@@ -685,6 +685,9 @@
                 }
                 html +='</div>';
                 $('#accordion-availability').html(html);
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
             }
         });
     });
