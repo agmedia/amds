@@ -380,7 +380,7 @@ class ControllerProductProduct extends Controller {
 
 			$data['products'] = array();
 
-			$results = $this->model_catalog_product->getProductRelated($this->request->get['product_id']);
+			$results = $this->model_catalog_product->getProductRelated($this->request->get['product_id'], $product_info['price']);
 
 			foreach ($results as $result) {
 				if ($result['image']) {
