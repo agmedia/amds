@@ -594,9 +594,9 @@
                 <div class="cd-store-header special">
                     <div class="cd-store-attr-title"><strong>Veličina:</strong> VB 46</div>
                 </div>
-                <div class="panel-group  " id="accordion">
+                <div class="panel-group" id="accordion-availability">
 
-                    <div class="panel panel-default">
+                    {#<div class="panel panel-default">
                         <div class="panel-heading">
                             <h5 class="panel-title"><a href="#collapse-locationDalmacija" class="accordion-toggle l-title sm collapsed" data-toggle="collapse" data-parent="#accordion" aria-expanded="false">Kaštel Sućurac (Regija Dalmacija) <span class="toggle-icon"></span></a></h5>
                         </div>
@@ -622,7 +622,7 @@
                         <div class="panel-collapse pmob collapse" id="collapse-locationDalmacija" aria-expanded="false" style="height: 0px;">
                             <div class="panel-body smp">
                                 <div class="row">
-                                    <div class="col-md-12 lp  lpp">
+                                    <div class="col-md-12 lp lpp">
                                         <h3 class="lp-title"></h3>
                                         Franje Tuđmana 7, 21212<br>
                                         021 224 185<br>
@@ -633,7 +633,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div>#}
 
 
 
@@ -669,58 +669,24 @@
         $.ajax({
             type: 'get',
             url: 'index.php?route=product/product/availability&sifra=' + e.currentTarget.getAttribute('data-uid'),
-            beforeSend: function() {
-                //$('#button-confirm').button('loading');
-                console.log('beforeSend: function()')
-            },
-            complete: function() {
-                //$('#button-confirm').button('reset');
-                console.log('complete: function()')
-            },
             success: (json) => {
                 console.log(json);
-                /*let html = '';
-                let qty = '';
-
-                let title = '';
-                let subtitle = '';
-                let icon = '';
-                let btn_title = '';
+                let html = '';
 
                 for (key in json) {
                     if (json.hasOwnProperty(key)) {
-                        if (!['Web', 'Dobavljač', 'Btn'].includes(json[key].title)) {
-                            if (json[key].qty) {
-                                qty = 'fa-check text-success';
-                            } else {
-                                qty = 'fa-times text-danger';
-                            }
 
-                            html += '<div class="d-flex poslov justify-content-between border-bottom py-3"><div><div class="fw-semibold text-dark"><a href="http://maps.google.com/?q=' + json[key].title + ' - ' + json[key].address + '" target="_blank">' + json[key].title + ' - ' + json[key].address + '</a></div></div><div><i class="fas ' + qty + ' me-2"></i></div></div>';
-
-                        }
-
-                        if (['Btn'].includes(json[key].title)) {
-                            title = json[key].address;
-                            if (json[key].qty) {
-                                subtitle = json[key].qty;
-                            }
-                            icon = json[key].btn;
-                            btn_title = json[key].button;
-                        }
+                        html += '<div class="panel panel-default"><div class="panel-heading"><h5 class="panel-title"><a href="#collapse-location-' + json[key].uid + '" class="accordion-toggle l-title sm collapsed" data-toggle="collapse" data-parent="#accordion" aria-expanded="false">' + json[key].name + ' ' + json[key].geocode + ' <span class="toggle-icon"></span></a></h5></div>';
+                        html += '<div class="panel-collapse pmob collapse" id="collapse-location-' + json[key].uid + '" aria-expanded="false" style="height: 0px;">';
+                        html += '<div class="panel-body smp"><div class="row"><div class="col-md-12 lp lpp">';
+                        html += json[key].address + '<br>';
+                        html += json[key].telephone + '<br>';
+                        html += json[key].email + '<br>';
+                        html += json[key].open + '</div></div></div></div>';
                     }
                 }
 
-                $('#availability-view').html(html);
-                $(".poslov").last().removeClass("border-bottom");
-
-                $('#availability-title').html(title);
-                $('#availability-subtitle').html(subtitle);
-                $('#availability-icon').addClass('text-' + icon);
-
-                if (title != 'DOSTUPNO ODMAH') {
-                    $('#button-cart,#button-cart2,#button-cart3').html(btn_title);
-                }*/
+                $('#accordion-availability').html(html);
             }
         });
     });

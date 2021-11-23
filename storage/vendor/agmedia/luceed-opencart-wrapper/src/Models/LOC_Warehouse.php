@@ -231,45 +231,47 @@ class LOC_Warehouse
 
     public function getAvailabilityForProduct(string $product): Collection
     {
+        $count = 0;
         $response = collect();
+        $has_items = collect();
         $locations = Location::all();
-        $houses = $locations->where('vidljivost', 1)->all();
         $units = $locations->pluck('skladiste')->flatten();
-
-        Log::store($product);
-        Log::store($this->getUnitsQuery($units));
 
         $availables = collect($this->setAvailables(
             LuceedProduct::stock($this->getUnitsQuery($units), $product)
         ));
 
-
-        // AVAILABILITY VIEW
-        foreach ($houses as $house) {
-            $has = $availables->where('skladiste_uid', $house['skladiste'])->first();
-
-            if ($has) {
-                $qty = $has->raspolozivo_kol;
-
-                if ($qty < 0) {
-                    $qty = 0;
-                }
-
-                $response->push([
-                    'title' => $house['naziv'],
-                    'address' => $house['adresa'],
-                    'qty'   => $qty
+        foreach ($availables as $available) {
+            if ($available->raspolozivo_kol) {
+                $has_items->push([
+                    'uid' => $available->skladiste_uid,
+                    'qty' => $available->raspolozivo_kol
                 ]);
 
-            } else {
-                $response->push([
-                    'title' => $house['naziv'],
-                    'address' => $house['adresa'],
-                    'qty'   => 0
-                ]);
+                $count += $available->raspolozivo_kol;
             }
         }
 
+        $houses = $locations->whereIn('skladiste_uid', $has_items->pluck('uid')->flatten())->where('vidljivost', 1);
+
+        // AVAILABILITY VIEW
+        if ( ! empty($houses)) {
+            foreach ($houses as $house) {
+                $has = $availables->where('skladiste_uid', $house['skladiste_uid'])->first();
+
+                if ($has) {
+                    $response->push([
+                        'name'      => $house['name'],
+                        'uid'       => $house['skladiste_uid'],
+                        'geocode'   => $house['geocode'],
+                        'address'   => $house['address'],
+                        'telephone' => $house['telephone'],
+                        'email'     => $house['fax'],
+                        'open'      => $house['open'],
+                    ]);
+                }
+            }
+        }
 
         return $response;
     }
@@ -346,8 +348,6 @@ class LOC_Warehouse
     private function setAvailables($items): array
     {
         $json = json_decode($items);
-
-        Log::store($items);
 
         return $json->result[0]->stanje;
     }
