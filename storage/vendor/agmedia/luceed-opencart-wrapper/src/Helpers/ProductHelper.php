@@ -88,15 +88,115 @@ class ProductHelper
                     }
                 }
             }
+
+            if ($product['marker']) {
+                $response[7] = static::getStrukId($product, $actual->category_id);
+            }
+
+            if ($product['jamstvo']) {
+                $response[8] = static::getNosivostId($product, $actual->category_id);
+            }
         }
 
-        $attributes = collect($product['atributi']);
+        if (static::hasOutletCategory(collect($product['atributi']))) {
+            $actual   = Category::where('luceed_uid', $product['spol'] . '-' . $product['grupa_artikla_uid'] . '-outlet')->first();
 
-        if (static::hasOutletCategory($attributes)) {
-            $response = static::sortOutletCategory($response);
+            if ( ! $actual) {
+                $parent = Category::where('luceed_uid', $product['spol'] . '-' . $product['nadgrupa_artikla'] . '-outlet')->first();
+
+                if ( ! $parent) {
+                    $main = Category::where('luceed_uid', $product['spol_uid'] . '-outlet')->first();
+
+                    if ( ! $main) {
+                        $main_category = [];
+                        $main_category['grupa_artikla'] = $product['spol_uid'] . '-outlet';
+                        $main_category['naziv'] = $product['spol_naziv'];
+
+                        $main_id = $lc->save($main_category, agconf('import.outlet_category'));
+                        $main = Category::where('category_id', $main_id)->first();
+                    }
+
+                    $parent_category = [];
+                    $parent_category['grupa_artikla'] = $product['spol'] . '-' . $product['nadgrupa_artikla'] . '-outlet';
+                    $parent_category['naziv'] = $product['nadgrupa_artikla_naziv'];
+
+                    $parent_id = $lc->save($parent_category, $main->category_id);
+                    $parent = Category::where('category_id', $parent_id)->first();
+                }
+
+                $actual_category = [];
+                $actual_category['grupa_artikla'] = $product['spol'] . '-' . $product['grupa_artikla_uid'] . '-outlet';
+                $actual_category['naziv'] = $product['grupa_artikla_naziv'];
+
+                $actual_id = $lc->save($actual_category, $parent->category_id);
+                $actual   = Category::where('category_id', $actual_id)->first();
+            }
+
+            if ($actual && $actual->count()) {
+                $response[3] = $actual->category_id;
+
+                if ($actual->parent_id) {
+                    $parent = Category::where('category_id', $actual->parent_id)->first();
+
+                    if ($parent->count()) {
+                        $response[4] = $parent->category_id;
+
+                        if ($parent->parent_id) {
+                            $main = Category::where('category_id', $parent->parent_id)->first();
+
+                            if ($main->count()) {
+                                $response[5] = $main->category_id;
+                            }
+                        }
+                    }
+                }
+
+                $response[6] = agconf('import.outlet_category');
+            }
+
+            $response = array_values($response);
         }
+
+        Log::store('$response');
+        Log::store($response);
 
         return $response;
+    }
+
+
+    private static function getStrukId(Collection $product, int $parent)
+    {
+        $lc = new LOC_Category();
+        $has = Category::where('luceed_uid', $product['marker_uid'] . '-s')->first();
+
+        if ( ! $has) {
+            $new = [];
+            $new['grupa_artikla'] = $product['marker_uid'] . '-s';
+            $new['naziv'] = $product['marker_naziv'];
+
+            $has_id = $lc->save($new, $parent);
+            $has = Category::where('category_id', $has_id)->first();
+        }
+
+        return $has->category_id;
+    }
+
+
+    private static function getNosivostId(Collection $product, int $parent)
+    {
+        $lc = new LOC_Category();
+        $has = Category::where('luceed_uid', $product['jamstvo_uid'] . '-n')->first();
+
+        if ( ! $has) {
+            $new = [];
+            $new['grupa_artikla'] = $product['jamstvo_uid'] . '-n';
+            $new['naziv'] = $product['jamstvo_naziv'];
+
+            $has_id = $lc->save($new, $parent);
+            $has = Category::where('category_id', $has_id)->first();
+        }
+
+        return $has->category_id;
     }
 
 

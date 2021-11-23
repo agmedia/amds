@@ -433,7 +433,7 @@ class LOC_Product
             'weight'              => '',
             'weight_class_id'     => 1,
             'status'              => $status,
-            'sort_order'          => 0,
+            'sort_order'          => substr($product['sezona_uid'], 0, strpos($product['sezona_uid'], '-')),
             'manufacturer'        => $manufacturer['name'],
             'manufacturer_id'     => $manufacturer['id'],
             'category'            => '',
