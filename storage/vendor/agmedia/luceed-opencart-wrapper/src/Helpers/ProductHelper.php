@@ -496,6 +496,7 @@ class ProductHelper
                         'points'          => '',
                         'weight_prefix'   => '+',
                         'sku'             => $item['uid'],
+                        'sifra'           => $item['artikl'],
                         'weight'          => 0,
                     ];
                 }

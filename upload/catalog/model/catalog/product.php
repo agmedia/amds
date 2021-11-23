@@ -354,7 +354,8 @@ class ModelCatalogProduct extends Model {
 					'quantity'                => $product_option_value['quantity'],
 					'subtract'                => $product_option_value['subtract'],
 					'price'                   => $product_option_value['price'],
-                    'sku'                   => $product_option_value['sku'],
+                    'sku'                     => $product_option_value['sku'],
+                    'sifra'                   => $product_option_value['sku'],
 					'price_prefix'            => $product_option_value['price_prefix'],
 					'weight'                  => $product_option_value['weight'],
 					'weight_prefix'           => $product_option_value['weight_prefix']
