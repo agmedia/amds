@@ -144,7 +144,7 @@
                                 {% for option_value in option.product_option_value %}
 
                                         <label class="btn btn-outline btn-option ">
-                                    <input type="radio" name="option[{{ option.product_option_id }}]" value="{{ option_value.product_option_value_id }}" data-uid="{{ option_value.sku }}" />
+                                    <input type="radio" name="option[{{ option.product_option_id }}]" value="{{ option_value.product_option_value_id }}" data-uid="{{ option_value.sifra }}" />
                                     {% if option_value.image %}
                                     <img src="{{ option_value.image }}" alt="{{ option_value.name }}{% if option_value.price %}({{ option_value.price_prefix }}{{ option_value.price }}){% endif %}" data-toggle="tooltip" data-title="{{ option_value.name }}{% if option_value.price %} ({{ option_value.price_prefix }}{{ option_value.price }}){% endif %}" />
                                     {% endif %}

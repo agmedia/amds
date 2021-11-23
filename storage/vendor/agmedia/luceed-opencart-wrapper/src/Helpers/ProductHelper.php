@@ -157,9 +157,6 @@ class ProductHelper
             $response = array_values($response);
         }
 
-        Log::store('$response');
-        Log::store($response);
-
         return $response;
     }
 
