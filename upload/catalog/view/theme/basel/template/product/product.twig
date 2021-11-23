@@ -680,6 +680,9 @@
                         html += json[key].email + '<br>';
                         html += json[key].open + '</div></div></div></div>';
                     }
+                    else {
+                        html += 'Nije raspoloživo.';
+                    }
                 }
 
                 $('#accordion-availability').html(html);
