@@ -676,7 +676,7 @@
                 for (key in json) {
                     if (json.hasOwnProperty(key)) {
 
-                        html += '<div class="panel panel-default"><div class="panel-heading"><h5 class="panel-title"><a href="#collapse-location-' + json[key].uid + '" class="accordion-toggle l-title sm collapsed" data-toggle="collapse" data-parent="#accordion" aria-expanded="false">' + json[key].name + ' ' + json[key].geocode + ' <span class="toggle-icon"></span></a></h5></div>';
+                        html += '<div class="panel panel-default"><div class="panel-heading"><h5 class="panel-title"><a href="#collapse-location-' + json[key].uid + '" class="accordion-toggle l-title sm collapsed" data-toggle="collapse" data-parent="#accordion" aria-expanded="false">' + json[key].name + ' (' + json[key].geocode + ') <span class="toggle-icon"></span></a></h5></div>';
                         html += '<div class="panel-collapse pmob collapse" id="collapse-location-' + json[key].uid + '" aria-expanded="false" style="height: 0px;">';
                         html += '<div class="panel-body smp"><div class="row"><div class="col-md-12 lp lpp">';
                         html += json[key].address + '<br>';
