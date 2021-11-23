@@ -504,7 +504,7 @@ class ControllerExtensionBaselProductTabs extends Controller {
 				'sort'        => 'name',
 				'order'       => 'ASC',
 				'start'       => 0,
-				'limit'       => 5
+				'limit'       => 30
 			);
 
 			$results = $this->model_extension_basel_product_tabs->getProductTabs($filter_data);

@@ -22,7 +22,7 @@ class ControllerExtensionFeedFacebookstore extends Controller {
 
         foreach ($products as $product) {
 
-            if($product['quantity']>0 || $product['model']!='') {
+            if($product['quantity'] > 0 || $product['model']!='') {
 
 
 
@@ -60,7 +60,7 @@ class ControllerExtensionFeedFacebookstore extends Controller {
 
                 }
 
-                $output .= '<g:google_product_category>222</g:google_product_category>';
+                $output .= '<g:google_product_category>1604</g:google_product_category>';
 
 
 
