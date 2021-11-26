@@ -86,6 +86,38 @@ class ControllerCheckoutCart extends Controller {
                             $special = false;
                         }
 
+                        $data['options'] = array();
+                        foreach ($this->model_catalog_product->getProductOptions($result['product_id']) as $option) {
+                            $product_option_value_data = array();
+
+                            foreach ($option['product_option_value'] as $option_value) {
+                                if (!$option_value['subtract'] || ($option_value['quantity'] > 0)) {
+
+
+
+                                    $product_option_value_data[] = array(
+                                        'product_option_value_id' => $option_value['product_option_value_id'],
+                                        'option_value_id'         => $option_value['option_value_id'],
+                                        'name'                    => $option_value['name'],
+                                        'image'                   => $this->model_tool_image->resize($option_value['image'], 50, 50),
+
+                                        'price_prefix'            => $option_value['price_prefix'],
+                                        'sku'            => $option_value['sku']
+                                    );
+                                }
+                            }
+
+                            $data['options'][] = array(
+                                'product_option_id'    => $option['product_option_id'],
+                                'product_option_value' => $product_option_value_data,
+                                'option_id'            => $option['option_id'],
+                                'name'                 => $option['name'],
+                                'type'                 => $option['type'],
+                                'value'                => $option['value'],
+                                'required'             => $option['required']
+                            );
+                        }
+
 
 
 
@@ -96,6 +128,7 @@ class ControllerCheckoutCart extends Controller {
                             'thumb'       => $image,
                             'name'        => $result['name'],
                             'price'       => $price,
+                            'options' => $data['options'],
                             'special'     => $special,
                             'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,
                             'href'        => $this->url->link('product/product', 'product_id=' . $result['product_id'])
