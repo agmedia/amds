@@ -56,6 +56,55 @@ class ControllerCheckoutCart extends Controller {
 			$data['products'] = array();
 
 			$products = $this->cart->getProducts();
+            $this->load->model('catalog/product');
+
+      foreach ($products as $product) {
+                $arrs[] = $results = $this->model_catalog_product->getProductRelatedNormal($product['product_id']);
+
+            }
+            if ($arrs) {
+                $data['related'] = array();
+                foreach ($arrs as $arr) {
+
+                    foreach ($arr as $result) {
+
+                        if ($result['image']) {
+                            $image = $this->model_tool_image->resize($result['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_related_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_related_height'));
+                        } else {
+                            $image = $this->model_tool_image->resize('placeholder.png', $this->config->get('theme_' . $this->config->get('config_theme') . '_image_related_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_related_height'));
+                        }
+
+                        if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
+                            $price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                        } else {
+                            $price = false;
+                        }
+
+                        if ((float)$result['special']) {
+                            $special = $this->currency->format(round($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax'))), $this->session->data['currency']);
+                        } else {
+                            $special = false;
+                        }
+
+
+
+
+
+
+                        $data['related'][] = array(
+                            'product_id'  => $result['product_id'],
+                            'thumb'       => $image,
+                            'name'        => $result['name'],
+                            'price'       => $price,
+                            'special'     => $special,
+                            'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,
+                            'href'        => $this->url->link('product/product', 'product_id=' . $result['product_id'])
+                        );
+
+
+                    }
+                }
+            }
 
 			foreach ($products as $product) {
 				$product_total = 0;

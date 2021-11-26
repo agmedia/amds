@@ -413,6 +413,22 @@ class ModelCatalogProduct extends Model {
         return $product_data;
     }
 
+    public function getProductRelatedNormal($product_id) {
+        $product_data = array();
+
+
+
+        $getCat = $this->db->query("SELECT product_id, min(category_id) as category_id FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "' AND category_id not in (SELECT distinct parent_id as category_id FROM oc_category)");
+        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_to_category WHERE category_id = '" . (int)$getCat->row['category_id'] . "' AND product_id != '" . (int)$product_id . "'  LIMIT 0,5");
+
+        foreach ($query->rows as $result) {
+            //$product_data[$result['related_id']] = $this->getProduct($result['related_id']);
+            $product_data[$result['product_id']] = $this->getProduct($result['product_id']);
+        }
+
+        return $product_data;
+    }
+
 	public function getProductLayoutId($product_id) {
 		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_to_layout WHERE product_id = '" . (int)$product_id . "' AND store_id = '" . (int)$this->config->get('config_store_id') . "'");
 
