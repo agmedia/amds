@@ -392,11 +392,17 @@ class ModelCatalogProduct extends Model {
 
         $product_data = array();
 
+      $getCat = $this->db->query("SELECT product_id, min(category_id) as category_id FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "' AND category_id not in (SELECT distinct parent_id as category_id FROM oc_category)");
+      //  $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_to_category WHERE category_id = '" . (int)$getCat->row['category_id'] . "' AND product_id != '" . (int)$product_id . "'  LIMIT 0,5");
 
 
 
 
-            $query = $this->db->query("SELECT p.product_id FROM " . DB_PREFIX . "product_to_category p2c LEFT JOIN " . DB_PREFIX . "product p ON (p2c.product_id = p.product_id) LEFT JOIN " . DB_PREFIX . "product_to_store p2s ON (p.product_id = p2s.product_id) WHERE p2c.category_id IN (SELECT category_id FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "') AND p.product_id != '" . (int)$product_id . "' AND price > '".$price."' AND  p.status = '1' AND p.date_available <= NOW() AND p2s.store_id = '" . (int)$this->config->get('config_store_id') . "' ORDER BY RAND() LIMIT 0, 10");
+
+
+
+
+            $query = $this->db->query("SELECT p.product_id FROM " . DB_PREFIX . "product_to_category p2c LEFT JOIN " . DB_PREFIX . "product p ON (p2c.product_id = p.product_id) LEFT JOIN " . DB_PREFIX . "product_to_store p2s ON (p.product_id = p2s.product_id) WHERE p2c.category_id = '" . (int)$getCat->row['category_id'] . "' AND p.product_id != '" . (int)$product_id . "' AND price > '".$price."' AND  p.status = '1' AND p.date_available <= NOW() AND p2s.store_id = '" . (int)$this->config->get('config_store_id') . "' ORDER BY RAND() LIMIT 0, 10");
 
             foreach ($query->rows as $result) {
                 $product_data[$result['product_id']] = $this->getProduct($result['product_id']);
