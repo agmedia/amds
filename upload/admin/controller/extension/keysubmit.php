@@ -5,7 +5,7 @@ class ControllerExtensionKeysubmit  extends Controller {
 		
 		$user_token= $this->session->data['user_token'];
 		$regkey= $this->config->get('moduledata_faq_key');
-		 $url = 'https://www.opencartextensions.in/index.php?route=api/keysubmit&foldername=extension&regkey='.$regkey.'&user_token='.$user_token;
+		// $url = 'https://www.opencartextensions.in/index.php?route=api/keysubmit&foldername=extension&regkey='.$regkey.'&user_token='.$user_token;
 		
 		$curl = curl_init($url);
 	
