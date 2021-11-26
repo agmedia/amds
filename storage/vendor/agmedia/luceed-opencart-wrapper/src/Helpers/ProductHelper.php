@@ -227,7 +227,7 @@ class ProductHelper
     public static function hasOutletCategory(Collection $attributes): bool
     {
         foreach ($attributes as $attribute) {
-            if ($attribute->atribut == 'outlet' && $attribute->aktivan == 'D') {
+            if ($attribute->atribut == 'outlet' && $attribute->vrijednost == 'D') {
                 return true;
             }
         }
