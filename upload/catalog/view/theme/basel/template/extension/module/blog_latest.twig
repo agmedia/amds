@@ -35,11 +35,7 @@
                   {% endif %}
                 <div class="summary">
                 <h3 class="blog-title"><a href="{{ blog.href }}">{{ blog.title }}</a></h3>
-                <div class="blog_stats">
-                {% if author_status %}<i>{{ text_posted_by }}: {{ blog.author }}</i>{% endif %}
-                {% if comments_count_status %}<i>{{ text_comments }}: {{ blog.comment_total }}</i>{% endif %}
-                {% if page_view_status %}<i>{{ text_read }}: {{ blog.count_read }}</i>{% endif %}
-                </div>
+
                 {% if blog.short_description %}
                 <p class="short-description">{{ blog.short_description }}</p>
                 {% endif %}
