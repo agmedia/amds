@@ -64,3 +64,4 @@ a.list-group-item, button.list-group-item {
     border-top:1px solid #ddd;
 }
 .faq-heading{background-color:#ea1313 !important;}
+.panel-body, .panel-body p{font-size:16px}
