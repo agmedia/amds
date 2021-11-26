@@ -8836,6 +8836,8 @@ a.label-link:not(:hover) {
 	position: absolute;
 	bottom: 20px;
 	line-height: 0;
+	margin-top: -15px;
+	position: relative;
 
 }
 
