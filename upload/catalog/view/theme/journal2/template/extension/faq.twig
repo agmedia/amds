@@ -1,0 +1,85 @@
+{{ header }}
+<div id="container" class="container j-container">
+  <ul class="breadcrumb">
+    {% for breadcrumb in breadcrumbs %}
+      <li itemscope itemtype="http://data-vocabulary.org/Breadcrumb"><a href="{{ breadcrumb.href }}" itemprop="url"><span itemprop="title">{{ breadcrumb.text }}</span></a></li>
+    {% endfor %}
+  </ul>
+  <div class="row">{{ column_left }}{{ column_right }}
+    {% if column_left and column_right %}
+    {% set class = 'col-sm-6' %}
+    {% elseif column_left or column_right %}
+    {% set class = 'col-sm-9' %}
+    {% else %}
+    {% set class = 'col-sm-12' %}
+    {% endif %}
+    <div id="content" class="{{ class }}">{{ content_top }}
+		  <h1 class="heading-title">{{ heading_title }}</h1>
+      <div class="xs-100 sm-100 md-100 lg-100 xl-100">
+      <div class="xs-100 sm-50 md-50 lg-50 xl-50 input-group pull-right">
+			  <input class="form-control" type="text" name="filtername" value=""/> <span class="input-group-btn"><button onclick="faqfilter();" class="btn btn-default"><i class="fa fa-search"></i></button></span>
+			</div>
+		  </div>
+		  	{% for keys, result in results %}
+			<h3 class="faq_title">{{ result.name }}</h3>
+				<div class="panel-group accordion">
+		  		{% for key, sub in result.subfaqs %}
+
+					<div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question" class="panel panel-default">
+						<div itemprop="name" class="panel-heading">
+						  <h4 class="panel-title">
+							<!-- New -->
+							<a class="accordion-toggle autoswtich{{ sub.faq_id }}" data-toggle="collapse" data-parent=".accordion" href="#collapse{{ key }}-{{ result.fcategory_id }}">
+							<!-- New -->
+							{% if keys == 0 and key == 0 %}
+							  <span class="glyphicon glyphicon-minus"></span>
+							{% else %}
+							 <span class="glyphicon glyphicon-plus"></span>
+							{% endif %}
+							  {{ sub.name }}
+							</a>
+						  </h4>
+						</div>
+						<div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"  id="collapse{{ key }}-{{ result.fcategory_id }}" class="panel-collapse collapse {% if keys==0 and key==0 %} {{ 'in' }} {% endif %}">
+						  <div itemprop="text" class="panel-body">
+						  	{{ sub.description }}
+						  </div>
+						</div>
+					  </div>
+				  {% endfor %}
+				</div>
+			{% endfor %}
+		{{ content_bottom }}</div>
+  </div>
+</div>
+<script>
+function faqfilter(){
+  var search = $('input[name="filtername"]').val();
+  url = 'index.php?route=extension/faq/search';
+  url += '&fsearch='+encodeURI(search);
+  location =url;
+}
+</script>
+<script type="text/javascript"><!--
+$('input[name="filtername"]').keydown(function(e) {
+	if (e.keyCode == 13) {
+		faqfilter();
+	}
+});
+//--></script>
+<script>
+	$('.collapse').on('shown.bs.collapse', function(){
+$(this).parent().find(".glyphicon-plus").removeClass("glyphicon-plus").addClass("glyphicon-minus");
+}).on('hidden.bs.collapse', function(){
+$(this).parent().find(".glyphicon-minus").removeClass("glyphicon-minus").addClass("glyphicon-plus");
+});
+</script>
+{% if faq_id %}
+	<script>
+		id=$('.autoswtich{{ faq_id }}').attr('href');
+		$('.autoswtich{{ faq_id }}').trigger('click');
+		var offset = $(id).offset();
+		$('html, body').animate({ scrollTop:  offset.top }, 'slow');
+	</script>
+{% endif %}
+{{ footer }}

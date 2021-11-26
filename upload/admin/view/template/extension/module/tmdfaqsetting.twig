@@ -1,0 +1,93 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-store" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-store" class="form-horizontal">
+          <div class="form-group">
+            <label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+            <div class="col-sm-10">
+              <select name="tmdfaqsetting_status" id="input-status" class="form-control">
+                 {% if tmdfaqsetting_status  %}
+                <option value="1" selected="selected">{{ text_enabled }}</option>
+                <option value="0">{{ text_disabled }}</option>
+                  {% else %}
+                <option value="1">{{ text_enabled }}</option>
+                <option value="0" selected="selected">{{ text_disabled }}</option>
+                {% endif %}
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_faqposition }}</label>
+            <div class="col-sm-9 btn-group" data-toggle="buttons">
+               {% if tmdfaqsetting_faqposition == 'in tab'  %}
+                <label class="btn btn-primary active">
+                <input type="radio" name="tmdfaqsetting_faqposition" value="in tab" checked="checked"> {{ text_in_tab }}
+              </label>
+                 {% else %}
+                <label class="btn btn-primary">
+                  <input type="radio" name="tmdfaqsetting_faqposition" value="in tab"> {{ text_in_tab }}
+                </label>
+              {% endif %}
+               {% if tmdfaqsetting_faqposition == 'out tab'  %}
+                <label class="btn btn-primary active">
+                <input type="radio" name="tmdfaqsetting_faqposition" value="out tab" checked="checked"> {{ text_out_tab }}
+              </label>
+                 {% else %}
+                <label class="btn btn-primary">
+                  <input type="radio" name="tmdfaqsetting_faqposition" value="out tab"> {{ text_out_tab }}
+                </label>
+              {% endif %}
+            </div>              
+          </div>
+          <div class="form-group">
+            <label class="col-sm-2 control-label">{{ entry_displaycategory }}</label>
+            <div class="col-sm-9 btn-group" data-toggle="buttons">
+               {% if tmdfaqsetting_displaycategory == 'yes'  %}
+                <label class="btn btn-primary active">
+                <input type="radio" name="tmdfaqsetting_displaycategory" value="yes" checked="checked"> {{ text_yes }}
+              </label>
+                 {% else %}
+                <label class="btn btn-primary">
+                  <input type="radio" name="tmdfaqsetting_displaycategory" value="yes"> {{ text_yes }}
+                </label>
+              {% endif %}
+               {% if tmdfaqsetting_displaycategory == 'no'  %}
+                <label class="btn btn-primary active">
+                <input type="radio" name="tmdfaqsetting_displaycategory" value="no" checked="checked"> {{ text_no }}
+              </label>
+                 {% else %}
+                <label class="btn btn-primary">
+                  <input type="radio" name="tmdfaqsetting_displaycategory" value="no"> {{ text_no }}
+                </label>
+              {% endif %}
+            </div>              
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{{ footer }}

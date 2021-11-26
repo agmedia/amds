@@ -1,0 +1,66 @@
+.faq-heading{
+		background-color: #229ac8;
+		color:#fff;
+		margin:0px 0 0px;
+		padding: 9px 10px;
+		text-transform: capitalize;
+		border-radius: 4px 4px 0 0;
+}
+.faq_title{font-size:15px;}
+.list-group-item {
+    position: relative;
+    display: block;
+    padding: 10px 15px;
+    margin-bottom: -1px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+}
+a.list-group-item, button.list-group-item {
+    color: #555;
+}
+.pull-right {
+    float: right !important;
+}
+.panel-group .panel+.panel {
+    margin-top: 5px;
+}
+.oc2 .pull-right .input-group-btn{
+	max-width: 20px;
+}
+.site-wrapper #extension-faq input.form-control{
+	max-width: 100%;
+	min-height: 40px;
+}
+.site-wrapper #extension-faq .input-group .input-group-btn .btn{
+	min-height: 40px;
+    margin-left: 0;
+}
+.site-wrapper .panel-group .glyphicon{
+	margin-right: 5px;
+}
+.site-wrapper .panel-group.accordion .panel-heading a:before{
+	    content: '' !important;
+}
+.panel-group.accordion{
+	margin-bottom: 10px;
+}
+.site-wrapper #extension-faq .panel-group .panel-heading a::before{
+        content: '' !important;
+}
+.site-wrapper #extension-faq .panel-heading{
+  padding:0 15px;
+  border-top-left-radius: 3px;
+    border-top-right-radius: 3px
+}
+.site-wrapper #extension-faq .panel-group .panel{
+  border: 1px solid #ddd;
+}
+.site-wrapper #extension-faq .panel-group .panel-heading a{
+  text-align: left !important;
+  display: block;
+}
+.site-wrapper #extension-faq .panel-body {
+    padding: 15px;
+    border-top:1px solid #ddd;
+}
+.faq-heading{background-color:#ea1313 !important;}

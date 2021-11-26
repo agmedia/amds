@@ -1,0 +1,86 @@
+{{ header }}
+	<div itemscope itemtype="https://schema.org/FAQPage" class="container">
+		<div class="wrapper">
+			<ul class="breadcrumb">
+				{% for breadcrumb in breadcrumbs %}
+					<li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+				{% endfor %}
+			</ul>
+
+	<div class="row">{{ column_left }}
+		{% if column_left and column_right %}
+			{% set class = 'col-sm-6' %}
+		{% elseif column_left or column_right %}
+			{% set class = 'col-sm-9' %}
+		{% else %}
+			{% set class = 'col-sm-12' %}
+		{% endif %}
+		<div id="content" class="{{ class }}">
+			<h1 id="page-title">{{ heading_title }}</h1>
+
+
+				{% for keys, result in results %}
+				<h2><strong>{{ result.name }}</strong></h2>
+					<div class="panel-group accordion">
+		  		{% for key, sub in result.subfaqs %}
+
+					<div itemscope itemprop="mainEntity" itemtype="https://schema.org/Question"  class="panel panel-default">
+						<div itemprop="name" class="panel-heading">
+							<h4 class="panel-title">
+							<!-- New -->
+							<a class="accordion-toggle l-title  autoswtich{{ sub.faq_id }}" data-toggle="collapse" data-parent=".accordion" href="#collapse{{ key }}-{{ result.fcategory_id }}">
+							<!-- New -->
+								{{ sub.name }}
+
+								<span class="toggle-icon"></span>
+
+
+							</a>
+						  </h4>
+						</div>
+						<div itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer"  id="collapse{{ key }}-{{ result.fcategory_id }}" class="panel-collapse pmob collapse {% if keys==0 and key==0 %} {{ 'in' }} {% endif %}">
+						  <div itemprop="text" class="panel-body">
+						  	<p style="font-size:16px">{{ sub.description }}</p>
+						  </div>
+						</div>
+					  </div>
+				  {% endfor %}
+				</div>
+			{% endfor %}
+
+		</div>
+
+	</div>
+</div>
+	</div>
+<script>
+function faqfilter(){
+  var search = $('input[name="filtername"]').val();
+  url = 'index.php?route=extension/faq/search';
+  url += '&fsearch='+encodeURI(search);
+  location =url; 
+}
+</script>
+<script type="text/javascript"><!--
+$('input[name="filtername"]').keydown(function(e) {
+	if (e.keyCode == 13) {
+		faqfilter();
+	}
+});
+//--></script> 
+<script>
+	$('.collapse').on('shown.bs.collapse', function(){
+$(this).parent().find(".glyphicon-plus").removeClass("glyphicon-plus").addClass("glyphicon-minus");
+}).on('hidden.bs.collapse', function(){
+$(this).parent().find(".glyphicon-minus").removeClass("glyphicon-minus").addClass("glyphicon-plus");
+});
+</script>
+{% if faq_id %}
+	<script>
+		id=$('.autoswtich{{ faq_id }}').attr('href');
+		$('.autoswtich{{ faq_id }}').trigger('click');
+		var offset = $(id).offset();
+		$('html, body').animate({ scrollTop:  offset.top }, 'slow');
+	</script>
+{% endif %}
+{{ footer }}
