@@ -27,7 +27,7 @@ class ControllerCheckoutSuccess extends Controller {
              *                                Copyright : AGmedia                           *
              *                              email: filip@agmedia.hr                         *
              *******************************************************************************/
-            /*$this->load->model('checkout/order');
+            $this->load->model('checkout/order');
 
             $order_id = $this->session->data['order_id'];
             $oc_order = $this->model_checkout_order->getOrder($order_id);
@@ -43,7 +43,7 @@ class ControllerCheckoutSuccess extends Controller {
 
             if ( ! $sent) {
                 $order->recordError();
-            }*/
+            }
             /*******************************************************************************
              *                              END Copyright : AGmedia                         *
              *******************************************************************************/
