@@ -1866,20 +1866,22 @@ class ControllerSaleOrder extends Controller {
             $order    = new \Agmedia\LuceedOpencartWrapper\Models\LOC_Order($oc_order);
             $customer = new \Agmedia\LuceedOpencartWrapper\Models\LOC_Customer($order->getCustomerData());
 
-            $order->collectProductsFromWarehouses();
+            $has_qty = $order->collectProductsFromWarehouses();
 
-            /*if ( ! $customer->exist()) {
-                $customer->store();
+            if ($has_qty) {
+                if ( ! $customer->exist()) {
+                    $customer->store();
+                }
+
+                $invoice_no = $order->setCustomerUid($customer->getUid())->store();
+
+                if ( ! $invoice_no) {
+                    $json['error'] = $this->language->get('error_action');
+                    $order->recordError();
+                } else {
+                    $json['invoice_no'] = $invoice_no;
+                }
             }
-
-            $invoice_no = $order->setCustomerUid($customer->getUid())->store();
-
-            if ( ! $invoice_no) {
-                $json['error'] = $this->language->get('error_action');
-                $order->recordError();
-            } else {
-                $json['invoice_no'] = $invoice_no;
-            }*/
         }
 
         $this->response->addHeader('Content-Type: application/json');

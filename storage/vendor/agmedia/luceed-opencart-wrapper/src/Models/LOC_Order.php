@@ -13,6 +13,7 @@ use Agmedia\Models\Order\OrderOption;
 use Agmedia\Models\Order\OrderProduct;
 use Agmedia\Models\Order\OrderTotal;
 use Agmedia\Models\Product\Product;
+use Agmedia\Models\Product\ProductOption;
 use Illuminate\Support\Carbon;
 
 /**
@@ -50,7 +51,7 @@ class LOC_Order
     /**
      * @var array
      */
-    private $items_available;
+    private $items_available = true;
 
     /**
      * @var int
@@ -58,9 +59,14 @@ class LOC_Order
     private $discount;
 
     /**
-     * @var array
+     * @var bool
      */
-    private $warehouse_collection;
+    private $has_all_in_main_warehouse = false;
+
+    /**
+     * @var array|null
+     */
+    private $has_all_in_warehouses = null;
 
 
     /**
@@ -132,16 +138,15 @@ class LOC_Order
     {
         $iznos = number_format($this->oc_order['total'], 2, '.', '');
 
-        $this->items_available = $this->setAvailability();
-
         $this->order = [
-            'nalog_prodaje_b2b' => $this->oc_order['order_id'],
+            'nalog_prodaje_b2b' => 'AG-' . $this->oc_order['order_id'],
+            'narudzba'          => $this->oc_order['order_id'],
             'datum'             => Carbon::make($this->oc_order['date_added'])->format(agconf('luceed.date')),
-            'skladiste'         => agconf('luceed.default_warehouse_uid'),
+            'skladiste_uid'     => '565-2987',
             'status'            => agconf('luceed.status_uid'),
             'napomena'          => $this->oc_order['comment'],
-            'raspored'          => $this->getDeliveryTime(),
-            'cijene_s_porezom'  => agconf('import.with_tax'),
+            //'raspored'          => $this->getDeliveryTime(),
+            'cijene_s_porezom'  => agconf('luceed.with_tax'),
             'partner_uid'       => $this->customer_uid,
             'iznos'             => (float) $iznos,
             'placanja'          => [
@@ -153,10 +158,25 @@ class LOC_Order
             'stavke'            => $this->getItems(),
         ];
 
-        if ($this->items_available) {
-            $this->order['sa__skladiste'] = agconf('luceed.stock_warehouse_uid');
-            $this->order['na__skladiste'] = agconf('luceed.default_warehouse_uid');
+        if ($this->has_all_in_main_warehouse) {
+            $this->order['sa__skladiste_uid'] = agconf('luceed.default_warehouse_luid');
+            $this->order['na__skladiste_uid'] = '565-298';
             $this->order['skl_dokument'] = 'MS';
+            $this->order['vrsta_isporuke_uid'] = '3-2987';
+            $this->order['korisnik__partner_uid'] = $this->customer_uid;
+        }
+
+        if ($this->has_all_in_warehouses && isset($this->has_all_in_warehouses[0])) {
+            $this->order['sa__skladiste_uid'] = $this->has_all_in_warehouses[0];
+            $this->order['na__skladiste_uid'] = '565-2987';
+            $this->order['skl_dokument'] = 'MS';
+            $this->order['vrsta_isporuke_uid'] = '3-2987';
+            $this->order['korisnik__partner_uid'] = $this->customer_uid;
+        }
+
+        if ( ! $this->has_all_in_main_warehouse && ! $this->has_all_in_warehouses) {
+            $this->order['korisnik__partner_uid'] = $this->customer_uid;
+            $this->items_available = false;
         }
 
         $this->log('Order create method: $this->>order - LOC_Order #156', $this->order);
@@ -197,32 +217,108 @@ class LOC_Order
     }
 
 
-    public function collectProductsFromWarehouses()
+    /**
+     * @return bool
+     */
+    public function collectProductsFromWarehouses(): bool
     {
-        $response       = [];
+        $availables     = [];
         $order_products = OrderProduct::where('order_id', $this->oc_order['order_id'])->get();
-        $order_options = OrderOption::where('order_id', $this->oc_order['order_id'])->get();
 
-        Log::store($order_products);
-        Log::store($order_options);
+        //Log::store($order_products->toArray());
 
         if ($order_products->count()) {
-            $locations = Location::all();
+            $locations = Location::orderBy('prioritet')->get();
             $units = $locations->pluck('skladiste')->flatten();
 
             foreach ($order_products as $order_product) {
-                $product = Product::where('product_id', $order_product->product_id)->first();
+                $option = OrderOption::where('order_id', $this->oc_order['order_id'])
+                                     ->where('order_product_id', $order_product->order_product_id)
+                                     ->first();
 
-                if ($product && ! $product->sku) {
+                if ($option) {
+                    $product = ProductOption::where('product_option_value_id', $option->product_option_value_id)->first();
 
+                    if ($product && $product->sifra) {
+                        $availables_data = collect(
+                            $this->setAvailables(
+                                LuceedProduct::stock($this->getUnitsQuery($units), $product->sifra)
+                            )
+                        )->where('raspolozivo_kol', '>', 0);
+
+                        //Log::store($availables_data->toArray());
+
+                        if ($availables_data->count()) {
+                            foreach ($availables_data as $available) {
+                                $availables[$available->skladiste_uid][] = [
+                                    'uid' => $product->sifra,
+                                    'qty' => $available->raspolozivo_kol
+                                ];
+                            }
+                        }
+                    }
                 }
-
-                /*$availables = collect($this->setAvailables(
-                    LuceedProduct::stock($this->getUnitsQuery($units), $product)
-                ));*/
-                $response[] = [];
             }
+
+            // Check if all in MAIN warehouse.
+            if ($order_products->count() == count($availables[agconf('luceed.default_warehouse_luid')])) {
+                $this->has_all_in_main_warehouse = true;
+            }
+
+            unset($availables[agconf('luceed.default_warehouse_luid')]);
+
+            // Check & collect warehouses that have all items.
+            foreach ($locations->where('stanje_web_shop', 1) as $store) {
+                if (isset($availables[$store['skladiste_uid']])) {
+                    if ($order_products->count() == count($availables[$store['skladiste_uid']])) {
+                        $this->has_all_in_warehouses[] = $store['skladiste_uid'];
+                    }
+                }
+            }
+
+            if ($this->has_all_in_warehouses && isset($this->has_all_in_warehouses[0])) {
+                return true;
+            }
+
+            $this->log('has_all_in_main_warehouse: ', $this->has_all_in_main_warehouse);
+            $this->log('has_all_in_warehouses: ', $this->has_all_in_warehouses);
         }
+
+        return false;
+    }
+
+
+    /**
+     * @param $units
+     *
+     * @return string
+     */
+    private function getUnitsQuery($units): string
+    {
+        $string = '[';
+
+        foreach ($units as $unit) {
+            $string .= $unit . ',';
+        }
+
+        $string = substr($string, 0, -1);
+
+        $string .= ']';
+
+        return $string;
+    }
+
+
+    /**
+     * @param $warehouses
+     *
+     * @return array
+     */
+    private function setAvailables($items): array
+    {
+        $json = json_decode($items);
+
+        return $json->result[0]->stanje;
     }
 
 
@@ -251,6 +347,10 @@ class LOC_Order
     {
         if ($this->oc_order['payment_code'] == 'cod') {
             return agconf('luceed.payment.cod');
+        }
+
+        if ($this->oc_order['payment_code'] == 'bank_transfer') {
+            return agconf('luceed.payment.bank_transfer');
         }
 
         if ($this->oc_order['payment_code'] == 'wspay') {
@@ -320,18 +420,26 @@ class LOC_Order
 
         if ($order_products->count()) {
             foreach ($order_products as $order_product) {
-                $price = $this->getItemPrices($order_product->product_id, $order_product->price);
+                $option = OrderOption::where('order_id', $this->oc_order['order_id'])
+                                     ->where('order_product_id', $order_product->order_product_id)
+                                     ->first();
 
-                if ( ! $price['rabat']) {
-                    $price['rabat'] = $this->applyCouponDiscount();
+                if ($option) {
+                    $product = ProductOption::where('product_option_value_id', $option->product_option_value_id)->first();
+
+                    $price = $this->getItemPrices($order_product->product_id, $order_product->price);
+
+                    if ( ! $price['rabat']) {
+                        $price['rabat'] = $this->applyCouponDiscount();
+                    }
+
+                    $response[] = [
+                        'artikl_uid' => $product->sku,
+                        'kolicina'   => (int) $order_product->quantity,
+                        'cijena'     => (float) $price['cijena'],
+                        'rabat'      => (int) $price['rabat'],
+                    ];
                 }
-
-                $response[] = [
-                    'artikl_uid' => $order_product->model,
-                    'kolicina'   => isset($price['quantity']) ? $price['quantity'] : (int) $order_product->quantity,
-                    'cijena'     => (float) $price['cijena'],
-                    'rabat'      => (int) $price['rabat'],
-                ];
             }
         }
 
@@ -425,26 +533,7 @@ class LOC_Order
 
         if ($price < $product->price) {
             $cijena = number_format($product->price, 2, '.', '');
-            $rabat = abs(($price / $product->price) * 100 - 100);
             $return_rabat = number_format((($price / $product->price) * 100 - 100), 2);
-
-            $B = [50, 75, 90];
-
-            if ($product->scale == 'B' && in_array($rabat, $B)) {
-                return [
-                    'cijena' => $cijena,
-                    'rabat'  => 0,
-                    'quantity' => 1 - ($rabat / 100),
-                ];
-            }
-
-            if ($product->scale == 'C' && $rabat = 50) {
-                return [
-                    'cijena' => $cijena,
-                    'rabat'  => 0,
-                    'quantity' => 1 - ($rabat / 100),
-                ];
-            }
 
             return [
                 'cijena' => $cijena,
@@ -473,41 +562,6 @@ class LOC_Order
 
 
     /**
-     * @return array
-     */
-    private function setAvailability()
-    {
-        $has      = true;
-        $iterator = $this->getRegularProducts();
-
-        $this->log('private function setAvailability()');
-
-        foreach ($iterator as $item) {
-            $available = json_decode($this->service->getIndividualStock($item['artikl_uid'], agconf('luceed.stock_warehouse_uid')))->result[0];
-
-            $this->log('$available', $available);
-
-            if (isset($available->stanje) && ! empty($available->stanje)) {
-                $check = collect($available->stanje)->where('stanje_kol', '>=', $item['kolicina'])->first();
-
-                $this->log('$check', $check);
-
-                if ( ! isset($check->artikl_uid)) {
-                    $has = false;
-                }
-            } else {
-                $has = false;
-            }
-        }
-
-        $this->log('$has', $has);
-
-        return $has;
-
-    }
-
-
-    /**
      * @param string|null $string
      * @param             $data
      */
@@ -522,60 +576,5 @@ class LOC_Order
         }
     }
 
-
-
-    /**
-     * @return array
-     */
-    /*private function setAvailability()
-    {
-        $response = [];
-
-        Log::store('private function setAvailability()', 'proccess_order');
-
-        // Provjeriti dostupnost u "stock_warehouse_uid"
-        $availble_list = json_decode(
-            $this->service->getStock(agconf('luceed.stock_warehouse_uid'))
-        );
-
-        Log::store('Set availability response: $available_list #332.', 'proccess_order');
-        Log::store($availble_list, 'proccess_order');
-
-        // Ako NE postoji dosupnost vratiti response sa warehouse_uid za key "skladiste"
-        $response['all'] = false;
-
-        // Ako postoji dodati polja na $this->order
-        if (isset($availble_list->result[0]) && ! empty($availble_list->result[0]->stanje)) {
-
-            Log::store('if (isset($availble_list->result[0]) && ! empty($availble_list->result[0]->stanje)) = true;', 'proccess_order');
-
-            $list = collect($availble_list->result[0]->stanje);
-            $iterator = $this->getRegularProducts();
-            $has  = true;
-
-            foreach ($iterator as $item) {
-                $check = $list->where('artikl_uid', $item['artikl_uid'])
-                              ->where('skladiste_uid', agconf('luceed.stock_warehouse_uid'))
-                              ->where('stanje_kol', '>=', $item['kolicina'])
-                              ->first();
-
-                Log::store('$check in foreach()', 'proccess_order');
-                Log::store($check, 'proccess_order');
-
-                if ( ! isset($check->article_uid)) {
-                    $has = false;
-                }
-            }
-
-            if ($has) {
-                $response['all'] = true;
-            }
-        }
-
-        Log::store('Availability sorting $response #359.', 'proccess_order');
-        Log::store($response, 'proccess_order');
-
-        return $response;
-    }*/
 
 }

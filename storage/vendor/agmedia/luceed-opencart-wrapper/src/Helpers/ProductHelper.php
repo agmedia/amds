@@ -99,6 +99,7 @@ class ProductHelper
         }
 
         if (static::hasOutletCategory(collect($product['atributi']))) {
+            $response = [];
             $actual   = Category::where('luceed_uid', $product['spol'] . '-' . $product['grupa_artikla_uid'] . '-outlet')->first();
 
             if ( ! $actual) {
