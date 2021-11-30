@@ -241,6 +241,12 @@ class LOC_Warehouse
             LuceedProduct::stock($this->getUnitsQuery($units), $product)
         ));
 
+        if ($availables->isEmpty()) {
+            return collect([
+                'error' => 'Trenutno nema raspoloživih količina!'
+            ]);
+        }
+
         foreach ($availables as $available) {
             if ($available->raspolozivo_kol) {
                 $has_items->push([
@@ -349,7 +355,11 @@ class LOC_Warehouse
     {
         $json = json_decode($items);
 
-        return $json->result[0]->stanje;
+        if (isset($json->result[0]->stanje)) {
+            return $json->result[0]->stanje;
+        }
+
+        return [];
     }
 
 
