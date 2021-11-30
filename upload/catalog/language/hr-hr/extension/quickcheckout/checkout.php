@@ -120,5 +120,5 @@ $_['error_delivery']				 = 'Warning: Delivery date is required!';
 $_['error_maximum']      		     = 'Warning: The maximum number of points that can be applied is %s!';
 $_['error_reward']        		     = 'Warning: Please enter the amount of reward points to use!';	
 $_['error_points']           		 = 'Warning: You don\'t have %s reward points!';
-$_['error_minimum_order']			 = 'Warning: You need a minimum order of %s before you can checkout.';
+
 $_['error_comment']					 = 'Warning: Order comment is required.';
