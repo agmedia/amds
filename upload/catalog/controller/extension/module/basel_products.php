@@ -240,7 +240,7 @@ class ControllerExtensionModuleBaselProducts extends Controller {
   				$results = $this->model_catalog_product->getBestSellerProducts($limit);
   				break;
   			case 'LA':
-  				$results = $this->model_catalog_product->getLatestProducts($limit);
+  				$results = $this->model_catalog_product->getLatestProductsB($limit);
   				break;
   			case 'SP':
   				$results = $this->model_catalog_product->getProductSpecials(array('start' => 0,'limit' => $limit));
