@@ -4871,12 +4871,12 @@ a.scroll-to-top:not(:hover) {
 	margin-bottom:30px;
 }
 .alert .close {
-	position:absolute;
-	right:18px;
-	top: 20%;
-	margin-top:-9px;
-	color:inherit;
-	opacity:0.9;
+	position: absolute;
+	right: 18px;
+	top: 35%;
+	margin-top: 0px;
+	color: inherit;
+	opacity: 0.9;
 }
 .alert .fa {
 	margin-right:5px;
