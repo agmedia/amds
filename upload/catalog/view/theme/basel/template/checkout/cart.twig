@@ -82,8 +82,17 @@
                             </td>
 
                             <td>
-                                <input type="number" min="1" step="1" name="quantity[{{ product.cart_id }}]" value="{{ product.quantity }}" class="form-control qty-form" />
+                                <input type="number" id="widgetFieldInput" min="1" step="1" name="quantity[{{ product.cart_id }}]" value="{{ product.quantity }}" class="form-control qty-form" />
                             </td>
+                            <script>
+
+
+                                $("#widgetFieldInput").change(function() {
+                                    this.form.submit();
+                                });
+
+
+                                </script>
 
                             <td class="text-right total-cell hidden-xs hidden-sm">
 
