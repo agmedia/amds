@@ -242,7 +242,7 @@ class LOC_Order
                     if ($product && $product->sifra) {
                         $availables_data = collect(
                             $this->setAvailables(
-                                LuceedProduct::stock($this->getUnitsQuery($units), $product->sifra)
+                                LuceedProduct::stock($this->getUnitsQuery($units), urlencode($product->sifra))
                             )
                         )->where('raspolozivo_kol', '>', 0);
 
@@ -261,11 +261,14 @@ class LOC_Order
             }
 
             // Check if all in MAIN warehouse.
-            if ($order_products->count() == count($availables[agconf('luceed.default_warehouse_luid')])) {
-                $this->has_all_in_main_warehouse = true;
+            if (isset($availables[agconf('luceed.default_warehouse_luid')])) {
+                if ($order_products->count() == count($availables[agconf('luceed.default_warehouse_luid')])) {
+                    $this->has_all_in_main_warehouse = true;
+                }
+
+                unset($availables[agconf('luceed.default_warehouse_luid')]);
             }
 
-            unset($availables[agconf('luceed.default_warehouse_luid')]);
 
             // Check & collect warehouses that have all items.
             foreach ($locations->where('stanje_web_shop', 1) as $store) {
