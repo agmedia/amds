@@ -13,6 +13,10 @@ class ModelExtensionShippingFlat extends Model {
 			$status = false;
 		}
 
+        if ($this->cart->getSubTotal() < $this->config->get('shipping_free_total')) {
+            $status = false;
+        }
+
 		$method_data = array();
 
 		if ($status) {
