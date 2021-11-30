@@ -13,7 +13,7 @@ class ModelExtensionShippingFlat extends Model {
 			$status = false;
 		}
 
-        if ($this->cart->getSubTotal() < $this->config->get('shipping_free_total')) {
+        if ($this->cart->getSubTotal() >= $this->config->get('shipping_free_total')) {
             $status = false;
         }
 
