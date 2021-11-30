@@ -165,11 +165,11 @@ class ProductHelper
     private static function getStrukId(Collection $product, int $parent)
     {
         $lc = new LOC_Category();
-        $has = Category::where('luceed_uid', $product['marker_uid'] . '-s')->first();
+        $has = Category::where('luceed_uid', $product['marker_uid'] . '-' . $parent . '-s')->first();
 
         if ( ! $has) {
             $new = [];
-            $new['grupa_artikla'] = $product['marker_uid'] . '-s';
+            $new['grupa_artikla'] = $product['marker_uid'] . '-' . $parent . '-s';
             $new['naziv'] = $product['marker_naziv'];
 
             $has_id = $lc->save($new, $parent);
@@ -183,11 +183,11 @@ class ProductHelper
     private static function getNosivostId(Collection $product, int $parent)
     {
         $lc = new LOC_Category();
-        $has = Category::where('luceed_uid', $product['jamstvo_uid'] . '-n')->first();
+        $has = Category::where('luceed_uid', $product['jamstvo_uid'] . '-' . $parent . '-n')->first();
 
         if ( ! $has) {
             $new = [];
-            $new['grupa_artikla'] = $product['jamstvo_uid'] . '-n';
+            $new['grupa_artikla'] = $product['jamstvo_uid'] . '-' . $parent . '-n';
             $new['naziv'] = $product['jamstvo_naziv'];
 
             $has_id = $lc->save($new, $parent);
