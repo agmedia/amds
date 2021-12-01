@@ -1,0 +1,79 @@
+<table class="table table-bordered table-hover" width="100%" >
+    <thead>
+        <tr class="table-header">
+            <td class="left" width="20%"><strong>Coupon Name</strong></td>
+            <td class="left" width="10%"><strong>Code</strong></td>
+            <td class="left" width="5%"><strong>Discount</strong></td>
+            <td class="left" width="15%"><strong>Date Start</strong></td>
+            <td class="left" width="14%"><strong>Date End</strong></td>
+            <td class="left" width="20%"><strong>Status</strong></td>
+            <td class="left" width="5%"><strong>Used</strong></td>
+            <td class="left" width="20%"><strong>Date Added</strong></td>
+        </tr>
+    </thead>
+    {% if sources %} 
+   {% for src in sources %} 
+    <tbody>
+        <tr>
+            <td>
+                {{ src.name }}
+            </td>
+            <td class="left">
+                {{ src.code }}
+            </td>
+            <td class="left">
+                {{ src.discount }}
+            </td>
+            <td class="left">
+                {{ src.date_start }}
+            </td>
+            <td class="left">
+                {{ src.date_end }}
+            </td>
+            <td class="left">
+                {% if src.status %} 
+                Enabled
+                {% else %}   
+                Disabled
+                {% endif %} 
+            </td>
+            <td class="left">
+                {% if src.used > 0 %} 
+                    {{'YES'}}
+                {% else %}   
+               {{'NO'}}
+                {% endif %} 
+            </td>
+            <td class="left">
+                {{ src.date_added }}
+            </td>
+        </tr>
+    </tbody>
+     {% endfor %}
+     {% endif %}
+    <tfoot>
+    <tr>
+        <td colspan="10">
+            <div class="row">
+                <div class="col-sm-6 text-left">{{ pagination }}</div>
+                <div class="col-sm-6 text-right">{{ results }}</div>
+            </div>
+        </td>
+    </tr>
+    </tfoot>
+</table>
+<script>
+$(document).ready(function(){
+  $('#SentCoupons{{ store_id }}  .pagination a').click(function(e){
+    e.preventDefault();
+    $.ajax({
+      url: this.href,
+      type: 'get',
+      dataType: 'html',
+      success: function(data) {       
+        $("#SentCoupons{{ store_id }}").html(data);
+      }
+    });
+  });    
+});
+</script>

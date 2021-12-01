@@ -1,0 +1,19 @@
+<div class="tab-pane active">
+   <h3>{{ text_mails_log }}</h3>
+   <br>
+   <div id="SentEmails{{ store.store_id }}"> 
+
+   </div>   
+</div>
+<script>
+    $(document).ready(function(){
+      $.ajax({
+         url: "index.php?route={{ module_path }}/getlog&user_token={{ user_token }}&page=1&store_id={{ store.store_id }}",
+         type: 'get',
+         dataType: 'html',
+         success: function(data) {     
+             $("#SentEmails{{ store.store_id }}").html(data);
+         }
+      });
+    });
+</script>

@@ -1,0 +1,19 @@
+<div class="tab-pane active">
+   <h3>Sent Coupons</h3>
+   <br>
+   <div id="SentCoupons{{ store.store_id }}"> 
+
+   </div>   
+</div>
+<script>
+    $(document).ready(function(){
+      $.ajax({
+         url: "index.php?route={{ module_path }}/getAllSentCoupons&user_token={{ user_token }}&page=1&store_id={{ store.store_id }}",
+         type: 'get',
+         dataType: 'html',
+         success: function(data) {     
+             $("#SentCoupons{{ store.store_id }}").html(data);
+         }
+      });
+    });
+</script>

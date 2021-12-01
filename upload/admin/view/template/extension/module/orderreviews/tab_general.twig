@@ -1,0 +1,25 @@
+<div class="tab-pane fade in active">
+    <div class="row">
+        <div class="col-md-3">
+            <h5><strong><span class="required">* </span>ReviewMail {{ reviewmail.id }}  status:</strong></h5>
+            <span class="help"><i class="fa fa-info-circle"></i>&nbsp;Enable or disable the selected mail review configuration.</span>
+        </div>
+        <div class="col-md-3">
+            <select id="Checker" name="{{ reviewmail_name }}[Enabled]" class="form-control">
+                <option value="yes" {{ reviewmail.Enabled is defined and  reviewmail.Enabled  == 'yes' ? 'selected=selected' : '' }}>{{text_enabled}}</option>
+                <option value="no"  {{ reviewmail.Enabled is not defined  or  reviewmail.Enabled == 'no' ? 'selected=selected' : '' }}>{{text_disabled}}</option>
+            </select>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <br />
+        <div class="col-md-3">
+            <h5><strong>ReviewMail {{ reviewmail.id }}  name:</strong></h5>
+            <span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{review_name}}</span>
+        </div>
+        <div class="col-md-3">
+            <input type="text" class="form-control" name="{{ reviewmail_name }}[Name]" value="{% if reviewmail.Name %}{{ reviewmail.Name }}{% else %}{{ 'ReviewMail '~reviewmail.id  }}{% endif %}" />
+        </div>
+    </div>
+</div>

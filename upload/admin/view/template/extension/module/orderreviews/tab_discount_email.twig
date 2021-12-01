@@ -1,0 +1,223 @@
+<div class="tab-pane">
+    <ul class="nav nav-tabs discountmail_tabs">
+        <h5><strong>{{text_multilingual}}</strong></h5>
+        {% for discount_language in languages %}
+            <li {{ discount_language.language_id == default_language_id ? 'class="active"' : '' }}><a href="#tab-discount-{{ reviewmail.id }}-{{ discount_language.language_id }}" data-toggle="tab"><img src="{{ discount_language.flag_url }}"/> {{ discount_language.name }} </a></li>
+        {% endfor %}
+    </ul>
+    <div class="tab-content">
+        {% for discount_language in languages %}
+            <div id="tab-discount-{{ reviewmail.id }}-{{ discount_language.language_id }}" class="row-fluid tab-pane discount_language {% if loop.first %}active{% endif %}">
+                <h5><strong>{{text_discount_mail_settings}}</strong></h5>
+                <br>
+                <div class="row">
+                    <div class="col-md-3">
+                        <h5><strong>{{text_discount_mail_subject}}</strong></h5>
+                    </div>
+                    <div class="col-md-7">
+                        <input
+                        placeholder="Mail subject"
+                        type="text"
+                        class="form-control"
+                        name="{{ reviewmail_name }}[SubjectDiscount][{{ discount_language.language_id }}]"
+                        value="{% if reviewmail.SubjectDiscount[discount_language.language_id] %}{{ reviewmail.SubjectDiscount[discount_language.language_id]}}  {% else %}  {{ "MailReview Subject" }} {% endif %}" />
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-info" id="DiscountLivePreview_{{ reviewmail.id }}" data-email-id="{{ reviewmail.id }}" data-lang-id="{{ discount_language.language_id }}">{{text_discount_mail_preview}}</button>
+                    </div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div class="col-md-3">
+                        <h5><strong>{{text_message}}</strong></h5>
+                        <span class="help">
+                          {{text_discount_mail_help}}
+                        </span>
+                    </div>
+                    <div class="col-md-7">
+                        <textarea id="messageD_{{ reviewmail.id }}_{{ discount_language.language_id }}" name="{{ reviewmail_name }}[MessageDiscount][{{ discount_language.language_id }}]">
+                        {% if reviewmail.MessageDiscount[discount_language.language_id] %}
+                            {{ reviewmail.MessageDiscount[discount_language.language_id] }}
+                        {% else %}
+                            {{text_discount_mail_default_message}}
+                        {% endif %}
+                        </textarea>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <br/>
+        <div class="row discountMailSettings">
+            <div class="col-md-3">
+                <h5><strong>{{text_select_date_format}}</strong></h5>
+            </div>
+            <div class="col-md-7">
+                <select name="{{ reviewmail_name }}[DateFormat]" class="form-control">
+                    <option value="d-m-Y" {{ reviewmail.DateFormat  and  reviewmail.DateFormat  ==  'd-m-Y' ? 'selected=selected' : '' }} >dd-mm-yyyy</option>
+                    <option value="m-d-Y" {{ reviewmail.DateFormat  and  reviewmail.DateFormat  ==  'm-d-Y' ? 'selected=selected' : ''}}  >mm-dd-yyyy</option>
+                    <option value="Y-m-d" {{ reviewmail.DateFormat  and  reviewmail.DateFormat  ==  'Y-m-d' ? 'selected=selected' : ''}}  >yyyy-mm-dd</option>
+                    <option value="Y-d-m" {{ reviewmail.DateFormat  and  reviewmail.DateFormat  ==  'Y-d-m' ? 'selected=selected' : '' }}  >yyyy-dd-mm</option>
+                </select>
+            </div>
+        </div>
+        <div class="modal fade " id="DiscountEmailPreview_{{ reviewmail.id }}"tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Discount Email Preview</h4>
+                </div>
+                <div class="modal-body" id="discountModal_{{ reviewmail.id }}">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+ <script>
+$('button[id^=DiscountLivePreview_{{ reviewmail.id }}]').click(function(e){
+    e.preventDefault();
+    e.stopPropagation();
+    var discount_language_id = $(this).attr('data-lang-id');
+   var discount_email_container = $(this).parents('#reviewmail_'+$(this).attr('data-email-id'));
+   var textarea = '';
+   try {
+       textarea = discount_email_container.find('#messageD_{{ reviewmail.id }}_'+ discount_language_id +'').code();
+
+   } catch (err) {
+      if(err.message.indexOf('is not a function') > -1) {
+         textarea = discount_email_container.find('#messageD_{{ reviewmail.id }}_'+ discount_language_id +'').summernote('code');
+      }
+   }
+   var discount_value = discount_email_container.find('input[name*="Discount"]').val();
+   var total_value = discount_email_container.find('input[name*="TotalAmount"]').val();
+   var validity = discount_email_container.find('input[name*="DiscountValidity"]').val();
+   var date_format = discount_email_container.find('select[name*="DateFormat"] option:selected').val();
+   var date = new Date();
+   date.setDate(date.getDate() + parseInt(validity)); 
+   var date_end = formatDate(date,date_format); 
+   var discount_code = 'EXAMPLE%';
+   var review_form;
+   var ordered_products = '<a href="#"><strong>Our Test Product(s)</strong></a>';
+   
+   var products = [];
+   {% for product in reviewmail.products %}
+		products = '<a href="{{ catalogURL }}index.php?route=product/product&product_id={{product.product_id}}">{{product.name|e('js')}}</a>';
+   {% endfor %}
+   var categories = [];
+   {% for category in reviewmail.categories %}
+		categories = '<a href="{{ catalogURL }}index.php?route=product/category&path={{category.category_id}}">{{category.name|e('js')}}</a>';
+   {% endfor %}
+   var patterns = ['{first_name}','{last_name}','{discount_code}','{discount_value}','{total_amount}','{date_end}','{product_discount}','{category_discount}'];
+   var replacement = ["John","Doe",discount_code,discount_value,total_value,date_end,products,categories];
+   
+   for (var x = 0; x < patterns.length; x++){
+      textarea = textarea.replace(patterns[x],replacement[x]); 
+   }
+   $('#DiscountEmailPreview_{{ reviewmail.id }} ').modal('show');
+   $('#DiscountEmailPreview_{{ reviewmail.id }} ').on('shown.bs.modal', function (e) {
+         var modalContent = $(this).find( ".modal-body" );
+         modalContent.html(textarea);
+   });
+   
+   function formatDate(date, format) {
+      console.log(format);
+    var d = new Date(date),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
+   var outputDate;
+
+   switch(format){
+      case 'd-m-Y':
+      outputDate = [day, month, year].join('-'); break;
+      case 'm-d-Y':
+      outputDate = [month, day, year].join('-'); break;
+      case 'Y-m-d':
+      outputDate = [year, month, day].join('-'); break;
+      case 'Y-d-m':
+      outputDate = [year, day, month].join('-'); break;
+   }
+  return outputDate;
+}
+});  
+{% for discount_language in languages %}
+    $('#messageD_{{ reviewmail.id }}_{{ discount_language.language_id }}').summernote({
+		lang: $(this).attr('data-lang'),
+		disableDragAndDrop: true,
+		height: 320,
+		emptyPara: '',
+		codemirror: { // codemirror options
+			mode: 'text/html',
+			htmlMode: true,
+			lineNumbers: true,
+			theme: 'monokai'
+		},			
+		fontsize: ['8', '9', '10', '11', '12', '14', '16', '18', '20', '24', '30', '36', '48' , '64'],
+		toolbar: [
+			['style', ['style']],
+			['font', ['bold', 'underline', 'clear']],
+			['fontname', ['fontname']],
+			['fontsize', ['fontsize']],
+			['color', ['color']],
+			['para', ['ul', 'ol', 'paragraph']],
+			['table', ['table']],
+			['insert', ['link', 'image', 'video']],
+			['view', ['fullscreen', 'codeview', 'help']]
+		],
+		popover: {
+			image: [
+				['custom', ['imageAttributes']],
+				['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
+				['float', ['floatLeft', 'floatRight', 'floatNone']],
+				['remove', ['removeMedia']]
+			],
+		},			
+		buttons: {
+			image: function() {
+				var ui = $.summernote.ui;
+						
+				// create button
+				var button = ui.button({
+					contents: '<i class="note-icon-picture" />',
+					tooltip: $.summernote.lang[$.summernote.options.lang].image.image,
+					click: function () {
+						$('#modal-image').remove();
+						console.log(getURLVar('token'));
+						$.ajax({
+							url: 'index.php?route=common/filemanager&user_token={{ user_token }}',
+							dataType: 'html',
+							beforeSend: function() {
+								$('#button-image i').replaceWith('<i class="fa fa-circle-o-notch fa-spin"></i>');
+								$('#button-image').prop('disabled', true);
+							},
+							complete: function() {
+								$('#button-image i').replaceWith('<i class="fa fa-upload"></i>');
+								$('#button-image').prop('disabled', false);
+							},
+							success: function(html) {
+								$('body').append('<div id="modal-image" class="modal">' + html + '</div>');
+								
+								$('#modal-image').modal('show');
+								
+								$('#modal-image').delegate('a.thumbnail', 'click', function(e) {
+									e.preventDefault();
+									
+									$('#messageD_{{ reviewmail.id }}_{{ discount_language.language_id }}').summernote('insertImage', $(this).attr('href'));
+																
+									$('#modal-image').modal('hide');
+								});
+							}
+						});						
+					}
+				});
+			
+				return button.render();
+			}
+		}
+	});
+{% endfor %}
+</script>

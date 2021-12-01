@@ -1,0 +1,80 @@
+<table id="SentEmails{{ store_id }}" class="table table-bordered table-hover" width="100%" >
+      <thead>
+        <tr class="table-header">
+          <td width="2%"><input type="checkbox" onclick="$('input[class*=\'select-to-remove\']').attr('checked', this.checked);" /></td>
+          <td class="left" width="14%"><strong>{{ text_order_id }}</strong></td>
+          <td class="left" width="19%"><strong>{{ text_customer }}</strong></td>
+		  <td class="left" width="18%"><strong>{{ text_email }}</strong></td>
+          <td class="left" width="14%"><strong>{{ text_date }}</strong></td>
+        </tr>
+      </thead>
+	{% if (sources is not empty) %}
+    {% for src in sources %}
+              <tbody>
+				<tr>
+        <td><input class="select-to-remove" type="checkbox" data-orderreviews-logid="{{ src.id }}"></td>
+                  <td class="left">
+                        <button type="button" class="btn btn-default btn-sm disabled" tabindex="-1">{{ src.order_id }}</button>
+                        <a href="index.php?route=sale/order/info&user_token={{ token }}&order_id={{ src.order_id }}" target="_blank" class="btn btn-default btn-sm btn-info">Order details</a>
+                  </td>
+                  <td class="left">
+                    {{ ((src.order_data.firstname is defined) )?src.order_data.firstname :'(not provided)' }} {{ ((src.order_data.lastname is defined) )?src.order_data.lastname :'' }}
+                  </td>
+				  <td class="left">
+                  	{{ ((src.order_data.email is defined) )?src.order_data.email :'(not provided)' }}
+                  </td>
+                  <td class="left">
+                  	{{ src.date }}
+                  </td>
+                </tr>
+              </tbody>
+        {% endfor %}
+	{% endif %}
+    <tfoot>
+    	<tr>
+        	<td colspan="5">
+                <div class="row">
+                  <div class="col-sm-6 text-left">{{ pagination }}</div>
+                  <div class="col-sm-6 text-right">{{ results }}</div>
+                </div>
+        	</td>
+        </tr>
+    </tfoot>
+</table>
+<div class="row">
+  <div class="col-md-12">
+      <a id="btn-remove" class="btn btn-danger pull-right">{{ text_remove }}</a>
+  </div>
+</div>
+<script>
+$(document).ready(function(){
+	$('#SentEmails{{ store_id }} .pagination a').click(function(e){
+		e.preventDefault();
+		$.ajax({
+			url: this.href,
+			type: 'get',
+			dataType: 'html',
+			success: function(data) {				
+				$("#SentEmails{{ store_id }}").html(data);
+			}
+		});
+	});		 
+});
+
+//Remove log entries
+$('#btn-remove').on('click', function(){
+    var selected_log_entries = [];
+    var store_id = {{ store_id }};
+    $("input:checkbox[class=select-to-remove]:checked").each(function(){
+        selected_log_entries.push($(this).attr('data-orderreviews-logid') );
+    });
+    $.ajax({
+      url: 'index.php?route={{ module_path }}/deleteLogEntry&user_token={{ token }}',
+      type:'post',
+      data: {selected_log_entries: selected_log_entries, store_id:store_id},
+      success:function(){
+        location.reload();
+      }
+    });    
+});
+</script>

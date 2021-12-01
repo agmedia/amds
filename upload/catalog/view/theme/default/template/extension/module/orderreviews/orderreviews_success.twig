@@ -1,0 +1,95 @@
+{{ header }}
+<div class="container">
+    <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+            <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+    </ul>
+    <div class="row">{{ column_left }}
+        {% if column_left and column_right %}
+            {% set class = 'col-sm-6' %}
+        {% elseif column_left or column_right %}
+            {% set class = 'col-sm-9' %}
+        {% else %}
+            {% set class = 'col-sm-12' %}
+        {% endif %}
+        <div id="content" class="{{ class }}">{{ content_top }}
+            <h1>{{ heading_title }}</h1>
+            {% if success is defined %}
+                <div class="success">
+                    {{success}}
+                </div>
+                <br />
+                {% if discount_text is defined %}
+                    {{discount_text}}
+                {% endif %}
+                <br /><br />
+            {% elseif errors is defined %}
+                <div class="warning">
+                    <strong>{{ errors ? errors : '' }}</strong><br />
+                    <ul>
+                        {% if errorsArray %}
+                            {% for error in errorsArray %}
+                                <li>{{error}}</li>
+                            {% endfor %}
+                        {% endif %}
+                    </ul>
+                </div>
+            {% endif %}
+            {% if FormData is defined %}
+                <div class="row orderReviews">
+					<div class="col-md-12">
+						<div class="table-responsive">
+							{{FormData}}
+						</div>
+					</div>
+				</div>
+                <script>
+                    $(document).ready(function() {
+						{% if start_rating %}
+							var start_rating = {{ start_rating }};
+							var ratSelector = 'input[id^=rat]';
+							$(ratSelector).each(function(){
+								var values = $(this).val();
+								console.log(values);
+								if (values == start_rating) {
+									$(this).attr("checked", "checked");
+								} else {
+									$(this).removeAttr('checked');
+								}
+							});
+						{% endif %}
+						$('form table input[type=submit]').on('click', function(e) {
+							if ($('label#ORPrivacyPolicy input').length > 0 && $('label#ORPrivacyPolicy input:checked').length == 0) {
+								$('label#ORPrivacyPolicy').after('<div style="font-size:12px;color:#d00">{{ text_privacy_error }}</div>');
+								return false;
+							}
+						});
+						$('.orderReviews table, .orderReviews table table, .orderReviews table table table').css('width', '100%');
+                    });
+                  </script>
+            {% else %}
+                <div class="buttons">
+                    <div class="pull-right">
+                        {% if errors %}
+							{% if duplicate %}{% else %}
+								<a href="{{ ReveiewMailLinkNotDec }}" class="btn btn-warning">{{button_send_again}}</a>&nbsp;&nbsp;
+							{% endif %}
+							{% if history and duplicate == false %}
+								<button type="button" id="back-btn" class="btn btn-warning">{{button_back}}</button>&nbsp;&nbsp;
+							{% endif %}
+                        {% endif %}
+                        <a href="{{ continue }}" class="btn btn-primary">{{button_continue}}</a>
+                    </div>
+                </div>
+            {% endif %}
+            {{ content_bottom }}</div>
+        {{ column_right }}</div>
+
+        <script type="text/javascript">
+          $('#back-btn').on('click', function() {
+            window.history.back();
+          });
+        </script>
+    </div>
+    {{ footer }}

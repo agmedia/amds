@@ -1,0 +1,17 @@
+<div class="tab-pane active">
+	<div id="LogWrapper{{ store.store_id }}"> 
+
+	</div>		
+</div>
+<script>
+    $(document).ready(function(){
+		$.ajax({
+			url: "index.php?route={{ module_path }}/getAllReviews&user_token={{ user_token }}&page=1&store_id={{ store.store_id }}",
+			type: 'get',
+			dataType: 'html',
+			success: function(data) {
+			    $("#LogWrapper{{ store.store_id }}").html(data);
+			}
+		});
+    });
+</script>

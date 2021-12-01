@@ -1,0 +1,198 @@
+<div class="tab-pane">
+<div class="row">
+    <div class="col-md-3">
+        <h5><strong>{{text_discount_type}}</strong></h5>
+        <span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_discount_type_help}}</span>
+    </div>
+    <div class="col-md-3">
+        <select name="{{ reviewmail_name }}[DiscountType]" id="DiscountType_{{ reviewmail.id }} " class="discountTypeSelect form-control">
+            <option value="P" {% if reviewmail.DiscountType is defined  and  reviewmail.DiscountType  ==  "P" %} {{ "selected" }} {% endif %} >{{text_percentage}}</option>
+            <option value="F" {% if reviewmail.DiscountType is defined  and  reviewmail.DiscountType  ==  "F" %} {{ "selected" }} {% endif %} >{{text_fixed}}</option>
+            <option value="N" {% if reviewmail.DiscountType is not defined  or  reviewmail.DiscountType  ==  "N" %} {{ "selected" }} {% endif %}>{{text_nod_disc}}</option>
+        </select>
+    </div>
+</div>
+<br />
+<div class="discountSettings">
+    <div class="row">
+        <div class="col-md-3">
+            <h5><strong><span class="required">* </span>{{text_discount}}</strong></h5>
+            <span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_discount_help}}</span>
+        </div>
+        <div class="col-md-3">
+            <div class="input-group">
+                <input type="text" class="form-control" name="{{ reviewmail_name }}[Discount]" value="{% if reviewmail.Discount %}{{ reviewmail.Discount }}{% else %}{{ '10' }}{% endif %}">
+                <span class="input-group-addon">
+                <span style="display:none;" id="currencyAddon">{{ currency }} </span><span style="display:none;" id="percentageAddon">%</span>
+                </span>
+            </div>
+        </div>
+    </div>
+    <br />
+	<div class="row">
+		<div class="col-sm-3">
+			<h5><strong>{{ entry_product }}</strong></h5>
+			<span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{ help_product }}</span>
+		</div>
+		<div class="col-sm-9">
+		  <input type="text" name="products" value="" placeholder="{{ entry_product }}" id="input-product" class="form-control" />
+		  <div id="products_{{ reviewmail.id }}" class="well well-sm" style="height: 150px; overflow: auto;">
+			{% for product in reviewmail.products %}
+				<div id="products_{{ reviewmail.id }}_{{ product.product_id }}"><i class="fa fa-minus-circle"></i> {{ product.name }}
+					<input type="hidden" name="{{ reviewmail_name }}[products][]" value="{{ product.product_id }}" />
+				</div>
+			{% endfor %}
+		</div>
+		</div>
+	</div>
+	<br />
+	<div class="row">
+		<div class="col-sm-3">
+			<h5><strong>{{ entry_category }}</strong></h5>
+			<span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{ help_category }}</span>
+		</div>
+		<div class="col-sm-9">
+			<input type="text" name="categories" value="" placeholder="{{ entry_category }}" id="input-category" class="form-control" />
+			<div id="categories_{{ reviewmail.id }}" class="well well-sm" style="height: 150px; overflow: auto;">
+				{% for category in reviewmail.categories %}
+				<div id="categories_{{ reviewmail.id }}_{{ category.category_id }}"><i class="fa fa-minus-circle"></i> {{ category.name }}
+					<input type="hidden" name="{{ reviewmail_name }}[categories][]" value="{{ category.category_id }}" />
+				</div>
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+	<br />
+    <div class="row">
+        <div class="col-md-3">
+            <h5><strong><span class="required">* </span>{{text_total_amount}}</strong></h5>
+            <span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_total_amount_help}}</span>
+        </div>
+        <div class="col-md-3">
+            <div class="input-group">
+                <input type="text" class="form-control" name="{{ reviewmail_name }}[TotalAmount]" value="{% if reviewmail.TotalAmount %}{{ reviewmail.TotalAmount }}{% else %}{{'20'}}{% endif %}">
+                <span class="input-group-addon">{{ currency }}</span>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-3">
+            <h5><strong><span class="required">* </span>{{text_validity}}</strong></h5>
+            <span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_validity_help}}</span>
+        </div>
+        <div class="col-md-3">
+            <div class="input-group">
+                <input type="text" class="form-control" value="{% if reviewmail.DiscountValidity %}{{ reviewmail.DiscountValidity }}{% else %}{{ '7' }}{% endif %}" name="{{ reviewmail_name }}[DiscountValidity]">
+                <span class="input-group-addon">days</span>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+         <div class="col-md-3">
+            <h5><strong>{{text_discount_mail_option}}</strong></h5>
+            <span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_discount_mail_option_help}}</span>
+         </div>
+         <div class="col-md-3">
+            <select id="Checker_{{ reviewmail.id }}" name="{{ reviewmail_name }}[DiscountMailEnabled]" class="discountMailSelect form-control">
+               <option value="yes" {{ reviewmail.DiscountMailEnabled is defined  and  reviewmail.DiscountMailEnabled  ==  'yes' }} ? 'selected=selected' :  '' }} >{{text_enabled}}</option>
+               <option value="no"  {{ reviewmail.DiscountMailEnabled is empty  or  reviewmail.DiscountMailEnabled == 'no'  ? 'selected=selected' : '' }}>{{text_disabled}}</option>
+            </select>
+         </div>
+      </div>
+</div>
+</div>
+<script>
+   $(function() {
+      var $typeSelector = $('#Checker_{{ reviewmail.id }}');
+      var $toggleArea = $('#discountMailTab_{{ reviewmail.id }}');
+    if ($typeSelector.val() === 'yes') {
+              $toggleArea.show(200); 
+          }
+          else {
+              $toggleArea.hide(200); 
+          }
+      $typeSelector.change(function(){
+          if ($typeSelector.val() === 'yes') {
+              $toggleArea.show(200); 
+          }
+          else {
+              $toggleArea.hide(200); 
+          }
+      });
+   });
+   
+   $(function() {
+      var $typeSelector = $('#DiscountType_{{ reviewmail.id }}');
+      var $toggleArea = $('#discountMailTab_{{ reviewmail.id }}');
+    var $toggleArea2 = $('#Checker_{{ reviewmail.id }} ');
+    if ($typeSelector.val() === 'N') {
+              $toggleArea.hide(200); 
+        $toggleArea2.val('no');
+          }
+      $typeSelector.change(function(){
+          if ($typeSelector.val() === 'N') {
+              $toggleArea.hide(200); 
+        $toggleArea2.val('no');
+          }
+      });
+   });
+
+	// Category
+	$('input[name="categories"]').autocomplete({
+		'source': function(request, response) {
+			$.ajax({
+				url: 'index.php?route=catalog/category/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+				dataType: 'json',
+				success: function(json) {
+					response($.map(json, function(item) {
+						return {
+							label: item['name'],
+							value: item['category_id']
+						}
+					}));
+				}
+			});
+		},
+		'select': function(item) {
+			var method = 'categories';
+
+			$(this).val('');
+			$('#' + method +'_{{ reviewmail.id }}_' + item['value']).remove();
+			$('#' + method +'_{{ reviewmail.id }}').append('<div id="' + method + '_{{ reviewmail.id }}_' + item['value'] + '"><i class="fa fa-minus-circle"></i> ' + item['label'] + '<input type="hidden" name="{{ reviewmail_name }}[' + method + '][]" value="' + item['value'] + '" /></div>');
+		}
+	});
+
+	$('#categories_{{ reviewmail.id }}').delegate('.fa-minus-circle', 'click', function() {
+		$(this).parent().remove();
+	});
+
+	// Products
+	$('input[name="products"]').autocomplete({
+		'source': function(request, response) {
+			$.ajax({
+				url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+				dataType: 'json',
+				success: function(json) {
+					response($.map(json, function(item) {
+						return {
+							label: item['name'],
+							value: item['product_id']
+						}
+					}));
+				}
+			});
+		},
+		'select': function(item) {
+			var method = 'products';
+
+			$(this).val('');
+			$('#' + method +'_{{ reviewmail.id }}_' + item['value']).remove();
+			$('#' + method +'_{{ reviewmail.id }}').append('<div id="' + method + '_{{ reviewmail.id }}_' + item['value'] + '"><i class="fa fa-minus-circle"></i> ' + item['label'] + '<input type="hidden" name="{{ reviewmail_name }}[' + method + '][]" value="' + item['value'] + '" /></div>');
+		}
+	});
+	$('#products_{{ reviewmail.id }}').delegate('.fa-minus-circle', 'click', function() {
+		$(this).parent().remove();
+	});
+</script>

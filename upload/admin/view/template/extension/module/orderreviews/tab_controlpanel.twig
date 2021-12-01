@@ -1,0 +1,1447 @@
+<div class="container-fluid">
+	<div class="row">
+		<div class="col-md-3">
+			<h5><strong><span class="required">* </span>Module status:</strong></h5>
+			<span class="help"><i class="fa fa-info-circle"></i>&nbsp;Enable or disable the module.</span>
+		</div>
+		<div class="col-md-3">
+			<select id="Checker" name="{{ moduleName }}[Enabled]" class="form-control">
+				<option value="yes" {{ moduleData.Enabled  and  moduleData.Enabled  == 'yes' ? 'selected=selected' : '' }}>{{ text_enabled }}</option>
+				<option value="no"  {{ (moduleData.Enabled  and  moduleData.Enabled == 'no') or  moduleData.Enabled is empty ? 'selected=selected' : '' }}>{{ text_disabled }}</option>
+			</select>
+		</div>
+	</div>
+	<br/>
+	<div class="row">
+		<div class="col-md-3">
+			<h5><strong><span class="required">* </span>{{text_email_type}}</strong></h5>
+			<span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_email_type_help}}</span>
+		</div>
+		<div class="col-md-3">
+			<select id="EmailType" name="{{ moduleName }}[EmailType]" class="form-control">
+				<option value="link" {{ moduleData.EmailType  and  moduleData.EmailType == 'link' ? 'selected=selected' : '' }}>{{text_send_link}}</option>
+				<option value="form"  {{ moduleData.EmailType is empty or  moduleData.EmailType == 'form'  ? 'selected=selected' : '' }}>{{text_send_form}}</option>
+			</select>
+		</div>
+	</div>
+	<br/>
+ 	<div class="row">
+      <div class="col-md-3">
+        <h5><strong>{{ text_privacy_policy }}</strong></h5>
+        <span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{ text_privacy_policy_help }}</span>
+      </div>
+      <div class="col-md-3">
+        <select name="{{ moduleName }}[PrivacyPolicy]" class="form-control">
+            <option value="1" {{ moduleData.PrivacyPolicy and moduleData.PrivacyPolicy == '1' ? 'selected=selected' : '' }}>{{ text_enabled }}</option>
+            <option value="0" {{ moduleData.PrivacyPolicy is empty or moduleData.PrivacyPolicy == '0' ? 'selected=selected' : '' }}>{{ text_disabled }}</option>
+        </select>
+      </div>
+    </div>
+	<br />
+	<div class="row">
+      <div class="col-md-3">
+        <h5><strong>{{ text_auto_approve }}</strong></h5>
+        <span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{ text_auto_approve_help }}</span>
+      </div>
+      <div class="col-md-3">
+        <select name="{{ moduleName }}[AutoApproved]" class="form-control" id="AutoApprovedToggle">
+            <option value="yes" {{ moduleData.AutoApproved and moduleData.AutoApproved == 'yes' ? 'selected=selected' : '' }}>{{ text_enabled }}</option>
+            <option value="no" {{ moduleData.AutoApproved is empty or moduleData.AutoApproved == 'no' ? 'selected=selected' : '' }}>{{ text_disabled }}</option>
+        </select>
+      </div>
+    </div>
+	<br />
+	<div id="AutoApprovedSettings">
+	<div class="row">
+      <div class="col-md-3">
+        <h5><strong>{{ text_auto_approve_setting }}</strong></h5>
+        <span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{ text_auto_approve_setting_help }}</span>
+      </div>
+      <div class="col-md-3">
+        <select name="{{ moduleName }}[AutoApprovedStar]" class="form-control">
+            <option value="1" {{ moduleData.AutoApprovedStar and moduleData.AutoApprovedStar == '1' ? 'selected=selected' : '' }}>1</option>
+            <option value="2" {{ moduleData.AutoApprovedStar and moduleData.AutoApprovedStar == '2' ? 'selected=selected' : '' }}>2</option>
+            <option value="3" {{ moduleData.AutoApprovedStar is empty or moduleData.AutoApprovedStar == '3' ? 'selected=selected' : '' }}>3</option>
+            <option value="4" {{ moduleData.AutoApprovedStar and moduleData.AutoApprovedStar == '4' ? 'selected=selected' : '' }}>4</option>
+            <option value="5" {{ moduleData.AutoApprovedStar and moduleData.AutoApprovedStar == '5' ? 'selected=selected' : '' }}>5</option>
+        </select>
+      </div>
+    </div>
+    </div>
+	<br />
+	<div class="row">
+		<div class="col-xs-3">
+			<h5 class="option_title"><strong>{{ text_expired_coupons }}</strong></h5>
+			<span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{ text_expired_coupons_help }}</span>
+		</div>
+		<div class="col-md-3">
+			<a class="btn btn-default btn-block btn-remove-expired" id="remove_expired_coupons"><i class="fa fa-info-circle"></i>&nbsp;{{ btn_clear_expired_coupons }}</a>
+		</div>
+	</div>
+	<br>
+</div>
+<div class="tabbable tabs-left" id="review_tabs">
+	<div class="container-fluid">
+		<div class="row">
+			<div class="col-md-3">
+				<h5><strong>{{text_cron_job}}</strong></h5>
+				<span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_cron_job_help}}</span>
+			</div>
+			<div class="col-md-3">
+				<button class="btn btn-primary cronModal"><i class="fa fa-question-circle"></i>&nbsp;&nbsp;{{text_how_to_setup}}</button>
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" name="{{ moduleName }}[CronNotification]" value="yes" {{ moduleData.CronNotification ? 'checked="checked"' : '' }}/> {{text_notification_option}}
+					</label>
+				</div>
+			</div>
+		</div>
+		<br />
+		<div class="row">
+			<div class="col-md-3">
+				<h5><strong>{{text_bcc}}</strong></h5>
+				<span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_bcc_help}}</span>
+			</div>
+			<div class="col-md-3">
+				<select name="{{ moduleName }}[BCC]" class="form-control">
+					<option value="yes" {{ moduleData.BCC  and  moduleData.BCC  == 'yes' ? 'selected=selected' : '' }}>{{text_enabled}}</option>
+					<option value="no" {{ moduleData.BCC is empty  or  moduleData.BCC == 'no' ? 'selected=selected' : '' }}>{{text_disabled}}</option>
+				</select>
+			</div>
+		</div>
+		<br />
+		<div class="row">
+			<div class="col-md-3">
+				<h5><strong>{{text_log}}</strong></h5>
+				<span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_log_help}}</span>
+			</div>
+			<div class="col-md-3">
+				<select name="{{ moduleName }}[LOG]" class="form-control">
+					<option value="yes" {{ moduleData.LOG  and  moduleData.LOG  == 'yes' ? 'selected=selected' : '' }}>{{text_enabled}}</option>
+					<option value="no" {{ moduleData.LOG is empty  or  moduleData.LOG == 'no' ? 'selected=selected' : '' }}>{{text_disabled}}</option>
+				</select>
+			</div>
+		</div>
+	</div>
+	<br />
+	<br />
+	<ul class="nav nav-tabs review-list">
+		<li class="static"><a class="addNewReviewMail"><i class="fa fa-plus"></i> Add New ReviewMail</a></li>
+		{% if moduleData.ReviewMail %}
+			{% for reviewmail in moduleData.ReviewMail %}
+				<li><a href="#reviewmail_{{ reviewmail.id }}" data-toggle="tab" data-reviewmail-id="{{ reviewmail.id }}"><i class="fa fa-pencil-square-o"></i> {{ reviewmail.Name ? reviewmail.Name :  'ReviewMail '~reviewmail.id }} <i class="fa fa-minus-circle removeReviewMail"></i>
+				<input type="hidden" name="{{ moduleNameMail }}[ReviewMail][{{ reviewmail.id }}][id]" value="{{ reviewmail.id }}" />
+				</a></li>
+			{% endfor %}
+		{% endif %}
+	</ul>
+		<div class="tab-content review-settings">
+			{% if moduleData.ReviewMail %}
+				{% for reviewmail in moduleData.ReviewMail %}
+					{% set reviewmail_name = moduleNameMail~'[ReviewMail]['~reviewmail.id~']'%}
+						<div id="reviewmail_{{ reviewmail.id }}" class="tab-pane reviews" style="width:99%;overflow:hidden;">
+							<ul class="nav nav-tabs">
+								<li class="active"><a data-toggle="tab" href="#general_settings_{{ reviewmail.id }}">{{ text_general }}</a></li>
+								<li><a data-toggle="tab" href="#conditions_{{ reviewmail.id }}">{{ text_configuration }}</a></li>
+								<li><a data-toggle="tab" href="#email_template_{{ reviewmail.id }}">{{ text_email_template }}</a></li>
+								<li><a data-toggle="tab" href="#discount_{{ reviewmail.id }}">{{ text_discount_settings }}</a></li>
+								<li id="discountMailTab_{{ reviewmail.id }}"><a data-toggle="tab" href="#discount_email_template_{{ reviewmail.id }}">{{ text_discount_email }}</a></li>
+							</ul>
+							<div class="tab-content">
+								<div id="general_settings_{{reviewmail.id}}" class="tab-pane active ">
+									<div class="tab-pane fade in active">
+										<div class="row">
+											<div class="col-md-3">
+												<h5><strong><span class="required">* </span>ReviewMail {{ reviewmail.id }}  status:</strong></h5>
+												<span class="help"><i class="fa fa-info-circle"></i>&nbsp;Enable or disable the selected mail review configuration.</span>
+											</div>
+											<div class="col-md-3">
+												<select id="Checker" name="{{ reviewmail_name }}[Enabled]" class="form-control">
+													<option value="yes" {{ reviewmail.Enabled is defined and  reviewmail.Enabled  == 'yes' ? 'selected=selected' : '' }}>{{text_enabled}}</option>
+													<option value="no"  {{ reviewmail.Enabled is not defined  or  reviewmail.Enabled == 'no' ? 'selected=selected' : '' }}>{{text_disabled}}</option>
+												</select>
+											</div>
+										</div>
+										<br />
+										<div class="row">
+											<br />
+											<div class="col-md-3">
+												<h5><strong>ReviewMail {{ reviewmail.id }}  name:</strong></h5>
+												<span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{review_name}}</span>
+											</div>
+											<div class="col-md-3">
+												<input type="text" class="form-control" name="{{ reviewmail_name }}[Name]" value="{% if reviewmail.Name %}{{ reviewmail.Name }}{% else %}{{ 'ReviewMail '~reviewmail.id  }}{% endif %}" />
+											</div>
+										</div>
+									</div>
+								</div>
+								<div id="conditions_{{reviewmail.id}}" class="tab-pane">
+									<div class="tab-pane fade in active">
+										<div class="row">
+											<div class="col-md-3">
+												<h5><strong>{{text_order_status}}</strong></h5>
+												<span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_order_status_help}}</span>
+											</div>
+											<div class="col-md-3">
+												<select required class="form-control" name="{{ reviewmail_name }}[OrderStatusID]">
+													<option disabled selected value="">{{text_select_order_status}}</option>
+												 
+													{% if moduleData.orderStatuses %}
+														{% for orderStatus in moduleData.orderStatuses %}
+															<option value="{{ orderStatus.order_status_id }}"
+																{% if reviewmail.OrderStatusID is defined  and  orderStatus.order_status_id == reviewmail.OrderStatusID %}
+																   {{'selected="selected"'}}
+																{% elseif reviewmail.OrderStatusID is not defined  and  orderStatus.name == 'Complete' %}
+																	{{'selected="selected"'}}
+																{% endif %} >
+																{{ orderStatus.name }}
+															</option>
+														{% endfor %}
+													{% endif %}
+												</select>
+											</div>
+										</div>
+										<br />
+										<div class="row">
+											<div class="col-md-3">
+												<h5><strong>{{text_customer_group}}</strong></h5>
+												<span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_customer_group_help}}</span>
+											</div>
+											<div class="col-md-3">
+												<select required class="form-control" name="{{ reviewmail_name }}[CustomerGroupID]">
+													<option value="send_all" selected value="">{{text_all_customer_groups}}</option>
+													{% if moduleData.customerGroups %} 
+														{% for customerGroup in moduleData.customerGroups %}
+															<option value="{{ customerGroup.customer_group_id }}"
+																{% if reviewmail.CustomerGroupID is not empty  and  customerGroup.customer_group_id == reviewmail.CustomerGroupID %}
+																	{{ 'selected="selected"' }}  {% endif %} >
+																{{ customerGroup.name }}
+															 </option>
+														{% endfor %} 
+													 {% endif %}
+											</select>
+										</div>
+									</div>
+									<br />
+									<div class="row">
+										<div class="col-md-3">
+											<h5><strong>{{text_message_delay}}</strong></h5>
+											<span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_message_delay}}</span>
+										</div>
+										<div class="col-md-3">
+											<div class="input-group">
+												<input type="text" class="form-control" name="{{ reviewmail_name }}[Delay]" 
+													value="{% if reviewmail.Delay is defined %}{{ reviewmail.Delay }}{% else %}{{ '15' }}{% endif %}"/>
+												<span class="input-group-addon">days</span>
+											</div>
+										</div>
+									</div>
+									<br />
+									<div class="row">
+										<div class="col-md-3">
+											<h5><strong>{{text_select_orders_by}}</strong></h5>
+											<span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_select_orders_by_help}}</span>
+										</div>
+										<div class="col-md-3">
+											<select name="{{ reviewmail_name }}[DateType]" class="form-control">
+												<option value="date_added" {{ reviewmail.DateType is defined and  reviewmail.DateType  == 'date_added' ? 'selected=selected' :  '' }} >{{text_date_added}}</option>
+												<option value="date_modified"  {{ reviewmail.DateType is empty  or  reviewmail.DateType == 'date_modified'  ? 'selected=selected' : ''}}>{{text_date_modified}}</option>
+											</select>
+										</div>
+									</div>
+									<br />
+									<div class="row">
+										<div class="col-md-3">
+											<h5><strong>{{text_review_type}}</strong></h5>
+											<span class="help">{{text_review_type_help}}</span>
+										</div>
+										<div class="col-md-3">
+											<select name="{{ reviewmail_name }}[ReviewType]" class="form-control">
+												<option value="per_product" {{ reviewmail.ReviewType is defined  and  reviewmail.ReviewType  == 'per_product'  ? 'selected=selected' :  '' }}>{{text_per_product}}</option>
+												<option value="per_purchase"  {{ reviewmail.ReviewType is empty  or  reviewmail.ReviewType == 'per_purchase'  ? 'selected=selected' : ''}}>{{text_per_purchase}}</option>
+											</select>
+										</div>
+									</div>
+									<br />
+									<div class="row" id="displayImages_{{ reviewmail.id }}">
+										<div class="col-md-3">
+											<h5><strong>{{text_dispaly_images}}</strong></h5>
+											<span class="help">{{text_dispaly_images_help}}</span>
+										</div>
+										<div class="col-md-3">
+											<select name="{{ reviewmail_name }}[DisplayImages]" class="form-control">
+												<option value="yes" {{ reviewmail.DisplayImages is defined  and  reviewmail.DisplayImages  == 'yes' ? 'selected=selected' : '' }} >{{text_yes}}</option>
+												<option value="no"  {{ reviewmail.DisplayImages is empty or reviewmail.DisplayImages == 'no'  ? 'selected=selected' : ''}} >{{text_no}}</option>
+											</select>
+										</div>
+									</div>
+									</div>
+									<script type="text/javascript">
+									$(document).ready(function() {
+									$('#displayImages_{{ reviewmail.id }}').hide();
+									if($("select[name='orderreviewsMailTemplate[ReviewMail][{{ reviewmail.id }}][ReviewType]']").val() == 'per_product') {
+									$('#displayImages_{{ reviewmail.id }}').show();
+									}
+									});
+									$("select[name='orderreviewsMailTemplate[ReviewMail][{{ reviewmail.id }}][ReviewType]']").on("change", function(){
+									var choosenReviewType = $("select[name='orderreviewsMailTemplate[ReviewMail][{{ reviewmail.id }}][ReviewType]']").val();
+									if(choosenReviewType == 'per_purchase') {
+									$('#displayImages_{{ reviewmail.id }}').hide(300);
+									}
+									else if (choosenReviewType == 'per_product') {
+									$('#displayImages_{{ reviewmail.id }}').show(300);
+									}
+									});
+									</script>
+								</div>
+								<div id="email_template_{{reviewmail.id}}" class="tab-pane">
+									<div class="tab-pane">
+										<ul class="nav nav-tabs reviewmail_tabs">
+											  <h5><strong>Multi-lingual settings:</strong></h5>
+											  {% for language in languages %} 
+												 <li {{ language.language_id == default_language_id ? 'class="active"' : '' }}><a href="#tab-{{ reviewmail.id }}-{{ language.language_id }} " data-toggle="tab"><img src="{{ language.flag_url }}"/> {{ language.name }} </a></li>
+											  {% endfor %}
+										   </ul>
+										   <div class="tab-content">
+											  
+										   {% for language in languages %} 
+											  <div id="tab-{{ reviewmail.id }}-{{ language.language_id }}" class="row-fluid tab-pane language {{ language.language_id == default_language_id ? "active" : '' }}">
+												 <br />
+												 <h5><strong><strong>{{text_review_mail_settings}}</strong></strong></h5>
+												 <br>
+												 <div class="row">
+													<div class="col-md-3">
+													   <h5><strong>{{text_review_mail_subject}}</strong></h5>
+													</div>
+													<div class="col-md-7">
+													   <input placeholder="Mail subject" type="text" class="form-control" name="{{ reviewmail_name }}[Subject][{{ language.language_id }}]" value="{% if reviewmail.Subject[language.language_id] %}{{ reviewmail.Subject[language.language_id] }} {% else %} {{text_mail_review_subject}}{% endif %}"/>
+													</div>
+													<div class="col-md-2">
+													   <button type="button" class="btn btn-info preview_button" data-lang-id="{{ language.language_id }}" id="livePreview_{{ reviewmail.id }}_{{ language.language_id }}" data-email-id="{{ reviewmail.id }}">{{text_email_preview}}</button>
+													</div>
+												 </div>
+												 <br />
+												 <div class="row">
+													<div class="col-md-3">
+													   <h5><strong>{{text_message}}</strong></h5>
+													   <span class="help"><i class="fa fa-info-circle"></i>&nbsp;
+														  {{text_email_shortcodes}}
+													   </span>
+													</div>
+													<div class="col-md-7">
+													   <textarea id="message_{{ reviewmail.id }}_{{ language.language_id }}" name="{{ reviewmail_name }}[Message][{{ language.language_id }}]">{% if reviewmail.Message[language.language_id] %}{{ reviewmail.Message[language.language_id] }}{% else %}{{text_email_default_message}}
+													{% endif %}
+													  </textarea>
+													</div>
+												 </div>
+												 <br />
+												 <hr />
+										   </div>
+										   {% endfor %} 
+										   <br />   
+									</div>
+									</div>
+									 <!--Modal for review email preview-->
+									<div class="modal fade " id="emailPreview_{{ reviewmail.id }}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"> 
+										<div class="modal-dialog modal-lg" role="document">
+										   <div class="modal-content">
+											  <div class="modal-header">
+												 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+												 <h4 class="modal-title" id="myModalLabel">Email preview</h4>
+											  </div>
+											  <div class="modal-body">
+												 
+											  </div>
+										   </div>
+										</div>
+									 </div>
+
+									<script>
+									$('.preview_button').click(function(e){
+									   e.preventDefault();
+									   e.stopPropagation();
+
+									   var email_container =$(this).parents('#reviewmail_'+$(this).attr('data-email-id'));
+
+									   var display_images = email_container.find('select[name*="DisplayImages"] option:selected').val();
+									   var email_type = $('#EmailType').val();
+									   var review_form;
+									   var textarea = '';
+									   var language_id = $(this).attr('data-lang-id');
+									   try {
+										   textarea = email_container.find('#message_{{ reviewmail.id }}_'+ language_id +'').code();
+									   } catch (err) {
+										  if(err.message.indexOf('is not a function') > -1) {
+											 textarea = email_container.find('#message_{{ reviewmail.id }}_'+ language_id +'').summernote('code');
+										  }
+									   }
+
+									   var review_form;
+									   var ordered_products = '<a href="#"><strong>Our Test Product(s)</strong></a>';
+									   if(email_type == 'form'){
+										  var form_link = '<div style="font-family:inherit;font-size:11px;text-align:center;background: #f2f2f2;padding:3px;"><p>If this email is not displayed correctly or you cannot submit the form, please <a href="#"><strong>click here</strong></a>.</p></div>';
+									   
+										  review_form = '<table width="100%">';
+										  
+										  if(display_images == 'yes'){        
+										  review_form += '<tr style="text-align:center;"><td><img src="../image/iphone_1.jpg"></td></tr>';
+										  }
+										  review_form += '<tr>';
+										  review_form += '<td width="100%" style="font-family:Verdana;color:#f0ad4e;direction:ltr; text-align:center;">';
+										  review_form += '<span style="display:inline-block">';
+										  review_form += '<span style="display:inline-block;float:left;margin-right:15px">';
+										  review_form += '<input id="rat{number}_1" name="orderreviews[{number}][rating]" type="radio" value="1" style="font-family:inherit"><label for="rat{number}_1">';
+										  review_form += '<span style="font-size:21px;padding-left:0">★</span></label></span>';
+										  review_form += '<span style="display:inline-block;float:left;margin-right:15px">';
+										  review_form += '<input id="rat{number}_1" name="orderreviews[{number}][rating]" type="radio" value="1" style="font-family:inherit"><label for="rat{number}_1">';
+										  review_form += '<span style="font-size:21px;padding-left:0">★★</span></label></span>';
+										  review_form += '<span style="display:inline-block;float:left;margin-right:15px">';
+										  review_form += '<input id="rat{number}_1" name="orderreviews[{number}][rating]" type="radio" value="1" style="font-family:inherit"><label for="rat{number}_1">';
+										  review_form += '<span style="font-size:21px;padding-left:0">★★★</span></label></span>';
+										  review_form += '<span style="display:inline-block;float:left;margin-right:15px">';
+										  review_form += '<input id="rat{number}_1" name="orderreviews[{number}][rating]" type="radio" value="1" style="font-family:inherit"><label for="rat{number}_1">';
+										  review_form += '<span style="font-size:21px;padding-left:0">★★★★</span></label></span>';
+										  review_form += '<span style="display:inline-block;float:left;margin-right:15px">';
+										  review_form += '<input id="rat{number}_1" name="orderreviews[{number}][rating]" type="radio" value="1" style="font-family:inherit"><label for="rat{number}_1">';
+										  review_form += '<span style="font-size:21px;padding-left:0">★★★★★</span></label></span>';
+										  review_form += '</span>';
+										  review_form += '</tr>';
+										  review_form += '<tr>';
+										  review_form += '<td>';
+										  review_form += '<ul style="margin:0;padding:0"><textarea name="orderreviews[{number}][text]" cols="40" rows="5"';
+										  review_form += 'style="font-size:12px;padding-left:3px;min-height:60px;width:99%;border:solid 1px #e1e1e1;font-family:inherit;margin:0 0 15px 0">';
+										  review_form += '</textarea></ul><br>';
+										  review_form += '</td>';
+										  review_form += '</tr>';
+										  review_form += '<tr><td style="font-family:Verdana;text-align:right">';
+										  review_form += '<input type="submit" style="font-family:inherit;border:1px solid #C57824;padding:6px 13px;text-transform:uppercase;';
+										  review_form += 'text-decoration:none;background-color:#DF9020;font-size:13px;color:#ffffff" value="✓ Submit "></td></tr>';
+										  review_form += '</table>';    
+									   }else{
+										  var form_link = '<div style="font-family:inherit;font-size:11px;text-align:center;background: #f2f2f2;padding:3px; height:25px;"></div>';
+										  review_form = '';
+										  review_form += '<table width="100%">';
+										  review_form += ' <tbody><tr><td width="5%" style="font-family:Verdana"></td>';
+										  review_form += '<td width="90%" style="font-family:Verdana"><table cellspacing="0" cellpadding="0" border="0" style="width:100%"><tbody>';
+										  review_form += '<tr><td  width="210px" height="25%" align="left" style="font-family:Verdana;font-size:inherit;padding:15px 0;letter-spacing:0; text-align:center;">';
+										  review_form += ' <a href="javascript:void(0)" style="display: block; width: 140px;height: 40px;background: #229ac8;padding: 10px;font-weight: bold;  margin: 0 auto; text-decoration: none; color: white;">Leave a review</a>';
+										  review_form += ' </td></tr></tbody></table></td><td width="5%" style="font-family:Verdana"></td></tr>';
+										  review_form += '</tbody>'
+										  review_form += '</table>';
+									   }
+									   
+									   
+									   var patterns = ['{reviewmail_link}', '{first_name}','{last_name}','{order_products}','{review_form}'];
+									   var replacement = [form_link,"John","Doe",ordered_products,review_form];
+									   
+									   for (var x = 0; x < patterns.length; x++){
+										  textarea = textarea.replace(patterns[x],replacement[x]); 
+									   }
+
+									   $('#emailPreview_{{ reviewmail.id }}').modal('show');
+
+									   $('#emailPreview_{{ reviewmail.id }}').on('shown.bs.modal', function (e) {
+											 var modalContent = $(this).find( ".modal-body" );
+											 modalContent.html(textarea);
+									   });
+									   
+									});
+
+									{% for language in languages %}
+										$('#message_{{ reviewmail.id}}_{{ language.language_id }}').summernote({
+											lang: $(this).attr('data-lang'),
+											disableDragAndDrop: true,
+											height: 320,
+											emptyPara: '',
+											codemirror: { // codemirror options
+												mode: 'text/html',
+												htmlMode: true,
+												lineNumbers: true,
+												theme: 'monokai'
+											},			
+											fontsize: ['8', '9', '10', '11', '12', '14', '16', '18', '20', '24', '30', '36', '48' , '64'],
+											toolbar: [
+												['style', ['style']],
+												['font', ['bold', 'underline', 'clear']],
+												['fontname', ['fontname']],
+												['fontsize', ['fontsize']],
+												['color', ['color']],
+												['para', ['ul', 'ol', 'paragraph']],
+												['table', ['table']],
+												['insert', ['link', 'image', 'video']],
+												['view', ['fullscreen', 'codeview', 'help']]
+											],
+											popover: {
+												image: [
+													['custom', ['imageAttributes']],
+													['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
+													['float', ['floatLeft', 'floatRight', 'floatNone']],
+													['remove', ['removeMedia']]
+												],
+											},			
+											buttons: {
+												image: function() {
+													var ui = $.summernote.ui;
+															
+													// create button
+													var button = ui.button({
+														contents: '<i class="note-icon-picture" />',
+														tooltip: $.summernote.lang[$.summernote.options.lang].image.image,
+														click: function () {
+															$('#modal-image').remove();
+															console.log(getURLVar('token'));
+															$.ajax({
+																url: 'index.php?route=common/filemanager&user_token={{ user_token }}',
+																dataType: 'html',
+																beforeSend: function() {
+																	$('#button-image i').replaceWith('<i class="fa fa-circle-o-notch fa-spin"></i>');
+																	$('#button-image').prop('disabled', true);
+																},
+																complete: function() {
+																	$('#button-image i').replaceWith('<i class="fa fa-upload"></i>');
+																	$('#button-image').prop('disabled', false);
+																},
+																success: function(html) {
+																	$('body').append('<div id="modal-image" class="modal">' + html + '</div>');
+																	
+																	$('#modal-image').modal('show');
+																	
+																	$('#modal-image').delegate('a.thumbnail', 'click', function(e) {
+																		e.preventDefault();
+																		
+																		$('#message_{{ reviewmail.id}}_{{ language.language_id }}').summernote('insertImage', $(this).attr('href'));
+																									
+																		$('#modal-image').modal('hide');
+																	});
+																}
+															});						
+														}
+													});
+												
+													return button.render();
+												}
+											}
+										});
+									{% endfor %}
+									</script>
+								</div>
+								<div id="discount_{{reviewmail.id}}" class="tab-pane">
+									<div class="tab-pane">
+									<div class="row">
+										<div class="col-md-3">
+											<h5><strong>{{text_discount_type}}</strong></h5>
+											<span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_discount_type_help}}</span>
+										</div>
+										<div class="col-md-3">
+											<select name="{{ reviewmail_name }}[DiscountType]" id="DiscountType_{{ reviewmail.id }} " class="discountTypeSelect form-control">
+												<option value="P" {% if reviewmail.DiscountType is defined  and  reviewmail.DiscountType  ==  "P" %} {{ "selected" }} {% endif %} >{{text_percentage}}</option>
+												<option value="F" {% if reviewmail.DiscountType is defined  and  reviewmail.DiscountType  ==  "F" %} {{ "selected" }} {% endif %} >{{text_fixed}}</option>
+												<option value="N" {% if reviewmail.DiscountType is not defined  or  reviewmail.DiscountType  ==  "N" %} {{ "selected" }} {% endif %}>{{text_nod_disc}}</option>
+											</select>
+										</div>
+									</div>
+									<br />
+									<div class="discountSettings">
+										<div class="row">
+											<div class="col-md-3">
+												<h5><strong><span class="required">* </span>{{text_discount}}</strong></h5>
+												<span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_discount_help}}</span>
+											</div>
+											<div class="col-md-3">
+												<div class="input-group">
+													<input type="text" class="form-control" name="{{ reviewmail_name }}[Discount]" value="{% if reviewmail.Discount %}{{ reviewmail.Discount }}{% else %}{{ '10' }}{% endif %}">
+													<span class="input-group-addon">
+													<span style="display:none;" id="currencyAddon">{{ currency }} </span><span style="display:none;" id="percentageAddon">%</span>
+													</span>
+												</div>
+											</div>
+										</div>
+										<br />
+										<div class="row">
+											<div class="col-sm-3">
+												<h5><strong>{{ entry_product }}</strong></h5>
+												<span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{ help_product }}</span>
+											</div>
+											<div class="col-sm-9">
+											  <input type="text" name="products" value="" placeholder="{{ entry_product }}" id="input-product" class="form-control" />
+											  <div id="products_{{ reviewmail.id }}" class="well well-sm" style="height: 150px; overflow: auto;">
+												{% for product in reviewmail.products %}
+													<div id="products_{{ reviewmail.id }}_{{ product.product_id }}"><i class="fa fa-minus-circle"></i> {{ product.name }}
+														<input type="hidden" name="{{ reviewmail_name }}[products][]" value="{{ product.product_id }}" />
+													</div>
+												{% endfor %}
+											</div>
+											</div>
+										</div>
+										<br />
+										<div class="row">
+											<div class="col-sm-3">
+												<h5><strong>{{ entry_category }}</strong></h5>
+												<span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{ help_category }}</span>
+											</div>
+											<div class="col-sm-9">
+												<input type="text" name="categories" value="" placeholder="{{ entry_category }}" id="input-category" class="form-control" />
+												<div id="categories_{{ reviewmail.id }}" class="well well-sm" style="height: 150px; overflow: auto;">
+													{% for category in reviewmail.categories %}
+													<div id="categories_{{ reviewmail.id }}_{{ category.category_id }}"><i class="fa fa-minus-circle"></i> {{ category.name }}
+														<input type="hidden" name="{{ reviewmail_name }}[categories][]" value="{{ category.category_id }}" />
+													</div>
+													{% endfor %}
+												</div>
+											</div>
+										</div>
+										<br />
+										<div class="row">
+											<div class="col-md-3">
+												<h5><strong><span class="required">* </span>{{text_total_amount}}</strong></h5>
+												<span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_total_amount_help}}</span>
+											</div>
+											<div class="col-md-3">
+												<div class="input-group">
+													<input type="text" class="form-control" name="{{ reviewmail_name }}[TotalAmount]" value="{% if reviewmail.TotalAmount %}{{ reviewmail.TotalAmount }}{% else %}{{'20'}}{% endif %}">
+													<span class="input-group-addon">{{ currency }}</span>
+												</div>
+											</div>
+										</div>
+										<br />
+										<div class="row">
+											<div class="col-md-3">
+												<h5><strong><span class="required">* </span>{{text_validity}}</strong></h5>
+												<span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_validity_help}}</span>
+											</div>
+											<div class="col-md-3">
+												<div class="input-group">
+													<input type="text" class="form-control" value="{% if reviewmail.DiscountValidity %}{{ reviewmail.DiscountValidity }}{% else %}{{ '7' }}{% endif %}" name="{{ reviewmail_name }}[DiscountValidity]">
+													<span class="input-group-addon">days</span>
+												</div>
+											</div>
+										</div>
+										<br />
+										<div class="row">
+											 <div class="col-md-3">
+												<h5><strong>{{text_discount_mail_option}}</strong></h5>
+												<span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_discount_mail_option_help}}</span>
+											 </div>
+											 <div class="col-md-3">
+												<select id="Checker_{{ reviewmail.id }}" name="{{ reviewmail_name }}[DiscountMailEnabled]" class="discountMailSelect form-control">
+												   <option value="yes" {{ reviewmail.DiscountMailEnabled is defined  and  reviewmail.DiscountMailEnabled  ==  'yes' }} ? 'selected=selected' :  '' }} >{{text_enabled}}</option>
+												   <option value="no"  {{ reviewmail.DiscountMailEnabled is empty  or  reviewmail.DiscountMailEnabled == 'no'  ? 'selected=selected' : '' }}>{{text_disabled}}</option>
+												</select>
+											 </div>
+										  </div>
+									</div>
+									</div>
+									<script>
+									   $(function() {
+										  var $typeSelector = $('#Checker_{{ reviewmail.id }}');
+										  var $toggleArea = $('#discountMailTab_{{ reviewmail.id }}');
+										if ($typeSelector.val() === 'yes') {
+												  $toggleArea.show(200); 
+											  }
+											  else {
+												  $toggleArea.hide(200); 
+											  }
+										  $typeSelector.change(function(){
+											  if ($typeSelector.val() === 'yes') {
+												  $toggleArea.show(200); 
+											  }
+											  else {
+												  $toggleArea.hide(200); 
+											  }
+										  });
+									   });
+									   
+									   $(function() {
+										  var $typeSelector = $('#DiscountType_{{ reviewmail.id }}');
+										  var $toggleArea = $('#discountMailTab_{{ reviewmail.id }}');
+										var $toggleArea2 = $('#Checker_{{ reviewmail.id }} ');
+										if ($typeSelector.val() === 'N') {
+												  $toggleArea.hide(200); 
+											$toggleArea2.val('no');
+											  }
+										  $typeSelector.change(function(){
+											  if ($typeSelector.val() === 'N') {
+												  $toggleArea.hide(200); 
+											$toggleArea2.val('no');
+											  }
+										  });
+									   });
+
+										// Category
+										$('input[name="categories"]').autocomplete({
+											'source': function(request, response) {
+												$.ajax({
+													url: 'index.php?route=catalog/category/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+													dataType: 'json',
+													success: function(json) {
+														response($.map(json, function(item) {
+															return {
+																label: item['name'],
+																value: item['category_id']
+															}
+														}));
+													}
+												});
+											},
+											'select': function(item) {
+												var method = 'categories';
+
+												$(this).val('');
+												$('#' + method +'_{{ reviewmail.id }}_' + item['value']).remove();
+												$('#' + method +'_{{ reviewmail.id }}').append('<div id="' + method + '_{{ reviewmail.id }}_' + item['value'] + '"><i class="fa fa-minus-circle"></i> ' + item['label'] + '<input type="hidden" name="{{ reviewmail_name }}[' + method + '][]" value="' + item['value'] + '" /></div>');
+											}
+										});
+
+										$('#categories_{{ reviewmail.id }}').delegate('.fa-minus-circle', 'click', function() {
+											$(this).parent().remove();
+										});
+
+										// Products
+										$('input[name="products"]').autocomplete({
+											'source': function(request, response) {
+												$.ajax({
+													url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+													dataType: 'json',
+													success: function(json) {
+														response($.map(json, function(item) {
+															return {
+																label: item['name'],
+																value: item['product_id']
+															}
+														}));
+													}
+												});
+											},
+											'select': function(item) {
+												var method = 'products';
+
+												$(this).val('');
+												$('#' + method +'_{{ reviewmail.id }}_' + item['value']).remove();
+												$('#' + method +'_{{ reviewmail.id }}').append('<div id="' + method + '_{{ reviewmail.id }}_' + item['value'] + '"><i class="fa fa-minus-circle"></i> ' + item['label'] + '<input type="hidden" name="{{ reviewmail_name }}[' + method + '][]" value="' + item['value'] + '" /></div>');
+											}
+										});
+										$('#products_{{ reviewmail.id }}').delegate('.fa-minus-circle', 'click', function() {
+											$(this).parent().remove();
+										});
+									</script>
+								</div>
+								<div id="discount_email_template_{{reviewmail.id}}" class="tab-pane">
+									<div class="tab-pane">
+										<ul class="nav nav-tabs discountmail_tabs">
+											<h5><strong>{{text_multilingual}}</strong></h5>
+											{% for discount_language in languages %}
+												<li {{ discount_language.language_id == default_language_id ? 'class="active"' : '' }}><a href="#tab-discount-{{ reviewmail.id }}-{{ discount_language.language_id }}" data-toggle="tab"><img src="{{ discount_language.flag_url }}"/> {{ discount_language.name }} </a></li>
+											{% endfor %}
+										</ul>
+										<div class="tab-content">
+											{% for discount_language in languages %}
+												<div id="tab-discount-{{ reviewmail.id }}-{{ discount_language.language_id }}" class="row-fluid tab-pane discount_language {% if loop.first %}active{% endif %}">
+													<h5><strong>{{text_discount_mail_settings}}</strong></h5>
+													<br>
+													<div class="row">
+														<div class="col-md-3">
+															<h5><strong>{{text_discount_mail_subject}}</strong></h5>
+														</div>
+														<div class="col-md-7">
+															<input
+															placeholder="Mail subject"
+															type="text"
+															class="form-control"
+															name="{{ reviewmail_name }}[SubjectDiscount][{{ discount_language.language_id }}]"
+															value="{% if reviewmail.SubjectDiscount[discount_language.language_id] %}{{ reviewmail.SubjectDiscount[discount_language.language_id]}}  {% else %}  {{ "MailReview Subject" }} {% endif %}" />
+														</div>
+														<div class="col-md-2">
+															<button type="button" class="btn btn-info" id="DiscountLivePreview_{{ reviewmail.id }}" data-email-id="{{ reviewmail.id }}" data-lang-id="{{ discount_language.language_id }}">{{text_discount_mail_preview}}</button>
+														</div>
+													</div>
+													<br/>
+													<div class="row">
+														<div class="col-md-3">
+															<h5><strong>{{text_message}}</strong></h5>
+															<span class="help">
+															  {{text_discount_mail_help}}
+															</span>
+														</div>
+														<div class="col-md-7">
+															<textarea id="messageD_{{ reviewmail.id }}_{{ discount_language.language_id }}" name="{{ reviewmail_name }}[MessageDiscount][{{ discount_language.language_id }}]">
+															{% if reviewmail.MessageDiscount[discount_language.language_id] %}
+																{{ reviewmail.MessageDiscount[discount_language.language_id] }}
+															{% else %}
+																{{text_discount_mail_default_message}}
+															{% endif %}
+															</textarea>
+														</div>
+													</div>
+												</div>
+											{% endfor %}
+											<br/>
+											<div class="row discountMailSettings">
+												<div class="col-md-3">
+													<h5><strong>{{text_select_date_format}}</strong></h5>
+												</div>
+												<div class="col-md-7">
+													<select name="{{ reviewmail_name }}[DateFormat]" class="form-control">
+														<option value="d-m-Y" {{ reviewmail.DateFormat  and  reviewmail.DateFormat  ==  'd-m-Y' ? 'selected=selected' : '' }} >dd-mm-yyyy</option>
+														<option value="m-d-Y" {{ reviewmail.DateFormat  and  reviewmail.DateFormat  ==  'm-d-Y' ? 'selected=selected' : ''}}  >mm-dd-yyyy</option>
+														<option value="Y-m-d" {{ reviewmail.DateFormat  and  reviewmail.DateFormat  ==  'Y-m-d' ? 'selected=selected' : ''}}  >yyyy-mm-dd</option>
+														<option value="Y-d-m" {{ reviewmail.DateFormat  and  reviewmail.DateFormat  ==  'Y-d-m' ? 'selected=selected' : '' }}  >yyyy-dd-mm</option>
+													</select>
+												</div>
+											</div>
+											<div class="modal fade " id="DiscountEmailPreview_{{ reviewmail.id }}"tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+											<div class="modal-dialog modal-lg" role="document">
+												<div class="modal-content">
+													<div class="modal-header">
+														<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+														<h4 class="modal-title" id="myModalLabel">Discount Email Preview</h4>
+													</div>
+													<div class="modal-body" id="discountModal_{{ reviewmail.id }}">
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									</div>
+									 <script>
+									$('button[id^=DiscountLivePreview_{{ reviewmail.id }}]').click(function(e){
+										e.preventDefault();
+										e.stopPropagation();
+										var discount_language_id = $(this).attr('data-lang-id');
+									   var discount_email_container = $(this).parents('#reviewmail_'+$(this).attr('data-email-id'));
+									   var textarea = '';
+									   try {
+										   textarea = discount_email_container.find('#messageD_{{ reviewmail.id }}_'+ discount_language_id +'').code();
+
+									   } catch (err) {
+										  if(err.message.indexOf('is not a function') > -1) {
+											 textarea = discount_email_container.find('#messageD_{{ reviewmail.id }}_'+ discount_language_id +'').summernote('code');
+										  }
+									   }
+									   var discount_value = discount_email_container.find('input[name*="Discount"]').val();
+									   var total_value = discount_email_container.find('input[name*="TotalAmount"]').val();
+									   var validity = discount_email_container.find('input[name*="DiscountValidity"]').val();
+									   var date_format = discount_email_container.find('select[name*="DateFormat"] option:selected').val();
+									   var date = new Date();
+									   date.setDate(date.getDate() + parseInt(validity)); 
+									   var date_end = formatDate(date,date_format); 
+									   var discount_code = 'EXAMPLE%';
+									   var review_form;
+									   var ordered_products = '<a href="#"><strong>Our Test Product(s)</strong></a>';
+									   
+									   var products = [];
+									   {% for product in reviewmail.products %}
+											products = '<a href="{{ catalogURL }}index.php?route=product/product&product_id={{product.product_id}}">{{product.name|e('js')}}</a>';
+									   {% endfor %}
+									   var categories = [];
+									   {% for category in reviewmail.categories %}
+											categories = '<a href="{{ catalogURL }}index.php?route=product/category&path={{category.category_id}}">{{category.name|e('js')}}</a>';
+									   {% endfor %}
+									   var patterns = ['{first_name}','{last_name}','{discount_code}','{discount_value}','{total_amount}','{date_end}','{product_discount}','{category_discount}'];
+									   var replacement = ["John","Doe",discount_code,discount_value,total_value,date_end,products,categories];
+									   
+									   for (var x = 0; x < patterns.length; x++){
+										  textarea = textarea.replace(patterns[x],replacement[x]); 
+									   }
+									   $('#DiscountEmailPreview_{{ reviewmail.id }} ').modal('show');
+									   $('#DiscountEmailPreview_{{ reviewmail.id }} ').on('shown.bs.modal', function (e) {
+											 var modalContent = $(this).find( ".modal-body" );
+											 modalContent.html(textarea);
+									   });
+									   
+									   function formatDate(date, format) {
+										  console.log(format);
+										var d = new Date(date),
+											month = '' + (d.getMonth() + 1),
+											day = '' + d.getDate(),
+											year = d.getFullYear();
+
+										if (month.length < 2) month = '0' + month;
+										if (day.length < 2) day = '0' + day;
+									   var outputDate;
+
+									   switch(format){
+										  case 'd-m-Y':
+										  outputDate = [day, month, year].join('-'); break;
+										  case 'm-d-Y':
+										  outputDate = [month, day, year].join('-'); break;
+										  case 'Y-m-d':
+										  outputDate = [year, month, day].join('-'); break;
+										  case 'Y-d-m':
+										  outputDate = [year, day, month].join('-'); break;
+									   }
+									  return outputDate;
+									}
+									});  
+									{% for discount_language in languages %}
+										$('#messageD_{{ reviewmail.id }}_{{ discount_language.language_id }}').summernote({
+											lang: $(this).attr('data-lang'),
+											disableDragAndDrop: true,
+											height: 320,
+											emptyPara: '',
+											codemirror: { // codemirror options
+												mode: 'text/html',
+												htmlMode: true,
+												lineNumbers: true,
+												theme: 'monokai'
+											},			
+											fontsize: ['8', '9', '10', '11', '12', '14', '16', '18', '20', '24', '30', '36', '48' , '64'],
+											toolbar: [
+												['style', ['style']],
+												['font', ['bold', 'underline', 'clear']],
+												['fontname', ['fontname']],
+												['fontsize', ['fontsize']],
+												['color', ['color']],
+												['para', ['ul', 'ol', 'paragraph']],
+												['table', ['table']],
+												['insert', ['link', 'image', 'video']],
+												['view', ['fullscreen', 'codeview', 'help']]
+											],
+											popover: {
+												image: [
+													['custom', ['imageAttributes']],
+													['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
+													['float', ['floatLeft', 'floatRight', 'floatNone']],
+													['remove', ['removeMedia']]
+												],
+											},			
+											buttons: {
+												image: function() {
+													var ui = $.summernote.ui;
+															
+													// create button
+													var button = ui.button({
+														contents: '<i class="note-icon-picture" />',
+														tooltip: $.summernote.lang[$.summernote.options.lang].image.image,
+														click: function () {
+															$('#modal-image').remove();
+															console.log(getURLVar('token'));
+															$.ajax({
+																url: 'index.php?route=common/filemanager&user_token={{ user_token }}',
+																dataType: 'html',
+																beforeSend: function() {
+																	$('#button-image i').replaceWith('<i class="fa fa-circle-o-notch fa-spin"></i>');
+																	$('#button-image').prop('disabled', true);
+																},
+																complete: function() {
+																	$('#button-image i').replaceWith('<i class="fa fa-upload"></i>');
+																	$('#button-image').prop('disabled', false);
+																},
+																success: function(html) {
+																	$('body').append('<div id="modal-image" class="modal">' + html + '</div>');
+																	
+																	$('#modal-image').modal('show');
+																	
+																	$('#modal-image').delegate('a.thumbnail', 'click', function(e) {
+																		e.preventDefault();
+																		
+																		$('#messageD_{{ reviewmail.id }}_{{ discount_language.language_id }}').summernote('insertImage', $(this).attr('href'));
+																									
+																		$('#modal-image').modal('hide');
+																	});
+																}
+															});						
+														}
+													});
+												
+													return button.render();
+												}
+											}
+										});
+									{% endfor %}
+									</script>
+								</div>
+								
+							</div>
+							{% if newAddition %}
+								<script type="text/javascript">
+								{% for language in languages %}
+									$('#message_{{ reviewmail.id}}_{{ language.language_id }}').summernote({
+										lang: $(this).attr('data-lang'),
+										disableDragAndDrop: true,
+										height: 320,
+										emptyPara: '',
+										codemirror: { // codemirror options
+											mode: 'text/html',
+											htmlMode: true,
+											lineNumbers: true,
+											theme: 'monokai'
+										},			
+										fontsize: ['8', '9', '10', '11', '12', '14', '16', '18', '20', '24', '30', '36', '48' , '64'],
+										toolbar: [
+											['style', ['style']],
+											['font', ['bold', 'underline', 'clear']],
+											['fontname', ['fontname']],
+											['fontsize', ['fontsize']],
+											['color', ['color']],
+											['para', ['ul', 'ol', 'paragraph']],
+											['table', ['table']],
+											['insert', ['link', 'image', 'video']],
+											['view', ['fullscreen', 'codeview', 'help']]
+										],
+										popover: {
+											image: [
+												['custom', ['imageAttributes']],
+												['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
+												['float', ['floatLeft', 'floatRight', 'floatNone']],
+												['remove', ['removeMedia']]
+											],
+										},			
+										buttons: {
+											image: function() {
+												var ui = $.summernote.ui;
+														
+												// create button
+												var button = ui.button({
+													contents: '<i class="note-icon-picture" />',
+													tooltip: $.summernote.lang[$.summernote.options.lang].image.image,
+													click: function () {
+														$('#modal-image').remove();
+														console.log(getURLVar('token'));
+														$.ajax({
+															url: 'index.php?route=common/filemanager&user_token={{ user_token }}',
+															dataType: 'html',
+															beforeSend: function() {
+																$('#button-image i').replaceWith('<i class="fa fa-circle-o-notch fa-spin"></i>');
+																$('#button-image').prop('disabled', true);
+															},
+															complete: function() {
+																$('#button-image i').replaceWith('<i class="fa fa-upload"></i>');
+																$('#button-image').prop('disabled', false);
+															},
+															success: function(html) {
+																$('body').append('<div id="modal-image" class="modal">' + html + '</div>');
+																
+																$('#modal-image').modal('show');
+																
+																$('#modal-image').delegate('a.thumbnail', 'click', function(e) {
+																	e.preventDefault();
+																	
+																	$('#message_{{ reviewmail.id}}_{{ language.language_id }}').summernote('insertImage', $(this).attr('href'));
+																								
+																	$('#modal-image').modal('hide');
+																});
+															}
+														});						
+													}
+												});
+											
+												return button.render();
+											}
+										}
+									});
+								{% endfor %}
+								{% for discount_language in languages %}
+									$('#messageD_{{ reviewmail.id }}_{{ discount_language.language_id }}').summernote({
+										lang: $(this).attr('data-lang'),
+										disableDragAndDrop: true,
+										height: 320,
+										emptyPara: '',
+										codemirror: { // codemirror options
+											mode: 'text/html',
+											htmlMode: true,
+											lineNumbers: true,
+											theme: 'monokai'
+										},			
+										fontsize: ['8', '9', '10', '11', '12', '14', '16', '18', '20', '24', '30', '36', '48' , '64'],
+										toolbar: [
+											['style', ['style']],
+											['font', ['bold', 'underline', 'clear']],
+											['fontname', ['fontname']],
+											['fontsize', ['fontsize']],
+											['color', ['color']],
+											['para', ['ul', 'ol', 'paragraph']],
+											['table', ['table']],
+											['insert', ['link', 'image', 'video']],
+											['view', ['fullscreen', 'codeview', 'help']]
+										],
+										popover: {
+											image: [
+												['custom', ['imageAttributes']],
+												['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
+												['float', ['floatLeft', 'floatRight', 'floatNone']],
+												['remove', ['removeMedia']]
+											],
+										},			
+										buttons: {
+											image: function() {
+												var ui = $.summernote.ui;
+														
+												// create button
+												var button = ui.button({
+													contents: '<i class="note-icon-picture" />',
+													tooltip: $.summernote.lang[$.summernote.options.lang].image.image,
+													click: function () {
+														$('#modal-image').remove();
+														console.log(getURLVar('token'));
+														$.ajax({
+															url: 'index.php?route=common/filemanager&user_token={{ user_token }}',
+															dataType: 'html',
+															beforeSend: function() {
+																$('#button-image i').replaceWith('<i class="fa fa-circle-o-notch fa-spin"></i>');
+																$('#button-image').prop('disabled', true);
+															},
+															complete: function() {
+																$('#button-image i').replaceWith('<i class="fa fa-upload"></i>');
+																$('#button-image').prop('disabled', false);
+															},
+															success: function(html) {
+																$('body').append('<div id="modal-image" class="modal">' + html + '</div>');
+																
+																$('#modal-image').modal('show');
+																
+																$('#modal-image').delegate('a.thumbnail', 'click', function(e) {
+																	e.preventDefault();
+																	
+																	$('#messageD_{{ reviewmail.id }}_{{ discount_language.language_id }}').summernote('insertImage', $(this).attr('href'));
+																								
+																	$('#modal-image').modal('hide');
+																});
+															}
+														});						
+													}
+												});
+											
+												return button.render();
+											}
+										}
+									});
+								{% endfor %}
+								selectorsForDiscount();
+								</script>
+							{% endif %}
+						</div>
+						</script>
+				{% endfor %}
+			{% endif %}
+		</div>
+</div>
+<script type="text/javascript"><!--
+// Add Template
+function addNewReviewMail() {
+	count = $('.review-list li:last-child > a').data('reviewmail-id') + 1 || 1;
+	var ajax_data = {};
+	ajax_data.user_token = '{{ user_token }}';
+	ajax_data.store_id = '{{ store.store_id }}';
+	ajax_data.reviewmail_id = count;
+
+	$.ajax({
+		url: 'index.php?route={{ module_path }}/get_review_settings',
+		data: ajax_data,
+		dataType: 'html',
+		beforeSend: function() {
+			NProgress.start();
+		},
+		success: function(settings_html) {
+			$('.review-settings').append(settings_html);
+			
+			if (count == 1) { $('a[href="#reviewmail_'+ count +'"]').tab('show'); }
+			tpl 	= '<li>';
+			tpl 	+= '<a href="#reviewmail_'+ count +'" data-toggle="tab" data-reviewmail-id="'+ count +'">';
+			tpl 	+= '<i class="fa fa-pencil-square-o"></i> ReviewMail '+ count;
+			tpl 	+= '<i class="fa fa-minus-circle removeReviewMail"></i>';
+			tpl 	+= '<input type="hidden" name="{{ moduleNameMail }}[ReviewMail]['+ count +'][id]" value="'+ count +'"/>';
+			tpl 	+= '</a>';
+			tpl	+= '</li>';
+			
+			$('.review-list').append(tpl);
+			
+			NProgress.done();
+			$('.review-list').children().last().children('a').trigger('click');
+			window.localStorage['currentSubTab'] = $('.review-list').children().last().children('a').attr('href');
+		}
+	});
+}
+
+// Remove expired coupons action
+function removeExpiredCoupons() {      
+    var confirmRemoveCoupons = confirm('Are you sure you want to remove all coupons generated by the module?');
+    if (confirmRemoveCoupons==true) {
+        $.ajax({
+            url: 'index.php?route={{ module_path }}/removeallexpiredcoupons&user_token={{ user_token }}',
+            type: 'post',
+            data: {'remove': confirmRemoveCoupons },
+            success: function(response) {
+                alert('Coupons Removed Successfully!');
+                location.reload();
+            }
+        });
+    }
+}
+
+// Remove Template
+function removeReviewMail() {
+	tab_link = $(event.target).parent();
+	tab_pane_id = tab_link.attr('href');
+	
+	var confirmRemove = confirm('Are you sure you want to remove ' + tab_link.text().trim() + '?');
+	
+	if (confirmRemove == true) {
+		tab_link.parent().remove();
+		$(tab_pane_id).remove();
+		if ($('.review-list').children().length > 1) {
+			$('.review-list > li:nth-child(2) a').tab('show');
+			window.localStorage['currentSubTab'] = $('.review-list > li:nth-child(2) a').attr('href');
+		}
+	}
+}
+
+
+
+// Events for the Add and Remove buttons
+$(document).ready(function() {
+	// Add New Label
+	$('.addNewReviewMail').click(function(e) { addNewReviewMail(); });
+	// Remove Label
+	$('.review-list').delegate('.removeReviewMail', 'click', function(e) { removeReviewMail(); });
+
+	$('#remove_expired_coupons').on('click', function(){
+		removeExpiredCoupons();
+	});
+
+});
+
+// Show the EDITOR
+
+{% if moduleData.ReviewMail %} 
+	{% for reviewmail in moduleData %}
+		{% for language in languages %} 
+			$('#message_{{ reviewmail.id }}_{{ language.language_id }}').summernote({
+				lang: $(this).attr('data-lang'),
+				disableDragAndDrop: true,
+				height: 320,
+				emptyPara: '',
+				codemirror: { // codemirror options
+					mode: 'text/html',
+					htmlMode: true,
+					lineNumbers: true,
+					theme: 'monokai'
+				},			
+				fontsize: ['8', '9', '10', '11', '12', '14', '16', '18', '20', '24', '30', '36', '48' , '64'],
+				toolbar: [
+					['style', ['style']],
+					['font', ['bold', 'underline', 'clear']],
+					['fontname', ['fontname']],
+					['fontsize', ['fontsize']],
+					['color', ['color']],
+					['para', ['ul', 'ol', 'paragraph']],
+					['table', ['table']],
+					['insert', ['link', 'image', 'video']],
+					['view', ['fullscreen', 'codeview', 'help']]
+				],
+				popover: {
+					image: [
+						['custom', ['imageAttributes']],
+						['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
+						['float', ['floatLeft', 'floatRight', 'floatNone']],
+						['remove', ['removeMedia']]
+					],
+				},			
+				buttons: {
+					image: function() {
+						var ui = $.summernote.ui;
+								
+						// create button
+						var button = ui.button({
+							contents: '<i class="note-icon-picture" />',
+							tooltip: $.summernote.lang[$.summernote.options.lang].image.image,
+							click: function () {
+								$('#modal-image').remove();
+								console.log(getURLVar('token'));
+								$.ajax({
+									url: 'index.php?route=common/filemanager&user_token={{ user_token }}',
+									dataType: 'html',
+									beforeSend: function() {
+										$('#button-image i').replaceWith('<i class="fa fa-circle-o-notch fa-spin"></i>');
+										$('#button-image').prop('disabled', true);
+									},
+									complete: function() {
+										$('#button-image i').replaceWith('<i class="fa fa-upload"></i>');
+										$('#button-image').prop('disabled', false);
+									},
+									success: function(html) {
+										$('body').append('<div id="modal-image" class="modal">' + html + '</div>');
+										
+										$('#modal-image').modal('show');
+										
+										$('#modal-image').delegate('a.thumbnail', 'click', function(e) {
+											e.preventDefault();
+											
+											$('#message_{{ reviewmail.id }}_{{ language.language_id }}').summernote('insertImage', $(this).attr('href'));
+																		
+											$('#modal-image').modal('hide');
+										});
+									}
+								});						
+							}
+						});
+					
+						return button.render();
+					}
+				}
+			});
+			$('#messageD_{{ reviewmail.id }}_{{ language.language_id }}').summernote({
+				lang: $(this).attr('data-lang'),
+				disableDragAndDrop: true,
+				height: 320,
+				emptyPara: '',
+				codemirror: { // codemirror options
+					mode: 'text/html',
+					htmlMode: true,
+					lineNumbers: true,
+					theme: 'monokai'
+				},			
+				fontsize: ['8', '9', '10', '11', '12', '14', '16', '18', '20', '24', '30', '36', '48' , '64'],
+				toolbar: [
+					['style', ['style']],
+					['font', ['bold', 'underline', 'clear']],
+					['fontname', ['fontname']],
+					['fontsize', ['fontsize']],
+					['color', ['color']],
+					['para', ['ul', 'ol', 'paragraph']],
+					['table', ['table']],
+					['insert', ['link', 'image', 'video']],
+					['view', ['fullscreen', 'codeview', 'help']]
+				],
+				popover: {
+					image: [
+						['custom', ['imageAttributes']],
+						['imagesize', ['imageSize100', 'imageSize50', 'imageSize25']],
+						['float', ['floatLeft', 'floatRight', 'floatNone']],
+						['remove', ['removeMedia']]
+					],
+				},			
+				buttons: {
+					image: function() {
+						var ui = $.summernote.ui;
+								
+						// create button
+						var button = ui.button({
+							contents: '<i class="note-icon-picture" />',
+							tooltip: $.summernote.lang[$.summernote.options.lang].image.image,
+							click: function () {
+								$('#modal-image').remove();
+								console.log(getURLVar('token'));
+								$.ajax({
+									url: 'index.php?route=common/filemanager&user_token={{ user_token }}',
+									dataType: 'html',
+									beforeSend: function() {
+										$('#button-image i').replaceWith('<i class="fa fa-circle-o-notch fa-spin"></i>');
+										$('#button-image').prop('disabled', true);
+									},
+									complete: function() {
+										$('#button-image i').replaceWith('<i class="fa fa-upload"></i>');
+										$('#button-image').prop('disabled', false);
+									},
+									success: function(html) {
+										$('body').append('<div id="modal-image" class="modal">' + html + '</div>');
+										
+										$('#modal-image').modal('show');
+										
+										$('#modal-image').delegate('a.thumbnail', 'click', function(e) {
+											e.preventDefault();
+											
+											$('#messageD_{{ reviewmail.id }}_{{ language.language_id }}').summernote('insertImage', $(this).attr('href'));
+																		
+											$('#modal-image').modal('hide');
+										});
+									}
+								});						
+							}
+						});
+					
+						return button.render();
+					}
+				}
+			});
+		{% endfor %}
+	{% endfor %}
+ {% endif %}
+
+$('.cronModal').on('click', function(e){
+	e.preventDefault();
+	e.stopPropagation();
+	$('.cronjobs').modal({backdrop: true});
+});
+
+// Selectors for discount
+function selectorsForDiscount() {
+	$('.discountTypeSelect').each(function() {
+		if ($(this).val() == 'P'){
+			$(this).parents('.reviews').find('#percentageAddon').show();
+		} else {
+			$(this).parents('.reviews').find('#currencyAddon').show();
+		}
+		//
+		$(this).parents('.reviews').find('.discountMailSelect').each(function() {
+			if ($(this).val() == 'yes'){
+				$(this).parents('.reviews').find('.discountMailSettings').show();
+			} else {
+				$(this).parents('.reviews').find('.discountMailSettings').hide();
+			}
+		});
+		//
+		if ($(this).val() == 'N'){
+			$(this).parents('.reviews').find('.discountSettings').hide();
+			$(this).parents('.reviews').find('.discountMailSettings').hide();
+		} else {
+			$(this).parents('.reviews').find('.discountSettings').show();
+		}
+	});
+
+	$('.discountMailSelect').on('change', function(e){ 
+		if($(this).val() == 'yes') {
+			$(this).parents('.reviews').find('.discountMailSettings').show(300);
+		} else {
+			$(this).parents('.reviews').find('.discountMailSettings').hide(300);
+		}	
+	});
+	
+	$('.discountTypeSelect').on('change', function(e){ 
+		if($(this).val() == 'P') {
+			$(this).parents('.reviews').find('#percentageAddon').show();
+			$(this).parents('.reviews').find('#currencyAddon').hide();
+		} else {
+			$(this).parents('.reviews').find('#currencyAddon').show();
+			$(this).parents('.reviews').find('#percentageAddon').hide();
+		}
+		//
+		$(this).parents('.reviews').find('.discountMailSelect').each(function() {
+			if ($(this).val() == 'yes'){
+				$(this).parents('.reviews').find('.discountMailSettings').show();
+			} else {
+				$(this).parents('.reviews').find('.discountMailSettings').hide();
+			}
+		});
+		//	
+		if($(this).val() == 'N') {
+			$(this).parents('.reviews').find('.discountSettings').hide(300);
+			$(this).parents('.reviews').find('.discountMailSettings').hide();
+		} else {
+			$(this).parents('.reviews').find('.discountSettings').show(300);
+		}
+	});
+}
+
+// Initialize selector for discount
+$(function() {
+	selectorsForDiscount();
+});
+
+$(function() {
+    var $typeSelector = $('#AutoApprovedToggle');
+    var $toggleArea = $('#AutoApprovedSettings');
+	
+	if ($typeSelector.val() === 'no') {
+		$toggleArea.hide(300) 
+	}
+	 
+    $typeSelector.change(function(){
+        if ($typeSelector.val() === 'yes') {
+            $toggleArea.show(300) 
+        }
+        else {
+            $toggleArea.hide(300);
+        }
+    });
+});
+</script>

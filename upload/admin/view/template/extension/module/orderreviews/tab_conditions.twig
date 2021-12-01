@@ -1,0 +1,117 @@
+<div class="tab-pane fade in active">
+    <div class="row">
+        <div class="col-md-3">
+            <h5><strong>{{text_order_status}}</strong></h5>
+            <span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_order_status_help}}</span>
+        </div>
+        <div class="col-md-3">
+            <select required class="form-control" name="{{ reviewmail_name }}[OrderStatusID]">
+                <option disabled selected value="">{{text_select_order_status}}</option>
+             
+                {% if moduleData.orderStatuses %}
+                    {% for orderStatus in moduleData.orderStatuses %}
+                        <option value="{{ orderStatus.order_status_id }}"
+                            {% if reviewmail.OrderStatusID is defined  and  orderStatus.order_status_id == reviewmail.OrderStatusID %}
+                               {{'selected="selected"'}}
+                            {% elseif reviewmail.OrderStatusID is not defined  and  orderStatus.name == 'Complete' %}
+                                {{'selected="selected"'}}
+                            {% endif %} >
+                            {{ orderStatus.name }}
+                        </option>
+                    {% endfor %}
+                {% endif %}
+            </select>
+        </div>
+    </div>
+    <br />
+    <div class="row">
+        <div class="col-md-3">
+            <h5><strong>{{text_customer_group}}</strong></h5>
+            <span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_customer_group_help}}</span>
+        </div>
+        <div class="col-md-3">
+            <select required class="form-control" name="{{ reviewmail_name }}[CustomerGroupID]">
+                <option value="send_all" selected value="">{{text_all_customer_groups}}</option>
+                {% if moduleData.customerGroups %} 
+                    {% for customerGroup in moduleData.customerGroups %}
+                        <option value="{{ customerGroup.customer_group_id }}"
+                            {% if reviewmail.CustomerGroupID is not empty  and  customerGroup.customer_group_id == reviewmail.CustomerGroupID %}
+                                {{ 'selected="selected"' }}  {% endif %} >
+                            {{ customerGroup.name }}
+                         </option>
+                    {% endfor %} 
+                 {% endif %}
+        </select>
+    </div>
+</div>
+<br />
+<div class="row">
+    <div class="col-md-3">
+        <h5><strong>{{text_message_delay}}</strong></h5>
+        <span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_message_delay}}</span>
+    </div>
+    <div class="col-md-3">
+        <div class="input-group">
+            <input type="text" class="form-control" name="{{ reviewmail_name }}[Delay]" 
+                value="{% if reviewmail.Delay is defined %}{{ reviewmail.Delay }}{% else %}{{ '15' }}{% endif %}"/>
+            <span class="input-group-addon">days</span>
+        </div>
+    </div>
+</div>
+<br />
+<div class="row">
+    <div class="col-md-3">
+        <h5><strong>{{text_select_orders_by}}</strong></h5>
+        <span class="help"><i class="fa fa-info-circle"></i>&nbsp;{{text_select_orders_by_help}}</span>
+    </div>
+    <div class="col-md-3">
+        <select name="{{ reviewmail_name }}[DateType]" class="form-control">
+            <option value="date_added" {{ reviewmail.DateType is defined and  reviewmail.DateType  == 'date_added' ? 'selected=selected' :  '' }} >{{text_date_added}}</option>
+            <option value="date_modified"  {{ reviewmail.DateType is empty  or  reviewmail.DateType == 'date_modified'  ? 'selected=selected' : ''}}>{{text_date_modified}}</option>
+        </select>
+    </div>
+</div>
+<br />
+<div class="row">
+    <div class="col-md-3">
+        <h5><strong>{{text_review_type}}</strong></h5>
+        <span class="help">{{text_review_type_help}}</span>
+    </div>
+    <div class="col-md-3">
+        <select name="{{ reviewmail_name }}[ReviewType]" class="form-control">
+            <option value="per_product" {{ reviewmail.ReviewType is defined  and  reviewmail.ReviewType  == 'per_product'  ? 'selected=selected' :  '' }}>{{text_per_product}}</option>
+            <option value="per_purchase"  {{ reviewmail.ReviewType is empty  or  reviewmail.ReviewType == 'per_purchase'  ? 'selected=selected' : ''}}>{{text_per_purchase}}</option>
+        </select>
+    </div>
+</div>
+<br />
+<div class="row" id="displayImages_{{ reviewmail.id }}">
+    <div class="col-md-3">
+        <h5><strong>{{text_dispaly_images}}</strong></h5>
+        <span class="help">{{text_dispaly_images_help}}</span>
+    </div>
+    <div class="col-md-3">
+        <select name="{{ reviewmail_name }}[DisplayImages]" class="form-control">
+            <option value="yes" {{ reviewmail.DisplayImages is defined  and  reviewmail.DisplayImages  == 'yes' ? 'selected=selected' : '' }} >{{text_yes}}</option>
+            <option value="no"  {{ reviewmail.DisplayImages is empty or reviewmail.DisplayImages == 'no'  ? 'selected=selected' : ''}} >{{text_no}}</option>
+        </select>
+    </div>
+</div>
+</div>
+<script type="text/javascript">
+$(document).ready(function() {
+$('#displayImages_{{ reviewmail.id }}').hide();
+if($("select[name='orderreviewsMailTemplate[ReviewMail][{{ reviewmail.id }}][ReviewType]']").val() == 'per_product') {
+$('#displayImages_{{ reviewmail.id }}').show();
+}
+});
+$("select[name='orderreviewsMailTemplate[ReviewMail][{{ reviewmail.id }}][ReviewType]']").on("change", function(){
+var choosenReviewType = $("select[name='orderreviewsMailTemplate[ReviewMail][{{ reviewmail.id }}][ReviewType]']").val();
+if(choosenReviewType == 'per_purchase') {
+$('#displayImages_{{ reviewmail.id }}').hide(300);
+}
+else if (choosenReviewType == 'per_product') {
+$('#displayImages_{{ reviewmail.id }}').show(300);
+}
+});
+</script>

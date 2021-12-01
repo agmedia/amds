@@ -1,0 +1,70 @@
+<table class="table table-bordered table-hover" width="100%" >
+      <thead>
+        <tr class="table-header">
+          <td class="left" width="15%"><strong>Order ID</strong></td>
+          <td class="left" width="20%"><strong>Customer Name</strong></td>
+          <td class="left" width="20%"><strong>Product Name</strong></td>
+          <td class="left" width="10%"><strong>Review Rating</strong></td>
+          <td class="left" width="15%"><strong>Review Coupon</strong></td>
+          {% if setting.PrivacyPolicy %}
+            <td width="10%">{{ text_privacy_policy }}</td>
+          {% endif %}
+          <td class="left" width="20%"><strong>Date Added</strong></td>
+        </tr>
+      </thead>
+  {% if sources %} 
+    {% for src in sources %}               
+              <tbody>
+              <tr>
+                  <td>
+                    <button type="button" class="btn btn-default btn-sm disabled" tabindex="-1">{{ src.order_id }} </button>
+                    <a href="index.php?route=sale/order/info&user_token={{ user_token }}&order_id={{ src.order_id }}" target="_blank" class="btn btn-default btn-sm btn-info">Order details</a>
+                  </td>
+                  <td class="left">
+                    {{ src.customer_name}}
+                  </td>
+                  <td class="left">
+                    <a href="{{ src.url}}">{{ src.name}}</a>
+                  </td>
+                  <td class="left">
+                    {{ src.review_rating}}
+                  </td>
+                   <td class="left">
+                    {{ src.review_coupon ? src.review_coupon : 'Not Provided' }} 
+                  </td>
+                  {% if setting.PrivacyPolicy %}
+                    <td class="text-center">{{ src.privacy_policy ? text_agree }}</td>
+                  {% endif %}
+                  <td class="left">
+                    {{ src.date_created}}
+                  </td>
+                </tr>
+              </tbody>
+        {% endfor %}
+      {% endif %} 
+    <tfoot>
+      <tr>
+          <td colspan="10">
+                <div class="row">
+                  <div class="col-sm-6 text-left">{{ pagination }} </div>
+                  <div class="col-sm-6 text-right">{{ results }} </div>
+                </div>
+          </td>
+        </tr>
+    </tfoot>
+</table>
+<script>
+$(document).ready(function(){
+  $('#LogWrapper{{ store_id }}  .pagination a').click(function(e){
+    e.preventDefault();
+    $.ajax({
+      url: this.href,
+      type: 'get',
+      dataType: 'html',
+      success: function(data) {       
+        $("#LogWrapper{{ store_id }}").html(data);
+      }
+    });
+  });    
+});
+</script>
