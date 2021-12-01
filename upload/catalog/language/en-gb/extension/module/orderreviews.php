@@ -1,34 +1,35 @@
 <?php
-$_['button_back']   = 'Back';
-$_['button_send_again']   = 'Resend review form mail';
-$_['resend_mail']   = 'Resend review mail form success.';
+$_['button_back'] = 'Natrag';
+$_['button_send_again'] = 'Ponovno pošalji e-poštu obrasca za pregled';
+$_['resend_mail'] = 'Ponovno pošaljite obrazac za recenziju uspješno.';
 
-$_['text_submit']	= 'Submit review';
-$_['text_review']	= 'Your review:';
-$_['text_leave_review']	= 'Leave a review';
-$_['text_and']		= 'and';
-$_['text_reviewmail_link']		  = '<div style="font-family:inherit;font-size:11px;text-align:center;background: #f2f2f2;padding:3px;"><p>If this email is not displayed correctly or you cannot submit the form, please <a href="{reviewmail_link_href}"><strong>click here</strong></a>.</p></div>';
+$_['text_submit'] = 'Pošalji recenziju';
+$_['text_review'] = 'Vaša recenzija:';
+$_['text_leave_review'] = 'Ostavite recenziju';
+$_['text_and'] = 'i';
+$_['text_reviewmail_link'] = '<div style="font-family:inherit;font-size:11px;text-align:center;background: #f2f2f2;padding:3px;"><p>Ako je ova e-poruka nije prikazan ispravno ili ne možete poslati obrazac, molimo <a href="{reviewmail_link_href}"><strong>kliknite ovdje</strong></a>.</p></div>';
 $_['link_replacement']		  = 
 '<div style="width:100%;height:25px;font-family:inherit;font-size:11px;text-align:center;background: #f2f2f2;padding:3px;"></div>';
 
-$_['heading_title']	= 'Submit a review';
-$_['successfull_review'] = 'Thank you for your review. It has been submitted to the webmaster for approval.';
-$_['text_errors'] = 'We\'ve encountered the following errors:';
+$_['heading_title'] = 'Pošalji recenziju';
+$_['successfull_review'] = 'Hvala na recenziji. Predan je webmasteru na odobrenje.';
+$_['text_errors'] = 'Naišli smo na sljedeće pogreške:';
 
-$_['text_discount'] = 'We would like to give you a special discount code - <strong>{discount_code}</strong> - which gives you <strong>{discount_value} OFF</strong>. <br />The code applies after you spent <strong>{total_amount}</strong>. This promotion is just for you and expires on <strong>{date_end}</strong>.';
-$_['text_discount_product_category'] = 'We would like to give you a special discount code - <strong>{discount_code}</strong> - which gives you <strong>{discount_value} OFF</strong>. <br />The code applies after you spent <strong>{total_amount}</strong>. You can apply the discount for all products and or all products under categories below:<br /><strong>{product_discount}</strong><br /><strong>{category_discount}</strong>. <br />This promotion is just for you and expires on <strong>{date_end}</strong>.';
-$_['text_privacy_agreement'] = 'I have read and agree to the <a href="%s" target="_blank"><b>%s</b></a>';
-$_['text_privacy_error'] = 'You must agree Privacy Policy in order to continue.';
+$_['text_discount'] = 'Željeli bismo vam dati poseban kod za popust - <strong>{discount_code}</strong> - koji vam daje <strong>{discount_value} OFF</strong>. <br />Kôd se primjenjuje nakon što potrošite <strong>{total_amount}</strong>. Ova je promocija samo za vas i istječe <strong>{date_end}</strong>.';
+$_['text_discount_product_category'] = 'Željeli bismo vam dati poseban kod za popust - <strong>{discount_code}</strong> - koji vam daje <strong>{discount_value} OFF</strong>. <br />Kôd se primjenjuje nakon što potrošite <strong>{total_amount}</strong>. Popust možete primijeniti na sve proizvode i/ili sve proizvode u kategorijama u nastavku:<br /><strong>{product_discount}</strong><br /><strong>{category_discount}</strong>. <br />Ova je promocija samo za vas i istječe <strong>{date_end}</strong>.';
+$_['text_privacy_agreement'] = 'Pročitao sam i slažem se s <a href="%s" target="_blank"><b>%s</b></a>';
+$_['text_privacy_error'] = 'Morate prihvatiti Pravila privatnosti da biste nastavili.';
 
-$_['no_reviews']	= 'Not a single review was written. Please, write a review to at least one product.';
-$_['error_form']	= 'There seems to be an issue with the submission of the form. If the issue persist, you can try the web-based form which you can open from the link in the email message.';
-$_['error_name']    = 'Name must be between 3 and 100 characters!';
-$_['error_text']    = 'Warning: Review text must be between 10 and 1000 characters!';
-$_['error_rating']  = 'Warning: Please select a review rating!';
-$_['error_duplicate'] = 'You have already reviewed the products from that order.';
 
-$_['star_1'] = '1 (Awful)';
-$_['star_2'] = '2 (Poor)';
-$_['star_3'] = '3 (Fair)';
-$_['star_4'] = '4 (Good)';
-$_['star_5'] = '5 (Excellent)';
+$_['no_reviews'] = 'Nijedna recenzija nije napisana. Molimo, napišite recenziju za barem jedan proizvod.';
+$_['error_form'] = 'Čini se da postoji problem s slanjem obrasca. Ako se problem nastavi, možete isprobati web-bazirani obrazac koji možete otvoriti putem veze u poruci e-pošte.';
+$_['error_name'] = 'Ime mora biti između 3 i 100 znakova!';
+$_['error_text'] = 'Upozorenje: Tekst recenzije mora biti između 10 i 1000 znakova!';
+$_['error_rating'] = 'Upozorenje: Molimo odaberite ocjenu pregleda!';
+$_['error_duplicate'] = 'Već ste pregledali proizvode iz te narudžbe.';
+
+$_['star_1'] = '1 (Grozno)';
+$_['star_2'] = '2 (Loše)';
+$_['star_3'] = '3 (Pošteno)';
+$_['star_4'] = '4 (Dobro)';
+$_['star_5'] = '5 (Izvrsno)';
