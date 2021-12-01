@@ -1,6 +1,6 @@
 <?php
 $_['button_back'] = 'Natrag';
-$_['button_send_again'] = 'Ponovno pošalji e-poštu obrasca za pregled';
+$_['button_send_again'] = 'Pošalji ponovno';
 $_['resend_mail'] = 'Ponovno pošaljite obrazac za recenziju uspješno.';
 
 $_['text_submit'] = 'Pošalji recenziju';
@@ -24,7 +24,7 @@ $_['text_privacy_error'] = 'Morate prihvatiti Pravila privatnosti da biste nasta
 $_['no_reviews'] = 'Nijedna recenzija nije napisana. Molimo, napišite recenziju za barem jedan proizvod.';
 $_['error_form'] = 'Čini se da postoji problem s slanjem obrasca. Ako se problem nastavi, možete isprobati web-bazirani obrazac koji možete otvoriti putem veze u poruci e-pošte.';
 $_['error_name'] = 'Ime mora biti između 3 i 100 znakova!';
-$_['error_text'] = 'Upozorenje: Tekst recenzije mora biti između 10 i 1000 znakova!';
+$_['error_text'] = 'Upozorenje: Tekst recenzije mora biti između 3 i 1000 znakova!';
 $_['error_rating'] = 'Upozorenje: Molimo odaberite ocjenu pregleda!';
 $_['error_duplicate'] = 'Već ste pregledali proizvode iz te narudžbe.';
 

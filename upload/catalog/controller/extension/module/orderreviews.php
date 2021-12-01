@@ -476,7 +476,7 @@ class ControllerExtensionModuleOrderReviews extends Controller {
 						$error['error'] = $this->language->get('error_name');
 					}
 		
-					if (!isset($this->request->get['orderreviews'][0]['text']) || (utf8_strlen($this->request->get['orderreviews'][0]['text']) < 10) || (utf8_strlen($this->request->get['orderreviews'][0]['text']) > 1000)) {
+					if (!isset($this->request->get['orderreviews'][0]['text']) || (utf8_strlen($this->request->get['orderreviews'][0]['text']) < 3) || (utf8_strlen($this->request->get['orderreviews'][0]['text']) > 1000)) {
 						$error['error'] = $this->language->get('error_text');
 					}
 		
