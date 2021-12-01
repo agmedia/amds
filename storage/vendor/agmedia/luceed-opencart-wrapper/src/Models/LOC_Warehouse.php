@@ -238,7 +238,7 @@ class LOC_Warehouse
         $units = $locations->pluck('skladiste')->flatten();
 
         $availables = collect($this->setAvailables(
-            LuceedProduct::stock($this->getUnitsQuery($units), $product)
+            LuceedProduct::stock($this->getUnitsQuery($units), urlencode($product))
         ));
 
         if ($availables->isEmpty()) {
