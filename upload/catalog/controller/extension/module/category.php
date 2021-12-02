@@ -42,7 +42,7 @@ class ControllerExtensionModuleCategory extends Controller {
                     $children = $this->model_catalog_category->getCategories($category['category_id']);
 
                     foreach($children as $child) {
-                        if ($child['top']) {
+
                         $filter_data = array('filter_category_id' => $child['category_id'], 'filter_sub_category' => true);
 
                         $children_data[] = array(
@@ -51,7 +51,7 @@ class ControllerExtensionModuleCategory extends Controller {
                             'href' => $this->url->link('product/category', 'path=' . $category['category_id'] . '_' . $child['category_id'])
                         );
 
-                        }
+
                     }
                 }
 
