@@ -19,9 +19,7 @@
 						<span class="toggle-icon"><span></span></span>
 						<ul>
 							{% for grandchild in child.grandchildren %}
-								{% if grandchild.name !='Nosivost' %}
 								<li><a href="{{ grandchild.href }}">{{ grandchild.name }}</a></li>
-								{% endif %}
 							{% endfor %}
 						</ul>
 						</li>
