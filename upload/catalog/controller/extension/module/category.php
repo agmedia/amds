@@ -34,22 +34,25 @@ class ControllerExtensionModuleCategory extends Controller {
 
 		foreach ($categories as $category) {
 
-            if ($category['top']) {
+
 
                 $children_data = array();
 
                 if ($category['category_id'] == $data['category_id']) {
                     $children = $this->model_catalog_category->getCategories($category['category_id']);
 
-                    foreach($children as $child) {
-                        $filter_data = array('filter_category_id' => $child['category_id'], 'filter_sub_category' => true);
+                        foreach ($children as $child) {
+                            if ($child['top']) {
+                                $filter_data = array('filter_category_id' => $child['category_id'], 'filter_sub_category' => true);
 
-                        $children_data[] = array(
-                            'category_id' => $child['category_id'],
-                            'name' => ucwords(strtolower($child['name'])) . ($this->config->get('config_product_count') ? ' (' . $this->model_catalog_product->getTotalProducts($filter_data) . ')' : ''),
-                            'href' => $this->url->link('product/category', 'path=' . $category['category_id'] . '_' . $child['category_id'])
-                        );
-                    }
+                                $children_data[] = array(
+                                    'category_id' => $child['category_id'],
+                                    'name' => ucwords(strtolower($child['name'])) . ($this->config->get('config_product_count') ? ' (' . $this->model_catalog_product->getTotalProducts($filter_data) . ')' : ''),
+                                    'href' => $this->url->link('product/category', 'path=' . $category['category_id'] . '_' . $child['category_id'])
+                                );
+                            }
+                        }
+
                 }
 
                 $filter_data = array(
@@ -65,7 +68,7 @@ class ControllerExtensionModuleCategory extends Controller {
                 );
             }
 
-		}
+
 
 		return $this->load->view('extension/module/category', $data);
 	}
