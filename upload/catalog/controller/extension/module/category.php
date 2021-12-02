@@ -34,6 +34,8 @@ class ControllerExtensionModuleCategory extends Controller {
 
 		foreach ($categories as $category) {
 
+            if ($category['top']) {
+
                 $children_data = array();
 
                 if ($category['category_id'] == $data['category_id']) {
@@ -61,7 +63,7 @@ class ControllerExtensionModuleCategory extends Controller {
                     'children'    => $children_data,
                     'href'        => $this->url->link('product/category', 'path=' . $category['category_id'])
                 );
-
+            }
 
 		}
 
