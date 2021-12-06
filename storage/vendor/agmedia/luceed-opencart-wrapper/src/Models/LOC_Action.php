@@ -165,42 +165,9 @@ class LOC_Action
      */
     public function collectActive()
     {
-        $actions = $this->getActions()
-                        ->where('status', '=', '2')
-                        ->where('naziv', '!=', 'web_cijene');
-
-        foreach ($actions as $key => $action) {
-            if ( ! empty($action->stavke) && $this->isForWeb($action)) {
-                if (( ! $action->start_date || (Carbon::createFromFormat('d.m.Y', $action->start_date) < Carbon::now())) &&
-                    ( ! $action->end_date || (Carbon::createFromFormat('d.m.Y', $action->end_date) > Carbon::now()))
-                ) {
-                    array_push($this->actions_to_add, $action);
-                }
-            }
-        }
+        $this->actions_to_add = $this->getActions()->where('mpc_rabat', '!=', null);
 
         return $this;
-    }
-
-
-    /**
-     * @param $action
-     *
-     * @return bool
-     */
-    private function isForWeb($action): bool
-    {
-        if (empty($action->poslovne_jedinice)) {
-            return true;
-        }
-
-        foreach ($action->poslovne_jedinice as $item) {
-            if ($item->pj == '10') {
-                return true;
-            }
-        }
-
-        return false;
     }
 
 
@@ -209,7 +176,6 @@ class LOC_Action
      */
     public function sortActions()
     {
-        $specials = collect();
         $this->insert_query = '';
         $this->insert_query_category = '';
         $this->count        = 0;
@@ -217,48 +183,14 @@ class LOC_Action
 
         $this->deleteActionsCategoriesDB();
 
-        foreach ($this->getActionsToAdd() as $key => $action) {
-            $data = [
-                'naziv' => str_replace('web_', '', $action->naziv),
-                'grupa_artikla' => $action->akcija_uid ?: '0'
-            ];
+        foreach ($this->getActionsToAdd() as $action) {
+            $product = Product::where('model', $action->artikl)->first();
 
-            $loc = new LOC_Category();
-            $category = $loc->save($data, $cat_action_id, $key);
+            if ($product && $action->mpc_rabat) {
+                $mpc = $this->calculateDiscountPrice($product->price, $action->mpc_rabat);
 
-            if ($category) {
-                foreach ($action->stavke as $item) {
-                    $item->category = $category;
-
-                    $start_time = $this->checkTime($action->start_time);
-                    $end_time = $this->checkTime($action->end_time);
-
-                    $item->start = $action->start_date . ' ' . $start_time;
-                    $item->end = $action->end_date . ' ' . $end_time;
-
-                    $specials->push($item);
-                }
-            }
-        }
-
-        $temps = $specials->groupBy('artikl_uid')->all();
-
-        foreach ($temps as $item) {
-            $mpc = $item->first()->mpc;
-            $product = Product::where('model', $item->first()->artikl)->first();
-
-            if ( ! $mpc && $item->first()->mpc_rabat) {
-                $mpc = $this->calculateDiscountPrice($product->price, $item->first()->mpc_rabat);
-            }
-
-            if ($product && $mpc) {
-                $start = Carbon::createFromFormat('d.m.Y H:i:s', $item->first()->start)->format('Y-m-d H:i:s');
-                $end   = Carbon::createFromFormat('d.m.Y H:i:s', $item->first()->end)->format('Y-m-d H:i:s');
-
-                //$end = date('Y-m-d', strtotime("+1 day", strtotime($end)));
-
-                $this->insert_query .= '(' . $product->product_id . ', 1, 0, ' . $mpc . ', "' . $start . '", "' . $end . '"),';
-                $this->insert_query_category .= '(' . $product->product_id . ',' . $item->first()->category . '),';
+                $this->insert_query .= '(' . $product->product_id . ', 1, 0, ' . $mpc . ', "0000-00-00", "0000-00-00"),';
+                $this->insert_query_category .= '(' . $product->product_id . ',' . $cat_action_id . '),';
 
                 $this->count++;
             }
