@@ -8,15 +8,26 @@ use Agmedia\Luceed\Luceed;
 
 class LuceedProduct extends Facade
 {
-    
+
     /**
      * @return mixed
      */
     public static function all()
     {
         $luceed = new Luceed();
-        
+
         return $luceed->getProductsList();
+    }
+
+
+    /**
+     * @return mixed
+     */
+    public static function shortList()
+    {
+        $luceed = new Luceed();
+
+        return $luceed->getProductsShortList();
     }
     
     

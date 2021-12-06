@@ -129,53 +129,53 @@ class ControllerExtensionModuleLuceedSync extends Controller
     /**
      * @return object
      */
-    public function updateCategories()
+    /*public function updateCategories()
     {
         $_loc = new LOC_Category(LuceedGroup::all());
 
         $updated = $_loc->joinByUid()->update();
 
         return $this->response($updated, 'categories');
-    }
+    }*/
 
 
     /**
      * @return mixed
      */
-    public function importManufacturers()
+    /*public function importManufacturers()
     {
         $_loc = new LOC_Manufacturer(LuceedManufacturer::all());
 
         $imported = $_loc->checkDiff()->import();
 
         return $this->response($imported, 'manufacturers');
-    }
+    }*/
 
 
     /**
      * @return mixed
      */
-    public function importInitialManufacturers()
+    /*public function importInitialManufacturers()
     {
         $_loc = new LOC_Manufacturer();
 
         $imported = $_loc->initialImport();
 
         return $this->response($imported, 'manufacturers');
-    }
+    }*/
 
 
     /**
      * @return mixed
      */
-    public function importInitialCustomers()
+    /*public function importInitialCustomers()
     {
         $_loc = new LOC_Customer();
 
         $imported = $_loc->initialImport();
 
         return $this->response($imported, 'customers');
-    }
+    }*/
 
 
     /**
@@ -194,14 +194,14 @@ class ControllerExtensionModuleLuceedSync extends Controller
     /**
      * @return mixed
      */
-    public function importPayments()
+    /*public function importPayments()
     {
         $_loc = new LOC_Payment(LuceedPayments::all());
 
         $imported = $_loc->import($_loc->getList());
 
         return $this->response($imported, 'payments');
-    }
+    }*/
 
 
     /**
@@ -252,7 +252,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
     /**
      * @return mixed
      */
-    public function updateProduct()
+    /*public function updateProduct()
     {
         $_loc_ps = new LOC_ProductSingle();
         $this->load->model('catalog/product');
@@ -336,7 +336,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
         }
 
         return $this->output($_loc_ps->finish());
-    }
+    }*/
 
 
     /**
@@ -458,9 +458,9 @@ class ControllerExtensionModuleLuceedSync extends Controller
      */
     public function updatePricesAndQuantities()
     {
-        $_loc = new LOC_Product(LuceedProduct::all());
+        $_loc = new LOC_Product(LuceedProduct::shortList());
 
-        $updated = $_loc->sortForUpdate()->update();
+        $updated = $_loc->sortForUpdate()/*->update()*/;
 
         return $this->response($updated, 'update');
     }

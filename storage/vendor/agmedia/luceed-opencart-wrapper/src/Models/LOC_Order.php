@@ -246,7 +246,8 @@ class LOC_Order
                             )
                         )->where('raspolozivo_kol', '>', 0);
 
-                        //Log::store($availables_data->toArray());
+                        /*Log::store($product->sifra);
+                        Log::store($availables_data->toArray());*/
 
                         if ($availables_data->count()) {
                             foreach ($availables_data as $available) {

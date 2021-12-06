@@ -156,18 +156,36 @@ class LOC_Product
      */
     public function sortForUpdate(string $products = null)
     {
-        if ($products) {
+        /*if ($products) {
             $products = str_replace('&quot;', '', $products);
             $products = explode(',', $products);
             
             $this->products_to_add = $this->getProducts()->whereIn('artikl', $products);
             
             return $this;
-        }
+        }*/
         // List of existing product identifiers.
-        $this->existing = Product::pluck('sku')->flatten();
+        $this->existing = Product::pluck('sku');
+
+        $full_list = $this->getProducts()
+                          ->where('artikl', '!=', '')
+                          ->where('naziv', '!=', '')
+                          ->where('enabled', '!=', 'N')
+                          ->where('webshop', '!=', 'N');
+
+        $response = [];
+
+        for ($i = 0; $i < $this->existing->count(); $i++) {
+            $product_options = $full_list->where('osnovni__artikl', '==', $this->existing[$i]->sku)->all();
+            $this->existing[$i]->opcije = ProductHelper::sortOptions($product_options);
+
+            $response[$this->existing[$i]->sku] = $this->existing[$i];
+        }
+
         // Full list of products to update.
-        $this->products_to_add = $this->getProducts()->whereIn('artikl', $this->existing);
+        $this->products_to_add = $response;
+
+        Log::store($response);
         
         return $this;
     }

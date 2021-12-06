@@ -163,6 +163,17 @@ class Luceed
 
 
     /**
+     * @param array|null $query
+     *
+     * @return mixed
+     */
+    public function getProductsShortList(array $query = null)
+    {
+        return $this->service->get($this->end_points['product_short_list'] . ($query ?: ''));
+    }
+
+
+    /**
      * @param string|array $id
      *
      * @return false|mixed

@@ -27,14 +27,14 @@
 
         <!-- Nav tabs -->
         <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Sync Manager</a></li>
-            <li role="presentation" class="active"><a href="#products" aria-controls="products" role="tab" data-toggle="tab">Products</a></li>
+            <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Sync Manager</a></li>
+            {#<li role="presentation"><a href="#products" aria-controls="products" role="tab" data-toggle="tab">Products</a></li>#}
         </ul>
         <div class="tab-content">
-            <div role="tabpanel" class="tab-pane" id="home">
+            <div role="tabpanel" class="tab-pane active" id="home">
                 <div class="row">
                     <div class="col-sm-12 col-md-5">
-                        <div class="panel panel-default">
+                        {#<div class="panel panel-default">
                             <div class="panel-heading darker-bg">
                                 <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_categories_import_panel }}</h3>
                             </div>
@@ -53,9 +53,9 @@
                                     <p class="col-sm-7">Vrši se update svih naziva kategorija.</p>
                                 </div>
                             </div>
-                        </div>
+                        </div>#}
 
-                        <div class="panel panel-default">
+                        {#<div class="panel panel-default">
                             <div class="panel-heading darker-bg">
                                 <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_manufacturer_import_panel }}</h3>
                             </div>
@@ -67,14 +67,14 @@
                                     <p class="col-sm-7">{{ help_manufacturer_import }}</p>
                                 </div>
 
-                                {#<div class="form-group">
+                                <div class="form-group">
                                     <div class="col-sm-5 text-center">
                                         <a href="javascript:void(0)" id="import-initial-manufacturer" data-toggle="tooltip" title="Inicijalni Import Proizvođača" class="btn btn-info btn-block">Inicijalni Import Proizvođača</a>
                                     </div>
                                     <p class="col-sm-7">Import se radi prema predefiniranoj JSON listi proizvođača.</p>
-                                </div>#}
+                                </div>
                             </div>
-                        </div>
+                        </div>#}
 
                         <div class="panel panel-default">
                             <div class="panel-heading darker-bg">
@@ -90,7 +90,7 @@
                             </div>
                         </div>
 
-                        <div class="panel panel-default">
+                        {#<div class="panel panel-default">
                             <div class="panel-heading darker-bg">
                                 <h3 class="panel-title"><i class="fa fa-list"></i> Načini plaćanja</h3>
                             </div>
@@ -102,7 +102,7 @@
                                     <p class="col-sm-7">Postojeći načini plaćanja se brišu. Radi se novi import svih potrebnih načina plaćanja iz Luceed-a..</p>
                                 </div>
                             </div>
-                        </div>
+                        </div>#}
 
                     </div>
 
@@ -133,26 +133,26 @@
                                     <p class="col-sm-8" style="margin-top: 9px;">{{ help_products_actions }}</p>
                                 </div>
 
-                                <div class="form-group">
+                                {#<div class="form-group">
                                     <div class="col-sm-4 text-center">
                                         <a href="javascript:void(0)" id="update-prices" data-toggle="tooltip" title="{{ btn_products_update_p }}" class="btn btn-info btn-block">{{ btn_products_update_p }}</a>
                                     </div>
                                     <p class="col-sm-8" style="margin-top: 9px;">{{ help_products_update_p }}</p>
-                                </div>
+                                </div>#}
 
-                                <div class="form-group">
+                                {#<div class="form-group">
                                     <div class="col-sm-4 text-center">
                                         <a href="javascript:void(0)" id="update-quantities" data-toggle="tooltip" title="{{ btn_products_update_q }}" class="btn btn-info btn-block">{{ btn_products_update_q }}</a>
                                     </div>
                                     <p class="col-sm-8" style="margin-top: 9px;">{{ help_products_update_q }}</p>
-                                </div>
+                                </div>#}
 
-                                {#<div class="form-group">
-                            <div class="col-sm-4 text-center">
-                                <a href="javascript:void(0)" id="update-prices-quantities" data-toggle="tooltip" title="{{ btn_products_update_pq }}" class="btn btn-info btn-block">{{ btn_products_update_pq }}</a>
-                            </div>
-                            <p class="col-sm-8" style="margin-top: 9px;">{{ help_products_update_pq }}</p>
-                        </div>#}
+                                <div class="form-group">
+                                    <div class="col-sm-4 text-center">
+                                        <a href="javascript:void(0)" id="update-prices-quantities" data-toggle="tooltip" title="{{ btn_products_update_pq }}" class="btn btn-info btn-block">{{ btn_products_update_pq }}</a>
+                                    </div>
+                                    <p class="col-sm-8" style="margin-top: 9px;">{{ help_products_update_pq }}</p>
+                                </div>
 
                             </div>
                         </div>
@@ -171,7 +171,7 @@
                             </div>
                         </div>#}
 
-                        <div class="panel panel-default">
+                        {#<div class="panel panel-default">
                             <div class="panel-heading darker-bg">
                                 <h3 class="panel-title"><i class="fa fa-list"></i> Narudžbe</h3>
                             </div>
@@ -189,13 +189,13 @@
                                     <p class="col-sm-8">Vrši se provjera trajanja pojedinih statusa narudžbi i šalje se mail ako je potrabno.</p>
                                 </div>
                             </div>
-                        </div>
+                        </div>#}
 
                     </div>
 
                 </div>
             </div>
-            <div role="tabpanel" class="tab-pane active" id="products">
+            {#<div role="tabpanel" class="tab-pane active" id="products">
                 <div class="row">
                     <div class="col-sm-12">
                         <div class="panel panel-default">
@@ -318,7 +318,7 @@
                     </div>
                 </div>
 
-            </div>
+            </div>#}
         </div>
 
     </div>
