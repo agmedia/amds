@@ -287,6 +287,17 @@ var unsubscribe = function(module) {
 	});
 }
 
+/* Mobile Search */
+$('.search-holder-mobile input[name=\'search-mobile\']').parent().find('.fa-search').on('click', function() {
+	var url = $('base').attr('href') + 'index.php?route=product/search';
+	var value = $('.search-holder-mobile input[name=\'search-mobile\']').val();
+	if (value) {url += '&search=' + encodeURIComponent(value);}
+	location = url;
+});
+$('.search-holder-mobile input[name=\'search-mobile\']').on('keydown', function(e) {
+	if (e.keyCode == 13) {$('.search-holder-mobile input[name=\'search-mobile\']').parent().find('.fa-search').trigger('click');}
+});
+
 // Cart add remove functions
 var cart = {
 	'add': function(product_id, quantity, source) {
