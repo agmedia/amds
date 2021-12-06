@@ -165,7 +165,10 @@ class LOC_Product
             return $this;
         }*/
         // List of existing product identifiers.
-        $this->existing = Product::pluck('sku');
+        $this->existing = Product::pluck('model')->toArray();
+        //$products_to_add = $this->getProducts()->whereIn('osnovni__artikl', $this->existing)->values();
+
+        //Log::store($this->existing);
 
         $full_list = $this->getProducts()
                           ->where('artikl', '!=', '')
@@ -175,17 +178,17 @@ class LOC_Product
 
         $response = [];
 
-        for ($i = 0; $i < $this->existing->count(); $i++) {
-            $product_options = $full_list->where('osnovni__artikl', '==', $this->existing[$i]->sku)->all();
-            $this->existing[$i]->opcije = ProductHelper::sortOptions($product_options);
+        for ($i = 0; $i < count($this->existing); $i++) {
+            $product_options = $full_list->where('osnovni__artikl', '==', $this->existing[$i])->all();
 
-            $response[$this->existing[$i]->sku] = $this->existing[$i];
+            $response[$this->existing[$i]] = $full_list->where('artikl', '==', $this->existing[$i])->first();
+            $response[$this->existing[$i]]->opcije = ProductHelper::sortOptions($product_options);
         }
 
         // Full list of products to update.
         $this->products_to_add = $response;
 
-        Log::store($response);
+        //Log::store($response);
         
         return $this;
     }
@@ -201,21 +204,21 @@ class LOC_Product
     {
         $db = new Database(DB_DATABASE);
         
-        if ($type != 'quantity' || $type != 'quantities') {
-            $updated = $this->updateOptionsPrices();
-        }
-        
-        // If the options are not updated return false.
-        if ( ! $updated) {
-            return false;
-        }
-        
         // Sort the temporary products DB import string.
         // (uid, price, quantity, stock_id)
         $query_str = '';
+
         foreach ($this->products_to_add as $item) {
-            $stock           = $item->stanje_kol ? $item->stanje_kol : 0;
-            $stock_status_id = $item->stanje_kol ? agconf('import.default_stock_full') : agconf('import.default_stock_empty');
+            $qty_sum = 0;
+
+            if ( ! empty($item->opcije)) {
+                foreach ($item->opcije as $option) {
+                    $qty_sum += $option['raspolozivo_kol'];
+                }
+            }
+
+            $stock           = $qty_sum ?: 0;
+            $stock_status_id = $stock ? agconf('import.default_stock_full') : agconf('import.default_stock_empty');
             $query_str       .= '("' . $item->artikl . '", ' . $item->mpc . ', ' . $stock . ', ' . $stock_status_id . '),';
         }
         
@@ -235,11 +238,13 @@ class LOC_Product
         
         // Truncate the product_temp table.
         $db->query("TRUNCATE TABLE `" . DB_PREFIX . "product_temp`");
+
+        $this->updateOptions();
         
         // Return products count if updated.
         // False if update error occurs.
         if ($updated) {
-            return $this->products_to_add->count();
+            return count($this->products_to_add);
         }
         
         return false;
@@ -250,24 +255,17 @@ class LOC_Product
      * @return bool
      * @throws \Exception
      */
-    private function updateOptionsPrices()
+    private function updateOptions()
     {
         $db = new Database(DB_DATABASE);
-        
+
         $query_str = '';
-        $uids      = $this->products_to_add->pluck('artikl')->flatten();
-        $products  = Product::whereIn('model', $uids)->with('options')->get();
-        
-        foreach ($products as $product) {
-            $new_price = $this->products_to_add->where('artikl', $product->model)->first()->mpc;
-            
-            if ($product->price != $new_price) {
-                if ($product->options) {
-                    foreach ($product->options as $option) {
-                        $price = $new_price * $option->weight;
-                        
-                        $query_str .= '("' . $option->product_option_value_id . '", ' . $price . ', 0, 0),';
-                    }
+
+        foreach ($this->products_to_add as $item) {
+            if ( ! empty($item->opcije)) {
+                foreach ($item->opcije as $option) {
+                    $stock           = $option['raspolozivo_kol'] ?: 0;
+                    $query_str       .= '("' . $option['uid'] . '", 0, ' . $stock . ', 0),';
                 }
             }
         }
@@ -278,7 +276,7 @@ class LOC_Product
         
         $db->query("INSERT INTO " . DB_PREFIX . "product_temp (uid, price, quantity, stock_id) VALUES " . substr($query_str, 0, -1) . ";");
         
-        $updated = $db->query("UPDATE " . DB_PREFIX . "product_option_value p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.product_option_value_id = pt.uid SET p.price = pt.price");
+        $updated = $db->query("UPDATE " . DB_PREFIX . "product_option_value p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.sku = pt.uid SET p.quantity = pt.quantity");
         
         $db->query("TRUNCATE TABLE `" . DB_PREFIX . "product_temp`");
         

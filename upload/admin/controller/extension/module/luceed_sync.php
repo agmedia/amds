@@ -460,7 +460,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
     {
         $_loc = new LOC_Product(LuceedProduct::shortList());
 
-        $updated = $_loc->sortForUpdate()/*->update()*/;
+        $updated = $_loc->sortForUpdate()->update();
 
         return $this->response($updated, 'update');
     }
