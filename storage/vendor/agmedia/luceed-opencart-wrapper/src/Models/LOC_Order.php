@@ -161,7 +161,7 @@ class LOC_Order
         if ($this->has_all_in_main_warehouse) {
             $this->order['sa__skladiste_uid'] = agconf('luceed.default_warehouse_luid');
             $this->order['na__skladiste_uid'] = '565-298';
-            $this->order['skl_dokument'] = 'MS';
+            $this->order['skl_dokument'] = 'MSO';
             $this->order['vrsta_isporuke_uid'] = '3-2987';
             $this->order['korisnik__partner_uid'] = $this->customer_uid;
         }
