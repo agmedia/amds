@@ -207,8 +207,12 @@
                                     <input type="button" value="-" class="minus"><input type="text" step="1" min="1" max="" id="input-quantity" name="quantity" value="{{ minimum }}" title="Qty" class="input-text qty text put-qty" size="4" pattern="" inputmode=""><input type="button" value="+" class="plus">
                                 </div>
                           <input type="hidden" name="product_id" value="{{ product_id }}" />
-                          <button type="button" id="button-cart" data-loading-text="{{ text_loading }}" class="btn btn-primary cd-btn-add"><span>{% if ((qty < 1) and (stock_badge_status)) %}{{ basel_text_out_of_stock }}{% else %}{{ button_cart }}{% endif %}</span></button>
 
+                                  {% if ((qty < 1) and (stock_badge_status)) %}
+                                    <button type="button"  data-loading-text="{{ text_loading }}" class="btn btn-primary cd-btn-add"><span>{{ basel_text_out_of_stock }}</span></button>
+                                  {% else %}
+                                      <button type="button" id="button-cart" data-loading-text="{{ text_loading }}" class="btn btn-primary cd-btn-add"><span>{{ button_cart }}</span></button>
+                                  {% endif %}
                               </div>
                             </div>
 
