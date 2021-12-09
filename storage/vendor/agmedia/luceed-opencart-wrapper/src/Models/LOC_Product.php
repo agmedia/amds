@@ -209,17 +209,24 @@ class LOC_Product
         $query_str = '';
 
         foreach ($this->products_to_add as $item) {
-            $qty_sum = 0;
 
-            if ( ! empty($item->opcije)) {
-                foreach ($item->opcije as $option) {
-                    $qty_sum += $option['raspolozivo_kol'];
+            if (isset($item->mpc)){
+
+                $qty_sum = 0;
+
+                if ( ! empty($item->opcije)) {
+                    foreach ($item->opcije as $option) {
+                        $qty_sum += $option['raspolozivo_kol'];
+                    }
                 }
+
+                $stock           = $qty_sum ?: 0;
+                $stock_status_id = $stock ? agconf('import.default_stock_full') : agconf('import.default_stock_empty');
+                $query_str       .= '("' . $item->artikl . '", ' . $item->mpc . ', ' . $stock . ', ' . $stock_status_id . '),';
+
+
             }
 
-            $stock           = $qty_sum ?: 0;
-            $stock_status_id = $stock ? agconf('import.default_stock_full') : agconf('import.default_stock_empty');
-            $query_str       .= '("' . $item->artikl . '", ' . $item->mpc . ', ' . $stock . ', ' . $stock_status_id . '),';
         }
         
         $db->query("INSERT INTO " . DB_PREFIX . "product_temp (uid, price, quantity, stock_id) VALUES " . substr($query_str, 0, -1) . ";");
