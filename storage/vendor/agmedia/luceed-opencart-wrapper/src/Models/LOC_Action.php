@@ -184,7 +184,7 @@ class LOC_Action
         $this->deleteActionsCategoriesDB();
 
         foreach ($this->getActionsToAdd() as $action) {
-            $product = Product::where('model', $action->artikl)->first();
+            $product = Product::where('model', substr($action->artikl, 0, strpos($action->artikl, '-')))->first();
 
             if ($product && $action->mpc_rabat) {
                 $mpc = $this->calculateDiscountPrice($product->price, $action->mpc_rabat);
