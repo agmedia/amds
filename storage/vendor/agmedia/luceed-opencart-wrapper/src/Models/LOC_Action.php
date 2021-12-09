@@ -165,7 +165,7 @@ class LOC_Action
      */
     public function collectActive()
     {
-        $this->actions_to_add = $this->getActions()->where('mpc_rabat', '!=', null);
+        $this->actions_to_add = $this->getActions()/*->where('mpc_rabat', '!=', null)*/;
 
         return $this;
     }
@@ -190,7 +190,7 @@ class LOC_Action
                 $mpc = $this->calculateDiscountPrice($product->price, $action->mpc_rabat);
 
                 $this->insert_query .= '(' . $product->product_id . ', 1, 0, ' . $mpc . ', "0000-00-00", "0000-00-00"),';
-                $this->insert_query_category .= '(' . $product->product_id . ',' . $cat_action_id . '),';
+                //$this->insert_query_category .= '(' . $product->product_id . ',' . $cat_action_id . '),';
 
                 $this->count++;
             }
@@ -220,7 +220,9 @@ class LOC_Action
 
 
         if ($inserted) {
-            $this->db->query("INSERT INTO " . DB_PREFIX . "product_to_category (product_id, category_id) VALUES " . substr($this->insert_query_category, 0, -1) . ";");
+            if ($this->insert_query_category != '') {
+                $this->db->query("INSERT INTO " . DB_PREFIX . "product_to_category (product_id, category_id) VALUES " . substr($this->insert_query_category, 0, -1) . ";");
+            }
 
             return $this->count;
         }
