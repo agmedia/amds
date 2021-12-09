@@ -176,6 +176,7 @@ class LOC_Action
      */
     public function sortActions()
     {
+        $array = [];
         $this->insert_query = '';
         $this->insert_query_category = '';
         $this->count        = 0;
@@ -189,11 +190,15 @@ class LOC_Action
             if ($product && $action->mpc_rabat) {
                 $mpc = $this->calculateDiscountPrice($product->price, $action->mpc_rabat);
 
-                $this->insert_query .= '(' . $product->product_id . ', 1, 0, ' . $mpc . ', "0000-00-00", "0000-00-00"),';
-                //$this->insert_query_category .= '(' . $product->product_id . ',' . $cat_action_id . '),';
+                $array[$product->product_id] = $mpc;
 
                 $this->count++;
             }
+        }
+
+        foreach ($array as $key => $item) {
+            $this->insert_query .= '(' . $key . ', 1, 0, ' . $item . ', "0000-00-00", "0000-00-00"),';
+            //$this->insert_query_category .= '(' . $product->product_id . ',' . $cat_action_id . '),';
         }
 
         return $this;
