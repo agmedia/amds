@@ -96,7 +96,7 @@ class ModelExtensionModuleDigitalElephantFilter extends Model
             $sql .= ' AND ((' . implode(') OR (', $conditions) . '))';
         }
 
-        $sql .= ") AS t GROUP BY t.tax_class_id) AS tr2 ON (tr2.tax_class_id = p.tax_class_id) WHERE p2s.store_id = '" . $this->config->get('config_store_id') . "' AND p.status = '1' AND p.quantity > '0' AND p.date_available <= NOW() GROUP BY p.product_id) as min_max";
+        $sql .= ") AS t GROUP BY t.tax_class_id) AS tr2 ON (tr2.tax_class_id = p.tax_class_id) WHERE p2s.store_id = '" . $this->config->get('config_store_id') . "' AND p.status = '1'  AND p.quantity > '0' AND p.date_available <= NOW() GROUP BY p.product_id) as min_max";
 
         $query = $this->db->query($sql);
 
