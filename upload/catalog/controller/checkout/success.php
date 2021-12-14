@@ -35,14 +35,18 @@ class ControllerCheckoutSuccess extends Controller {
             $order    = new LOC_Order($oc_order);
             $customer = new LOC_Customer($order->getCustomerData());
 
-            if ( ! $customer->exist()) {
-                $customer->store();
-            }
+            $has_qty = $order->collectProductsFromWarehouses();
 
-            $sent = $order->setCustomerUid($customer->getUid())->store();
+            if ($has_qty) {
+                if ( ! $customer->exist()) {
+                    $customer->store();
+                }
 
-            if ( ! $sent) {
-                $order->recordError();
+                $sent = $order->setCustomerUid($customer->getUid())->store();
+
+                if ( ! $sent) {
+                    $order->recordError();
+                }
             }
             /*******************************************************************************
              *                              END Copyright : AGmedia                         *
