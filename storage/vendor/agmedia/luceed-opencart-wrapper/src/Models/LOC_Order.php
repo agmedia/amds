@@ -266,9 +266,13 @@ class LOC_Order
 
             // Check if all in MAIN warehouse.
             if (isset($availables[agconf('luceed.default_warehouse_luid')])) {
-                if ($order_products->count() <= $availables[agconf('luceed.default_warehouse_luid')][0]['qty']) {
+                if ($order_products->count() == count($availables[agconf('luceed.default_warehouse_luid')])) {
                     $this->has_all_in_main_warehouse = true;
                 }
+
+                /*if ($order_products->count() <= $availables[agconf('luceed.default_warehouse_luid')][0]['qty']) {
+                    $this->has_all_in_main_warehouse = true;
+                }*/
 
                 unset($availables[agconf('luceed.default_warehouse_luid')]);
             }
@@ -277,9 +281,13 @@ class LOC_Order
             // Check & collect warehouses that have all items.
             foreach ($locations->where('stanje_web_shop', 1) as $store) {
                 if (isset($availables[$store['skladiste_uid']])) {
-                    if ($order_products->count() <= $availables[$store['skladiste_uid']][0]['qty']) {
+                    if ($order_products->count() == count($availables[$store['skladiste_uid']])) {
                         $this->has_all_in_warehouses[] = $store['skladiste_uid'];
                     }
+
+                    /*if ($order_products->count() <= $availables[$store['skladiste_uid']][0]['qty']) {
+                        $this->has_all_in_warehouses[] = $store['skladiste_uid'];
+                    }*/
                 }
             }
 
