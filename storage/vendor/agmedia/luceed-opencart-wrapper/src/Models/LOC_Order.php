@@ -160,13 +160,13 @@ class LOC_Order
 
         if ($this->has_all_in_main_warehouse) {
             $this->order['sa__skladiste_uid'] = agconf('luceed.default_warehouse_luid');
-            $this->order['na__skladiste_uid'] = '565-298';
+            $this->order['na__skladiste_uid'] = '565-2987';
             $this->order['skl_dokument'] = 'MSO';
             $this->order['vrsta_isporuke_uid'] = '3-2987';
             $this->order['korisnik__partner_uid'] = $this->customer_uid;
         }
 
-        if ($this->has_all_in_warehouses && isset($this->has_all_in_warehouses[0])) {
+        if ( ! $this->has_all_in_main_warehouse &&$this->has_all_in_warehouses && isset($this->has_all_in_warehouses[0])) {
             $this->order['sa__skladiste_uid'] = $this->has_all_in_warehouses[0];
             $this->order['na__skladiste_uid'] = '565-2987';
             $this->order['skl_dokument'] = 'MS';
@@ -263,7 +263,7 @@ class LOC_Order
 
             // Check if all in MAIN warehouse.
             if (isset($availables[agconf('luceed.default_warehouse_luid')])) {
-                if ($order_products->count() == count($availables[agconf('luceed.default_warehouse_luid')])) {
+                if ($order_products->count() <= $availables[agconf('luceed.default_warehouse_luid')][0]['qty']) {
                     $this->has_all_in_main_warehouse = true;
                 }
 
@@ -274,18 +274,18 @@ class LOC_Order
             // Check & collect warehouses that have all items.
             foreach ($locations->where('stanje_web_shop', 1) as $store) {
                 if (isset($availables[$store['skladiste_uid']])) {
-                    if ($order_products->count() == count($availables[$store['skladiste_uid']])) {
+                    if ($order_products->count() <= $availables[$store['skladiste_uid']][0]['qty']) {
                         $this->has_all_in_warehouses[] = $store['skladiste_uid'];
                     }
                 }
             }
 
+            $this->log('has_all_in_main_warehouse: ', $this->has_all_in_main_warehouse ? 1 : 0);
+            $this->log('has_all_in_warehouses: ', $this->has_all_in_warehouses ? 1 : 0);
+
             if ($this->has_all_in_warehouses && isset($this->has_all_in_warehouses[0])) {
                 return true;
             }
-
-            $this->log('has_all_in_main_warehouse: ', $this->has_all_in_main_warehouse);
-            $this->log('has_all_in_warehouses: ', $this->has_all_in_warehouses);
         }
 
         return false;
@@ -572,11 +572,11 @@ class LOC_Order
     private function log(string $string = null, $data = null): void
     {
         if ($string) {
-            Log::store($string, 'proccess_order_' . $this->oc_order['order_id']);
+            Log::store($string, 'procces_order_' . $this->oc_order['order_id']);
         }
 
         if ($data) {
-            Log::store($data, 'proccess_order_' . $this->oc_order['order_id']);
+            Log::store($data, 'procces_order_' . $this->oc_order['order_id']);
         }
     }
 
