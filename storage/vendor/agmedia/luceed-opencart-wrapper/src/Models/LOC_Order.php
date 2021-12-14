@@ -51,7 +51,7 @@ class LOC_Order
     /**
      * @var array
      */
-    private $items_available = true;
+    private $call_raspis = true;
 
     /**
      * @var int
@@ -114,7 +114,7 @@ class LOC_Order
         // If response ok.
         // Update order uid.
         if (isset($this->response->result[0])) {
-            if ( ! $this->items_available) {
+            if ( ! $this->call_raspis) {
                 $raspis = json_decode(
                     $this->service->orderWrit($this->response->result[0])
                 );
@@ -159,11 +159,12 @@ class LOC_Order
         ];
 
         if ($this->has_all_in_main_warehouse) {
-            $this->order['sa__skladiste_uid'] = agconf('luceed.default_warehouse_luid');
-            $this->order['na__skladiste_uid'] = '565-2987';
-            $this->order['skl_dokument'] = 'MSO';
+            //$this->order['sa__skladiste_uid'] = agconf('luceed.default_warehouse_luid');
+            //$this->order['na__skladiste_uid'] = '565-2987';
+            //$this->order['skl_dokument'] = 'MSO';
             $this->order['vrsta_isporuke_uid'] = '3-2987';
             $this->order['korisnik__partner_uid'] = $this->customer_uid;
+            $this->call_raspis = false;
         }
 
         if ( ! $this->has_all_in_main_warehouse &&$this->has_all_in_warehouses && isset($this->has_all_in_warehouses[0])) {
@@ -176,7 +177,7 @@ class LOC_Order
 
         if ( ! $this->has_all_in_main_warehouse && ! $this->has_all_in_warehouses) {
             $this->order['korisnik__partner_uid'] = $this->customer_uid;
-            $this->items_available = false;
+            $this->call_raspis = false;
         }
 
         $this->log('Order create method: $this->>order - LOC_Order #156', $this->order);
@@ -260,6 +261,8 @@ class LOC_Order
                     }
                 }
             }
+
+            $this->log('Available products: ', $availables);
 
             // Check if all in MAIN warehouse.
             if (isset($availables[agconf('luceed.default_warehouse_luid')])) {
