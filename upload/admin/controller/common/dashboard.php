@@ -7,6 +7,20 @@ class ControllerCommonDashboard extends Controller {
 
 		$data['user_token'] = $this->session->data['user_token'];
 
+
+        $data['link_home_slider'] = $this->url->link('extension/module/basel_layerslider', 'user_token=' . $this->session->data['user_token'].'&module_id=37', true);
+
+
+        $data['link_banneri'] = $this->url->link('extension/module/basel_content', 'user_token=' . $this->session->data['user_token'].'&module_id=58', true);
+
+        $data['link_home_products'] = $this->url->link('extension/basel/productgroups', 'user_token=' . $this->session->data['user_token'], true);
+
+        $data['link_blog'] = $this->url->link('extension/blog/blog', 'user_token=' . $this->session->data['user_token'], true);
+
+        $data['link_sync_manager'] = $this->url->link('extension/module/luceed_sync', 'user_token=' . $this->session->data['user_token'], true);
+
+
+
 		$data['breadcrumbs'] = array();
 
 		$data['breadcrumbs'][] = array(

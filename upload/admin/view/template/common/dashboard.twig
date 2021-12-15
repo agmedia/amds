@@ -18,6 +18,59 @@
       <button type="button" class="close pull-right" data-dismiss="alert">&times;</button>
       <i class="fa fa-exclamation-circle"></i> {{ error_install }}</div>
     {% endif %}
+
+      <style>
+
+
+          .handy-box{
+              padding: 5px;
+              border: 1px solid #f1f1f1;
+              background: #fff;
+              margin-bottom: 10px;
+          }
+
+          .handy-box ul{
+              list-style: none;
+              padding: 0;
+              margin: 0;
+          }
+
+          .handy-box ul li{
+              display: inline-block;
+              padding: 0;
+              margin: 0;
+          }
+          .handy-box ul li a{
+              display: block;
+              padding: 5px 10px;
+              margin: 5px;
+
+          }
+
+
+
+      </style>
+
+
+      <div class="handy-box">
+          <ul>
+
+
+
+              <li><a href="{{ link_home_slider }}" class="btn btn-info"><i class="fa fa-id-card-o" aria-hidden="true"></i> Top banner</a></li>
+              <li><a href="{{ link_banneri }}" class="btn btn-info"><i class="fa fa-id-card-o" aria-hidden="true"></i> Banneri</a></li>
+              <li><a href="{{ link_home_products }}" class="btn btn-info"><i class="fa fa-cart-plus" aria-hidden="true"></i> Izdvojeni proizvodi </a></li>
+              <li><a href="{{ link_blog }}" class="btn btn-info"><i class="fa fa-list" aria-hidden="true"></i> Blog </a></li>
+              <li><a href="{{ link_sync_manager }}" class="btn btn-info"><i class="fa fa-cogs" aria-hidden="true"></i> Sync Manager</a></li>
+
+          </ul>
+      </div>
+
+
+
+
+
+
     {% for row in rows %}
     <div class="row">{% for dashboard_1 in row %}
       {% set class = 'col-lg-%s %s'|format(dashboard_1.width, 'col-md-3 col-sm-6') %}
