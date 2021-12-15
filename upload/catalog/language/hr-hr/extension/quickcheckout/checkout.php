@@ -72,8 +72,8 @@ $_['text_agree']                     = 'Slažem se s <a class="agree" href="%s" 
 $_['text_create_account']			 = 'Ujedno kreiraj i korisnički račun.';
 $_['text_or']						 = '-- ILIR --';
 $_['text_please_wait']				 = 'Molimo pričekajte...';
-$_['text_coupon']        		     = 'Success: Your coupon discount has been applied!';
-$_['text_coupon_removed']      	     = 'Success: Your coupon discount has been removed!';
+$_['text_coupon']        		     = 'Uspješno: Vaš popust je dodan!';
+$_['text_coupon_removed']      	     = 'Uspješno: Vaš popust je uklonjen!';
 $_['text_voucher']        		     = 'Success: Your gift voucher discount has been applied!';
 $_['text_voucher_removed']           = 'Success: Your gift voucher discount has been removed!';
 $_['text_reward']         		     = 'Success: Your reward points discount has been applied!';
