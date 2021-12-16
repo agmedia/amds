@@ -589,7 +589,7 @@ class LOC_Order
         $product = Product::find($product_id);
 
         if ($price < $product->price) {
-            $cijena = number_format($product->price, 2, '.', '');
+            $cijena = number_format($price, 2, '.', '');
             //$return_rabat = number_format((($price / $product->price) * 100 - 100), 2);
 
             return [
