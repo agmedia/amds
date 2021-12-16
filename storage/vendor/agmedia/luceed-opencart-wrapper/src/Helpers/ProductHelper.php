@@ -607,6 +607,22 @@ class ProductHelper
     }
 
 
+    /**
+     * @param float $price
+     * @param int   $discount
+     *
+     * @return float|int
+     */
+    public static function calculateDiscountPrice(float $price, int $discount)
+    {
+        if ( ! $discount) {
+            return $price;
+        }
+
+        return $price - ($price * ($discount / 100));
+    }
+
+
     /*******************************************************************************
     *                                Copyright : AGmedia                           *
     *                              email: filip@agmedia.hr                         *
@@ -716,4 +732,5 @@ class ProductHelper
 
         return $image->result[0]->files[0]->content;
     }
+
 }

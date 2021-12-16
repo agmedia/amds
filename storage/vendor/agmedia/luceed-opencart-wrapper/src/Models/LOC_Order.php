@@ -6,6 +6,7 @@ use Agmedia\Helpers\Log;
 use Agmedia\Kaonekad\Models\ShippingCollector;
 use Agmedia\Luceed\Facade\LuceedProduct;
 use Agmedia\Luceed\Luceed;
+use Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper;
 use Agmedia\Models\Coupon;
 use Agmedia\Models\Location;
 use Agmedia\Models\Order\Order;
@@ -57,6 +58,11 @@ class LOC_Order
      * @var int
      */
     private $discount;
+
+    /**
+     * @var array
+     */
+    private $coupon_item = [];
 
     /**
      * @var bool
@@ -136,14 +142,14 @@ class LOC_Order
      */
     public function create(): void
     {
-        $iznos = number_format($this->oc_order['total'], 2, '.', '');
+        $iznos = $this->getTotal();
 
         $this->order = [
             'nalog_prodaje_b2b' => 'AG-' . $this->oc_order['order_id'],
             'narudzba'          => $this->oc_order['order_id'],
             'datum'             => Carbon::make($this->oc_order['date_added'])->format(agconf('luceed.date')),
             'skladiste_uid'     => '565-2987',
-            'status'            => agconf('luceed.status_uid'),
+            'status'            => $this->getStatus(),
             'napomena'          => $this->oc_order['comment'],
             //'raspored'          => $this->getDeliveryTime(),
             'cijene_s_porezom'  => agconf('luceed.with_tax'),
@@ -299,7 +305,7 @@ class LOC_Order
             }
         }
 
-        return false;
+        return true;
     }
 
 
@@ -350,6 +356,31 @@ class LOC_Order
         $value = (($regular_price - $action_price) / $regular_price) * 100;
 
         return floor($value);
+    }
+
+
+    private function getTotal()
+    {
+        /*if ($this->discount) {
+            return number_format(
+                ProductHelper::calculateDiscountPrice($this->oc_order['total'], $this->discount), 2, '.', ''
+            );
+        }*/
+
+        return number_format($this->oc_order['total'], 2, '.', '');
+    }
+
+
+    /**
+     * @return string
+     */
+    private function getStatus(): string
+    {
+        if ($this->oc_order['payment_code'] == 'bank_transfer') {
+            return '02';
+        }
+
+        return agconf('luceed.status_uid');
     }
 
 
@@ -444,9 +475,9 @@ class LOC_Order
 
                     $price = $this->getItemPrices($order_product->product_id, $order_product->price);
 
-                    if ( ! $price['rabat']) {
+                    /*if ( ! $price['rabat']) {
                         $price['rabat'] = $this->applyCouponDiscount();
-                    }
+                    }*/
 
                     $response[] = [
                         'artikl_uid' => $product->sku,
@@ -456,6 +487,10 @@ class LOC_Order
                     ];
                 }
             }
+        }
+
+        if ($this->discount) {
+            $response[] = $this->coupon_item;
         }
 
         return $response;
@@ -482,6 +517,13 @@ class LOC_Order
                     $this->log('$coupon', $coupon->toArray());
 
                     $this->discount = $coupon->discount;
+
+                    $this->coupon_item = [
+                        'artikl_uid' => '668150-2987',
+                        'kolicina'   => 1,
+                        'cijena'     => (float) number_format($item->value, 2, '.', ''),
+                        'rabat'      => 0,
+                    ];
 
                     $this->log('$this->discount', $this->discount);
                 }
@@ -548,17 +590,17 @@ class LOC_Order
 
         if ($price < $product->price) {
             $cijena = number_format($product->price, 2, '.', '');
-            $return_rabat = number_format((($price / $product->price) * 100 - 100), 2);
+            //$return_rabat = number_format((($price / $product->price) * 100 - 100), 2);
 
             return [
                 'cijena' => $cijena,
-                'rabat'  => abs($return_rabat)
+                'rabat'  => 0//abs($return_rabat)
             ];
         }
 
         return [
             'cijena' => number_format($price, 2, '.', ''),
-            'rabat'  => 0
+            'rabat'  => 0//$this->applyCouponDiscount()
         ];
     }
 
