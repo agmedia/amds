@@ -87,7 +87,17 @@ class LOC_Customer
 
                 Log::store('Customer update();', 'proccess_order');
                 Log::store($response, 'proccess_order');
+            }
 
+            if ( ! $this->should_update && $this->customer['adresa'] != $exist[0]->adresa) {
+                $this->customer['partner_uid'] = $exist[0]->partner_uid;
+
+                $response = json_decode(
+                    $this->service->updateCustomer(['partner' => [$this->customer]])
+                );
+
+                Log::store('Customer update() 2;', 'proccess_order');
+                Log::store($response, 'proccess_order');
             }
 
             return true;
