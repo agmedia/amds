@@ -11,7 +11,7 @@ $_['text_reviewmail_link'] = '<div style="font-family:inherit;font-size:11px;tex
 $_['link_replacement']		  = 
 '<div style="width:100%;height:25px;font-family:inherit;font-size:11px;text-align:center;background: #f2f2f2;padding:3px;"></div>';
 
-$_['heading_title'] = 'Pošalji recenziju';
+
 $_['successfull_review'] = 'Hvala na recenziji. Predan je webmasteru na odobrenje.';
 $_['text_errors'] = 'Naišli smo na sljedeće pogreške:';
 

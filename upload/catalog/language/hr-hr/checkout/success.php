@@ -7,8 +7,8 @@ $_['heading_title']        = 'Hvala vam na povjerenju!';
 $_['text_basket']          = 'Košarica';
 $_['text_checkout']        = 'Naplata';
 $_['text_success']         = 'Uspješno';
-$_['text_customer']        = '<p>Vaša narudžba je uspješno zaprimljena!</p><p>Možete pogledati pregled Vaših narudžbi na stranici <a href="%s">moj korisnički račun</a> ili kliknuvši na <a href="%s">povijest narudžbi</a>.</p><p style="display:none">Ako Vaša narudžba sadrži artikle za download, možete otići na <a href="%s">download</a> stranicu da ih pogledate i preuzmete.</p><p>Molimo Vas da ukoliko imate nekih pitanja ista uputite na <a href="%s">webshop@amds.hr</a>.</p><p>Zahvaljujemo se što ste kupovali online kod nas!</p>';
-$_['text_guest']           = '<p>Vaša narudžba je uspješno zaprimljena !</p><p>Molimo Vas da ukoliko imate nekih pitanja ista uputite na <a href="%s">webshop@amds.hre</a>.</p><p>Zahvaljujemo se što ste kupovali online kod nas!</p>';
+$_['text_customer']        = '<p>Vaša narudžba je uspješno zaprimljena!</p><p>Možete pogledati pregled Vaših narudžbi na stranici <a href="%s">moj korisnički račun</a> ili kliknuvši na <a href="%s">povijest narudžbi</a>.</p><p style="display:none">Ako Vaša narudžba sadrži artikle za download, možete otići na <a href="%s">download</a> stranicu da ih pogledate i preuzmete.</p><p>Molimo Vas da ukoliko imate nekih pitanja ista uputite na <a href="mailto:webshop@amds.hr">webshop@amds.hr</a>.</p><p>Zahvaljujemo se što ste kupovali online kod nas!</p>';
+$_['text_guest']           = '<p>Vaša narudžba je uspješno zaprimljena !</p><p>Molimo Vas da ukoliko imate nekih pitanja ista uputite na <a href="mailto:webshop@amds.h">webshop@amds.hr</a>.</p><p>Zahvaljujemo se što ste kupovali online kod nas!</p>';
 
 $_['text_tnx']           ='Hvala vam na povjerenju!';
 $_['text_pouzece']           = '<p>Uredno smo zaprimili Vašu narudžbu broj  %s</p><p>Naš tim u webshopu će je obraditi u najbržem mogućem roku.</p><p>Podsjećamo Vas da ćete plaćanje obaviti kod kurira naše dostavne službe pri preuzimanju paketa, te Vas molimo ukoliko ste u mogućnosti da pripremite točan iznos novca za Vašu narudžbu.</p>';
