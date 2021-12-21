@@ -75,13 +75,7 @@ class ModelExtensionTotalCoupon extends Model {
 			$status = false;
 		}
 
-
-        $product_details = $this->model_catalog_product->getProduct($product['product_id']);
-        if($product_details['special']) {
-            continue;
-        }
-
-        if ($status) {
+		if ($status) {
 			return array(
 				'coupon_id'     => $coupon_query->row['coupon_id'],
 				'code'          => $coupon_query->row['code'],
@@ -103,8 +97,6 @@ class ModelExtensionTotalCoupon extends Model {
 
 	public function getTotal($total) {
 		if (isset($this->session->data['coupon'])) {
-
-            $this->load->model('catalog/product');
 			$this->load->language('extension/total/coupon', 'coupon');
 
 			$coupon_info = $this->getCoupon($this->session->data['coupon']);
