@@ -125,6 +125,8 @@ class LOC_Order
                     $this->service->orderWrit($this->response->result[0])
                 );
 
+                $this->call_raspis = false;
+
                 $this->log('Raspis response: $raspis - LOC_Order #110.', $raspis);
             }
 
