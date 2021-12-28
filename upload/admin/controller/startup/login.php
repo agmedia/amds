@@ -7,7 +7,9 @@ class ControllerStartupLogin extends Controller {
 			'common/login',
 			'common/forgotten',
 			'common/reset',
-            'extension/module/luceed_sync/importProducts'
+            'extension/module/luceed_sync/importProducts',
+            'extension/module/luceed_sync/importActions',
+            'extension/module/luceed_sync/updatePricesAndQuantities'
 		);
 
 		// User
@@ -25,7 +27,9 @@ class ControllerStartupLogin extends Controller {
 				'common/reset',
 				'error/not_found',
 				'error/permission',
-                'extension/module/luceed_sync/importProducts'
+                'extension/module/luceed_sync/importProducts',
+                'extension/module/luceed_sync/importActions',
+                'extension/module/luceed_sync/updatePricesAndQuantities'
 			);
 
 			if (!in_array($route, $ignore) && (!isset($this->request->get['user_token']) || !isset($this->session->data['user_token']) || ($this->request->get['user_token'] != $this->session->data['user_token']))) {

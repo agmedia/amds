@@ -6,7 +6,7 @@ class ControllerStartupPermission extends Controller {
 
 			$part = explode('/', $this->request->get['route']);
             
-            if (isset($part[3]) && in_array($part[3], ['importProducts'])) {
+            if (isset($part[3]) && in_array($part[3], ['importProducts', 'importActions', 'updatePricesAndQuantities'])) {
                 return;
             }
 
