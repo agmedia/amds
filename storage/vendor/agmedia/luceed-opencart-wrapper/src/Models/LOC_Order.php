@@ -120,14 +120,25 @@ class LOC_Order
         // If response ok.
         // Update order uid.
         if (isset($this->response->result[0])) {
-            if ( ! $this->call_raspis) {
+            $existing_order = Order::where('order_id', $this->oc_order['order_id'])->first();
+
+            if ( ! $this->call_raspis && ! $existing_order->luceed_raspis_uid) {
                 $raspis = json_decode(
                     $this->service->orderWrit($this->response->result[0])
                 );
 
-                $this->call_raspis = false;
+                if (isset($raspis->result[0])) {
+                    $this->call_raspis = false;
 
-                $this->log('Raspis response: $raspis - LOC_Order #110.', $raspis);
+                    Order::where('order_id', $this->oc_order['order_id'])->update([
+                        'luceed_raspis_uid' => $raspis->result[0]
+                    ]);
+
+                    $this->log('Raspis response: $raspis - LOC_Order', $raspis);
+
+                } else {
+                    $this->log('GREŠKA ::::::::: Raspis response: $raspis - LOC_Order', $raspis);
+                }
             }
 
             return Order::where('order_id', $this->oc_order['order_id'])->update([
