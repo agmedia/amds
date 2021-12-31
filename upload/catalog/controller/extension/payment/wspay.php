@@ -70,39 +70,61 @@ class ControllerExtensionPaymentWSPay extends Controller {
     
     public function callback() {
 
-       $this->load->model('checkout/order');  
+        $this->load->model('checkout/order');
 
-         $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']); 
-             // Lets get wspay response parameters
-       $posted = $_REQUEST;
-
-    //print_r($posted);
+        $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
+        // Lets get wspay response parameters
+        $posted = $_REQUEST;
 
 
-      // Variables for readability
-           
-                $ShopID = $data['merchant'] = $this->config->get('payment_wspay_merchant');
-                $SecretKey = $data['password'] = $this->config->get('payment_wspay_password');
-                $ShoppingCartID = $posted['ShoppingCartID'];
-               
-                $Success = $posted['Success'];
-               
-                $ApprovalCode = $posted['ApprovalCode'];
-              
-           
-            
-            $str = $ShopID.$SecretKey.$ShoppingCartID.$SecretKey.$Success.$SecretKey.$ApprovalCode.$SecretKey;
-            $hash = md5($str); 
- 
+        // Variables for readability
+
+        $ShopID = $data['merchant'] = $this->config->get('payment_wspay_merchant');
+        $SecretKey = $data['password'] = $this->config->get('payment_wspay_password');
+        $ShoppingCartID = $posted['ShoppingCartID'];
+        $Success = $posted['Success'];
+        $ApprovalCode = $posted['ApprovalCode'];
+
+        $PaymentCard  = $posted['PaymentType'];
+        $PaymentPlan  = $posted['PaymentPlan'];
+
+        if($PaymentCard == 'MAESTRO' && $PaymentPlan != '0000' ){
+            $kartica = 'MAESTRO RATE';
+        }
+        else if($PaymentCard == 'MAESTRO' && $PaymentPlan == '0000'){
+            $kartica = 'MAESTRO';
+        }
+
+        else if($PaymentCard == 'MASTERCARD' && $PaymentPlan != '0000' ){
+            $kartica = 'MASTERCARD RATE';
+        }
+        else if($PaymentCard == 'MASTERCARD' && $PaymentPlan == '0000'){
+            $kartica = 'MASTERCARD';
+        }
+
+        else if($PaymentCard == 'VISA' && $PaymentPlan != '0000' ){
+            $kartica = 'VISA RATE';
+        }
+        else if($PaymentCard == 'VISA' && $PaymentPlan == '0000'){
+            $kartica = 'VISA';
+        }
+
+
+        $this->db->query("UPDATE `" . DB_PREFIX . "order` SET payment_card = '" . $this->db->escape($kartica) . "', installment  = '" . $this->db->escape($PaymentPlan) . "' WHERE order_id = '" . (int)$ShoppingCartID . "'");
+
+
+        $str = $ShopID.$SecretKey.$ShoppingCartID.$SecretKey.$Success.$SecretKey.$ApprovalCode.$SecretKey;
+        $hash = md5($str);
+
         if( ($posted['Success'] == 1) && (!empty($posted['ApprovalCode'])) && ($hash == $posted['Signature']) ) {
 
-             $this->model_checkout_order->addOrderHistory($this->session->data['order_id'], $this->config->get('payment_wspay_order_status_id'), '', true);
+            $this->model_checkout_order->addOrderHistory($this->session->data['order_id'], $this->config->get('payment_wspay_order_status_id'), '', true);
 
-             $order_id =$this->session->data['order_id'];
+            $order_id =$this->session->data['order_id'];
 
-            
 
-               $this->response->redirect($this->url->link('checkout/success', '', 'SSL'));
+
+            $this->response->redirect($this->url->link('checkout/success', '', 'SSL'));
 
         } else if( $posted['Success'] == 1 && $hash !== $posted['Signature'] ){
 
@@ -118,10 +140,10 @@ class ControllerExtensionPaymentWSPay extends Controller {
     }
 
 
- 
 
 
 
-    
+
+
 }
 ?>
