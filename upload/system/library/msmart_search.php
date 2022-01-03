@@ -411,7 +411,7 @@ class Msmart_Search {
 		$conditions = array(
 			'`p`.`date_available` <= NOW()',
 			'`p`.`status` = 1',
-            '`p`.`quantity` = 1',
+            '`p`.`quantity` > 1',
 
 		);
 		
