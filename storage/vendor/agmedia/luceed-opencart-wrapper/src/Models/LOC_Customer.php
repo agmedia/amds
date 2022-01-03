@@ -149,7 +149,7 @@ class LOC_Customer
             'adresa'         => $customer['address'],
             'telefon'        => ($customer['phone'] != '') ? $customer['phone'] : '000',
             'e_mail'         => $customer['email'],
-            'postanski_broj' => $customer['zip']
+            'postanski_broj' => str_replace(' ', '', $customer['zip'])
         ];
     }
 
@@ -171,7 +171,7 @@ class LOC_Customer
                 $this->customer['uid'] = $customer->luceed_uid;
             }
         } else {
-            $this->customer['uid'] = $uid ? $uid : null;
+            $this->customer['uid'] = $uid ?: null;
         }
     }
 
