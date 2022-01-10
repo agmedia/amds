@@ -32,20 +32,22 @@ class ControllerCheckoutSuccess extends Controller {
             $order_id = $this->session->data['order_id'];
             $oc_order = $this->model_checkout_order->getOrder($order_id);
 
-            $order    = new LOC_Order($oc_order);
-            $customer = new LOC_Customer($order->getCustomerData());
+            if (isset($oc_order['luceed_uid']) && ! $oc_order['luceed_uid']) {
+                $order    = new LOC_Order($oc_order);
+                $customer = new LOC_Customer($order->getCustomerData());
 
-            $has_qty = $order->collectProductsFromWarehouses();
+                $has_qty = $order->collectProductsFromWarehouses();
 
-            if ($has_qty) {
-                if ( ! $customer->exist()) {
-                    $customer->store();
-                }
+                if ($has_qty) {
+                    if ( ! $customer->exist()) {
+                        $customer->store();
+                    }
 
-                $sent = $order->setCustomerUid($customer->getUid())->store();
+                    $sent = $order->setCustomerUid($customer->getUid())->store();
 
-                if ( ! $sent) {
-                    $order->recordError();
+                    if ( ! $sent) {
+                        $order->recordError();
+                    }
                 }
             }
             /*******************************************************************************
