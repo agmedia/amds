@@ -37,7 +37,7 @@ class ControllerCheckoutSuccess extends Controller {
             $data['paymethod'] = $oc_order['payment_code'];
             $data['order_id'] = $order_id;
 
-            Log::store($oc_order, 'order');
+
 
             if (empty($oc_order['luceed_uid'])) {
                 $order    = new LOC_Order($oc_order);
