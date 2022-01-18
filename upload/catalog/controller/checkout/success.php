@@ -4,24 +4,27 @@ use Agmedia\LuceedOpencartWrapper\Models\LOC_Customer;
 use Agmedia\LuceedOpencartWrapper\Models\LOC_Order;
 
 class ControllerCheckoutSuccess extends Controller {
-	public function index() {
-		$this->load->language('checkout/success');
+    public function index() {
+        $this->load->language('checkout/success');
 
-		if (isset($this->session->data['order_id'])) {
-			$this->cart->clear();
+        if (isset($this->session->data['order_id'])) {
+            $order_id = $this->session->data['order_id'];
+            unset($this->session->data['order_id']);
 
-			unset($this->session->data['shipping_method']);
-			unset($this->session->data['shipping_methods']);
-			unset($this->session->data['payment_method']);
-			unset($this->session->data['payment_methods']);
-			unset($this->session->data['guest']);
-			unset($this->session->data['comment']);
+            $this->cart->clear();
 
-			unset($this->session->data['coupon']);
-			unset($this->session->data['reward']);
-			unset($this->session->data['voucher']);
-			unset($this->session->data['vouchers']);
-			unset($this->session->data['totals']);
+            unset($this->session->data['shipping_method']);
+            unset($this->session->data['shipping_methods']);
+            unset($this->session->data['payment_method']);
+            unset($this->session->data['payment_methods']);
+            unset($this->session->data['guest']);
+            unset($this->session->data['comment']);
+
+            unset($this->session->data['coupon']);
+            unset($this->session->data['reward']);
+            unset($this->session->data['voucher']);
+            unset($this->session->data['vouchers']);
+            unset($this->session->data['totals']);
 
             /*******************************************************************************
              *                                Copyright : AGmedia                           *
@@ -29,15 +32,14 @@ class ControllerCheckoutSuccess extends Controller {
              *******************************************************************************/
             $this->load->model('checkout/order');
 
-            $order_id = $this->session->data['order_id'];
             $oc_order = $this->model_checkout_order->getOrder($order_id);
 
-            $order_info = $this->model_checkout_order->getOrder($order_id);
-
-            $data['paymethod'] = $order_info['payment_code'];
+            $data['paymethod'] = $oc_order['payment_code'];
             $data['order_id'] = $order_id;
 
-           if (isset($oc_order['luceed_uid']) && ! $oc_order['luceed_uid']) {
+            Log::store($oc_order, 'order');
+
+            if (empty($oc_order['luceed_uid'])) {
                 $order    = new LOC_Order($oc_order);
                 $customer = new LOC_Customer($order->getCustomerData());
 
@@ -58,46 +60,46 @@ class ControllerCheckoutSuccess extends Controller {
             /*******************************************************************************
              *                              END Copyright : AGmedia                         *
              *******************************************************************************/
-		}
+        }
 
-		$this->document->setTitle($this->language->get('heading_title'));
+        $this->document->setTitle($this->language->get('heading_title'));
 
-		$data['breadcrumbs'] = array();
+        $data['breadcrumbs'] = array();
 
-		$data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_home'),
-			'href' => $this->url->link('common/home')
-		);
+        $data['breadcrumbs'][] = array(
+            'text' => $this->language->get('text_home'),
+            'href' => $this->url->link('common/home')
+        );
 
-		$data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_basket'),
-			'href' => $this->url->link('checkout/cart')
-		);
+        $data['breadcrumbs'][] = array(
+            'text' => $this->language->get('text_basket'),
+            'href' => $this->url->link('checkout/cart')
+        );
 
-		$data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_checkout'),
-			'href' => $this->url->link('checkout/checkout', '', true)
-		);
+        $data['breadcrumbs'][] = array(
+            'text' => $this->language->get('text_checkout'),
+            'href' => $this->url->link('checkout/checkout', '', true)
+        );
 
-		$data['breadcrumbs'][] = array(
-			'text' => $this->language->get('text_success'),
-			'href' => $this->url->link('checkout/success')
-		);
+        $data['breadcrumbs'][] = array(
+            'text' => $this->language->get('text_success'),
+            'href' => $this->url->link('checkout/success')
+        );
 
-		if ($this->customer->isLogged()) {
-			$data['text_message'] = sprintf($this->language->get('text_customer'), $this->url->link('account/account', '', true), $this->url->link('account/order', '', true), $this->url->link('account/download', '', true), $this->url->link('information/contact'));
-		} else {
-			$data['text_message'] = sprintf($this->language->get('text_guest'), $this->url->link('information/contact'));
-		}
+        if ($this->customer->isLogged()) {
+            $data['text_message'] = sprintf($this->language->get('text_customer'), $this->url->link('account/account', '', true), $this->url->link('account/order', '', true), $this->url->link('account/download', '', true), $this->url->link('information/contact'));
+        } else {
+            $data['text_message'] = sprintf($this->language->get('text_guest'), $this->url->link('information/contact'));
+        }
 
-		$data['continue'] = $this->url->link('common/home');
+        $data['continue'] = $this->url->link('common/home');
 
-		$data['column_left'] = $this->load->controller('common/column_left');
-		$data['column_right'] = $this->load->controller('common/column_right');
-		$data['content_top'] = $this->load->controller('common/content_top');
-		$data['content_bottom'] = $this->load->controller('common/content_bottom');
-		$data['footer'] = $this->load->controller('common/footer');
-		$data['header'] = $this->load->controller('common/header');
+        $data['column_left'] = $this->load->controller('common/column_left');
+        $data['column_right'] = $this->load->controller('common/column_right');
+        $data['content_top'] = $this->load->controller('common/content_top');
+        $data['content_bottom'] = $this->load->controller('common/content_bottom');
+        $data['footer'] = $this->load->controller('common/footer');
+        $data['header'] = $this->load->controller('common/header');
 
         $this->load->model('account/order');
         // Totals
@@ -109,12 +111,12 @@ class ControllerCheckoutSuccess extends Controller {
 
             if ($total['title']=='Ukupno'){
 
-                $ukupno = $this->currency->format($total['value'], $order_info['currency_code'], $order_info['currency_value']);
+                $ukupno = $this->currency->format($total['value'], $oc_order['currency_code'], $oc_order['currency_value']);
                 $ukupnohub = number_format((float)$total['value'], 2, '.', '');
             }
             $data['totals'][] = array(
                 'title' => $total['title'],
-                'text'  => $this->currency->format($total['value'], $order_info['currency_code'], $order_info['currency_value']),
+                'text'  => $this->currency->format($total['value'], $oc_order['currency_code'], $oc_order['currency_value']),
             );
         }
 
@@ -123,7 +125,7 @@ class ControllerCheckoutSuccess extends Controller {
         /// orderinoend
         if (isset($data['paymethod'])) {
 
-           if ($data['paymethod'] == 'bank_transfer') {
+            if ($data['paymethod'] == 'bank_transfer') {
 
                 $nhs_no = $order_id.''.date("y");
 
@@ -147,9 +149,9 @@ class ControllerCheckoutSuccess extends Controller {
                             'amount' => floatval($ukupnohub),
                             'sender' =>
                                 array (
-                                    'name' => $order_info['payment_firstname'].' '.$order_info['payment_lastname'],
-                                    'street' => $order_info['shipping_address_1'],
-                                    'place' => $order_info['shipping_postcode'].' '.$order_info['shipping_city'],
+                                    'name' => $oc_order['payment_firstname'].' '.$oc_order['payment_lastname'],
+                                    'street' => $oc_order['shipping_address_1'],
+                                    'place' => $oc_order['shipping_postcode'].' '.$oc_order['shipping_city'],
                                 ),
                             'receiver' =>
                                 array (
@@ -174,18 +176,18 @@ class ControllerCheckoutSuccess extends Controller {
                 $ch = curl_init($url);
 
                 # Setting our options
-               curl_setopt($ch, CURLOPT_POST, 1);
-               curl_setopt($ch, CURLOPT_POSTFIELDS, $postString);
-               curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
-               curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-               curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+                curl_setopt($ch, CURLOPT_POST, 1);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $postString);
+                curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 20);
                 # Get the response
 
-               $response = curl_exec($ch);
-               curl_close($ch);
+                $response = curl_exec($ch);
+                curl_close($ch);
 
 
-               $json = json_decode($response);
+                $json = json_decode($response);
 
                 if(isset($json->message)){
                     $this->db->query("UPDATE " . DB_PREFIX . "order SET scanimage = '" . $json->errors[0] . "' WHERE order_id = '" . (int)$order_id . "'");
@@ -222,6 +224,6 @@ class ControllerCheckoutSuccess extends Controller {
 
 
         unset($this->session->data['order_id']);
-		$this->response->setOutput($this->load->view('common/success', $data));
-	}
+        $this->response->setOutput($this->load->view('common/success', $data));
+    }
 }
