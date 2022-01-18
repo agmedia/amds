@@ -105,7 +105,7 @@ class ControllerCheckoutSuccess extends Controller {
         // Totals
         $data['totals'] = array();
 
-        $totals = $this->model_account_order->getOrderTotals($this->session->data['order_id']);
+        $totals = $this->model_account_order->getOrderTotals($order_id);
 
         foreach ($totals as $total) {
 
