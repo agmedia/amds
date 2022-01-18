@@ -32,7 +32,12 @@ class ControllerCheckoutSuccess extends Controller {
             $order_id = $this->session->data['order_id'];
             $oc_order = $this->model_checkout_order->getOrder($order_id);
 
-            if (isset($oc_order['luceed_uid']) && ! $oc_order['luceed_uid']) {
+            $order_info = $this->model_checkout_order->getOrder($order_id);
+
+            $data['paymethod'] = $order_info['payment_code'];
+            $data['order_id'] = $order_id;
+
+           if (isset($oc_order['luceed_uid']) && ! $oc_order['luceed_uid']) {
                 $order    = new LOC_Order($oc_order);
                 $customer = new LOC_Customer($order->getCustomerData());
 
@@ -93,6 +98,129 @@ class ControllerCheckoutSuccess extends Controller {
 		$data['content_bottom'] = $this->load->controller('common/content_bottom');
 		$data['footer'] = $this->load->controller('common/footer');
 		$data['header'] = $this->load->controller('common/header');
+
+        $this->load->model('account/order');
+        // Totals
+        $data['totals'] = array();
+
+        $totals = $this->model_account_order->getOrderTotals($this->session->data['order_id']);
+
+        foreach ($totals as $total) {
+
+            if ($total['title']=='Ukupno'){
+
+                $ukupno = $this->currency->format($total['value'], $order_info['currency_code'], $order_info['currency_value']);
+                $ukupnohub = number_format((float)$total['value'], 2, '.', '');
+            }
+            $data['totals'][] = array(
+                'title' => $total['title'],
+                'text'  => $this->currency->format($total['value'], $order_info['currency_code'], $order_info['currency_value']),
+            );
+        }
+
+
+
+        /// orderinoend
+        if (isset($data['paymethod'])) {
+
+           if ($data['paymethod'] == 'bank_transfer') {
+
+                $nhs_no = $order_id.''.date("y");
+
+                $pozivnabroj = $nhs_no;
+
+                $data['text_message'] = sprintf($this->language->get('text_bank'), $order_id, $ukupno, $pozivnabroj);
+
+                $hubstring = array (
+                    'renderer' => 'image',
+                    'options' =>
+                        array (
+                            "format" => "jpg",
+                            "scale" =>  3,
+                            "ratio" =>  3,
+                            "color" =>  "#2c3e50",
+                            "bgColor" => "#fff",
+                            "padding" => 20
+                        ),
+                    'data' =>
+                        array (
+                            'amount' => floatval($ukupnohub),
+                            'sender' =>
+                                array (
+                                    'name' => $order_info['payment_firstname'].' '.$order_info['payment_lastname'],
+                                    'street' => $order_info['shipping_address_1'],
+                                    'place' => $order_info['shipping_postcode'].' '.$order_info['shipping_city'],
+                                ),
+                            'receiver' =>
+                                array (
+                                    'name' => 'AMO DIZAJN JJ d.o.o.',
+                                    'street' => 'Kamenarka 11',
+                                    'place' => '10010 Zagreb',
+                                    'iban' => 'HR2124840081105798322',
+                                    'model' => '00',
+                                    'reference' => $pozivnabroj,
+                                ),
+                            'purpose' => 'CMDT',
+                            'description' => 'Web narudžba AMDS Jeans',
+                        ),
+                );
+
+
+
+
+                $postString = json_encode($hubstring);
+
+                $url = 'https://hub3.bigfish.software/api/v1/barcode';
+                $ch = curl_init($url);
+
+                # Setting our options
+               curl_setopt($ch, CURLOPT_POST, 1);
+               curl_setopt($ch, CURLOPT_POSTFIELDS, $postString);
+               curl_setopt( $ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
+               curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+               curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+                # Get the response
+
+               $response = curl_exec($ch);
+               curl_close($ch);
+
+
+               $json = json_decode($response);
+
+                if(isset($json->message)){
+                    $this->db->query("UPDATE " . DB_PREFIX . "order SET scanimage = '" . $json->errors[0] . "' WHERE order_id = '" . (int)$order_id . "'");
+                    $data['uplatnica'] = 'error';
+                }
+                else{
+
+                    $response = base64_encode($response);
+                    $data['uplatnica'] = $response;
+                    $this->db->query("UPDATE " . DB_PREFIX . "order SET scanimage = '" . $response . "' WHERE order_id = '" . (int)$order_id . "'");
+
+
+                    $scimg = 'data:image/png;base64,'.$response;
+
+                    list($type, $scimg) = explode(';', $scimg);
+                    list(, $scimg)      = explode(',', $scimg);
+                    $scimg = base64_decode($scimg);
+
+                    file_put_contents(DIR_IMAGE.'tmp/'.$order_id.'.png', $scimg);
+
+                    $data['scan'] = HTTPS_SERVER.'image/tmp/'.$order_id.'.png';
+
+                }
+
+
+            }
+
+
+        }
+
+
+
+
+
+
         unset($this->session->data['order_id']);
 		$this->response->setOutput($this->load->view('common/success', $data));
 	}

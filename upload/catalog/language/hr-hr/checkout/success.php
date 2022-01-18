@@ -14,8 +14,11 @@ $_['text_tnx']           ='Hvala vam na povjerenju!';
 $_['text_pouzece']           = '<p>Uredno smo zaprimili Vašu narudžbu broj  %s</p><p>Naš tim u webshopu će je obraditi u najbržem mogućem roku.</p><p>Podsjećamo Vas da ćete plaćanje obaviti kod kurira naše dostavne službe pri preuzimanju paketa, te Vas molimo ukoliko ste u mogućnosti da pripremite točan iznos novca za Vašu narudžbu.</p>';
 
 $_['text_bank']           = '<p>Uredno smo zaprimili Vašu narudžbu broj %s i zahvaljujemo Vam.</p><p>Molimo vas da izvršite uplatu po sljedećim uputama za plaćanje.</p><p> Rok za uplatu je maksimalno 48h tijekom koga robu koju ste naručili držimo rezerviranu za vas.</p><p> Ukoliko u tom roku ne zaprimimo uplatu, nažalost moramo poništiti ovu narudžbu.</p><p>MOLIMO IZVRŠITE UPLATU U IZNOSU OD %s <br>
-IBAN RAČUN: HR4424070001100582698<br>
-MODEL: 05 POZIV NA BROJ: %s</p>
+IBAN RAČUN: HR2124840081105798322<br>
+MODEL: 00 POZIV NA BROJ: %s</p>
+
+
+
 
 <p>ILI JEDNOSTAVNO POSKENIRAJTE 2D BARKOD</p>';
 
