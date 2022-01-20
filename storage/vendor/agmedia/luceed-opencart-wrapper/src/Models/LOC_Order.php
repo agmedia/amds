@@ -2,6 +2,7 @@
 
 namespace Agmedia\LuceedOpencartWrapper\Models;
 
+use Agmedia\Helpers\Database;
 use Agmedia\Helpers\Log;
 use Agmedia\Kaonekad\Models\ShippingCollector;
 use Agmedia\Luceed\Facade\LuceedProduct;
@@ -12,6 +13,7 @@ use Agmedia\Models\Location;
 use Agmedia\Models\Order\Order;
 use Agmedia\Models\Order\OrderOption;
 use Agmedia\Models\Order\OrderProduct;
+use Agmedia\Models\Order\OrderStatus;
 use Agmedia\Models\Order\OrderTotal;
 use Agmedia\Models\Product\Product;
 use Agmedia\Models\Product\ProductOption;
@@ -28,6 +30,11 @@ class LOC_Order
      * @var Luceed
      */
     private $service;
+
+    /**
+     * @var
+     */
+    private $orders;
 
     /**
      * @var array|null
@@ -90,6 +97,15 @@ class LOC_Order
 
 
     /**
+     * @param $orders
+     */
+    public function setOrders($orders)
+    {
+        $this->orders = collect($this->setLuceedOrders($orders));
+    }
+
+
+    /**
      * @param string $customer_uid
      *
      * @return $this
@@ -120,6 +136,10 @@ class LOC_Order
         // If response ok.
         // Update order uid.
         if (isset($this->response->result[0])) {
+            $created = Order::where('order_id', $this->oc_order['order_id'])->update([
+                'luceed_uid' => $this->response->result[0]
+            ]);
+
             $existing_order = Order::where('order_id', $this->oc_order['order_id'])->first();
 
             if ( ! $this->call_raspis && ! $existing_order->luceed_raspis_uid) {
@@ -141,9 +161,7 @@ class LOC_Order
                 }
             }
 
-            return Order::where('order_id', $this->oc_order['order_id'])->update([
-                'luceed_uid' => $this->response->result[0]
-            ]);
+            return $created;
         }
 
         return false;
@@ -234,6 +252,101 @@ class LOC_Order
         return Order::where('order_id', $this->oc_order['order_id'])->update([
             'luceed_uid' => $this->response->error
         ]);
+    }
+
+
+    /**
+     * @param array|null $statuses
+     *
+     * @return string
+     */
+    public function collectStatuses(array $statuses = null): string
+    {
+        $string = '[';
+
+        if ( ! $statuses) {
+            $statuses = OrderStatus::whereNotNull('luceed_status_id')->get();
+        }
+
+        foreach ($statuses as $status) {
+            $string .= $status->luceed_status_id . ',';
+        }
+
+        return substr($string, 0, -1) . ']';
+    }
+
+
+    /**
+     * @return $this
+     */
+    public function sort()
+    {
+        $statuses = OrderStatus::where('luceed_status_id', '!=', '')->get();
+        $orders   = Order::select('order_id', 'luceed_uid', 'email', 'payment_code', 'order_status_id', 'order_status_changed')
+                         ->where('order_status_id', '!=', 0)
+                         ->get();
+
+        // Check if status have changed.
+        foreach ($orders as $order) {
+            $l_order = $this->orders->where('nalog_prodaje_uid', $order->luceed_uid)->first();
+
+            if ($l_order) {
+                $old_status = $statuses->where('order_status_id', $order->order_status_id)->first();
+                $new_status = $statuses->where('luceed_status_id', $l_order->status)->first();
+
+                if ($l_order->status != $old_status->luceed_status_id) {
+                    $this->collection[] = [
+                        'order_id'     => $order->order_id,
+                        'status_from'  => $old_status->luceed_status_id,
+                        'status_to'    => $l_order->status,
+                        'oc_status_to' => $new_status->order_status_id,
+                        'payment'      => $order->payment_code,
+                        'email'        => $order->email
+                    ];
+                }
+            }
+        }
+
+        if ( ! empty($this->collection)) {
+            // Get the apropriate mail.
+            for ($i = 0; $i < count($this->collection); $i++) {
+                foreach (agconf('mail.' . $this->collection[$i]['payment']) as $key => $item) {
+                    if ($key) {
+                        if ($this->collection[$i]['status_from'] == $item['from'] && $this->collection[$i]['status_to'] == $item['to']) {
+                            $this->collection[$i]['mail'] = $key;
+                        }
+                    }
+                }
+            }
+
+            // Collect update status query.
+            foreach ($this->collection as $item) {
+                $this->query_update_status .= '(' . $item['order_id'] . ', ' . $item['oc_status_to'] . ', NULL, NULL),';
+                $this->query_update_history = '(' . $item['order_id'] . ', ' . $item['oc_status_to'] . ', 1, "", "' . Carbon::now() . '"),';
+            }
+        }
+
+        return $this;
+    }
+
+
+    /**
+     * @return int
+     * @throws \Exception
+     */
+    public function updateStatuses(): int
+    {
+        if ($this->query_update_status != '') {
+            $this->db = new Database(DB_DATABASE);
+
+            $this->db->query("INSERT INTO " . DB_PREFIX . "order_temp (id, status, data_1, data_2) VALUES " . substr($this->query_update_status, 0, -1) . ";");
+            $this->db->query("UPDATE " . DB_PREFIX . "order o INNER JOIN " . DB_PREFIX . "order_temp ot ON o.order_id = ot.id SET o.order_status_id = ot.status, o.order_status_changed = NOW();");
+            $this->db->query("INSERT INTO " . DB_PREFIX . "order_history (order_id, order_status_id, notify, comment, date_added) VALUES " . substr($this->query_update_history, 0, -1) . ";");
+
+            $this->deleteOrderTempDB();
+        }
+
+        return count($this->collection);
     }
 
 
@@ -628,6 +741,15 @@ class LOC_Order
         }
 
         return true;
+    }
+
+
+    /**
+     * @throws \Exception
+     */
+    private function deleteOrderTempDB(): void
+    {
+        $this->db->query("TRUNCATE TABLE `" . DB_PREFIX . "order_temp`");
     }
 
 

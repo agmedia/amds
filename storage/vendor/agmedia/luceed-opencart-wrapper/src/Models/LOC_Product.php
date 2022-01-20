@@ -156,19 +156,8 @@ class LOC_Product
      */
     public function sortForUpdate(string $products = null)
     {
-        /*if ($products) {
-            $products = str_replace('&quot;', '', $products);
-            $products = explode(',', $products);
-            
-            $this->products_to_add = $this->getProducts()->whereIn('artikl', $products);
-            
-            return $this;
-        }*/
         // List of existing product identifiers.
         $this->existing = Product::pluck('model')->toArray();
-        //$products_to_add = $this->getProducts()->whereIn('osnovni__artikl', $this->existing)->values();
-
-        //Log::store($this->existing);
 
         $full_list = $this->getProducts()
                           ->where('artikl', '!=', '')
@@ -187,8 +176,6 @@ class LOC_Product
 
         // Full list of products to update.
         $this->products_to_add = $response;
-
-        //Log::store($response);
         
         return $this;
     }
@@ -209,9 +196,7 @@ class LOC_Product
         $query_str = '';
 
         foreach ($this->products_to_add as $item) {
-
-            if (isset($item->mpc)){
-
+            if (isset($item->mpc)) {
                 $qty_sum = 0;
 
                 if ( ! empty($item->opcije)) {
@@ -220,16 +205,14 @@ class LOC_Product
                     }
                 }
 
-                $stock           = $qty_sum ?: 0;
+                $stock = $qty_sum ?: 0;
+
                 $stock_status_id = $stock ? agconf('import.default_stock_full') : agconf('import.default_stock_empty');
-                $query_str       .= '("' . $item->artikl . '", ' . $item->mpc . ', ' . $stock . ', ' . $stock_status_id . '),';
-
-
+                $query_str       .= '("' . $item->artikl . '", ' . $item->mpc . ', ' . $stock . ', ' . $stock_status_id . ', ' . ($stock > 1) ? 1 : 0 . '),';
             }
-
         }
         
-        $db->query("INSERT INTO " . DB_PREFIX . "product_temp (uid, price, quantity, stock_id) VALUES " . substr($query_str, 0, -1) . ";");
+        $db->query("INSERT INTO " . DB_PREFIX . "product_temp (uid, price, quantity, stock_id, status) VALUES " . substr($query_str, 0, -1) . ";");
         
         // Check wich type of update to conduct.
         // Price and quantity or each individualy?

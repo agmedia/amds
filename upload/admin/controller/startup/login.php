@@ -9,7 +9,8 @@ class ControllerStartupLogin extends Controller {
 			'common/reset',
             'extension/module/luceed_sync/importProducts',
             'extension/module/luceed_sync/importActions',
-            'extension/module/luceed_sync/updatePricesAndQuantities'
+            'extension/module/luceed_sync/updatePricesAndQuantities',
+            'extension/module/luceed_sync/updateOrderStatuses'
 		);
 
 		// User
@@ -29,7 +30,8 @@ class ControllerStartupLogin extends Controller {
 				'error/permission',
                 'extension/module/luceed_sync/importProducts',
                 'extension/module/luceed_sync/importActions',
-                'extension/module/luceed_sync/updatePricesAndQuantities'
+                'extension/module/luceed_sync/updatePricesAndQuantities',
+                'extension/module/luceed_sync/updateOrderStatuses'
 			);
 
 			if (!in_array($route, $ignore) && (!isset($this->request->get['user_token']) || !isset($this->session->data['user_token']) || ($this->request->get['user_token'] != $this->session->data['user_token']))) {

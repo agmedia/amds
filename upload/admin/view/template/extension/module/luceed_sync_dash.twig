@@ -325,18 +325,19 @@
 
     <script type="text/javascript">
         $(() => {
-            //
+            /**
+             *
+             */
             if (localStorage.getItem('sync_updated')) {
                 document.getElementById('luceed-updated').innerHTML = localStorage.getItem('sync_updated') ? localStorage.getItem('sync_updated') : 0;
                 document.getElementById('luceed-inserted').innerHTML = localStorage.getItem('sync_inserted') ? localStorage.getItem('sync_inserted') : 0;
                 document.getElementById('luceed-error').innerHTML = localStorage.getItem('sync_error') ? localStorage.getItem('sync_error') : 0;
                 document.getElementById('luceed-deleted').innerHTML = localStorage.getItem('sync_deleted') ? localStorage.getItem('sync_deleted') : 0;
             }
-
-            //
+            /**
+             *
+             */
             $('#import-luceed-products').on('click', e => { callApi(e, 'importLuceedProducts'); });
-
-
             //
             $('#import-new-categories')     .on('click', e => { callApi(e, 'importCategories'); });
             $('#update-categories')         .on('click', e => { callApi(e, 'updateCategories'); });
@@ -351,15 +352,17 @@
             $('#update-prices-quantities')  .on('click', e => { callApi(e, 'updatePricesAndQuantities'); });
             $('#update-prices')             .on('click', e => { callApi(e, 'updatePrices'); });
             $('#update-quantities')         .on('click', e => { callApi(e, 'updateQuantities'); });
-
+            //
             $('#update-order-statuses')     .on('click', e => { callApi(e, 'updateOrderStatuses'); });
             $('#duration-order-statuses')   .on('click', e => { callApi(e, 'checkOrderStatusDuration'); });
-
+            //
             $('#import-initial-manufacturer').on('click', e => { callApi(e, 'importInitialManufacturers'); });
             $('#import-initial-customers')   .on('click', e => { callApi(e, 'importInitialCustomers'); });
         });
 
-
+        /**
+         *
+         */
         function updateList() {
             lockTarget('u', $('#btn-updating-list'));
 
@@ -375,6 +378,9 @@
             });
         }
 
+        /**
+         *
+         */
         function checkRevisionList() {
             lockTarget('u', $('#btn-check-list'));
 
