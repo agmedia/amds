@@ -1,7 +1,7 @@
 {
     "1": {
-        "subject": "Chipoteka.hr - Narudžba broj %s je zaprimljena",
-        "text": "<p style=\"color: inherit;font-family: Arial, Helvetica, sans-serif;margin-top: 0px;margin-bottom: 15px;word-break: break-word;font-size: 16px;line-height: 26px;\">Po&scaron;tovani/a,</p>\n\n<p style=\"color: inherit;font-family: Arial, Helvetica, sans-serif;margin-top: 0px;margin-bottom: 15px;word-break: break-word;font-size: 16px;line-height: 26px;\">zahvaljujemo Vam na Va&scaron;oj narudžbi. Uplatu kao i narudžbu smo uredno zaprimili i na&scaron; tim u webshopu će je obraditi u najbržem mogućem roku.</p>",
+        "subject": "amds.hr - Narudžba broj %s je poslanaa",
+        "text": "<p style=\"color: inherit;font-family: Arial, Helvetica, sans-serif;margin-top: 0px;margin-bottom: 15px;word-break: break-word;font-size: 16px;line-height: 26px;\">Po&scaron;tovani/a,</p>\n\n<p style=\"color: inherit;font-family: Arial, Helvetica, sans-serif;margin-top: 0px;margin-bottom: 15px;word-break: break-word;font-size: 16px;line-height: 26px;\">pokrenuta je isporuka Vaše narudžbe br. %s . Daljnje informacije o isporuci dobit ćete od dostavne službe.\n\nHvala Vam na kupnji,\n\nVaš AMSD tim</p>",
         "data": "1"
     }
 }

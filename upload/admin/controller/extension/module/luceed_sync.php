@@ -573,11 +573,13 @@ class ControllerExtensionModuleLuceedSync extends Controller
                 $data['products'][$i]['image'] = HTTPS_CATALOG . 'image/' . Product::where('product_id', $data['products'][$i]['product_id'])->pluck('image')->first();
             }
 
-            $data['mail_logo']          = HTTPS_CATALOG . 'image/chipoteka-hd.png';
+            $data['mail_logo']          = HTTPS_CATALOG . 'image/catalog/logo.png';
             $data['mail_title']         = sprintf($email['subject'], $order['order_id']);
             $data['mail_data']          = $email['data'];
             $nhs_no                     = $order['order_id'] . date("ym");
             $data['mail_poziv_na_broj'] = $nhs_no . $this->mod11INI($nhs_no);
+
+            $data['mail_order_id']         =  $order['order_id'];
 
             $mail                = new Mail($this->config->get('config_mail_engine'));
             $mail->parameter     = $this->config->get('config_mail_parameter');
