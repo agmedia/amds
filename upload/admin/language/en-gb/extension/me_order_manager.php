@@ -270,7 +270,6 @@ $_['error_filetype']             = 'Invalid file type!';
 $_['error_order_id']             = 'Warning: Please select alteast one order!';
 
 $_['heading_title']              = 'Narudžbe';
-
 // Text
 $_['text_success']               = 'Uspješno: Napravili ste promjene u narudžbama!';
 $_['text_list']                  = 'Popis/lista narudžbi';
