@@ -393,7 +393,6 @@ $_['entry_order_id']             = 'Broj narudžbe';
 $_['entry_total']                = 'Ukupno';
 $_['entry_date_added']           = 'Datum dodavanja';
 $_['entry_date_modified']        = 'Datum izmjene';
-
 // Help
 $_['help_override']              = 'Ako je narudžba kupca blokirana za promjene statusa narudžbe zbog Borba protiv prijevara (Anti-Fraud) proširenja omogućite opciju Nadjačaj.';
 
