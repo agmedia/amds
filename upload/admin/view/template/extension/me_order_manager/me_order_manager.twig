@@ -1,0 +1,1247 @@
+{{ header }}
+<link href="view/javascript/me_order_manager/style.css" rel="stylesheet">
+<link href="view/javascript/me_order_manager/multiselect.css" rel="stylesheet">
+<script src="view/javascript/me_order_manager/multiselect.min.js"></script>
+{{ column_left }}
+<div id="content">
+<div class="page-header">
+  <div class="container-fluid">
+    <div class="pull-right">
+	  {% if order_manager_setting.exportorderbtn %}
+      <a type="button" data-toggle="tooltip" title="{{ button_export }}" id="button-export" class="btn btn-warning"><i class="fa fa-download"></i></a>
+	  {% endif %}
+      <a href="{{ settings }}" data-toggle="tooltip" title="{{ button_setting }}" class="btn btn-success"><i class="fa fa-cogs"></i></a>
+	  {% if order_manager_setting.bulkshippingbtn %}
+      <button type="submit" id="button-shipping" form="form-order" formaction="{{ shipping }}" formtarget="_blank" data-toggle="tooltip" title="{{ button_shipping_print }}" class="btn btn-info"><i class="fa fa-truck"></i></button>
+	  {% endif %}
+	  {% if order_manager_setting.bulkinvoicebtn %}
+      <button type="submit" id="button-invoice" form="form-order" formaction="{{ invoice }}" formtarget="_blank" data-toggle="tooltip" title="{{ button_invoice_print }}" class="btn btn-info"><i class="fa fa-print"></i></button>
+	  {% endif %}
+      <a href="#" data-toggle="tooltip" title="{{ button_add }}" class="btn btn-primary btn-orderadd"><i class="fa fa-plus"></i></a> 
+	  {% if order_manager_setting.bulkdeletebtn %}
+      <button type="button" id="button-delete" form="form-order" formaction="{{ delete }}" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger" onclick="confirm('{{ text_confirm }}') ? $('#form-order').submit() : false;"><i class="fa fa-trash-o"></i></button>
+	  {% endif %}
+	  </div>
+    <h1>{{ heading_title }}</h1>
+    <ul class="breadcrumb">
+      {% for breadcrumb in breadcrumbs %}
+      <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>
+<div class="container-fluid">{% if error_warning %}
+  <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+  </div>
+  {% endif %}
+  {% if success %}
+  <div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> {{ success }}
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+  </div>
+  {% endif %}
+	<div class="panel panel-default">
+        <div class="panel-heading">
+          <h3 class="panel-title"><i class="fa fa-filter"></i> {{ text_list }} <ul class="list-inline count_orders"><li>{{ text_orders }}: <strong>{{ order_total }}</strong></li><li>{{ text_orders_total }} : <strong>{{ sum_order_total }}</strong></li></ul></h3>
+		  {% if order_manager_filter.status %}
+		  <div class="pull-right"><a href="javascript:void(0);" data-toggle="tooltip" title="{{ button_hide_filter }}" class="toggle-btn"><i class="fa fa-th"></i></a></div>
+		  {% endif %}
+        </div>
+        <div class="panel-body">
+			{% if order_manager_setting.total_orders and total_orders %}
+			<ul class="list-inline total_orders">
+				{% for total_order in total_orders %}
+					<li><a href="{{ total_order.href }}"><span class="label pull-right" style="background-color:{% if total_order.bgcolor %}{{ total_order.bgcolor }}{% else %}#2f2f2f{% endif %};color:{% if total_order.color %}{{ total_order.color }}{% else %}#fff{% endif %}">{{ total_order.total }}</span><span>{{ total_order.name }}</span></a></li>
+				{% endfor %}
+			</ul>
+			{% endif %}
+			{% if order_manager_filter.status %}
+			<div class="well well-sm filters">
+				<div class="row">
+					{% if order_manager_filter.order_id %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-order-id">{{ entry_order_id }}</label>
+							<input type="text" name="filter_order_id" value="{{ filter_order_id }}" placeholder="{{ entry_order_id }}" id="input-order-id" class="form-control input-sm" />
+						</div>
+					</div>
+					{% endif %}
+					{% if order_manager_filter.customer %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-customer">{{ entry_customer }}</label>
+							<input type="text" name="filter_customer" value="{{ filter_customer }}" placeholder="{{ entry_customer }}" id="input-customer" class="form-control input-sm" />
+						</div>
+					</div>
+					{% endif %}
+					{% if order_manager_filter.customeremail %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-customeremail">{{ entry_customer_email }}</label>
+							<input type="text" name="filter_customeremail" value="{{ filter_customeremail }}" placeholder="{{ entry_customer_email }}" id="input-customeremail" class="form-control input-sm" />
+						</div>
+					</div>
+					{% endif %}
+					{% if order_manager_filter.customertelephone %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-customertelephone">{{ entry_customer_telephone }}</label>
+							<input type="text" name="filter_customer_telephone" value="{{ filter_customer_telephone }}" placeholder="{{ entry_customer_telephone }}" id="input-customertelephone" class="form-control input-sm" />
+						</div>
+					</div>
+					{% endif %}
+					{% if order_manager_filter.product %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-product">{{ entry_products }}</label>
+							<input type="text" name="filter_product" value="{{ filter_product }}" placeholder="{{ entry_products }}" id="input-product" class="form-control input-sm" />
+						</div>
+					</div>
+					{% endif %}
+					{% if order_manager_filter.order_status %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-order-status">{{ entry_order_status }}</label>
+							<select name="filter_order_status_id[]" id="input-order-status" class="form-control input-sm" multiple>
+							  {% if 0 in filter_order_status_id %}
+							  <option value="0" selected="selected">{{ text_missing }}</option>
+							  {% else %}
+							  <option value="0">{{ text_missing }}</option>
+							  {% endif %}
+							  {% for order_status in order_statuses %}
+							  {% if order_status.order_status_id in filter_order_status_id %}
+							  <option value="{{ order_status.order_status_id }}" selected="selected">{{ order_status.name }}</option>
+							  {% else %}
+							  <option value="{{ order_status.order_status_id }}">{{ order_status.name }}</option>
+							  {% endif %}
+							  {% endfor %}
+							</select>
+						</div>
+					</div>
+					{% endif %}
+					{% if order_manager_filter.total %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-total">{{ entry_total }}</label>
+							<input type="text" name="filter_total" value="{{ filter_total }}" placeholder="{{ entry_total }}" id="input-total" class="form-control input-sm" />
+						</div>
+					</div>
+					{% endif %}
+					{% if order_manager_filter.date_added %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-date-added">{{ entry_date_added }}</label>
+							<div class="input-group date input-group-sm">
+							  <input type="text" name="filter_date_added" value="{{ filter_date_added }}" placeholder="{{ entry_date_added }}" data-date-format="YYYY-MM-DD" id="input-date-added" class="form-control" />
+							  <span class="input-group-btn">
+							  <button type="button" class="btn btn-default"><i class="fa fa-calendar"></i></button>
+							  </span> </div>
+						</div>
+					</div>
+					{% endif %}
+					{% if order_manager_filter.date_modified %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-date-modified">{{ entry_date_modified }}</label>
+							<div class="input-group date input-group-sm">
+							  <input type="text" name="filter_date_modified" value="{{ filter_date_modified }}" placeholder="{{ entry_date_modified }}" data-date-format="YYYY-MM-DD" id="input-date-modified" class="form-control" />
+							  <span class="input-group-btn">
+							  <button type="button" class="btn btn-default"><i class="fa fa-calendar"></i></button>
+							  </span> </div>
+						</div>
+					</div>
+					{% endif %}
+					{% if order_manager_filter.payment_method %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-payment_method">{{ entry_payment_method }}</label>
+							<select name="filter_payment_method" id="input-payment_method" class="form-control input-sm">
+							<option value="">{{ text_select }}</option>
+								{% for payment_method in payment_methods %}
+								<option value="{{ payment_method.code }}" {% if payment_method.code == filter_payment_method %}selected="selected"{% endif %}>{{ payment_method.name }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					{% endif %}
+					{% if order_manager_filter.shipping_method %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-shipping_method">{{ entry_shipping_method }}</label>
+							<select name="filter_shipping_method" id="input-shipping_method" class="form-control input-sm">
+							<option value="">{{ text_select }}</option>
+								{% for shipping_method in shipping_methods %}
+								<option value="{{ shipping_method.code }}" {% if shipping_method.code == filter_shipping_method %}selected="selected"{% endif %}>{{ shipping_method.name }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					{% endif %}
+					{% if order_manager_filter.customer_group %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-customer_group">{{ entry_customer_group }}</label>
+							<select name="filter_customer_group" id="input-customer_group" class="form-control input-sm">
+							<option value="">{{ text_select }}</option>
+								{% for customer_group in customer_groups %}
+								<option value="{{ customer_group.customer_group_id }}" {% if customer_group.customer_group_id == filter_customer_group %}selected="selected"{% endif %}>{{ customer_group.name }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					{% endif %}
+					{% if order_manager_filter.store %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-store">{{ entry_store }}</label>
+							<select name="filter_store" id="input-store" class="form-control input-sm">
+							<option value="">{{ text_select }}</option>
+								{% for store in stores %}
+								<option value="{{ store.store_id }}" {% if store.store_id == filter_store and filter_store is not null %}selected="selected"{% endif %}>{{ store.name }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					{% endif %}
+					{% if order_manager_filter.payment_country %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-pcountry">{{ entry_payment_country }}</label>
+							<select name="filter_payment_country" id="input-pcountry" class="form-control input-sm">
+							<option value="">{{ text_select }}</option>
+								{% for country in countries %}
+								<option value="{{ country.country_id }}" {% if country.country_id == filter_payment_country %}selected="selected"{% endif %}>{{ country.name }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					{% endif %}
+					{% if order_manager_filter.shipping_country %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-scountry">{{ entry_shipping_country }}</label>
+							<select name="filter_shipping_country" id="input-scountry" class="form-control input-sm">
+							<option value="">{{ text_select }}</option>
+								{% for country in countries %}
+								<option value="{{ country.country_id }}" {% if country.country_id == filter_shipping_country %}selected="selected"{% endif %}>{{ country.name }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					{% endif %}
+					{% if order_manager_filter.shippingstate %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-state">{{ entry_shippingstate }}</label>
+							<select name="filter_shipping_zone" id="input-state" class="form-control input-sm">
+							<option value="">{{ text_select }}</option>
+								{% for zone in zones %}
+								<option value="{{ zone.zone_id }}" {% if zone.zone_id == filter_shipping_zone %}selected="selected"{% endif %}>{{ zone.name }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					{% endif %}
+					{% if order_manager_filter.carrier_name %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-carrier_name">{{ entry_carrier_name }}</label>
+							<select name="filter_carrier_name" id="input-carrier-name" class="form-control input-sm">
+								<option value="">{{ text_select }}</option>
+								{% for carrier in order_manager_setting_tracking.carrier %}
+								<option value="{{ carrier.name }}" {% if carrier.name == filter_carrier_name %}selected="selected"{% endif %}>{{ carrier.name }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					{% endif %}
+					{% if order_manager_filter.tracking_code %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-tracking_code">{{ entry_tracking_number }}</label>
+							<input type="text" name="filter_tracking_code" value="{{ filter_tracking_code }}" placeholder="{{ entry_tracking_number }}" id="input-tracking_code" class="form-control input-sm" />
+						</div>
+					</div>
+					{% endif %}
+					{% if order_manager_filter.currency %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-currency">{{ entry_currency }}</label>
+							<select name="filter_currency" id="input-currency" class="form-control input-sm">
+								<option value="">{{ text_select }}</option>
+								{% for currency in currencies %}
+								<option value="{{ currency.currency_id }}" {% if currency.currency_id == filter_currency %}selected="selected"{% endif %}>{{ currency.code }}</option>
+								{% endfor %}
+							</select>
+						</div>
+					</div>
+					{% endif %}
+					{% if order_manager_filter.ip %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-ip">{{ entry_ip }}</label>
+							<input type="text" name="filter_ip" value="{{ filter_ip }}" placeholder="{{ entry_ip }}" id="input-ip" class="form-control input-sm" />
+						</div>
+					</div>
+					{% endif %}
+					{% if order_manager_filter.display_limit %}
+					<div class="col-sm-2">
+						<div class="form-group">
+							<label class="control-label" for="input-limit">{{ entry_limit }}</label>
+							<input type="text" name="limit" value="{{ limit ? limit : order_manager_filter.limit }}" placeholder="{{ entry_limit }}" id="input-limit" class="form-control input-sm" />
+						</div>
+					</div>
+					{% endif %}
+					<div class="col-sm-2">
+						<br/><br/>
+						<a id="button-clear" href="{{ action }}" class="btn btn-danger btn-sm"><i class="fa fa-eraser"></i> {{ text_clear }}</a>
+						<button type="button" id="button-filter" class="btn btn-info btn-sm"><i class="fa fa-filter"></i> {{ text_filter }}</button>
+						<br/><br/>
+					</div>
+					{% if order_manager_setting.bulkorderstatus %}
+					<div class="col-sm-2">
+						<div class="form-group">
+						<label class="control-label" for="input-bulk-status">{{ entry_bulk_update_status }}</label>
+						<a id="button-order_history" data-toggle="modal" data-target="#quickorderhistory" class="btn btn-primary btn-sm"><i class="fa fa-comment"></i> {{ text_add_order_history }}</a>
+					  </div>
+					</div>
+					{% endif %}
+				</div>
+			</div>
+			{% endif %}
+			<form method="post" action="{{ delete }}" enctype="multipart/form-data" id="form-order">
+				<div class="table-responsive">
+				  <table class="table table-bordered table-hover">
+					<thead>
+						<tr>
+						  <td style="width: 1px;" class="text-center"><input type="checkbox" class="selectall" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" /></td>
+						  {% set colspan = 1 %}
+						  {% for key,column in order_manager_column %}
+							  {% if column.status %}
+							<td>{% if sort == key %}
+							<a href="{{ column.sort }}" class="{{ order|lower }}">{{ column.name }}</a>
+							{% else %}
+							<a href="{{ column.sort }}">{{ column.name }}</a>
+							{% endif %}</td>
+							{% set colspan = colspan+1 %}
+							{% endif %}
+							{% endfor %}
+							{% if order_manager_setting.quickviewbtn or order_manager_setting.invoicebtn or order_manager_setting.editbtn or order_manager_setting.deletebtn %}
+							{% set colspan = colspan+1 %}
+							<td class="text-right" style="min-width:120px;">{{ text_action }}</td>
+							{% endif %}
+						</tr>
+					</thead>
+					<tbody>
+					{% if orders %}
+					{% for order in orders %}
+					<tr id="order{{ order.order_id }}">
+					  <td class="text-center"> {% if order.order_id in selected %}
+						<input type="checkbox" name="selected[]" value="{{ order.order_id }}" checked="checked" />
+						{% else %}
+						<input type="checkbox" name="selected[]" value="{{ order.order_id }}" />
+						{% endif %}
+						<input type="hidden" name="shipping_code[]" value="{{ order.shipping_code }}" /></td>
+						{% for key,column in order_manager_column %}
+						{% if column.status %}
+						{% if key == 'order_id' %}
+							<td class="text-left order_id">{{ order.order_id }}</td>
+						{% endif %}
+						{% if key == 'invoice_no' %}
+							<td class="text-left invoice_no">{% if not order.invoice_no and order_manager_setting.geninvoicebtn %}<a data-loading-text="{{ text_loading }}" data-toggle="tooltip" title="{{ button_generate }}" rel="{{ order.order_id }}" class="btn btn-success btn-xs button-generate-invoice"><i class="fa fa-cog"></i> {{ button_generate }}</a>{% else %}{{ order.invoice_prefix }}{{ order.invoice_no }}{% endif %}</td>
+						{% endif %}
+						{% if key == 'invoice_prefix' %}
+							<td class="text-left invoice_prefix">{{ order.invoice_prefix }}</td>
+						{% endif %}
+						{% if key == 'store' %}
+							<td class="text-left store_name">{% if order.store_url %}<a href="{{ order.store_url }}">{{ order.store_name }}</a>{% else %}{{ order.store_name }}{% endif %}</td>
+						{% endif %}
+						{% if key == 'customer' %}
+							<td class="text-left customer">{{ order.customer }}<br/>{{ order.email }}<br/>{{ order.telephone }}</td>
+						{% endif %}
+						{% if key == 'customer_type' %}
+							<td class="text-center customer_type">{% if order.customer_type %}<span class="label label-success">{{ text_registered }}</span>{% else %}<span class="label label-danger">{{ text_guest }}</span>{% endif %}</td>
+						{% endif %}
+						{% if key == 'customer_group' %}
+							<td class="text-left customer_group">{{ order.customer_group }}</td>
+						{% endif %}
+						{% if key == 'order_status' %}
+							<td class="text-center order_status"><span {% if order.bgcolor %}class="label"{% endif %} style="background-color:{{ order.bgcolor }};color:{{ order.color }}">{{ order.order_status }}</span></td>
+						{% endif %}
+						{% if key == 'total' %}
+							<td class="text-right total">{{ order.total }}</td>
+						{% endif %}
+						{% if key == 'order_weight' %}
+							<td class="text-right order_weight">{{ order.order_weight }}</td>
+						{% endif %}
+						{% if key == 'tracking_code' %}
+							<td class="text-center tracking_code">{% if order.tracking_url %}<a href="{{ order.tracking_url }}" target="_new">{% if order.carrier_name %}{{ order.carrier_name }} -  {{ order.tracking_code }}{% endif %}</a>{% else %}{% if order.carrier_name %}{{ order.carrier_name }} -  {{ order.tracking_code }}{% endif %}{% endif %}</td>
+						{% endif %}
+						{% if key == 'payment_address' %}
+							<td class="payment_address">{{ order.payment_address }}</td>
+						{% endif %}
+						{% if key == 'payment_method' %}
+							<td class="payment_method">{{ order.payment_method }}</td>
+						{% endif %}
+						{% if key == 'shipping_address' %}
+							<td class="shipping_address">{{ order.shipping_address }}</td>
+						{% endif %}
+						{% if key == 'shipping_method' %}
+							<td class="shipping_method">{{ order.shipping_method }}</td>
+						{% endif %}
+						{% if key == 'comment' %}
+							<td class="comment">{{ order.comment }}</td>
+						{% endif %}
+						{% if key == 'language' %}
+							<td class="language_code">{{ order.language_code }}</td>
+						{% endif %}
+						{% if key == 'currency' %}
+							<td class="currency_code">{{ order.currency_code }}</td>
+						{% endif %}
+						{% if key == 'affiliate' %}
+							<td class="affiliate">{{ order.affiliate }}</td>
+						{% endif %}
+						{% if key == 'ip' %}
+							<td class="ip">{{ order.ip }}</td>
+						{% endif %}
+						{% if key == 'product' %}
+							<td class="text-center product">
+							{% if order_manager_setting.displayproducts %}
+								<a type="button" class="btn btn-primary btn-xs btn-product" onclick="getproduct('{{ order.order_id }}');">{{ order.totalproducts }} {{ text_products }}</a>
+							{% else %}
+								<div class="table-responsive">
+									<table class="table table-bordered table-hover">
+										<thead>
+											<tr>
+												<td class="text-left">{{ column_image }}</td>
+												<td class="text-left">{{ column_product }}</td>
+												<td class="text-left">{{ column_model }}</td>
+												<td class="text-right">{{ column_price }}</td>
+												<td class="text-right">{{ column_total }}</td>
+											</tr>
+										</thead>
+										<tbody>
+										{% for product in order.products %}
+											<tr>
+											<td><img src="{{ product.image }}" class="img-responsive"></td>
+											<td class="text-left">{{ product.name }}
+											{% if product.option %}
+												<br />
+												{% for option in product.option %}
+													<br />
+													{% if option.type != 'file' %}
+														&nbsp;<small> - {{ option.name }}: {{ option.value }}</small>
+													{% else %}
+														&nbsp;<small> - {{ option.name }}: <a href="{{ option.href }}">{{ option.value }}</a></small>
+													{% endif %}
+												{% endfor %}
+											{% endif %}
+											</td>
+											<td class="text-left">{{ product.model }}</td>
+											<td class="text-right">{{ product.price }} x {{ product.quantity }}</td>
+											<td class="text-right">{{ product.total }}</td>
+											</tr>
+										{% endfor %}
+										</tbody>
+									</table>
+								</div>
+							{% endif %}
+							</td>
+						{% endif %}
+						{% if key == 'coupon' %}
+							<td class="coupon">{% if order.couponvoucher.coupon %}{{ order.couponvoucher.coupon }}{% endif %}</td>
+						{% endif %}
+						{% if key == 'voucher' %}
+							<td class="voucher">{% if order.couponvoucher.voucher %}{{ order.couponvoucher.voucher }}{% endif %}</td>
+						{% endif %}
+						{% if key == 'reward' %}
+							<td class="reward">{% if order.couponvoucher.reward %}{{ order.couponvoucher.reward }}{% endif %}</td>
+						{% endif %}
+						{% if key == 'date_added' %}
+							<td class="text-right date_added">{{ order.date_added }}</td>
+						{% endif %}
+						{% if key == 'date_modified' %}
+							<td class="text-right date_modified">{{ order.date_modified }}</td>
+						{% endif %}
+						{% endif %}
+						{% endfor %}
+						{% if order_manager_setting.quickviewbtn or order_manager_setting.invoicebtn or order_manager_setting.editbtn or order_manager_setting.deletebtn %}
+						<td class="text-right">
+							{% if order_manager_setting.quickviewbtn %}
+							<a href="#" data-toggle="tooltip" title="{{ button_quick_view }}" class="btn btn-info btn-sm btn-quickview" rel="{{ order.order_id }}"><i class="fa fa-eye"></i></a>
+							{% endif %}
+							{% if order_manager_setting.invoicebtn %}
+							<a href="{{ order.invoice }}" data-toggle="tooltip" title="{{ button_invoice }}" target="_new" class="btn btn-success btn-sm"><i class="fa fa-print"></i></a>
+							{% endif %}
+							{% if order_manager_setting.editbtn %}
+							<a href="#" data-toggle="tooltip" title="{{ button_edit }}" class="btn btn-primary btn-sm btn-quickedit" rel="{{ order.order_id }}"><i class="fa fa-pencil"></i> </a>
+							{% endif %}
+							{% if order_manager_setting.deletebtn %}
+							<a href="{{ order.order_id }}" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger btn-sm btn-delete"><i class="fa fa-trash-o"></i> </a>
+							{% endif %}
+						</td>
+						{% endif %}
+					</tr>
+					{% endfor %}
+					{% else %}
+					<tr>
+					  <td class="text-center" colspan="{{ colspan }}">{{ text_no_results }}</td>
+					</tr>
+					{% endif %}
+					  </tbody>
+					
+				  </table>
+				</div>
+			</form>
+		</div>
+    </div>
+  <div class="row">
+	<div class="col-sm-6 text-left">{{ pagination }}</div>
+	<div class="col-sm-6 text-right">{{ results }}</div>
+  </div>
+</div>
+</div>
+<div id="orderquickview"></div>
+<div id="orderquickedit"></div>
+<div class="modal fade" id="quickorderhistory" tabindex="-1" role="dialog" aria-labelledby="order_history" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title pull-left" id="order_history">{{ entry_order_history }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+		<div class="modal-body">
+			<form method="post" enctype="multipart/form-data" id="form-order_history" class="form-horizontal">
+				<div class="form-group">
+				  <label class="col-sm-2 control-label" for="input-order-status">{{ entry_order_status }}</label>
+				  <div class="col-sm-10">
+					<select name="order_status_id" id="input-order-status" class="form-control">
+					   {% for order_statuses in order_statuses %}
+					  {% if order_statuses.order_status_id == order_manager_setting_active_orderstatus %}
+					   <option value="{{ order_statuses.order_status_id }}" selected="selected">{{ order_statuses.name }}</option>
+					  {% else %}
+					  <option value="{{ order_statuses.order_status_id }}">{{ order_statuses.name }}</option>
+					  
+					  {% endif %}
+					  {% endfor %}
+					</select>
+				  </div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="input-override"><span data-toggle="tooltip" title="{{ help_override }}">{{ entry_override }}</span></label>
+					<div class="col-sm-3">
+						<div class="checkbox">
+						  <input type="checkbox" name="override" value="1" id="input-override" />
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label class="col-sm-2 control-label" for="input-notify">{{ entry_notify }}</label>
+					<div class="col-sm-3">
+						<div class="checkbox">
+						  <input type="checkbox" name="notify" value="1" id="input-notify" />
+						</div>
+					</div>
+				</div>
+				<div class="form-group">
+				  <label class="col-sm-2 control-label" for="input-comment">{{ entry_comment }}</label>
+				  <div class="col-sm-8">
+					<textarea name="comment" rows="5" id="input-comment" class="form-control">{% if order_status_message.status %}{{ order_status_message.comment }}{% endif %}</textarea>
+				  </div>
+				  <div class="col-sm-2">
+					<p><strong>Shortcodes:</strong><br/>
+					{order_id}
+					{firstname}
+					{lastname}
+					{order_status}
+					{date_added}
+					</p>
+				  </div>
+				</div>
+			</form>
+		</div>
+		<div class="modal-footer">
+			<button data-loading-text="{{ text_loading }}" class="btn btn-primary" id="addorderhistory"><i class="fa fa-plus-circle"></i> {{ button_history_add }}</button>
+		</div>	
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="fieldmanager" tabindex="-1" role="dialog" aria-labelledby="fieldname" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title pull-left" id="fieldname">{{ entry_field_manager }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+		 <form method="post" enctype="multipart/form-data" id="form-field">
+			  
+		  </form>
+		</div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript"><!--
+$('select[multiple]').multiselect({
+    columns: 1,
+    placeholder: '{{ entry_order_status }}',
+    search: true,
+    selectAll: false
+});
+
+$('#button-filter').on('click', function() {
+	url = '';
+	
+	{% if order_manager_filter.order_id %}
+	var filter_order_id = $('input[name=\'filter_order_id\']').val();
+
+	if (filter_order_id) {
+		url += '&filter_order_id=' + encodeURIComponent(filter_order_id);
+	}
+	{% endif %}
+	{% if order_manager_filter.product %}
+	var filter_product = $('input[name=\'filter_product\']').val();
+
+	if (filter_product) {
+		url += '&filter_product=' + encodeURIComponent(filter_product);
+	}
+	{% endif %}
+	{% if order_manager_filter.customer %}
+	var filter_customer = $('input[name=\'filter_customer\']').val();
+
+	if (filter_customer) {
+		url += '&filter_customer=' + encodeURIComponent(filter_customer);
+	}
+	{% endif %}
+	{% if order_manager_filter.customeremail %}
+	var filter_customeremail = $('input[name=\'filter_customeremail\']').val();
+
+	if (filter_customeremail) {
+		url += '&filter_customeremail=' + encodeURIComponent(filter_customeremail);
+	}
+	{% endif %}
+	{% if order_manager_filter.customertelephone %}
+	var filter_customer_telephone = $('input[name=\'filter_customer_telephone\']').val();
+
+	if (filter_customer_telephone) {
+		url += '&filter_customer_telephone=' + encodeURIComponent(filter_customer_telephone);
+	}
+	{% endif %}
+	{% if order_manager_filter.order_status %}
+	var filter_order_status_id = $('select[name^=\'filter_order_status_id\']').val();
+
+	if (filter_order_status_id !== '' && filter_order_status_id != null) {
+		url += '&filter_order_status_id=' + encodeURIComponent(filter_order_status_id);
+	}
+	{% endif %}
+	{% if order_manager_filter.payment_country %}
+	var filter_payment_country = $('select[name=\'filter_payment_country\']').val();
+
+	if (filter_payment_country !== '') {
+		url += '&filter_payment_country=' + encodeURIComponent(filter_payment_country);
+	}
+	{% endif %}
+	{% if order_manager_filter.shipping_country %}
+	var filter_shipping_country = $('select[name=\'filter_shipping_country\']').val();
+
+	if (filter_shipping_country !== '') {
+		url += '&filter_shipping_country=' + encodeURIComponent(filter_shipping_country);
+	}
+	{% endif %}
+	{% if order_manager_filter.currency %}
+	var filter_currency = $('select[name=\'filter_currency\']').val();
+
+	if (filter_currency !== '') {
+		url += '&filter_currency=' + encodeURIComponent(filter_currency);
+	}
+	{% endif %}
+	{% if order_manager_filter.payment_method %}
+	var filter_payment_method = $('select[name=\'filter_payment_method\']').val();
+
+	if (filter_payment_method !== '') {
+		url += '&filter_payment_method=' + encodeURIComponent(filter_payment_method);
+	}
+	{% endif %}
+	{% if order_manager_filter.shipping_method %}
+	var filter_shipping_method = $('select[name=\'filter_shipping_method\']').val();
+
+	if (filter_shipping_method !== '') {
+		url += '&filter_shipping_method=' + encodeURIComponent(filter_shipping_method);
+	}
+	{% endif %}
+	{% if order_manager_filter.customer_group %}
+	var filter_customer_group = $('select[name=\'filter_customer_group\']').val();
+
+	if (filter_customer_group !== '') {
+		url += '&filter_customer_group=' + encodeURIComponent(filter_customer_group);
+	}
+	{% endif %}
+	{% if order_manager_filter.store %}
+	var filter_store = $('select[name=\'filter_store\']').val();
+
+	if (filter_store !== '') {
+		url += '&filter_store=' + encodeURIComponent(filter_store);
+	}
+	{% endif %}
+	{% if order_manager_filter.shippingstate %}
+	var filter_shipping_zone = $('select[name=\'filter_shipping_zone\']').val();
+
+	if (filter_shipping_zone !== '') {
+		url += '&filter_shipping_zone=' + encodeURIComponent(filter_shipping_zone);
+	}
+	{% endif %}
+	{% if order_manager_filter.carrier_name %}
+	var filter_carrier_name = $('select[name=\'filter_carrier_name\']').val();
+
+	if (filter_carrier_name !== '') {
+		url += '&filter_carrier_name=' + encodeURIComponent(filter_carrier_name);
+	}
+	{% endif %}
+	{% if order_manager_filter.tracking_code %}
+	var filter_tracking_code = $('input[name=\'filter_tracking_code\']').val();
+
+	if (filter_tracking_code) {
+		url += '&filter_tracking_code=' + encodeURIComponent(filter_tracking_code);
+	}
+	{% endif %}
+	{% if order_manager_filter.ip %}
+	var filter_ip = $('input[name=\'filter_ip\']').val();
+
+	if (filter_ip) {
+		url += '&filter_ip=' + encodeURIComponent(filter_ip);
+	}
+	{% endif %}
+	{% if order_manager_filter.total %}
+	var filter_total = $('input[name=\'filter_total\']').val();
+
+	if (filter_total) {
+		url += '&filter_total=' + encodeURIComponent(filter_total);
+	}
+	{% endif %}
+	{% if order_manager_filter.date_added %}
+	var filter_date_added = $('input[name=\'filter_date_added\']').val();
+
+	if (filter_date_added) {
+		url += '&filter_date_added=' + encodeURIComponent(filter_date_added);
+	}
+	{% endif %}
+	{% if order_manager_filter.date_modified %}
+	var filter_date_modified = $('input[name=\'filter_date_modified\']').val();
+
+	if (filter_date_modified) {
+		url += '&filter_date_modified=' + encodeURIComponent(filter_date_modified);
+	}
+	{% endif %}
+	
+	{% if order_manager_filter.display_limit %}
+	var limit = $('input[name=\'limit\']').val();
+
+	if (limit) {
+		url += '&limit=' + encodeURIComponent(limit);
+	}
+	{% endif %}
+	
+	location = 'index.php?route=extension/me_order_manager&user_token={{ user_token }}' + url;
+});
+//--></script>
+<script type="text/javascript"><!--
+$('input[name=\'filter_customer\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=customer/customer/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['customer_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_customer\']').val(item['label']);
+	}
+});
+
+$('input[name=\'filter_customeremail\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=customer/customer/autocomplete&user_token={{ user_token }}&filter_email=' +  encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['email'],
+						value: item['customer_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_customeremail\']').val(item['label']);
+	}
+});
+
+$('input[name=\'filter_product\']').autocomplete({
+	'source': function(request, response) {
+		$.ajax({
+			url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&filter_name=' +  encodeURIComponent(request),
+			dataType: 'json',
+			success: function(json) {
+				response($.map(json, function(item) {
+					return {
+						label: item['name'],
+						value: item['product_id']
+					}
+				}));
+			}
+		});
+	},
+	'select': function(item) {
+		$('input[name=\'filter_product\']').val(item['label']);
+	}
+});
+//--></script> 
+  <script type="text/javascript"><!--
+$('input[name^=\'selected\']').on('change', function() {
+	$('#button-shipping, #button-invoice').prop('disabled', true);
+
+	var selected = $('input[name^=\'selected\']:checked');
+
+	if (selected.length) {
+		$('#button-invoice').prop('disabled', false);
+	}
+
+	for (i = 0; i < selected.length; i++) {
+		if ($(selected[i]).parent().find('input[name^=\'shipping_code\']').val()) {
+			$('#button-shipping').prop('disabled', false);
+
+			break;
+		}
+	}
+});
+
+$('.selectall').on('click', function() {
+	$('#button-shipping, #button-invoice').prop('disabled', true);
+
+	var selected = $('input[name^=\'selected\']:checked');
+	
+	if (selected.length) {
+		$('#button-invoice').prop('disabled', false);
+	}
+
+	for (i = 0; i < selected.length; i++) {
+		if ($(selected[i]).parent().find('input[name^=\'shipping_code\']').val()) {
+			$('#button-shipping').prop('disabled', false);
+
+			break;
+		}
+	}
+});
+
+$('#button-shipping, #button-invoice').prop('disabled', true);
+
+$('input[name^=\'selected\']:first').trigger('change');
+
+// IE and Edge fix!
+$('#button-shipping, #button-invoice, #button-delete').on('click', function(e) {
+	$('#form-order').attr('action', this.getAttribute('formAction'));
+});
+
+$('.btn-delete').on('click', function(e) {
+	e.preventDefault();
+	
+	var element = this;
+	
+	if (confirm('{{ text_confirm }}')) {
+		$.ajax({
+			url: '{{ catalog }}index.php?route=api/order/delete&api_token={{ api_token }}&store_id={{ store_id }}&order_id=' + $(element).attr('href'),
+			dataType: 'json',
+			beforeSend: function() {
+				$(element).parent().parent().parent().find('button').button('loading');
+			},
+			complete: function() {
+				$(element).parent().parent().parent().find('button').button('reset');
+			},
+			success: function(json) {
+				$('.alert-dismissible').remove();
+	
+				if (json['error']) {
+					$('#content > .container-fluid').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+				}
+	
+				if (json['success']) {
+					location = '{{ delete }}';
+					$('#content > .container-fluid').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+				}
+			},
+			error: function(xhr, ajaxOptions, thrownError) {
+				alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+			}
+		});
+	}
+});
+$('.btn-quickview').on('click', function(e) {
+	e.preventDefault();
+	$('#orderquickview').html('');
+	$(this).html('<i class="fa fa-circle-o-notch fa-spin"></i>');
+	var order_id = $(this).attr('rel');
+	$('#orderquickview').load('index.php?route=extension/me_order_manager/info&user_token={{ user_token }}&order_id='+order_id);
+});
+
+$('.btn-quickedit').on('click', function(e) {
+	e.preventDefault();
+	$('#orderquickedit').html('');
+	$(this).html('<i class="fa fa-circle-o-notch fa-spin"></i>');
+	var order_id = $(this).attr('rel');
+	$('#orderquickedit').load('index.php?route=extension/me_order_manager/edit&user_token={{ user_token }}&order_id='+order_id);
+});
+
+$('.btn-orderadd').on('click', function(e) {
+	e.preventDefault();
+	$('#orderquickedit').html('');
+	$(this).html('<i class="fa fa-circle-o-notch fa-spin"></i>');
+	$('#orderquickedit').load('index.php?route=extension/me_order_manager/edit&user_token={{ user_token }}');
+});
+
+function toggleIcon(e) {
+    $(e.target)
+        .prev('.panel-heading')
+        .find(".more-less")
+        .toggleClass('glyphicon-plus glyphicon-minus');
+}
+$('.panel-group').on('hidden.bs.collapse', toggleIcon);
+$('.panel-group').on('shown.bs.collapse', toggleIcon);
+
+$('#addorderhistory').on('click', function() {
+	$.ajax({
+		url: 'index.php?route=extension/me_order_manager/addOrderHistory&user_token={{ user_token }}',
+		type: 'post',
+		dataType: 'json',
+		data: $("input[name^=\'selected\']:checked,#form-order_history select,#form-order_history input[type='checkbox']:checked,#form-order_history textarea"),
+		beforeSend: function() {
+			$('#addorderhistory').button('loading');
+		},
+		complete: function() {
+			$('#addorderhistory').button('reset');
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				if(json['error']['warning']){
+					$('#form-order_history').before('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> '+ json['error']['warning'] +'<button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+				}
+			}
+
+			if (json['success']) {
+				if(json['order']){
+					$('#order'+i+' .order_status span').removeAttr('style');
+					for(i in json['order']){
+						if(json['order'][i]['bgcolor']){
+							$('#order'+i+' .order_status span').css('background-color',json['order'][i]['bgcolor']);
+						}
+						if(json['order'][i]['color']){
+							$('#order'+i+' .order_status span').css('color',json['order'][i]['color']);
+						}
+						$('#order'+i+' .date_modified').html(json['order'][i]['date_modified']);
+						$('#order'+i+' .order_status span').html(json['order'][i]['order_status']);
+					}
+				}
+				$('input[name^=\'selected\']').prop('checked',false);
+				$('#quickorderhistory').modal('hide');
+			}
+		}
+	});
+});
+
+$('#button-export').on('click', function() {
+	url = '';
+	
+	{% if order_manager_filter.order_id %}
+	var filter_order_id = $('input[name=\'filter_order_id\']').val();
+
+	if (filter_order_id) {
+		url += '&filter_order_id=' + encodeURIComponent(filter_order_id);
+	}
+	{% endif %}
+	{% if order_manager_filter.product %}
+	var filter_product = $('input[name=\'filter_product\']').val();
+
+	if (filter_product) {
+		url += '&filter_product=' + encodeURIComponent(filter_product);
+	}
+	{% endif %}
+	{% if order_manager_filter.customer %}
+	var filter_customer = $('input[name=\'filter_customer\']').val();
+
+	if (filter_customer) {
+		url += '&filter_customer=' + encodeURIComponent(filter_customer);
+	}
+	{% endif %}
+	{% if order_manager_filter.customeremail %}
+	var filter_customeremail = $('input[name=\'filter_customeremail\']').val();
+
+	if (filter_customeremail) {
+		url += '&filter_customeremail=' + encodeURIComponent(filter_customeremail);
+	}
+	{% endif %}
+	{% if order_manager_filter.customertelephone %}
+	var filter_customer_telephone = $('input[name=\'filter_customer_telephone\']').val();
+
+	if (filter_customer_telephone) {
+		url += '&filter_customer_telephone=' + encodeURIComponent(filter_customer_telephone);
+	}
+	{% endif %}
+	{% if order_manager_filter.order_status %}
+	var filter_order_status_id = $('select[name^=\'filter_order_status_id\']').val();
+
+	if (filter_order_status_id !== '' && filter_order_status_id != null) {
+		url += '&filter_order_status_id=' + encodeURIComponent(filter_order_status_id);
+	}
+	{% endif %}
+	{% if order_manager_filter.payment_country %}
+	var filter_payment_country = $('select[name=\'filter_payment_country\']').val();
+
+	if (filter_payment_country !== '') {
+		url += '&filter_payment_country=' + encodeURIComponent(filter_payment_country);
+	}
+	{% endif %}
+	{% if order_manager_filter.shipping_country %}
+	var filter_shipping_country = $('select[name=\'filter_shipping_country\']').val();
+
+	if (filter_shipping_country !== '') {
+		url += '&filter_shipping_country=' + encodeURIComponent(filter_shipping_country);
+	}
+	{% endif %}
+	{% if order_manager_filter.currency %}
+	var filter_currency = $('select[name=\'filter_currency\']').val();
+
+	if (filter_currency !== '') {
+		url += '&filter_currency=' + encodeURIComponent(filter_currency);
+	}
+	{% endif %}
+	{% if order_manager_filter.payment_method %}
+	var filter_payment_method = $('select[name=\'filter_payment_method\']').val();
+
+	if (filter_payment_method !== '') {
+		url += '&filter_payment_method=' + encodeURIComponent(filter_payment_method);
+	}
+	{% endif %}
+	{% if order_manager_filter.shipping_method %}
+	var filter_shipping_method = $('select[name=\'filter_shipping_method\']').val();
+
+	if (filter_shipping_method !== '') {
+		url += '&filter_shipping_method=' + encodeURIComponent(filter_shipping_method);
+	}
+	{% endif %}
+	{% if order_manager_filter.customer_group %}
+	var filter_customer_group = $('select[name=\'filter_customer_group\']').val();
+
+	if (filter_customer_group !== '') {
+		url += '&filter_customer_group=' + encodeURIComponent(filter_customer_group);
+	}
+	{% endif %}
+	{% if order_manager_filter.store %}
+	var filter_store = $('select[name=\'filter_store\']').val();
+
+	if (filter_store !== '') {
+		url += '&filter_store=' + encodeURIComponent(filter_store);
+	}
+	{% endif %}
+	{% if order_manager_filter.shippingstate %}
+	var filter_shipping_zone = $('select[name=\'filter_shipping_zone\']').val();
+
+	if (filter_shipping_zone !== '') {
+		url += '&filter_shipping_zone=' + encodeURIComponent(filter_shipping_zone);
+	}
+	{% endif %}
+	{% if order_manager_filter.carrier_name %}
+	var filter_carrier_name = $('select[name=\'filter_carrier_name\']').val();
+
+	if (filter_carrier_name !== '') {
+		url += '&filter_carrier_name=' + encodeURIComponent(filter_carrier_name);
+	}
+	{% endif %}
+	{% if order_manager_filter.tracking_code %}
+	var filter_tracking_code = $('input[name=\'filter_tracking_code\']').val();
+
+	if (filter_tracking_code) {
+		url += '&filter_tracking_code=' + encodeURIComponent(filter_tracking_code);
+	}
+	{% endif %}
+	{% if order_manager_filter.total %}
+	var filter_total = $('input[name=\'filter_total\']').val();
+
+	if (filter_total) {
+		url += '&filter_total=' + encodeURIComponent(filter_total);
+	}
+	{% endif %}
+	{% if order_manager_filter.date_added %}
+	var filter_date_added = $('input[name=\'filter_date_added\']').val();
+
+	if (filter_date_added) {
+		url += '&filter_date_added=' + encodeURIComponent(filter_date_added);
+	}
+	{% endif %}
+	{% if order_manager_filter.date_modified %}
+	var filter_date_modified = $('input[name=\'filter_date_modified\']').val();
+
+	if (filter_date_modified) {
+		url += '&filter_date_modified=' + encodeURIComponent(filter_date_modified);
+	}
+	{% endif %}
+	{% if order_manager_filter.ip %}
+	var filter_ip = $('input[name=\'filter_ip\']').val();
+
+	if (filter_ip) {
+		url += '&filter_ip=' + encodeURIComponent(filter_ip);
+	}
+	{% endif %}
+	{% if order_manager_filter.display_limit %}
+	var limit = $('input[name=\'limit\']').val();
+
+	if (limit) {
+		url += '&limit=' + encodeURIComponent(limit);
+	}
+	{% endif %}
+	
+	var $selected = $("input[name='selected[]']:checked");
+	
+	if ($selected.length) {
+		url += '&'+$selected.serialize();
+	}
+	
+	location = 'index.php?route=extension/me_order_manager/exportOrder&user_token={{ user_token }}' + url;
+});
+
+$('.button-generate-invoice').on('click', function() {
+	var order_id = $(this).attr('rel');
+	
+	$.ajax({
+		url: 'index.php?route=extension/me_order_manager/createinvoiceno&user_token={{ user_token }}&order_id='+ order_id,
+		type: 'post',
+		dataType: 'json',
+		beforeSend: function() {
+			
+		},
+		complete: function() {
+			
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#order'+ order_id +' .button-generate-invoice').after('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + '</div>');
+			}
+
+			if (json['invoice_no']) {
+				$('#order'+ order_id +' .invoice_no').html(json['invoice_no']);
+			}
+		}
+	});
+});
+
+function getproduct(id){
+	$.ajax({
+		url: 'index.php?route=extension/me_order_manager/getproduct&user_token={{ user_token }}&id='+ id,
+		type: 'get',
+		dataType: 'json',
+		beforeSend: function() {
+			$('#order'+ id +' .btn-product').button('loading');
+		},
+		complete: function() {
+			$('#order'+ id +' .btn-product').button('reset');
+		},
+		success: function(json) {
+			$('.alert-success, .alert-danger').remove();
+			
+			html = '<div class="table-responsive">';
+			html += '<table class="table table-bordered table-hover">';
+			html += '  <thead>';
+			html += '    <tr>';
+			html += '		<td class="text-left">{{ column_image }}</td>';
+			html += '		<td class="text-left">{{ column_product }}</td>';
+			html += '		<td class="text-left">{{ column_model }}</td>';
+			html += '		<td class="text-right">{{ column_quantity }}</td>';
+			html += '		<td class="text-right">{{ column_price }}</td>';
+			html += '		<td class="text-right">{{ column_total }}</td>';
+			html += '    </tr>';
+			html += '  </thead>';
+			html += '  <tbody>';
+			for(i in json['getvalue']){
+			html += '	<tr>';
+			html += '	<td><img src="'+ json['getvalue'][i]['image']+'" class="img-responsive"></td>';
+			html += '    <td class="text-left">'+ json['getvalue'][i]['name'];
+			if(json['getvalue'][i]['option']){
+				html += '<br />';
+				
+				for(j in json['getvalue'][i]['option']){
+					html += '<br />';
+					if(json['getvalue'][i]['option'][j]['type'] != 'file'){
+						html += '&nbsp;<small> - '+ json['getvalue'][i]['option'][j]['name'] +': '+ json['getvalue'][i]['option'][j]['value'] +'</small>';
+					}else{
+						html += '&nbsp;<small> - '+ json['getvalue'][i]['option'][j]['name'] +': <a href="'+ json['getvalue'][i]['option'][j]['href'] +'">'+ json['getvalue'][i]['option'][j]['value'] +'</a></small>';
+					} 
+				}
+			}
+			html += ' </td>';
+			html += ' <td class="text-left">'+ json['getvalue'][i]['model'] +'</td>';
+			html += ' <td class="text-right">'+ json['getvalue'][i]['quantity'] +'</td>';
+			html += ' <td class="text-right">'+ json['getvalue'][i]['price'] +'</td>';
+			html += ' <td class="text-right">'+ json['getvalue'][i]['total'] +'</td>';
+			html += ' </tr>';
+			}
+			html += '  </tbody>';
+			html += '</table>';
+			html += '</div>';
+			$('#form-field').html(html);
+			$('.savefield').attr('rel',id);
+			$('#fieldname').text('{{ entry_products }}');
+			$('#fieldmanager').modal('show');
+		}
+	});
+}
+
+$('#quickorderhistory select[name="order_status_id"]').change(function(){
+	var status_id = $('#quickorderhistory select[name="order_status_id"]').val();
+	$.ajax({
+		url: 'index.php?route=extension/me_order_manager_setting/getmessage&user_token={{ user_token }}&status_id='+status_id,
+		type: 'post',
+		dataType: 'json',
+		beforeSend: function() {
+			$('#quickorderhistory select[name="order_status_id"]').after(' <i class="fa fa-circle-o-notch fa-spin"></i>');
+		},
+		complete: function() {
+			$('.fa-spin').remove();
+		},
+		success: function (json) {
+			if(json['message']){
+				$('#quickorderhistory #input-comment').val(json['message']);
+			}else{
+				$('#quickorderhistory #input-comment').val('');
+			}
+		}
+  });
+});
+
+$(".toggle-btn").click(function(){
+  $(".filters").toggle();
+});
+//--></script> 
+  <script src="view/javascript/jquery/datetimepicker/bootstrap-datetimepicker.min.js" type="text/javascript"></script>
+  <link href="view/javascript/jquery/datetimepicker/bootstrap-datetimepicker.min.css" type="text/css" rel="stylesheet" media="screen" />
+  <script type="text/javascript"><!--
+$('.date').datetimepicker({
+	language: '{{ datepicker }}',
+	pickTime: false
+});
+//--></script>
+{{ footer }} 

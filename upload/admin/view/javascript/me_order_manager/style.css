@@ -1,0 +1,155 @@
+.toggle-btn{
+	color:#2f2f2f;
+}
+.btn-edit{
+	position:absolute;
+	right: 0;
+    top: 0;
+    padding: 10px;
+    font-size: 15px;
+	display:none;
+	cursor:pointer;
+}
+.tempedit{
+	position: absolute;
+    top: -6px;
+    left: -7px;
+    transform: rotate(40deg);
+	display:none;
+	border: 5px solid red;
+    border-top-color: transparent;
+    border-left-color: transparent;
+    border-bottom-color: transparent;
+}
+.table tr td{
+	position:relative;
+}
+td:hover > .btn-edit{
+	display:block;
+}
+.connected-sortable{
+	/* height:450px;
+	overflow-y:auto; */
+}
+.total_orders li{
+	width:14%;
+}
+@media(max-width:992px){
+	.total_orders li{
+		width:24%;
+	}
+}
+
+@media(max-width:768px){
+	.total_orders li{
+		width:24%;
+	}
+}
+.total_orders li a{
+	padding:5px;
+	display:block;
+	color:#2f2f2f;
+	background-color:#f7f7f7;
+	border:1px solid #ddd;
+	margin-bottom:5px;
+}
+#form-order .label, .total_orders .label{
+	line-height:inherit;
+}
+.draggable-item{
+	padding: 7px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+	margin-bottom:5px;
+}
+.switch {
+  position: relative;
+  display: inline-block;
+      width: 38px;
+    height: 23px;
+}
+
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #dd3520;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 15px;
+  width: 15px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #409e40;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #409e40;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(15px);
+  -ms-transform: translateX(15px);
+  transform: translateX(15px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}
+.mb-0{
+	margin-bottom:0;
+}
+#accordion .panel{
+	border-radius: 0;
+}
+#accordion .panel .panel-heading{
+	background: #fff;
+    border-radius: 0;
+    border-left: 4px solid #1e91cf;
+}
+.modal-body .checkbox input{
+	margin-left:0;
+}
+.count_orders{
+	position: absolute;
+    top: 13px;
+    right: 45px;
+}
+/* #button-customer,#button-product-add,#button-cart,#button-payment-address,#button-shipping-address,#button-save{
+	margin-right:10px;
+} */
+@media (min-width: 768px){
+	.modal-dialog {
+		width: 700px;
+		margin: 30px auto;
+	}
+}
+/* .table tr td span{
+	padding: 5px 10px;
+    font-size: 11px;
+} */

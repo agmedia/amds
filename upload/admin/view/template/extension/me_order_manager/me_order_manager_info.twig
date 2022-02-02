@@ -1,0 +1,757 @@
+<div class="modal fade" id="quickorderview" tabindex="-1" role="dialog" aria-labelledby="order_info" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title pull-left" id="order_info">{{ entry_order_info }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+		<div class="modal-body">
+			<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">
+				{% if order_manager_setting.order_detail %}
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="order_detail">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-parent="#accordion" href="#order_details" aria-expanded="true" aria-controls="order_details">
+								<i class="fa fa-shopping-cart"></i> {{ text_order_detail }}
+							</a>
+						</h4>
+					</div>
+					<div id="order_details" class="panel-collapse collapse" role="tabpanel" aria-labelledby="order_detail">
+						<div class="panel-body">
+							<table class="table mb-0 table-bordered">
+								<tbody>
+								  <tr>
+									<td style="width: 1%;"><button data-toggle="tooltip" title="{{ text_store }}" class="btn btn-info btn-xs"><i class="fa fa-shopping-cart fa-fw"></i></button></td>
+									<td><a href="{{ store_url }}" target="_blank">{{ store_name }}</a></td>
+								  </tr>
+								  <tr>
+									<td><button data-toggle="tooltip" title="{{ text_date_added }}" class="btn btn-info btn-xs"><i class="fa fa-calendar fa-fw"></i></button></td>
+									<td>{{ date_added }}</td>
+								  </tr>
+								  <tr>
+									<td><button data-toggle="tooltip" title="{{ text_payment_method }}" class="btn btn-info btn-xs"><i class="fa fa-credit-card fa-fw"></i></button></td>
+									<td>{{ payment_method }}</td>
+								  </tr>
+								{% if shipping_method %}
+								<tr>
+								  <td><button data-toggle="tooltip" title="{{ text_shipping_method }}" class="btn btn-info btn-xs"><i class="fa fa-truck fa-fw"></i></button></td>
+								  <td>{{ shipping_method }}</td>
+								</tr>
+								{% endif %}
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				{% endif %}
+				{% if order_manager_setting.customer_detail %}
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="customer_detail">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-parent="#accordion" href="#customer_details" aria-expanded="true" aria-controls="customer_details">
+								<i class="fa fa-user"></i> {{ text_customer_detail }}
+							</a>
+						</h4>
+					</div>
+					<div id="customer_details" class="panel-collapse collapse" role="tabpanel" aria-labelledby="customer_detail">
+						<div class="panel-body">
+							<table class="table mb-0 table-bordered">
+								<tr>
+								  <td style="width: 1%;"><button data-toggle="tooltip" title="{{ text_customer }}" class="btn btn-info btn-xs"><i class="fa fa-user fa-fw"></i></button></td>
+								  <td>{% if customer %} <a href="{{ customer }}" target="_blank">{{ firstname }} {{ lastname }}</a> {% else %}
+									{{ firstname }} {{ lastname }}
+									{% endif %}</td>
+								</tr>
+								<tr>
+								  <td><button data-toggle="tooltip" title="{{ text_customer_group }}" class="btn btn-info btn-xs"><i class="fa fa-group fa-fw"></i></button></td>
+								  <td>{{ customer_group }}</td>
+								</tr>
+								<tr>
+								  <td><button data-toggle="tooltip" title="{{ text_email }}" class="btn btn-info btn-xs"><i class="fa fa-envelope-o fa-fw"></i></button></td>
+								  <td><a href="mailto:{{ email }}">{{ email }}</a></td>
+								</tr>
+								<tr>
+								  <td><button data-toggle="tooltip" title="{{ text_telephone }}" class="btn btn-info btn-xs"><i class="fa fa-phone fa-fw"></i></button></td>
+								  <td>{{ telephone }}</td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+				{% endif %}
+				{% if order_manager_setting.options %}
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="customer_option">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-parent="#accordion" href="#customer_options" aria-expanded="true" aria-controls="customer_options">
+								<i class="fa fa-cog"></i> {{ text_option }}
+							</a>
+						</h4>
+					</div>
+					<div id="customer_options" class="panel-collapse collapse" role="tabpanel" aria-labelledby="customer_option">
+						<div class="panel-body">
+							<table class="table mb-0 table-bordered">
+								<tbody>
+								  <tr>
+									<td>{{ text_invoice }}</td>
+									<td id="invoice" class="text-right">{{ invoice_no }}</td>
+									<td style="width: 1%;" class="text-center">{% if not invoice_no %}
+									  <button id="button-generate-invoice" data-loading-text="{{ text_loading }}" data-toggle="tooltip" title="{{ button_generate }}" class="btn btn-success btn-xs"><i class="fa fa-cog"></i></button>
+									  {% else %}
+									  <button disabled="disabled" class="btn btn-success btn-xs"><i class="fa fa-refresh"></i></button>
+									  {% endif %}</td>
+								  </tr>
+								  <tr>
+									<td>{{ text_reward }}</td>
+									<td class="text-right">{{ reward }}</td>
+									<td class="text-center">{% if customer and reward %}
+									  {% if not reward_total %}
+									  <button id="button-reward-add" data-loading-text="{{ text_loading }}" data-toggle="tooltip" title="{{ button_reward_add }}" class="btn btn-success btn-xs"><i class="fa fa-plus-circle"></i></button>
+									  {% else %}
+									  <button id="button-reward-remove" data-loading-text="{{ text_loading }}" data-toggle="tooltip" title="{{ button_reward_remove }}" class="btn btn-danger btn-xs"><i class="fa fa-minus-circle"></i></button>
+									  {% endif %}
+									  {% else %}
+									  <button disabled="disabled" class="btn btn-success btn-xs"><i class="fa fa-plus-circle"></i></button>
+									  {% endif %}</td>
+								  </tr>
+								  <tr>
+									<td>{{ text_affiliate }}
+									  {% if affiliate %}
+									  (<a href="{{ affiliate }}">{{ affiliate_firstname }} {{ affiliate_lastname }}</a>)
+									  {% endif %}</td>
+									<td class="text-right">{{ commission }}</td>
+									<td class="text-center">{% if affiliate %}
+									  {% if not commission_total %}
+									  <button id="button-commission-add" data-loading-text="{{ text_loading }}" data-toggle="tooltip" title="{{ button_commission_add }}" class="btn btn-success btn-xs"><i class="fa fa-plus-circle"></i></button>
+									  {% else %}
+									  <button id="button-commission-remove" data-loading-text="{{ text_loading }}" data-toggle="tooltip" title="{{ button_commission_remove }}" class="btn btn-danger btn-xs"><i class="fa fa-minus-circle"></i></button>
+									  {% endif %}
+									  {% else %}
+									  <button disabled="disabled" class="btn btn-success btn-xs"><i class="fa fa-plus-circle"></i></button>
+									  {% endif %}</td>
+								  </tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				{% endif %}
+				{% if order_manager_setting.orderinfo %}
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="order">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-parent="#accordion" href="#orders" aria-expanded="true" aria-controls="orders">
+								<i class="fa fa-info-circle"></i> {{ text_order }}
+							</a>
+						</h4>
+					</div>
+					<div id="orders" class="panel-collapse collapse" role="tabpanel" aria-labelledby="order">
+						<div class="panel-body">
+							<table class="table table-bordered">
+								<thead>
+									<tr>
+									  <td style="width: 50%;" class="text-left">{{ text_payment_address }}</td>
+									  {% if shipping_method %}
+									  <td style="width: 50%;" class="text-left">{{ text_shipping_address }}</td>
+									  {% endif %} </tr>
+								</thead>
+								<tbody>
+									<tr>
+									  <td class="text-left">{{ payment_address }}</td>
+									  {% if shipping_method %}
+									  <td class="text-left">{{ shipping_address }}</td>
+									  {% endif %} </tr>
+								</tbody>
+							</table>
+							<table class="table table-bordered">
+							  <thead>
+								<tr>
+								  <td class="text-left">{{ column_product }}</td>
+								  <td class="text-left">{{ column_model }}</td>
+								  <td class="text-right">{{ column_quantity }}</td>
+								  <td class="text-right">{{ column_price }}</td>
+								  <td class="text-right">{{ column_total }}</td>
+								</tr>
+							  </thead>
+							  <tbody>
+							  
+							  {% for product in products %}
+							  <tr>
+								<td class="text-left"><a href="{{ product.href }}">{{ product.name }}</a> {% for option in product.option %} <br />
+								  {% if option.type != 'file' %}
+								  &nbsp;<small> - {{ option.name }}: {{ option.value }}</small> {% else %}
+								  &nbsp;<small> - {{ option.name }}: <a href="{{ option.href }}">{{ option.value }}</a></small> {% endif %}
+								  {% endfor %}</td>
+								<td class="text-left">{{ product.model }}</td>
+								<td class="text-right">{{ product.quantity }}</td>
+								<td class="text-right">{{ product.price }}</td>
+								<td class="text-right">{{ product.total }}</td>
+							  </tr>
+							  {% endfor %}
+							  {% for voucher in vouchers %}
+							  <tr>
+								<td class="text-left"><a href="{{ voucher.href }}">{{ voucher.description }}</a></td>
+								<td class="text-left"></td>
+								<td class="text-right">1</td>
+								<td class="text-right">{{ voucher.amount }}</td>
+								<td class="text-right">{{ voucher.amount }}</td>
+							  </tr>
+							  {% endfor %}
+							  {% for total in totals %}
+							  <tr>
+								<td colspan="4" class="text-right">{{ total.title }}</td>
+								<td class="text-right">{{ total.text }}</td>
+							  </tr>
+							  {% endfor %}
+								</tbody>
+							  
+							</table>
+							{% if comment %}
+							<table class="table table-bordered">
+							  <thead>
+								<tr>
+								  <td>{{ text_comment }}</td>
+								</tr>
+							  </thead>
+							  <tbody>
+								<tr>
+								  <td>{{ comment }}</td>
+								</tr>
+							  </tbody>
+							</table>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+				{% endif %}
+				{% if order_manager_setting.orderhistory %}
+				<div class="panel panel-default">
+					<div class="panel-heading" role="tab" id="order_history">
+						<h4 class="panel-title">
+							<a role="button" data-toggle="collapse" data-parent="#accordion" href="#order_histories" aria-expanded="true" aria-controls="order_histories">
+								<i class="fa fa-comment-o"></i> {{ text_history }}
+							</a>
+						</h4>
+					</div>
+					<div id="order_histories" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="order_history">
+						<div class="panel-body">
+							<ul class="nav nav-tabs">
+								<li class="active"><a href="#tab-history" data-toggle="tab">{{ tab_history }}</a></li>
+								<li><a href="#tab-additional" data-toggle="tab">{{ tab_additional }}</a></li>
+								{% for tab in tabs %}
+								<li><a href="#tab-{{ tab.code }}" data-toggle="tab">{{ tab.title }}</a></li>
+								{% endfor %}
+							</ul>
+							<div class="tab-content">
+								<div class="tab-pane active" id="tab-history">
+									<div id="history"></div>
+									<fieldset>
+									  <form class="form-horizontal">
+										<div class="form-group">
+										  <label class="col-sm-2 control-label" for="input-order-status">{{ entry_order_status }}</label>
+										  <div class="col-sm-10">
+											<select name="order_status_id" id="input-order-status" class="form-control">
+											   {% for order_statuses in order_statuses %}
+											  {% if order_statuses.order_status_id == order_status_id %}
+											   <option value="{{ order_statuses.order_status_id }}" selected="selected">{{ order_statuses.name }}</option>
+											  {% else %}
+											  <option value="{{ order_statuses.order_status_id }}">{{ order_statuses.name }}</option>
+											  {% endif %}
+											  {% endfor %}
+											</select>
+										  </div>
+										</div>
+										{% if order_manager_setting_tracking.status %}
+										<div class="form-group order_tracking {% if order_manager_setting_tracking.orderstatus != order_status_id %}hide{% endif %}">
+											<label class="col-sm-2 control-label" for="input-carrier-name">{{ entry_carrier_name }}</label>
+											<div class="col-sm-4">
+												<select name="carrier_name" id="input-carrier-name" class="form-control">
+													<option value="">{{ text_select }}</option>
+													{% for key,carrier in order_manager_setting_tracking.carrier %}
+													<option value="{{ key }}">{{ carrier.name }}</option>
+													{% endfor %}
+												</select>
+											</div>
+											<label class="col-sm-2 control-label" for="input-tracking-number">{{ entry_tracking_number }}</label>
+											<div class="col-sm-4">
+												<input type="text" name="tracking_number" value="" placeholder="{{ entry_tracking_number }}" id="input-number" class="form-control" />
+											</div>
+										</div>
+										{% endif %}
+										<div class="form-group">
+											<label class="col-sm-2 control-label" for="input-override"><span data-toggle="tooltip" title="{{ help_override }}">{{ entry_override }}</span></label>
+											<div class="col-sm-3">
+												<div class="checkbox">
+												  <input type="checkbox" name="override" value="1" id="input-override" />
+												</div>
+											</div>
+											<label class="col-sm-4 control-label" for="input-notify">{{ entry_notify }}</label>
+											<div class="col-sm-3">
+												<div class="checkbox">
+												  <input type="checkbox" name="notify" value="1" id="input-notify" />
+												</div>
+											</div>
+										</div>
+										<div class="form-group">
+										  <label class="col-sm-2 control-label" for="input-comment">{{ entry_comment }}</label>
+										  <div class="col-sm-8">
+											<textarea name="comment" rows="5" id="input-comment" class="form-control"></textarea>
+										  </div>
+										  <div class="col-sm-2">
+											<p><strong>Shortcodes:</strong><br/>
+											{order_id}
+											{firstname}
+											{lastname}
+											{order_status}
+											{date_added}
+											</p>
+										  </div>
+										</div>
+									  </form>
+									</fieldset>
+									<div class="text-right">
+									  <button id="button-history" data-loading-text="{{ text_loading }}" class="btn btn-primary"><i class="fa fa-plus-circle"></i> {{ button_history_add }}</button>
+									</div>
+								</div>
+								<div class="tab-pane" id="tab-additional"> 
+									{% if account_custom_fields %}
+									<div class="table-responsive">
+									  <table class="table table-bordered">
+										<thead>
+										  <tr>
+											<td colspan="2">{{ text_account_custom_field }}</td>
+										  </tr>
+										</thead>
+										<tbody>
+										
+										{% for custom_field in account_custom_fields %}
+										<tr>
+										  <td>{{ custom_field.name }}</td>
+										  <td>{{ custom_field.value }}</td>
+										</tr>
+										{% endfor %}
+										  </tbody>
+										
+									  </table>
+									</div>
+									{% endif %}
+									{% if payment_custom_fields %}
+									<div class="table-responsive">
+									  <table class="table table-bordered">
+										<thead>
+										  <tr>
+											<td colspan="2">{{ text_payment_custom_field }}</td>
+										  </tr>
+										</thead>
+										<tbody>
+										
+										{% for custom_field in payment_custom_fields %}
+										<tr>
+										  <td>{{ custom_field.name }}</td>
+										  <td>{{ custom_field.value }}</td>
+										</tr>
+										{% endfor %}
+										  </tbody>
+										
+									  </table>
+									</div>
+									{% endif %}
+									{% if shipping_method and shipping_custom_fields %}
+									<div class="table-responsive">
+									  <table class="table table-bordered">
+										<thead>
+										  <tr>
+											<td colspan="2">{{ text_shipping_custom_field }}</td>
+										  </tr>
+										</thead>
+										<tbody>
+										
+										{% for custom_field in shipping_custom_fields %}
+										<tr>
+										  <td>{{ custom_field.name }}</td>
+										  <td>{{ custom_field.value }}</td>
+										</tr>
+										{% endfor %}
+										  </tbody>
+										
+									  </table>
+									</div>
+									{% endif %}
+									<div class="table-responsive">
+									  <table class="table table-bordered">
+										<thead>
+										  <tr>
+											<td colspan="2">{{ text_browser }}</td>
+										  </tr>
+										</thead>
+										<tbody>
+										  <tr>
+											<td>{{ text_ip }}</td>
+											<td>{{ ip }}</td>
+										  </tr>
+										{% if forwarded_ip %}
+										<tr>
+										  <td>{{ text_forwarded_ip }}</td>
+										  <td>{{ forwarded_ip }}</td>
+										</tr>
+										{% endif %}
+										<tr>
+										  <td>{{ text_user_agent }}</td>
+										  <td>{{ user_agent }}</td>
+										</tr>
+										<tr>
+										  <td>{{ text_accept_language }}</td>
+										  <td>{{ accept_language }}</td>
+										</tr>
+										  </tbody>
+										
+									  </table>
+									</div>
+								</div>
+								{% for tab in tabs %}
+									<div class="tab-pane" id="tab-{{ tab.code }}">{{ tab.content }}</div>
+								{% endfor %} 
+							</div>
+						</div>
+					</div>
+				</div>
+				{% endif %}
+			</div>
+		</div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript"><!--
+$('.btn-quickview').html('<i class="fa fa-eye"></i>');
+$('.fa-spin').remove();
+$('#quickorderview').modal('show');
+$(document).delegate('#button-generate-invoice', 'click', function() {
+	$.ajax({
+		url: 'index.php?route=extension/me_order_manager/createinvoiceno&user_token={{ user_token }}&order_id={{ order_id }}',
+		dataType: 'json',
+		beforeSend: function() {
+			$('#button-generate-invoice').button('loading');
+		},
+		complete: function() {
+			$('#button-generate-invoice').button('reset');
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#quickorderview #customer_options .table').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + '</div>');
+			}
+
+			if (json['invoice_no']) {
+				$('#invoice').html(json['invoice_no']);
+				
+				$('#button-generate-invoice').replaceWith('<button disabled="disabled" class="btn btn-success btn-xs"><i class="fa fa-cog"></i></button>');
+			}
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+});
+
+$(document).delegate('#button-reward-add', 'click', function() {
+	$.ajax({
+		url: 'index.php?route=extension/me_order_manager/addreward&user_token={{ user_token }}&order_id={{ order_id }}',
+		type: 'post',
+		dataType: 'json',
+		beforeSend: function() {
+			$('#button-reward-add').button('loading');
+		},
+		complete: function() {
+			$('#button-reward-add').button('reset');
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#quickorderview #customer_options .table').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + '</div>');
+			}
+
+			if (json['success']) {
+                $('#quickorderview #customer_options .table').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + '</div>');
+
+				$('#button-reward-add').replaceWith('<button id="button-reward-remove" data-toggle="tooltip" title="{{ button_reward_remove }}" class="btn btn-danger btn-xs"><i class="fa fa-minus-circle"></i></button>');
+			}
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+});
+
+$(document).delegate('#button-reward-remove', 'click', function() {
+	$.ajax({
+		url: 'index.php?route=extension/me_order_manager/removereward&user_token={{ user_token }}&order_id={{ order_id }}',
+		type: 'post',
+		dataType: 'json',
+		beforeSend: function() {
+			$('#button-reward-remove').button('loading');
+		},
+		complete: function() {
+			$('#button-reward-remove').button('reset');
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#quickorderview #customer_options .table').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + '</div>');
+			}
+
+			if (json['success']) {
+                $('#quickorderview #customer_options .table').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + '</div>');
+
+				$('#button-reward-remove').replaceWith('<button id="button-reward-add" data-toggle="tooltip" title="{{ button_reward_add }}" class="btn btn-success btn-xs"><i class="fa fa-plus-circle"></i></button>');
+			}
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+});
+
+$(document).delegate('#button-commission-add', 'click', function() {
+	$.ajax({
+		url: 'index.php?route=extension/me_order_manager/addcommission&user_token={{ user_token }}&order_id={{ order_id }}',
+		type: 'post',
+		dataType: 'json',
+		beforeSend: function() {
+			$('#button-commission-add').button('loading');
+		},
+		complete: function() {
+			$('#button-commission-add').button('reset');
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#quickorderview #customer_options .table').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + '</div>');
+			}
+
+			if (json['success']) {
+                $('#quickorderview #customer_options .table').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + '</div>');
+
+				$('#button-commission-add').replaceWith('<button id="button-commission-remove" data-toggle="tooltip" title="{{ button_commission_remove }}" class="btn btn-danger btn-xs"><i class="fa fa-minus-circle"></i></button>');
+			}
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+});
+
+$(document).delegate('#button-commission-remove', 'click', function() {
+	$.ajax({
+		url: 'index.php?route=extension/me_order_manager/removecommission&user_token={{ user_token }}&order_id={{ order_id }}',
+		type: 'post',
+		dataType: 'json',
+		beforeSend: function() {
+			$('#button-commission-remove').button('loading');
+		},
+		complete: function() {
+			$('#button-commission-remove').button('reset');
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#quickorderview #customer_options .table').prepend('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + '</div>');
+			}
+
+			if (json['success']) {
+                $('#quickorderview #customer_options .table').prepend('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + '</div>');
+
+				$('#button-commission-remove').replaceWith('<button id="button-commission-add" data-toggle="tooltip" title="{{ button_commission_add }}" class="btn btn-success btn-xs"><i class="fa fa-plus-circle"></i></button>');
+			}
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+});
+
+$('#history').delegate('.pagination a', 'click', function(e) {
+	e.preventDefault();
+
+	$('#history').load(this.href);
+});
+
+$('#history').load('index.php?route=sale/order/history&user_token={{ user_token }}&order_id={{ order_id }}');
+
+$('#button-history').on('click', function() {
+	{% if openbaystaus %}
+	if (typeof verifyStatusChange == 'function'){
+	  if (verifyStatusChange() == false){
+	    return false;
+	  } else{
+	    addOrderInfo();
+	  }
+	} else{
+	  addOrderInfo();
+	}
+	{% endif %}
+	
+	var data = 'order_status_id=' + encodeURIComponent($('select[name=\'order_status_id\']').val()) + '&notify=' + ($('input[name=\'notify\']').prop('checked') ? 1 : 0) + '&override=' + ($('input[name=\'override\']').prop('checked') ? 1 : 0) + '&append=' + ($('input[name=\'append\']').prop('checked') ? 1 : 0) + '&comment=' + encodeURIComponent($('textarea[name=\'comment\']').val());
+	{% if order_manager_setting_tracking.status %}
+	data += '&tracking_number='+encodeURIComponent($('input[name=\'tracking_number\']').val()) + '&carrier_id=' + encodeURIComponent($('select[name=\'carrier_name\']').val());
+	{% endif %}
+	$.ajax({
+		url: 'index.php?route=extension/me_order_manager/history&user_token={{ user_token }}&store_id={{ store_id }}&order_id={{ order_id }}',
+		type: 'post',
+		dataType: 'json',
+		data: data,
+		beforeSend: function() {
+			$('#button-history').button('loading');
+		},
+		complete: function() {
+			$('#button-history').button('reset');
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#history').before('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+			}
+
+			if (json['success']) {
+				$('#history').load('index.php?route=sale/order/history&user_token={{ user_token }}&order_id={{ order_id }}');
+
+				$('#history').before('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+
+				$('textarea[name=\'comment\']').val('');
+				if(json['bgcolor']){
+					$('#order{{ order_id }} .order_status span').css('background-color',json['bgcolor']);
+				}
+				if(json['color']){
+					$('#order{{ order_id }} .order_status span').css('color',json['color']);
+				}
+				
+				if(json['tracking_detail']){
+					$('#order{{ order_id }} .tracking_code').html(json['tracking_detail']);
+				}
+				$('#order{{ order_id }} .date_modified').html(json['date_modified']);
+				$('#order{{ order_id }} .order_status span').html(json['order_status']);
+				$('#quickorderview').modal('hide');
+			}
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+});
+{% if openbaystaus %}
+function changeStatus(){
+  var status_id = $('select[name="order_status_id"]').val();
+  $('#openbay-info').remove();
+  $.ajax({
+    url: 'index.php?route=marketplace/openbay/getorderinfo&user_token={{ user_token }}&order_id={{ order_id }}&status_id='+status_id,
+    dataType: 'html',
+    success: function (html) {
+      $('#history').after(html);
+    }
+  });
+}
+
+function addOrderInfo(){
+  var status_id = $('select[name="order_status_id"]').val();
+  $.ajax({
+    url: 'index.php?route=marketplace/openbay/addorderinfo&user_token={{ user_token }}&order_id={{ order_id }}&status_id='+status_id,
+    type: 'post',
+    dataType: 'html',
+    data: $(".openbay-data").serialize()
+  });
+}
+
+$(document).ready(function() {
+  changeStatus();
+});
+
+$('select[name="order_status_id"]').change(function(){
+  changeStatus();
+});
+{% endif %}
+
+{% if order_manager_setting_tracking.status %}
+	$('select[name="order_status_id"]').change(function(){
+		if($('select[name="order_status_id"]').val() == '{{ order_manager_setting_tracking.orderstatus }}'){
+			$('.order_tracking').removeClass('hide');
+		}else{
+			$('.order_tracking').addClass('hide');
+		}
+	});
+{% endif %}
+$('#quickorderview input[name="tracking_number"],#quickorderview select[name="carrier_name"]').change(function(){
+	var tracking_number = $('#quickorderview input[name="tracking_number"]').val();
+	var carrier_id = $('#quickorderview select[name="carrier_name"]').val();
+	var status_id = $('#quickorderview select[name="order_status_id"]').val();
+	$.ajax({
+		url: 'index.php?route=extension/me_order_manager_setting/getrackingmessage&user_token={{ user_token }}&status_id='+ status_id,
+		type: 'post',
+		dataType: 'json',
+		data: 'carrier_id=' + carrier_id + '&tracking_number=' + tracking_number,
+		beforeSend: function() {
+			
+		},
+		complete: function() {
+			
+		},
+		success: function (json) {
+			$('.alert-dismissible, .text-danger').remove();
+			$('.form-group,.col-sm-4').removeClass('has-error');
+			
+			if (json['error_carrier_id']) {
+				$('#quickorderview select[name=\'carrier_name\']').after('<div class="text-danger"> ' + json['error_carrier_id'] + '</div>');
+
+				// Highlight any found errors
+				$('#quickorderview select[name=\'carrier_name\']').parent().addClass('has-error');
+			}
+			
+			if (json['error_tracking_number']) {
+				$('#quickorderview input[name=\'tracking_number\']').after('<div class="text-danger"> ' + json['error_tracking_number'] + '</div>');
+
+				// Highlight any found errors
+				$('#quickorderview input[name=\'tracking_number\']').parent().addClass('has-error');
+			}
+			
+			if(json['notify_customer']){
+				$('#quickorderview input[name=\'notify\']').prop('checked',true);
+			}
+			
+			if(json['message']){
+				$('#quickorderview #input-comment').val(json['message']);
+			}else{
+				$('#quickorderview #input-comment').val('');
+			}
+		}
+	});
+});
+
+$('#quickorderview select[name="order_status_id"]').change(function(){
+	var status_id = $('#quickorderview select[name="order_status_id"]').val();
+	$.ajax({
+		url: 'index.php?route=extension/me_order_manager_setting/getmessage&user_token={{ user_token }}&status_id='+status_id,
+		type: 'post',
+		dataType: 'json',
+		beforeSend: function() {
+			$('#quickorderview select[name="order_status_id"]').after(' <i class="fa fa-circle-o-notch fa-spin"></i>');
+		},
+		complete: function() {
+			$('.fa-spin').remove();
+		},
+		success: function (json) {
+			if(json['message']){
+				$('#quickorderview #input-comment').val(json['message']);
+			}else{
+				$('#quickorderview #input-comment').val('');
+			}
+		}
+  });
+});
+$('#quickorderview select[name="order_status_id"]').trigger('change');
+//--></script> 

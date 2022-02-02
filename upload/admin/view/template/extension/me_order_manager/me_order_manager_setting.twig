@@ -1,0 +1,921 @@
+{{ header }}
+<link href="view/javascript/colorpicker/css/bootstrap-colorpicker.min.css" rel="stylesheet">
+<script src="view/javascript/colorpicker/js/bootstrap-colorpicker.min.js"></script>
+<link href="view/javascript/me_order_manager/style.css" rel="stylesheet">
+{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+		<a href="{{ importdemo }}" data-toggle="tooltip" title="{{ button_import_demo }}" class="btn btn-success" onclick="confirm('{{ text_confirm }}') ? true : false;"><i class="fa fa-download"></i></a>
+        <button type="submit" form="form-module" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+      </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+			<ul class="nav nav-tabs">
+				<li class="active"><a href="#tab-general" data-toggle="tab">{{ tab_general }}</a></li>
+				<li><a href="#tab-filter" data-toggle="tab">{{ tab_filter }}</a></li>
+				<li><a href="#tab-columns" data-toggle="tab">{{ tab_column }}</a></li>
+				<li><a href="#tab-bulk_update_status" data-toggle="tab">{{ tab_bulk_update_status }}</a></li>
+				<li><a href="#tab-order_status_color" data-toggle="tab">{{ tab_order_status_color }}</a></li>
+				<li><a href="#tab-quickviewpopup" data-toggle="tab">{{ tab_quickviewpopup }}</a></li>
+				<li><a href="#tab-ordertracking" data-toggle="tab">{{ tab_ordertracking }}</a></li>
+				<li><a href="#tab-export_columns" data-toggle="tab">{{ tab_export_columns }}</a></li>
+				<li><a href="#tab-support" data-toggle="tab">{{ tab_support }}</a></li>
+			</ul>
+			<div class="tab-content">
+				<!-- General Tab begin -->
+				<div class="tab-pane active" id="tab-general">
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_exportorderbtn }}">{{ entry_exportorderbtn }}</span></label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[exportorderbtn]" value="1" {% if module_me_order_manager_setting.exportorderbtn %}checked="checked"{% endif %} />
+							{{ text_enabled }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[exportorderbtn]" value="0" {% if not module_me_order_manager_setting.exportorderbtn %}checked="checked" {% endif %}/>
+							{{ text_disabled }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_quickviewbtn }}">{{ entry_quickviewbtn }}</span></label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[quickviewbtn]" value="1" {% if module_me_order_manager_setting.quickviewbtn %}checked="checked"{% endif %} />
+							{{ text_enabled }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[quickviewbtn]" value="0" {% if not module_me_order_manager_setting.quickviewbtn %}checked="checked" {% endif %}/>
+							{{ text_disabled }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_invoicebtn }}">{{ entry_invoicebtn }}</span></label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[invoicebtn]" value="1" {% if module_me_order_manager_setting.invoicebtn %}checked="checked"{% endif %} />
+							{{ text_enabled }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[invoicebtn]" value="0" {% if not module_me_order_manager_setting.invoicebtn %}checked="checked" {% endif %}/>
+							{{ text_disabled }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_editbtn }}">{{ entry_editbtn }}</span></label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[editbtn]" value="1" {% if module_me_order_manager_setting.editbtn %}checked="checked"{% endif %} />
+							{{ text_enabled }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[editbtn]" value="0" {% if not module_me_order_manager_setting.editbtn %}checked="checked" {% endif %}/>
+							{{ text_disabled }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_deletebtn }}">{{ entry_deletebtn }}</span></label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[deletebtn]" value="1" {% if module_me_order_manager_setting.deletebtn %}checked="checked"{% endif %} />
+							{{ text_enabled }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[deletebtn]" value="0" {% if not module_me_order_manager_setting.deletebtn %}checked="checked" {% endif %}/>
+							{{ text_disabled }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_geninvoicebtn }}">{{ entry_geninvoicebtn }}</span></label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[geninvoicebtn]" value="1" {% if module_me_order_manager_setting.geninvoicebtn %}checked="checked"{% endif %} />
+							{{ text_enabled }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[geninvoicebtn]" value="0" {% if not module_me_order_manager_setting.geninvoicebtn %}checked="checked" {% endif %}/>
+							{{ text_disabled }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_bulkorderstatusupdate }}">{{ entry_bulkorderstatusupdate }}</span></label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[bulkorderstatus]" value="1" {% if module_me_order_manager_setting.bulkorderstatus %}checked="checked"{% endif %} />
+							{{ text_enabled }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[bulkorderstatus]" value="0" {% if not module_me_order_manager_setting.bulkorderstatus %}checked="checked" {% endif %}/>
+							{{ text_disabled }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_bulkinvoicebtn }}">{{ entry_bulkinvoicebtn }}</span></label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[bulkinvoicebtn]" value="1" {% if module_me_order_manager_setting.bulkinvoicebtn %}checked="checked"{% endif %} />
+							{{ text_enabled }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[bulkinvoicebtn]" value="0" {% if not module_me_order_manager_setting.bulkinvoicebtn %}checked="checked" {% endif %}/>
+							{{ text_disabled }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_bulkdeletebtn }}">{{ entry_bulkdeletebtn }}</span></label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[bulkdeletebtn]" value="1" {% if module_me_order_manager_setting.bulkdeletebtn %}checked="checked"{% endif %} />
+							{{ text_enabled }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[bulkdeletebtn]" value="0" {% if not module_me_order_manager_setting.bulkdeletebtn %}checked="checked" {% endif %}/>
+							{{ text_disabled }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_bulkshippingbtn }}">{{ entry_bulkshippingbtn }}</span></label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[bulkshippingbtn]" value="1" {% if module_me_order_manager_setting.bulkshippingbtn %}checked="checked"{% endif %} />
+							{{ text_enabled }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[bulkshippingbtn]" value="0" {% if not module_me_order_manager_setting.bulkshippingbtn %}checked="checked" {% endif %}/>
+							{{ text_disabled }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-displayproducts"><span data-toggle="tooltip" title="{{ help_displayproducts }}">{{ entry_displayproducts }}</span></label>
+						<div class="col-sm-6">
+						  <select name="module_me_order_manager_setting[displayproducts]" id="input-displayproducts" class="form-control">
+							{% if module_me_order_manager_setting.displayproducts %}
+							<option value="1" selected="selected">{{ text_popup }}</option>
+							<option value="0">{{ text_list }}</option>
+							{% else %}
+							<option value="1">{{ text_popup }}</option>
+							<option value="0" selected="selected">{{ text_list }}</option>
+							{% endif %}
+						  </select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-exportformat">{{ entry_exportformat }}</label>
+						<div class="col-sm-6">
+						  <select name="module_me_order_manager_setting[exportformat]" id="input-exportformat" class="form-control">
+							<option value="xls" {% if module_me_order_manager_setting.exportformat == 'xls' %}selected="selected"{% endif %}>{{ text_xls }}</option>
+							<option value="csv" {% if module_me_order_manager_setting.exportformat == 'csv' %}selected="selected"{% endif %}>{{ text_csv }}</option>
+							</select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_totalorders }}">{{ entry_total_orders }}</span></label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[total_orders]" value="1" {% if module_me_order_manager_setting.total_orders %}checked="checked"{% endif %} />
+							{{ text_enabled }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[total_orders]" value="0" {% if not module_me_order_manager_setting.total_orders %}checked="checked" {% endif %}/>
+							{{ text_disabled }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-process-status"><span data-toggle="tooltip" title="{{ help_choose_status }}">{{ entry_choose_status }}</span></label>
+						<div class="col-sm-10">
+							<div class="well well-sm" style="height: 150px; overflow: auto;"> {% for order_status in order_statuses %}
+								<div class="checkbox">
+									<label> {% if order_status.order_status_id in module_me_order_manager_setting.total_order_status %}
+									  <input type="checkbox" name="module_me_order_manager_setting[total_order_status][]" value="{{ order_status.order_status_id }}" checked="checked" />
+									  {{ order_status.name }}
+									  {% else %}
+									  <input type="checkbox" name="module_me_order_manager_setting[total_order_status][]" value="{{ order_status.order_status_id }}" />
+									  {{ order_status.name }}
+									  {% endif %} </label>
+								</div>
+							  {% endfor %} </div>
+						</div>
+					</div>
+				</div>
+				<!-- General Tab finish -->
+				
+				<!-- Filter Tab begin -->
+				<div class="tab-pane" id="tab-filter">
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-fstatus">{{ entry_status }}</label>
+						<div class="col-sm-6">
+						  <select name="module_me_order_manager_setting_filter[status]" id="input-fstatus" class="form-control">
+							{% if module_me_order_manager_setting_filter.status %}
+							<option value="1" selected="selected">{{ text_enabled }}</option>
+							<option value="0">{{ text_disabled }}</option>
+							{% else %}
+							<option value="1">{{ text_enabled }}</option>
+							<option value="0" selected="selected">{{ text_disabled }}</option>
+							{% endif %}
+						  </select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_displayorder_id }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[order_id]" value="1" {% if module_me_order_manager_setting_filter.order_id %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[order_id]" value="0" {% if not module_me_order_manager_setting_filter.order_id %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+						<label class="col-sm-2 control-label">{{ entry_displaycustomer }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[customer]" value="1" {% if module_me_order_manager_setting_filter.customer %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[customer]" value="0" {% if not module_me_order_manager_setting_filter.customer %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_displaycustomeremail }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[customeremail]" value="1" {% if module_me_order_manager_setting_filter.customeremail %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[customeremail]" value="0" {% if not module_me_order_manager_setting_filter.customeremail %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+						<label class="col-sm-2 control-label">{{ entry_displaycustomertelephone }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[customertelephone]" value="1" {% if module_me_order_manager_setting_filter.customertelephone %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[customertelephone]" value="0" {% if not module_me_order_manager_setting_filter.customertelephone %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_displayorder_status }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[order_status]" value="1" {% if module_me_order_manager_setting_filter.order_status %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[order_status]" value="0" {% if not module_me_order_manager_setting_filter.order_status %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+						<label class="col-sm-2 control-label">{{ entry_displaytotal }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[total]" value="1" {% if module_me_order_manager_setting_filter.total %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[total]" value="0" {% if not module_me_order_manager_setting_filter.total %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_displaydate_added }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[date_added]" value="1" {% if module_me_order_manager_setting_filter.date_added %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[date_added]" value="0" {% if not module_me_order_manager_setting_filter.date_added %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+						<label class="col-sm-2 control-label">{{ entry_displaydate_modified }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[date_modified]" value="1" {% if module_me_order_manager_setting_filter.date_modified %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[date_modified]" value="0" {% if not module_me_order_manager_setting_filter.date_modified %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_displaypayment_method }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[payment_method]" value="1" {% if module_me_order_manager_setting_filter.payment_method %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[payment_method]" value="0" {% if not module_me_order_manager_setting_filter.payment_method %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+						<label class="col-sm-2 control-label">{{ entry_displayshipping_method }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[shipping_method]" value="1" {% if module_me_order_manager_setting_filter.shipping_method %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[shipping_method]" value="0" {% if not module_me_order_manager_setting_filter.shipping_method %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_displaycustomer_group }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[customer_group]" value="1" {% if module_me_order_manager_setting_filter.customer_group %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[customer_group]" value="0" {% if not module_me_order_manager_setting_filter.customer_group %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+						<label class="col-sm-2 control-label">{{ entry_displaystore }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[store]" value="1" {% if module_me_order_manager_setting_filter.store %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[store]" value="0" {% if not module_me_order_manager_setting_filter.store %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_displayproduct }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[product]" value="1" {% if module_me_order_manager_setting_filter.product %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[product]" value="0" {% if not module_me_order_manager_setting_filter.product %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+						<label class="col-sm-2 control-label">{{ entry_displayip }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[ip]" value="1" {% if module_me_order_manager_setting_filter.ip %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[ip]" value="0" {% if not module_me_order_manager_setting_filter.ip %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_display_limit }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[display_limit]" value="1" {% if module_me_order_manager_setting_filter.display_limit %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[display_limit]" value="0" {% if not module_me_order_manager_setting_filter.display_limit %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+						<label class="col-sm-2 control-label">{{ entry_limit }}</label>
+						<div class="col-sm-4">
+							<input type="text" name="module_me_order_manager_setting_filter[limit]" value="{{ module_me_order_manager_setting_filter.limit ? module_me_order_manager_setting_filter.limit : '20' }}" placeholder="{{ entry_limit }}" id="input-limit" class="form-control" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_displaypaymentcountry }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[payment_country]" value="1" {% if module_me_order_manager_setting_filter.payment_country %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[payment_country]" value="0" {% if not module_me_order_manager_setting_filter.payment_country %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+						<label class="col-sm-2 control-label">{{ entry_displayshippingcountry }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[shipping_country]" value="1" {% if module_me_order_manager_setting_filter.shipping_country %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[shipping_country]" value="0" {% if not module_me_order_manager_setting_filter.shipping_country %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_countries }}</label>
+						<div class="col-sm-4">
+							<select name="module_me_order_manager_setting_filter[country_id]" id="input-state" class="form-control">
+							<option value="">{{ text_select }}</option>
+							{% for country in countries %}
+							<option value="{{ country.country_id }}" {% if country.country_id == module_me_order_manager_setting_filter.country_id %}selected="selected"{% endif %}>{{ country.name }}</option>
+							{% endfor %}
+							</select>
+						</div>
+						<label class="col-sm-2 control-label">{{ entry_displayshippingstate }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[shippingstate]" value="1" {% if module_me_order_manager_setting_filter.shippingstate %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[shippingstate]" value="0" {% if not module_me_order_manager_setting_filter.shippingstate %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_displaycarrier_name }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[carrier_name]" value="1" {% if module_me_order_manager_setting_filter.carrier_name %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[carrier_name]" value="0" {% if not module_me_order_manager_setting_filter.carrier_name %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+						<label class="col-sm-2 control-label">{{ entry_displaytracking_code }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[tracking_code]" value="1" {% if module_me_order_manager_setting_filter.tracking_code %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[tracking_code]" value="0" {% if not module_me_order_manager_setting_filter.tracking_code %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_displaycurrency }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[currency]" value="1" {% if module_me_order_manager_setting_filter.currency %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_filter[currency]" value="0" {% if not module_me_order_manager_setting_filter.currency %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					</div>
+				</div>
+				<!-- Filter Tab finish -->
+				
+				<!-- Columns Tab begin -->
+				<div class="tab-pane" id="tab-columns">
+					<ul class="connected-sortable droppable-area1 list-unstyled">
+					  {% if order_manager_setting %}
+						{% set columns = order_manager_setting %}
+					  {% endif %}
+					  {% set i = 0 %}
+						{% for key,column in columns %}
+						<li class="draggable-item"><i class="fa fa-arrows"></i> {% if column.name %}{{ column.name }}{% else %}{{ column }}{% endif %} <input type="hidden" name="module_me_order_manager_setting_column[{{ key }}][sort_order]" class="sort_order" value="{% if column.sort_order %}{{ column.sort_order }}{% else %}{{ i }}{% endif %}"><label class="switch pull-right"><input type="checkbox" {% if column.status == 'on' %}checked{% endif %} name="module_me_order_manager_setting_column[{{ key }}][status]"><span class="slider"></span></label></li>
+						{% set i = i+1 %}
+						{% endfor %}
+					  </ul>
+				</div>
+				<!-- Columns Tab finish -->
+				
+				<!-- Bulk Update Order Status Tab begin -->
+				<div class="tab-pane" id="tab-bulk_update_status">
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-fstatus">{{ entry_activeorder_status }}</label>
+						<div class="col-sm-10">
+						  <select name="module_me_order_manager_setting_active_orderstatus" id="input-fstatus" class="form-control">
+							{% for order_status in order_statuses %}
+							<option value="{{ order_status.order_status_id }}" {% if order_status.order_status_id == module_me_order_manager_setting_active_orderstatus %}selected="selected"{% endif %}>{{ order_status.name }}</option>
+							{% endfor %}
+						  </select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_smsonupdate }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_sms" value="1" {% if module_me_order_manager_setting_sms %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_sms" value="0" {% if not module_me_order_manager_setting_sms %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_apikey }}</label>
+						<div class="col-sm-8">
+							<textarea name="module_me_order_manager_setting_api" rows="5" id="input-apikey" placeholder="{{ entry_apikey }}" class="form-control">{{ module_me_order_manager_setting_api }}</textarea>
+						</div>
+						<div class="col-sm-2">
+							Shortcode:<br/>
+							{mobile} : Customer Mobile Number
+							{message} : Message
+						</div>
+					</div>
+					<br/>
+					<legend>{{ entry_comment }}</legend>
+					<ul class="nav nav-tabs" id="order_status_comment">
+						{% for order_status in order_statuses %}
+						<li><a href="#tab-order_status-{{ order_status.order_status_id }}" data-toggle="tab"> {{ order_status.name }}</a></li>
+						{% endfor %}
+					</ul>
+					<div class="tab-content">
+						{% for order_status in order_statuses %}
+						<div class="tab-pane" id="tab-order_status-{{ order_status.order_status_id }}">
+							<div class="form-group">
+								<label class="col-sm-2 control-label" for="input-buos-status">{{ entry_status }}</label>
+								<div class="col-sm-10">
+								  <select name="module_me_order_manager_setting_bulkupdate[{{ order_status.order_status_id }}][status]" id="input-buos-status" class="form-control">
+									{% if module_me_order_manager_setting_bulkupdate[order_status.order_status_id].status %}
+									<option value="1" selected="selected">{{ text_enabled }}</option>
+									<option value="0">{{ text_disabled }}</option>
+									{% else %}
+									<option value="1">{{ text_enabled }}</option>
+									<option value="0" selected="selected">{{ text_disabled }}</option>
+									{% endif %}
+								  </select>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label" for="input-comment{{ order_status.order_status_id }}">{{ entry_predefined_order_comment }}<br/><br/>
+								SHORTCODES:<br/>
+								{order_id}<br/>
+								{firstname}<br/>
+								{lastname}
+								{order_status}
+								{date_added}
+								</label>
+								<div class="col-sm-10">
+									<textarea name="module_me_order_manager_setting_bulkupdate[{{ order_status.order_status_id }}][comment]" rows="8" id="input-comment{{ order_status.order_status_id }}" placeholder="{{ entry_predefined_order_comment }}" class="form-control">{{ module_me_order_manager_setting_bulkupdate[order_status.order_status_id].comment }}</textarea>
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label" for="input-comment-template{{ order_status.order_status_id }}">{{ entry_template }}<br/><br/>
+								SHORTCODES:<br/>
+								{order_id}<br/>
+								{firstname}<br/>
+								{lastname}
+								{order_status}
+								{date_added}<br/>
+								{comment}<br/>
+								{store_name}<br/>
+								{store_url}<br/>
+								{store_logo}<br/>
+								{total_cost}<br/>
+								{products}
+								</label>
+								<div class="col-sm-10">
+									<textarea name="module_me_order_manager_setting_template[{{ order_status.order_status_id }}]" rows="8" id="input-comment-template{{ order_status.order_status_id }}" data-toggle="summernote" data-lang="{{ summernote }}" placeholder="{{ entry_comment }}" class="form-control">{{ module_me_order_manager_setting_template[order_status.order_status_id] }}</textarea>
+								</div>
+							</div>
+						</div>
+						{% endfor %}
+					</div>
+				</div>
+				<!-- Bulk Update Order Status Tab begin -->
+				
+				<!-- Order Status Color Tab begin -->
+				<div class="tab-pane" id="tab-order_status_color">
+					<div class="table-responsive">
+						<table class="table table-striped table-bordered table-hover">
+							<thead>
+								<tr>
+								  <td class="text-left">{{ entry_order_status_name }}</td>
+								  <td class="text-left">{{ entry_bgcolor }}</td>
+								  <td class="text-left">{{ entry_textcolor }}</td>
+								</tr>
+							  </thead>
+							<tbody>
+								<tr>
+									<td>{{ text_missing_orders }}</td>
+									<td>
+										<div class="input-group colorpicker-component">
+											<input type="text" name="module_me_order_manager_setting_ostatus[0][bgcolor]" value="{{ module_me_order_manager_setting_ostatus[0]['bgcolor'] }}" class="form-control" /> <span class="input-group-addon"><i></i></span>
+										</div>
+									</td>
+									<td>
+										<div class="input-group colorpicker-component">
+											<input type="text" name="module_me_order_manager_setting_ostatus[0][color]" value="{{ module_me_order_manager_setting_ostatus[0]['color'] }}" class="form-control" /> <span class="input-group-addon"><i></i></span>
+										</div>
+									</td>
+								</tr>
+								{% for order_status in order_statuses %}
+								<tr>
+									<td>{{ order_status.name }}</td>
+									<td>
+										<div class="input-group colorpicker-component">
+											<input type="text" name="module_me_order_manager_setting_ostatus[{{ order_status.order_status_id }}][bgcolor]" value="{{ module_me_order_manager_setting_ostatus[order_status.order_status_id]['bgcolor'] }}" class="form-control" /> <span class="input-group-addon"><i></i></span>
+										</div>
+									</td>
+									<td>
+										<div class="input-group colorpicker-component">
+											<input type="text" name="module_me_order_manager_setting_ostatus[{{ order_status.order_status_id }}][color]" value="{{ module_me_order_manager_setting_ostatus[order_status.order_status_id]['color'] }}" class="form-control" /> <span class="input-group-addon"><i></i></span>
+										</div>
+									</td>
+								</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<!-- Order Status Color Tab finish -->
+				
+				<!-- Quick View Popup Tab begin -->
+				<div class="tab-pane" id="tab-quickviewpopup">
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_display_order_detail }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[order_detail]" value="1" {% if module_me_order_manager_setting.order_detail %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[order_detail]" value="0" {% if not module_me_order_manager_setting.order_detail %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_display_customer_detail }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[customer_detail]" value="1" {% if module_me_order_manager_setting.customer_detail %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[customer_detail]" value="0" {% if not module_me_order_manager_setting.customer_detail %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_display_options }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[options]" value="1" {% if module_me_order_manager_setting.options %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[options]" value="0" {% if not module_me_order_manager_setting.options %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_display_orderinfo }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[orderinfo]" value="1" {% if module_me_order_manager_setting.orderinfo %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[orderinfo]" value="0" {% if not module_me_order_manager_setting.orderinfo %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_display_orderhistory }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[orderhistory]" value="1" {% if module_me_order_manager_setting.orderhistory %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting[orderhistory]" value="0" {% if not module_me_order_manager_setting.orderhistory %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					</div>
+				</div>
+				<!-- Quick View Popup Tab finish -->
+				
+				<!-- Order Tracking Tab begin -->
+				<div class="tab-pane" id="tab-ordertracking">
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-tstatus">{{ entry_status }}</label>
+						<div class="col-sm-10">
+						  <select name="module_me_order_manager_setting_tracking[status]" id="input-tstatus" class="form-control">
+							{% if module_me_order_manager_setting_tracking.status %}
+							<option value="1" selected="selected">{{ text_enabled }}</option>
+							<option value="0">{{ text_disabled }}</option>
+							{% else %}
+							<option value="1">{{ text_enabled }}</option>
+							<option value="0" selected="selected">{{ text_disabled }}</option>
+							{% endif %}
+						  </select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-tostatus">{{ entry_shipped_order_status }}</label>
+						<div class="col-sm-10">
+						  <select name="module_me_order_manager_setting_tracking[orderstatus]" id="input-tostatus" class="form-control">
+							{% for order_status in order_statuses %}
+							<option value="{{ order_status.order_status_id }}" {% if order_status.order_status_id == module_me_order_manager_setting_tracking.orderstatus %}selected="selected"{% endif %}>{{ order_status.name }}</option>
+							{% endfor %}
+						  </select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label">{{ entry_autocheck_notify }}</label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_tracking[notify]" value="1" {% if module_me_order_manager_setting_tracking.notify %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_order_manager_setting_tracking[notify]" value="0" {% if not module_me_order_manager_setting_tracking.notify %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					</div>
+					<hr/>
+					<div class="row">
+						<div class="col-sm-3">
+							<ul class="nav nav-pills nav-stacked" id="order_tracking">
+								<li class="active"><a href="#tab-carriers" data-toggle="tab">{{ tab_carriers }}</a></li>
+								<li><a href="#tab-otcomment" data-toggle="tab">{{ tab_otcomment }}</a></li>
+							</ul>
+						</div>
+						<div class="col-sm-9">
+							<div class="tab-content">
+								<div class="tab-pane active" id="tab-carriers">
+									<table id="carrier" class="table table-striped table-bordered table-hover">
+										<thead>
+											<tr>
+												<td class="text-left">{{ entry_carrier_name }}</td>
+												<td class="text-left">{{ entry_url }} (Tracking Number = {tracking_number})</td>
+												<td></td>
+											</tr>
+										</thead>
+										<tbody>
+											{% set carrier_row = 0 %}
+											{% for carrier in module_me_order_manager_setting_tracking.carrier %}
+											<tr id="carrier-row{{ carrier_row }}">
+												<td class="text-left"><input type="text" name="module_me_order_manager_setting_tracking[carrier][{{ carrier_row }}][name]" value="{{ carrier.name }}" placeholder="{{ entry_carrier_name }}" class="form-control" /></td>
+												<td class="text-right"><input type="text" name="module_me_order_manager_setting_tracking[carrier][{{ carrier_row }}][url]" value="{{ carrier.url }}" placeholder="{{ entry_url }}" id="input-url" class="form-control" /></td>
+												<td class="text-right"><button type="button" onclick="$('#carrier-row{{ carrier_row }}').remove();" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button></td>
+											</tr>
+											{% set carrier_row = carrier_row + 1 %}
+											{% endfor %}
+										</tbody>
+										<tfoot>
+											<tr>
+											  <td colspan="2"></td>
+											  <td class="text-right"><button type="button" onclick="addCarrierRow();" data-toggle="tooltip" title="{{ button_carrier_add }}" class="btn btn-primary"><i class="fa fa-plus-circle"></i></button></td>
+											</tr>
+										</tfoot>
+									</table>
+								</div>
+								<div class="tab-pane" id="tab-otcomment">
+									<div class="form-group">
+										<label class="col-sm-2 control-label" for="input-otcomment">{{ entry_comment }}<br/><br/>
+										SHORTCODES:<br/>
+										{carrier_name}
+										{tracking_code}
+										{tracking_url}
+										</label>
+										<div class="col-sm-10">
+											<textarea name="module_me_order_manager_setting_tracking[comment]" rows="8" id="input-otcomment" placeholder="{{ entry_comment }}" class="form-control">{{ module_me_order_manager_setting_tracking.comment }}</textarea>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- Order Tracking Tab finish -->
+				
+				<!-- Export Columns Tab begin -->
+				<div class="tab-pane" id="tab-export_columns">
+					<div class="clearfix" style="padding: 7px 10px;">
+						<div class="pull-right">
+						  <label class="switch pull-right"><input type="checkbox" {% if module_me_order_manager_setting_export_column_all %}checked{% endif %} name="module_me_order_manager_setting_export_column_all" onclick="$('.connected-sortables input[type=\'checkbox\']').prop('checked', this.checked);"><span class="slider"></span></label>
+						</div>
+						<label class="pull-right" style="margin-right:5px;">Select ALL: </label>
+					</div>
+					<ul class="connected-sortables droppable-area1 list-unstyled">
+					  {% if export_column_setting %}
+						{% set export_columns = export_column_setting %}
+					  {% endif %}
+					  {% set i = 0 %}
+						{% for key,column in export_columns %}
+						<li class="draggable-item"><i class="fa fa-arrows"></i> {% if column.name %}{{ column.name }}{% else %}{{ column }}{% endif %} <input type="hidden" name="module_me_order_manager_setting_export_column[{{ key }}][sort_order]" class="sort_order" value="{% if column.sort_order %}{{ column.sort_order }}{% else %}{{ i }}{% endif %}"><label class="switch pull-right"><input type="checkbox" {% if column.status == 'on' %}checked{% endif %} name="module_me_order_manager_setting_export_column[{{ key }}][status]"><span class="slider"></span></label></li>
+						{% set i = i+1 %}
+						{% endfor %}
+					  </ul>
+				</div>
+				<!-- Export Columns Tab finish -->
+				
+				<!-- Support Tab begin -->
+				<div class="tab-pane" id="tab-support">
+					<h4 class="text-center">For Support Please mail at <a href="mailto:support@martextensions.in">support@martextensions.in</a></h4>
+				</div>
+				<!-- Support Tab finish -->
+			</div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script src="view/javascript/me_order_manager/jquery-ui.min.js"></script>
+<script type="text/javascript" src="view/javascript/summernote/summernote.js"></script>
+<link href="view/javascript/summernote/summernote.css" rel="stylesheet" />
+<script type="text/javascript" src="view/javascript/summernote/summernote-image-attributes.js"></script>
+<script type="text/javascript" src="view/javascript/summernote/opencart.js"></script>
+<script>
+	$('.colorpicker-component').colorpicker();	  
+</script>
+<script>
+$('.connected-sortable').sortable({
+	stop: function(event, ui) {
+		$(".connected-sortable li").each(function(i, el){
+			var index = $(el).index();
+			$(this).find('.sort_order').val(index);
+		});
+	}
+});
+
+$('.connected-sortables').sortable({
+	stop: function(event, ui) {
+		$(".connected-sortables li").each(function(i, el){
+			var index = $(el).index();
+			$(this).find('.sort_order').val(index);
+		});
+	}
+});
+$('#order_status_comment a:first').tab('show');
+</script>
+<script type="text/javascript"><!--
+var carrier_row = {{ carrier_row }};
+
+function addCarrierRow() {
+	html  = '<tr id="carrier-row' + carrier_row + '">';
+    html += '  <td class="text-left">';
+	html += '    <input type="text" name="module_me_order_manager_setting_tracking[carrier][' + carrier_row + '][name]" value="" placeholder="{{ entry_carrier_name }}" class="form-control" />';
+	html += '  </td>';
+	html += '  <td class="text-left"><input type="text" name="module_me_order_manager_setting_tracking[carrier][' + carrier_row + '][url]" value="" placeholder="{{ entry_url }}" id="input-url" class="form-control" /></td>';
+	html += '  <td class="text-right"><button type="button" onclick="$(\'#carrier-row' + carrier_row + '\').remove();" data-toggle="tooltip" title="{{ button_remove }}" class="btn btn-danger"><i class="fa fa-minus-circle"></i></button></td>';
+	html += '</tr>';
+
+	$('#carrier tbody').append(html);
+
+	carrier_row++;
+}
+//--></script>
+{{ footer }}
