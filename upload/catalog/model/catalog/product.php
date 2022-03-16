@@ -438,7 +438,7 @@ class ModelCatalogProduct extends Model {
        // $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_to_category p2c LEFT JOIN " . DB_PREFIX . "product p ON (p2c.product_id = p.product_id) WHERE (p2c.category_id = '" . (int)$getCat->row['category_id'] . "'  AND (p2c.product_id != '" . (int)$product_id . "'  LIMIT 0,5");
 
 
-        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_to_category WHERE category_id = '" . (int)$getCat->row['category_id'] . "' AND product_id != '" . (int)$product_id . "'  LIMIT 0,5");
+        $query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_to_category p2c LEFT JOIN " . DB_PREFIX . "product p ON (p2c.product_id = p.product_id) WHERE p2c.category_id = '" . (int)$getCat->row['category_id'] . "'  AND  p.status = '1' AND p.quantity > '0' AND p2c.product_id != '" . (int)$product_id . "'  LIMIT 0,5");
 
 
 
