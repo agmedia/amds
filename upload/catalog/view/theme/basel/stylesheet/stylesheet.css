@@ -4628,16 +4628,7 @@ h4.follow-title {margin-bottom:5px;}
 	text-align: left;
 }
 
-#footer input[type="checkbox"] {
-	position: absolute;
-	left: -9999px;
-	display: inline;
-}
 
-#footer input[type="checkbox"]:checked + label::before {
-	color: #040707;
-	border-color: #040707;
-}
 
 .footer-support a {
 	font-size: 24px;
