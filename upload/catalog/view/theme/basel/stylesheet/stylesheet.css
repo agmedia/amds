@@ -4598,35 +4598,6 @@ h4.follow-title {margin-bottom:5px;}
 }
 
 
-#footer input[type="checkbox"] + label::before {
-	content: "";
-	position: absolute;
-	display: block;
-	width: 20px;
-	height: 20px;
-	text-indent: 1px;
-	color: #fff;
-	border: 1px solid #CECECE;
-	left: 0;
-	text-align: center;
-	top: 0;
-	content: "\e90d";
-	font: 10px/22px "icomoon";
-	transition: all .3s;
-	-webkit-backface-visibility: hidden;
-	-webkit-tap-highlight-color: transparent;
-	line-height: 16px;
-}
-
-#footer input[type="checkbox"] + label {
-	cursor: pointer;
-	position: relative;
-	padding: 1px 0 0 34px;
-	min-height: 22px;
-	line-height: 19px;
-	font-size: 14px;
-	text-align: left;
-}
 
 
 
