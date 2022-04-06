@@ -51,7 +51,7 @@ class ControllerExtensionFeedKlaviyo extends Controller {
 
                 $output .= '<price>' . number_format($product['price'], '2','.','').  '</price>';
 
-                $output .= '<category>' . $this->getCategoriesName($product['product_id']).  '</category>';
+                $output .= '<categories>' . $this->getCategoriesName($product['product_id']).  '</categories>';
 
 
 
