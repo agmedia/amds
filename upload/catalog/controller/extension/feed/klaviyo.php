@@ -1,6 +1,6 @@
 <?php
 
-class ControllerExtensionFeedFacebookstore extends Controller {
+class ControllerExtensionFeedKlaviyo extends Controller {
 
     public function index()
     {
