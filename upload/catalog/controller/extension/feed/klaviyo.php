@@ -51,7 +51,7 @@ class ControllerExtensionFeedKlaviyo extends Controller {
 
                 $output .= '<price>' . number_format($product['price'], '2','.','').  '</price>';
 
-
+                $output .= '<category>' . $this->getPath($product['product_id']).  '</category>';
 
 
 
@@ -141,7 +141,7 @@ class ControllerExtensionFeedKlaviyo extends Controller {
 
                 if ($category['parent_id'] != 0) {
                     $parent = $this->model_catalog_category->getCategory($category['parent_id']);
-                    $name   = $parent['name'] . ' > ' . $category['name'];
+                    $name   = $parent['name'] . ',' . $category['name'];
                 }
             }
         }
