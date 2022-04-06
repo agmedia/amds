@@ -49,7 +49,7 @@ class ControllerExtensionFeedKlaviyo extends Controller {
                 $output .= '<image_link>' . $this->wrapInCDATA(HTTPS_SERVER.'image/' . $product['image']) . '</image_link>';
 
 
-                $output .= '<price>' . number_format($product['price'], '2','.','')  '</price>';
+                $output .= '<price>' . number_format($product['price'], '2','.','').  '</price>';
 
 
 
