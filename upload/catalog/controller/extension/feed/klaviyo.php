@@ -139,7 +139,7 @@ class ControllerExtensionFeedKlaviyo extends Controller {
                 $category = $this->model_catalog_category->getCategory($item['category_id']);
                 $name     = $category['name'];
 
-                if ($category['parent_id'] != 0) {
+             if ($category['parent_id'] != 0) {
                     $parent = $this->model_catalog_category->getCategory($category['parent_id']);
                     $name   = $parent['name'] . ',' . $category['name'];
                 }
