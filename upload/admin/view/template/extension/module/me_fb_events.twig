@@ -1,0 +1,791 @@
+{{ header }}{{ column_left }}
+<div id="content">
+  <div class="page-header">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <button type="submit" form="form-module" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
+        <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
+      <h1>{{ heading_title }}</h1>
+      <ul class="breadcrumb">
+        {% for breadcrumb in breadcrumbs %}
+        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+  <div class="container-fluid">
+    {% if error_warning %}
+    <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}
+      <button type="button" class="close" data-dismiss="alert">&times;</button>
+    </div>
+    {% endif %}
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3 class="panel-title"><i class="fa fa-pencil"></i> {{ text_edit }}</h3>
+		<div class="pull-right">
+			<label for="input-store">{{ entry_store }}</label>
+			<select name="store_id" id="input-store">
+				{% for store in stores %}
+				{% if store.store_id == store_id %}
+				<option value="{{ store.store_id }}" selected="selected">{{ store.name }}</option>
+				{% else %}
+				<option value="{{ store.store_id }}">{{ store.name }}</option>
+				{% endif %}
+				{% endfor %}
+			</select>
+		</div>
+	  </div>
+      <div class="panel-body">
+        <form action="{{ action }}" method="post" enctype="multipart/form-data" id="form-module" class="form-horizontal">
+			<ul class="nav nav-tabs">
+				<li class="active"><a href="#tab-general" data-toggle="tab">{{ tab_general }}</a></li>
+				<li><a href="#tab-feed_setting" data-toggle="tab">{{ tab_feed_setting }}</a></li>
+				<li><a href="#tab-google_category" data-toggle="tab">{{ tab_google_category }}</a></li>
+				<li><a href="#tab-facebook_category" data-toggle="tab">{{ tab_facebook_category }}</a></li>
+				<li><a href="#tab-support" data-toggle="tab">{{ tab_support }}</a></li>
+			</ul>
+			<div class="tab-content">
+				<!-- General Tab begin -->
+				<div class="tab-pane active" id="tab-general">
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-status">{{ entry_status }}</label>
+						<div class="col-sm-10">
+						  <select name="module_me_fb_events_status" id="input-status" class="form-control">
+							{% if module_me_fb_events_status %}
+							<option value="1" selected="selected">{{ text_enabled }}</option>
+							<option value="0">{{ text_disabled }}</option>
+							{% else %}
+							<option value="1">{{ text_enabled }}</option>
+							<option value="0" selected="selected">{{ text_disabled }}</option>
+							{% endif %}
+						  </select>
+						</div>
+					  </div>
+					  <div class="form-group">
+						<label class="col-sm-2 control-label" for="input-pixel_id">{{ entry_pixel_id }}</label>
+						<div class="col-sm-10">
+						  <input type="text" name="module_me_fb_events_pixel_id" value="{{ module_me_fb_events_pixel_id }}" placeholder="{{ entry_pixel_id }}" id="input-pixel_id" class="form-control" />
+						</div>
+					  </div>
+					  <div class="form-group">
+						<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_track_view }}">{{ entry_track_view }}</span></label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_fb_events_track_view" value="1" {% if module_me_fb_events_track_view %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_fb_events_track_view" value="0" {% if not module_me_fb_events_track_view %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					  </div>
+					  <div class="form-group">
+						<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_track_content }}">{{ entry_track_content }}</span></label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_fb_events_track_content" value="1" {% if module_me_fb_events_track_content %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_fb_events_track_content" value="0" {% if not module_me_fb_events_track_content %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					  </div>
+					  <div class="form-group">
+						<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_track_cart }}">{{ entry_track_cart }}</span></label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_fb_events_track_cart" value="1" {% if module_me_fb_events_track_cart %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_fb_events_track_cart" value="0" {% if not module_me_fb_events_track_cart %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					  </div>
+					  <div class="form-group">
+						<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_track_wishlist }}">{{ entry_track_wishlist }}</span></label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_fb_events_track_wishlist" value="1" {% if module_me_fb_events_track_wishlist %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_fb_events_track_wishlist" value="0" {% if not module_me_fb_events_track_wishlist %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					  </div>
+					  <div class="form-group">
+						<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_track_checkout }}">{{ entry_track_checkout }}</span></label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_fb_events_track_checkout" value="1" {% if module_me_fb_events_track_checkout %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_fb_events_track_checkout" value="0" {% if not module_me_fb_events_track_checkout %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					  </div>
+					  <div class="form-group">
+						<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_track_purchase }}">{{ entry_track_purchase }}</span></label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_fb_events_track_purchase" value="1" {% if module_me_fb_events_track_purchase %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_fb_events_track_purchase" value="0" {% if not module_me_fb_events_track_purchase %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					  </div>
+					  <div class="form-group">
+						<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_track_search }}">{{ entry_track_search }}</span></label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_fb_events_track_search" value="1" {% if module_me_fb_events_track_search %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_fb_events_track_search" value="0" {% if not module_me_fb_events_track_search %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					  </div>
+					  <div class="form-group">
+						<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_track_contact }}">{{ entry_track_contact }}</span></label>
+						<div class="col-sm-4">
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_fb_events_track_contact" value="1" {% if module_me_fb_events_track_contact %}checked="checked"{% endif %} />
+							{{ text_yes }}
+							</label>
+							<label class="radio-inline"> 
+							<input type="radio" name="module_me_fb_events_track_contact" value="0" {% if not module_me_fb_events_track_contact %}checked="checked" {% endif %}/>
+							{{ text_no }}
+							</label>
+						</div>
+					  </div>
+				</div>
+				<!-- General Tab finish -->
+				
+				<!-- Feed Setting Tab begin -->
+				<div class="tab-pane" id="tab-feed_setting">
+					<div class="row">
+					<div class="col-sm-3">
+						<ul class="nav nav-pills nav-stacked" id="feed">
+							{% set tab_row = 0 %}
+							{% for feed in module_me_fb_events_feeds %}
+							 <li><a href="#tab-feed{{ tab_row }}" data-toggle="tab"><i class="fa fa-minus-circle" onclick="$('a[href=\'#tab-feed{{ tab_row }}\']').parent().remove(); $('#tab-feed{{ tab_row }}').remove(); $('#feed a:first').tab('show');"></i> {{ feed.name }}</a></li>
+							{% set tab_row = tab_row + 1 %}
+							 {% endfor %}
+							  <li id="feedtab-add"><a style="cursor:pointer" onclick="addfeed();"><i class="fa fa-plus-circle"></i> {{ button_module_add }}</a></li>
+						</ul>
+					</div>
+					{% set tab_row = 0 %}
+					<div class="col-sm-9">
+						<div class="tab-content">
+						   {% for key,feed in module_me_fb_events_feeds %}
+							  <div class="tab-pane" id="tab-feed{{ tab_row }}">
+								  {% if feed.name %}
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="input-data-feed">{{ entry_feed_url }}</label>
+									<div class="col-sm-10">
+										<input type="text" class="form-control" value="{{ feed.link }}" readonly>
+									</div>
+								</div>
+								{% endif %}
+								<div class="form-group required">
+									<label class="col-sm-2 control-label" for="input-name">{{ entry_name }}</label>
+									<div class="col-sm-10"><input type="text" class="form-control" value="{{ feed.name }}" placeholder="{{ entry_name }}" name="module_me_fb_events_feed[{{ tab_row }}][name]" />
+									 {% if error_feed[key] %}
+									  <div class="text-danger">{{ error_feed[key] }}</div>
+									  {% endif %}</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="input-type">{{ entry_store }}</label>
+									<div class="col-sm-4">
+										<select name="module_me_fb_events_feed[{{ tab_row }}][store_id]" class="form-control">
+											{% for store in stores %}
+											<option value="{{ store.store_id }}" {% if feed.store_id == store.store_id %} selected="selected"{% endif %} >{{ store.name }}</option>
+											{% endfor %}
+										</select>
+									</div>
+									<label class="col-sm-2 control-label" for="input-type">{{ entry_customer_cgroup }}</label>
+									<div class="col-sm-4">
+										<select name="module_me_fb_events_feed[{{ tab_row }}][customer_cgroup]" class="form-control">
+											{% for customer_group in customer_groups %}
+											<option value="{{ customer_group.customer_group_id }}" {% if feed.customer_cgroup == customer_group.customer_group_id %}selected="selected"{% endif %}>{{ customer_group.name }}</option>
+											{% endfor %}
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="input-type">{{ entry_language }}</label>
+									<div class="col-sm-4">
+										<select name="module_me_fb_events_feed[{{ tab_row }}][language_id]" class="form-control">
+											{% for language in languages %}
+											<option value="{{ language.language_id }}" {% if feed.language_id == language.language_id %}selected="selected"{% endif %}>{{ language.name }}</option>
+											{% endfor %}
+										</select>
+									</div>
+									<label class="col-sm-2 control-label" for="input-type">{{ entry_currency }}</label>
+									<div class="col-sm-4">
+										<select name="module_me_fb_events_feed[{{ tab_row }}][currency]" class="form-control">
+											{% for currency in currencies %}
+											<option value="{{ currency.code }}" {% if feed.currency == currency.code %}selected="selected"{% endif %}>{{ currency.title }}</option>
+											{% endfor %}
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="input-type">{{ entry_category }}</label>
+									<div class="col-sm-10">
+										<div class="well category" style="height:200px;overflow:auto;">
+											{% for category in categories %}
+											<div class="checkbox">
+												<label>
+													<input type="checkbox" name="module_me_fb_events_feed[{{ tab_row }}][category][]" {% if category.category_id in feed.category %}checked="checked"{% endif %} value="{{ category.category_id }}" /> {{ category.name }}
+												</label>
+											</div>
+											{% endfor %}
+										</div>
+										<a onclick="selectall('category',{{ tab_row }});">{{ text_select_all }}</a> / <a onclick="deselectall('category',{{ tab_row }});">{{ text_unselect_all }}</a>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="input-type">{{ entry_manufacturer }}</label>
+									<div class="col-sm-10">
+										<div class="well manufacturer" style="height:200px;overflow:auto;">
+											{% for manufacturer in manufacturers %}
+											<div class="checkbox">
+												<label>
+													<input type="checkbox" name="module_me_fb_events_feed[{{ tab_row }}][manufacturer][]" {% if manufacturer.manufacturer_id in feed.manufacturer %}checked="checked"{% endif %} value="{{ manufacturer.manufacturer_id }}" /> {{ manufacturer.name }}
+												</label>
+											</div>
+											{% endfor %}
+										</div>
+										<a onclick="selectall('manufacturer',{{ tab_row }});">{{ text_select_all }}</a> / <a onclick="deselectall('manufacturer',{{ tab_row }});">{{ text_unselect_all }}</a>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label" for="input-type">{{ entry_gid_tag }}</label>
+									<div class="col-sm-4">
+										<select class="form-control" name="module_me_fb_events_feed[{{ tab_row }}][gid_tag]">
+											<option value="product_id" {% if feed.gid_tag == 'product_id' %}selected="selected"{% endif %}>{{ entry_product_id }}</option>
+											<option value="model" {% if feed.gid_tag == 'model' %}selected="selected"{% endif %}>{{ entry_model }}</option>
+											<option value="sku" {% if feed.gid_tag == 'sku' %}selected="selected"{% endif %}>{{ entry_sku }}</option>
+											<option value="upc" {% if feed.gid_tag == 'upc' %}selected="selected"{% endif %}>{{ entry_upc }}</option>
+											<option value="ean" {% if feed.gid_tag == 'ean' %}selected="selected"{% endif %}>{{ entry_ean }}</option>
+											<option value="jan" {% if feed.gid_tag == 'jan' %}selected="selected"{% endif %}>{{ entry_jan }}</option>
+											<option value="isbn" {% if feed.gid_tag == 'isbn' %}selected="selected"{% endif %}>{{ entry_isbn }}</option>
+											<option value="mpn" {% if feed.gid_tag == 'mpn' %}selected="selected"{% endif %}>{{ entry_mpn }}</option>
+										</select>
+									</div>
+									<label class="col-sm-2 control-label">{{ entry_pricewithtax }}</label>
+									<div class="col-sm-4">
+										<label class="radio-inline"> 
+											<input type="radio" name="module_me_fb_events_feed[{{ tab_row }}][pricetax]" {% if feed.pricetax %}checked="checked"{% endif %} value="1" />
+											{{ text_yes }}
+										</label>
+										<label class="radio-inline">
+											<input type="radio" name="module_me_fb_events_feed[{{ tab_row }}][pricetax]" value="0" {% if not feed.pricetax %}checked="checked"{% endif %}/>
+											{{ text_no }}
+										</label>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_gcategory_status }}">{{ entry_gcategory_status }}</span></label>
+									<div class="col-sm-4">
+										<label class="radio-inline"> 
+											<input type="radio" name="module_me_fb_events_feed[{{ tab_row }}][gcategory_status]" {% if feed.gcategory_status %}checked="checked"{% endif %} value="1" />
+											{{ text_yes }}
+										</label>
+										<label class="radio-inline">
+											<input type="radio" name="module_me_fb_events_feed[{{ tab_row }}][gcategory_status]" value="0" {% if not feed.gcategory_status %}checked="checked"{% endif %}/>
+											{{ text_no }}
+										</label>
+									</div>
+									<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_fbcategory_status }}">{{ entry_fbcategory_status }}</span></label>
+									<div class="col-sm-4">
+										<label class="radio-inline"> 
+											<input type="radio" name="module_me_fb_events_feed[{{ tab_row }}][fbcategory_status]" {% if feed.fbcategory_status %}checked="checked"{% endif %} value="1" />
+											{{ text_yes }}
+										</label>
+										<label class="radio-inline">
+											<input type="radio" name="module_me_fb_events_feed[{{ tab_row }}][fbcategory_status]" value="0" {% if not feed.fbcategory_status %}checked="checked"{% endif %}/>
+											{{ text_no }}
+										</label>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-sm-2 control-label">{{ entry_price }}</label>
+									<div class="col-sm-4">
+										<input style="display:inline-block; width:47%;"; type="text" name="module_me_fb_events_feed[{{ tab_row }}][minprice]" value="{{ feed.minprice }}" placeholder="To" id="input-price" class="form-control" /> - <input style="display:inline-block; width:47%;"; type="text" name="module_me_fb_events_feed[{{ tab_row }}][maxprice]" value="{{ feed.maxprice }}" placeholder="From" id="input-price" class="form-control"/>
+									</div>
+									<label class="col-sm-2 control-label">{{ entry_qty }}</label>
+									<div class="col-sm-4">
+										<input style="display:inline-block; width:47%;"; type="text" name="module_me_fb_events_feed[{{ tab_row }}][minqty]" value="{{ feed.minqty }}" placeholder="To" id="input-price" class="form-control" /> - <input style="display:inline-block; width:47%;"; type="text" name="module_me_fb_events_feed[{{ tab_row }}][maxqty]" value="{{ feed.maxqty }}" placeholder="From" id="input-price" class="form-control"/>
+									</div>
+								</div>
+							  </div>
+							  {% set tab_row = tab_row + 1 %}
+							{% endfor %}
+						</div>
+					</div>
+				</div>
+				</div>
+				<!-- Feed Setting Tab finish -->
+				
+				<!-- Google Category Tab begin -->
+				<div class="tab-pane" id="tab-google_category">
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-glanguage">{{ entry_language }}</label>
+						<div class="col-sm-4">
+							<select name="module_me_fb_events_glanguage" id="input-flanguage" class="form-control">
+								<option value="en-GB" {% if module_me_fb_events_glanguage == 'en-GB' %}selected="selected"{% endif %}>English (UK)</option>
+								<option value="en-US" {% if module_me_fb_events_glanguage == 'en-US' %}selected="selected"{% endif %}>English (US)</option>
+								<option value="en-AU" {% if module_me_fb_events_glanguage == 'en-AU' %}selected="selected"{% endif %}>English (Australia)</option>
+								<option value="pt-BR" {% if module_me_fb_events_glanguage == 'pt-BR' %}selected="selected"{% endif %}>Portuguese</option>
+								<option value="fr-FR" {% if module_me_fb_events_glanguage == 'fr-FR' %}selected="selected"{% endif %}>French</option>
+								<option value="de-DE" {% if module_me_fb_events_glanguage == 'de-DE' %}selected="selected"{% endif %}>Deutsch</option>
+								<option value="it-IT" {% if module_me_fb_events_glanguage == 'it-IT' %}selected="selected"{% endif %}>Italian</option>
+								<option value="tr-TR" {% if module_me_fb_events_glanguage == 'tr-TR' %}selected="selected"{% endif %}>Turkish</option>
+							</select>
+						</div>
+					</div>
+					<div id="google_category">
+						<table class="table table-bordered">
+						  <thead>
+							<tr>
+							  <td class="text-left">{{ column_category_id }}</td>
+							  <td class="text-left" style="width:40%;">{{ column_category }}</td>
+							  <td class="text-left">{{ column_google_category }}</td>
+							</tr>
+						  </thead>
+						  <tbody>
+							{% if categories %}
+							{% for category in categories %}
+							<tr id="cate{{ category.category_id }}">
+							  <td class="text-left">{{ category.category_id }}</td>
+							  <td class="text-left">{{ category.name }}</td>
+							  <td class="text-left"><div class="input-group"><input type="text" name="gcategory" value="{{ google_categories[category.category_id].google_category }}" rel="{{ category.category_id }}" placeholder="{{ entry_category }}" id="input-category" class="form-control" /><span class="input-group-btn"><button type="button" class="btn btn-primary btn-category" onclick="savecategory('{{ category.category_id }}')"><i class="fa fa-check"></i></button><button type="button" class="btn btn-default" onclick="removecategory('{{ category.category_id }}')"><i class="fa fa-times"></i></button></span></div>
+							  <input type="hidden" name="google_category_id" value="{{ google_categories[category.category_id].google_category_id }}"/>
+							  <input type="hidden" name="google_category" value="{{ google_categories[category.category_id].google_category }}"/></td>
+							</tr>
+							{% endfor %}
+							{% else %}
+							<tr>
+							  <td class="text-center" colspan="3">{{ text_no_results }}</td>
+							</tr>
+							{% endif %}
+						  </tbody>
+						</table>
+						<div class="row">
+						  <div class="col-sm-6 text-left">{{ pagination }}</div>
+						  <div class="col-sm-6 text-right">{{ results }}</div>
+						</div>
+					</div>
+				</div>
+				<!-- Google Category Tab finish -->
+				
+				<!-- Facebook Category Tab begin -->
+				<div class="tab-pane" id="tab-facebook_category">
+					<div class="form-group">
+						<label class="col-sm-2 control-label" for="input-flanguage">{{ entry_language }}</label>
+						<div class="col-sm-4">
+							<select name="module_me_fb_events_flanguage" id="input-flanguage" class="form-control">
+								<option value="en_GB" {% if module_me_fb_events_flanguage == 'en_GB' %}selected="selected"{% endif %}>English (UK)</option>
+								<option value="en_US" {% if module_me_fb_events_flanguage == 'en_US' %}selected="selected"{% endif %}>English (US)</option>
+								<option value="ar_AR" {% if module_me_fb_events_flanguage == 'ar_AR' %}selected="selected"{% endif %}>Arabic</option>
+								<option value="pt_BR" {% if module_me_fb_events_flanguage == 'pt_BR' %}selected="selected"{% endif %}>Portuguese</option>
+								<option value="fr_FR" {% if module_me_fb_events_flanguage == 'fr_FR' %}selected="selected"{% endif %}>French</option>
+								<option value="zh_TW" {% if module_me_fb_events_flanguage == 'zh_TW' %}selected="selected"{% endif %}>Chinese</option>
+								<option value="it_IT" {% if module_me_fb_events_flanguage == 'it_IT' %}selected="selected"{% endif %}>Italian</option>
+								<option value="tr_TR" {% if module_me_fb_events_flanguage == 'tr_TR' %}selected="selected"{% endif %}>Turkish</option>
+							</select>
+						</div>
+					</div>
+					<div id="facebook_category">
+						<table class="table table-bordered">
+						  <thead>
+							<tr>
+							  <td class="text-left">{{ column_category_id }}</td>
+							  <td class="text-left" style="width:40%;">{{ column_category }}</td>
+							  <td class="text-left">{{ column_facebook_category }}</td>
+							</tr>
+						  </thead>
+						  <tbody>
+							{% if categories %}
+							{% for category in categories %}
+							<tr id="fbcate{{ category.category_id }}">
+							  <td class="text-left">{{ category.category_id }}</td>
+							  <td class="text-left">{{ category.name }}</td>
+							  <td class="text-left"><div class="input-group"><input type="text" name="fcategory" value="{{ facebook_categories[category.category_id].facebook_category }}" rel="{{ category.category_id }}" placeholder="{{ entry_category }}" id="input-category" class="form-control" /><span class="input-group-btn"><button type="button" class="btn btn-primary btn-category" onclick="savefbcategory('{{ category.category_id }}')"><i class="fa fa-check"></i></button><button type="button" class="btn btn-default" onclick="removefbcategory('{{ category.category_id }}')"><i class="fa fa-times"></i></button></span></div>
+							  <input type="hidden" name="facebook_category_id" value="{{ facebook_categories[category.category_id].facebook_category_id }}"/>
+							  <input type="hidden" name="facebook_category" value="{{ facebook_categories[category.category_id].facebook_category }}"/></td>
+							</tr>
+							{% endfor %}
+							{% else %}
+							<tr>
+							  <td class="text-center" colspan="3">{{ text_no_results }}</td>
+							</tr>
+							{% endif %}
+						  </tbody>
+						</table>
+						<div class="row">
+						  <div class="col-sm-6 text-left">{{ fpagination }}</div>
+						  <div class="col-sm-6 text-right">{{ fresults }}</div>
+						</div>
+					</div>
+				</div>
+				<!-- Facebook Category Tab finish -->
+				
+				<!-- Support Tab begin -->
+				<div class="tab-pane" id="tab-support">
+					<h4 class="text-center">For Support Please mail at <a href="mailto:support@martextensions.in">support@martextensions.in</a></h4>
+				</div>
+				<!-- Support Tab finish -->
+			</div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<script type="text/javascript"><!--
+ var tab_row = {{ tab_row }};
+function addfeed(){
+	tab_row++;
+	html  = '<div class="tab-pane" id="tab-feed' + tab_row + '">';
+	html += '<div class="form-group required">';
+	html += '<label class="col-sm-2 control-label" for="input-name">{{ entry_name }}</label>';
+	html += '<div class="col-sm-10"><input type="text" class="form-control" value="" placeholder="{{ entry_name }}" name="module_me_fb_events_feed[' + tab_row + '][name]" id="feedinput_' + tab_row + '" /></div>';
+	html += '</div>';	
+	html += '<div class="form-group">';
+	html += '<label class="col-sm-2 control-label" for="input-type">{{ entry_store }}</label>';
+	html += '<div class="col-sm-4"><select name="module_me_fb_events_feed[' + tab_row + '][store_id]" class="form-control">';
+	{% for store in stores %}
+	html += '<option value="{{ store.store_id }}">{{ store.name }}</option>';
+	{% endfor %}
+	html += '</select></div>';
+	html += '<label class="col-sm-2 control-label" for="input-type">{{ entry_customer_cgroup }}</label>';
+	html += '<div class="col-sm-4"><select name="module_me_fb_events_feed[' + tab_row + '][customer_cgroup]" class="form-control">';
+	{% for customer_group in customer_groups %}
+	html += '<option value="{{ customer_group.customer_group_id }}">{{ customer_group.name }}</option>';
+	{% endfor %}
+	html += '</select></div>';
+	html += '</div>';
+	html += '<div class="form-group">';
+	html += '<label class="col-sm-2 control-label" for="input-type">{{ entry_language }}</label>';
+	html += '<div class="col-sm-4"><select name="module_me_fb_events_feed[' + tab_row + '][language_id]" class="form-control">';
+	{% for language in languages %}
+	html += '<option value="{{ language.language_id }}">{{ language.name }}</option>';
+	{% endfor %}
+	html += '</select></div>';
+	html += '<label class="col-sm-2 control-label" for="input-type">{{ entry_currency }}</label>';
+	html += '<div class="col-sm-4"><select name="module_me_fb_events_feed[' + tab_row + '][currency]" class="form-control">';
+	{% for currency in currencies %}
+	html += '<option value="{{ currency.code }}">{{ currency.title }}</option>';
+	{% endfor %}
+	html += '</select></div>';
+	html += '</div>';
+	html += '<div class="form-group">';
+	html += '<label class="col-sm-2 control-label" for="input-type">{{ entry_category }}</label>';
+	html += '<div class="col-sm-10">';
+	html += '<div class="well category" style="height:200px;overflow:auto;">';
+		{% for category in categories %}
+	html += '	<div class="checkbox">';
+	html += '	  <label>';
+	html += '		<input type="checkbox" name="module_me_fb_events_feed[' + tab_row + '][category][]" value="{{ category.category_id }}" /> {{ category.name }} ';
+	html += '	  </label>';
+	html += '	</div>';
+		{% endfor %}
+	html += '  </div>';
+	html += '  <a onclick="selectall(\'category\',' + tab_row + ');">{{ text_select_all }}</a> / <a onclick="deselectall(\'category\',' + tab_row + ');">{{ text_unselect_all }}</a>';
+	html += '</div>';
+	html += '</div>';
+	html += '<div class="form-group">';
+	html += '<label class="col-sm-2 control-label" for="input-type">{{ entry_manufacturer }}</label>';
+	html += '<div class="col-sm-10">';
+	html += '<div class="well manufacturer" style="height:200px;overflow:auto;">';
+	{% for manufacturer in manufacturers %}
+	html += '	<div class="checkbox">';
+	html += '	  <label>';
+	html += '		<input type="checkbox" name="module_me_fb_events_feed[' + tab_row + '][manufacturer][]" value="{{ manufacturer.manufacturer_id }}" /> {{ manufacturer.name }} ';
+	html += '	  </label>';
+	html += '	</div>';
+		{% endfor %}
+	html += '  </div>';
+	html += '  <a onclick="selectall(\'manufacturer\',' + tab_row + ');">{{ text_select_all }}</a> / <a onclick="deselectall(\'manufacturer\',' + tab_row + ');">{{ text_unselect_all }}</a>';
+	html += '</div>';
+	html += '</div>';
+	html += '<div class="form-group">';
+	html += '<label class="col-sm-2 control-label" for="input-type">{{ entry_gid_tag }}</label>';
+	html += '<div class="col-sm-4"><select class="form-control" name="module_me_fb_events_feed[' + tab_row + '][gid_tag]">';
+	html += '<option value="product_id">{{ entry_product_id }}</option>';
+	html += '<option value="model">{{ entry_model }}</option>';
+	html += '<option value="sku">{{ entry_sku }}</option>';
+	html += '<option value="upc">{{ entry_upc }}</option>';
+	html += '<option value="ean">{{ entry_ean }}</option>';
+	html += '<option value="jan">{{ entry_jan }}</option>';
+	html += '<option value="isbn">{{ entry_isbn }}</option>';
+	html += '<option value="mpn">{{ entry_mpn }}</option>';
+	html += '</select></div>';
+	html += '<label class="col-sm-2 control-label">{{ entry_pricewithtax }}</label>';
+	html += '<div class="col-sm-4">';
+	html += '<label class="radio-inline"> ';
+	html += '<input type="radio" name="module_me_fb_events_feed[' + tab_row + '][pricetax]" value="1" />';
+	html += ' {{ text_yes }}';
+	html += '</label>';
+	html += '<label class="radio-inline"> ';
+	html += '<input type="radio" name="module_me_fb_events_feed[' + tab_row + '][pricetax]" value="0" checked="checked"/>';
+	html += ' {{ text_no }}';
+	html += '</label>';
+	html += '</div>';
+	html += '</div>';
+	html += '<div class="form-group">';
+	html += '	<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_gcategory_status }}">{{ entry_gcategory_status }}</span></label>';
+	html += '	<div class="col-sm-4">';
+	html += '		<label class="radio-inline">'; 
+	html += '			<input type="radio" name="module_me_fb_events_feed[' + tab_row + '][gcategory_status]" value="1" /> {{ text_yes }}';		
+	html += '		</label>';
+	html += '		<label class="radio-inline">';
+	html += '			<input type="radio" name="module_me_fb_events_feed[' + tab_row + '][gcategory_status]" value="0" checked="checked"/>{{ text_no }}</label>';
+	html += '	</div>';
+	html += '	<label class="col-sm-2 control-label"><span data-toggle="tooltip" title="{{ help_fbcategory_status }}">{{ entry_fbcategory_status }}</span></label>';
+	html += '	<div class="col-sm-4">';
+	html += '		<label class="radio-inline"> ';
+	html += '			<input type="radio" name="module_me_fb_events_feed[' + tab_row + '][fbcategory_status]" value="1" />';
+	html += '			{{ text_yes }}';
+	html += '		</label>';
+	html += '		<label class="radio-inline">';
+	html += '			<input type="radio" name="module_me_fb_events_feed[' + tab_row + '][fbcategory_status]" value="0" checked="checked"/>';
+	html += '			{{ text_no }}';
+	html += '		</label>';
+	html += '	</div>';
+	html += '</div>';
+	html += '<div class="form-group">';
+	html += '<label class="col-sm-2 control-label">{{ entry_price }}</label>';
+	html += '<div class="col-sm-4"><input style="display:inline-block; width:47%;"; type="text" name="module_me_fb_events_feed[' + tab_row + '][minprice]" value="" placeholder="To" id="input-price" class="form-control" /> - <input style="display:inline-block; width:47%;"; type="text" name="module_me_fb_events_feed[' + tab_row + '][maxprice]" value="" placeholder="From" id="input-price" class="form-control"/></div>';
+	html += '<label class="col-sm-2 control-label">{{ entry_qty }}</label>';
+	html += '<div class="col-sm-4"><input style="display:inline-block; width:47%;"; type="text" name="module_me_fb_events_feed[' + tab_row + '][minqty]" value="" placeholder="To" id="input-price" class="form-control" /> - <input style="display:inline-block; width:47%;"; type="text" name="module_me_fb_events_feed[' + tab_row + '][maxqty]" value="" placeholder="From" id="input-price" class="form-control"/></div>';
+	html += '</div>';
+	html += '</div>';
+	
+	$('#tab-feed_setting .tab-content:first-child').prepend(html);
+
+	$('#feedtab-add').before('<li><a href="#tab-feed' + tab_row + '" data-toggle="tab"><i class="fa fa-minus-circle" onclick="$(\'a[href=\\\'#tab-feed' + tab_row + '\\\']\').parent().remove(); $(\'#tab-feed' + tab_row + '\').remove(); $(\'#tab-feed a:first\').tab(\'show\');"></i> {{tab_feed}} - ' + tab_row + '</a></li>');
+
+	$('#tab-feed_setting a[href=\'#tab-feed' + tab_row + '\']').tab('show');
+	
+	$('[data-toggle=\'tooltip\']').tooltip({
+	  container: 'body',
+	  html: true
+  });
+}
+$('#tab-feed_setting a:first').tab('show');
+function selectall(type,tabrrow){
+	$('#tab-feed'+ tabrrow +' .'+type).parent().find(':checkbox').prop('checked', true);
+}
+function deselectall(type,tabrrow){
+	$('#tab-feed'+ tabrrow +' .'+type).parent().find(':checkbox').prop('checked', false);
+}
+
+$('input[name=\'gcategory\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=extension/module/me_fb_events/getCategories&user_token={{ user_token }}&language_code='+ $('select[name="module_me_fb_events_glanguage"]').val()+'&filter_name=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) {
+            return {
+              label: item['name'],
+              value: item['category_id']
+            }
+          }));
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+          alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+      });
+    },
+    'select': function(item) {
+		var rel = $(this).attr('rel');
+		$(this).val(item['label']);
+      $('#cate'+ rel +' input[name="google_category"]').val(item['label']);
+	$('#cate'+ rel +' input[name="google_category_id"]').val(item['value']);
+  }
+});
+
+$('input[name=\'fcategory\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=extension/module/me_fb_events/getFbCategories&user_token={{ user_token }}&language_code='+ $('select[name="module_me_fb_events_flanguage"]').val()+'&filter_name=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) {
+            return {
+              label: item['name'],
+              value: item['category_id']
+            }
+          }));
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+          alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+      });
+    },
+    'select': function(item) {
+		var rel = $(this).attr('rel');
+		$(this).val(item['label']);
+      $('#fbcate'+ rel +' input[name="facebook_category"]').val(item['label']);
+	$('#fbcate'+ rel +' input[name="facebook_category_id"]').val(item['value']);
+  }
+});
+
+function savecategory(category_id){
+	$.ajax({
+		url: 'index.php?route=extension/module/me_fb_events/savecategory&user_token={{ user_token }}&category_id='+category_id,
+		type: 'post',
+		dataType: 'json',
+		data: $('#cate'+ category_id +' input[name="google_category"],#cate'+ category_id +' input[name="google_category_id"],#cate'+ category_id +' input[name="gcategory"]'),
+		beforeSend: function() {
+			
+		},
+		complete: function() {
+			
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#category').before('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+			}
+
+			if (json['success']) {
+				$('#cate'+ category_id + '.btn-category').removeClass('btn-primary');
+				$('#cate'+ category_id +' .btn-category').addClass('btn-success');
+				$('#category').before('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+			}
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+}
+
+function removecategory(category_id){
+	$.ajax({
+		url: 'index.php?route=extension/module/me_fb_events/removecategory&user_token={{ user_token }}&category_id='+category_id,
+		type: 'post',
+		dataType: 'json',
+		beforeSend: function() {
+			
+		},
+		complete: function() {
+			
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#category').before('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+			}
+
+			if (json['success']) {
+				$('#cate'+ category_id +' input[name="gcategory"]').val('');
+				$('#category').before('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+			}
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+}
+
+$('#google_category').delegate('.pagination a', 'click', function(e) {
+    e.preventDefault();
+
+    $('#google_category').fadeOut('slow');
+
+    $('#google_category').load(this.href);
+
+    $('#google_category').fadeIn('slow');
+});
+
+function savefbcategory(category_id){
+	$.ajax({
+		url: 'index.php?route=extension/module/me_fb_events/savefbcategory&user_token={{ user_token }}&category_id='+category_id,
+		type: 'post',
+		dataType: 'json',
+		data: $('#fbcate'+ category_id +' input[name="facebook_category"],#fbcate'+ category_id +' input[name="facebook_category_id"],#fbcate'+ category_id +' input[name="fcategory"]'),
+		beforeSend: function() {
+			
+		},
+		complete: function() {
+			
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#category').before('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+			}
+
+			if (json['success']) {
+				$('#fbcate'+ category_id + '.btn-category').removeClass('btn-primary');
+				$('#fbcate'+ category_id +' .btn-category').addClass('btn-success');
+				$('#category').before('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+			}
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+}
+
+function removefbcategory(category_id){
+	$.ajax({
+		url: 'index.php?route=extension/module/me_fb_events/removefbcategory&user_token={{ user_token }}&category_id='+category_id,
+		type: 'post',
+		dataType: 'json',
+		beforeSend: function() {
+			
+		},
+		complete: function() {
+			
+		},
+		success: function(json) {
+			$('.alert-dismissible').remove();
+
+			if (json['error']) {
+				$('#category').before('<div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> ' + json['error'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+			}
+
+			if (json['success']) {
+				$('#fbcate'+ category_id +' input[name="fcategory"]').val('');
+				$('#category').before('<div class="alert alert-success alert-dismissible"><i class="fa fa-check-circle"></i> ' + json['success'] + ' <button type="button" class="close" data-dismiss="alert">&times;</button></div>');
+			}
+		},
+		error: function(xhr, ajaxOptions, thrownError) {
+			alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+		}
+	});
+}
+
+$('#facebook_category').delegate('.pagination a', 'click', function(e) {
+    e.preventDefault();
+
+    $('#facebook_category').fadeOut('slow');
+
+    $('#facebook_category').load(this.href);
+
+    $('#facebook_category').fadeIn('slow');
+});
+//--></script>
+{{ footer }}

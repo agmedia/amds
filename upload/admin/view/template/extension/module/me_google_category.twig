@@ -1,0 +1,58 @@
+<table class="table table-bordered">
+  <thead>
+	<tr>
+	  <td class="text-left">{{ column_category_id }}</td>
+	  <td class="text-left" style="width:40%;">{{ column_category }}</td>
+	  <td class="text-left">{{ column_google_category }}</td>
+	</tr>
+  </thead>
+  <tbody>
+	{% if categories %}
+	{% for category in categories %}
+	<tr id="cate{{ category.category_id }}">
+	  <td class="text-left">{{ category.category_id }}</td>
+	  <td class="text-left">{{ category.name }}</td>
+	  <td class="text-left"><div class="input-group"><input type="text" name="gcategory" value="{{ google_categories[category.category_id].google_category }}" rel="{{ category.category_id }}" placeholder="{{ entry_category }}" id="input-category" class="form-control" /><span class="input-group-btn"><button type="button" class="btn btn-primary btn-category" onclick="savecategory('{{ category.category_id }}')"><i class="fa fa-check"></i></button><button type="button" class="btn btn-default" onclick="removecategory('{{ category.category_id }}')"><i class="fa fa-times"></i></button></span></div>
+	  <input type="hidden" name="google_category_id" value="{{ google_categories[category.category_id].google_category_id }}"/>
+	  <input type="hidden" name="google_category" value="{{ google_categories[category.category_id].google_category }}"/></td>
+	</tr>
+	{% endfor %}
+	{% else %}
+	<tr>
+	  <td class="text-center" colspan="3">{{ text_no_results }}</td>
+	</tr>
+	{% endif %}
+  </tbody>
+</table>
+<div class="row">
+  <div class="col-sm-6 text-left">{{ pagination }}</div>
+  <div class="col-sm-6 text-right">{{ results }}</div>
+</div>
+
+<script>
+$('input[name=\'gcategory\']').autocomplete({
+    'source': function(request, response) {
+      $.ajax({
+        url: 'index.php?route=extension/module/me_fb_events/getCategories&user_token={{ user_token }}&language_code='+ $('select[name="module_me_fb_events_glanguage"]').val()+'&filter_name=' +  encodeURIComponent(request),
+        dataType: 'json',
+        success: function(json) {
+          response($.map(json, function(item) {
+            return {
+              label: item['name'],
+              value: item['category_id']
+            }
+          }));
+        },
+        error: function(xhr, ajaxOptions, thrownError) {
+          alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        }
+      });
+    },
+    'select': function(item) {
+		var rel = $(this).attr('rel');
+		$(this).val(item['label']);
+      $('#cate'+ rel +' input[name="google_category"]').val(item['label']);
+	$('#cate'+ rel +' input[name="google_category_id"]').val(item['value']);
+  }
+});
+</script>
