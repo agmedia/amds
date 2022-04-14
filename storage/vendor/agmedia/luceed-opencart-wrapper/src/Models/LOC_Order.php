@@ -199,7 +199,7 @@ class LOC_Order
             //$this->order['sa__skladiste_uid'] = agconf('luceed.default_warehouse_luid');
             //$this->order['na__skladiste_uid'] = '565-2987';
             //$this->order['skl_dokument'] = 'MSO';
-            $this->order['vrsta_isporuke_uid'] = '3-2987';
+            $this->order['vrsta_isporuke_uid'] = '6-2987';
             $this->order['korisnik__partner_uid'] = $this->customer_uid;
             $this->call_raspis = false;
         }
@@ -208,7 +208,7 @@ class LOC_Order
             $this->order['sa__skladiste_uid'] = $this->has_all_in_warehouses[0];
             $this->order['na__skladiste_uid'] = '565-2987';
             $this->order['skl_dokument'] = 'MS';
-            $this->order['vrsta_isporuke_uid'] = '3-2987';
+            $this->order['vrsta_isporuke_uid'] = '6-2987';
             $this->order['korisnik__partner_uid'] = $this->customer_uid;
         }
 
@@ -423,8 +423,8 @@ class LOC_Order
                 }
             }
 
-            $this->log('has_all_in_main_warehouse: ', $this->has_all_in_main_warehouse ? '1' : '0');
-            $this->log('has_all_in_warehouses: ', $this->has_all_in_warehouses ? '1' : '0');
+            $this->log('has_all_in_main_warehouse: ', $this->has_all_in_main_warehouse ? 'yes' : 'no');
+            $this->log('has_all_in_warehouses: ', $this->has_all_in_warehouses ? 'yes' : 'no');
 
             if ($this->has_all_in_warehouses && isset($this->has_all_in_warehouses[0])) {
                 return true;
@@ -741,6 +741,22 @@ class LOC_Order
         }
 
         return true;
+    }
+
+
+    /**
+     * Return the corrected response from luceed service.
+     * Without unnecessary tags.
+     *
+     * @param $products
+     *
+     * @return array
+     */
+    private function setLuceedOrders($orders): array
+    {
+        $json = json_decode($orders);
+
+        return $json->result[0]->nalozi_prodaje;
     }
 
 
