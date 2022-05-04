@@ -145,4 +145,24 @@ class ControllerCheckoutCheckout extends Controller {
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));
 	}
+
+    public function places()
+    {
+        $loc = new \Agmedia\LuceedOpencartWrapper\Models\LOC_Places();
+
+        $loc->getList();
+
+        if (isset($this->request->get['city'])) {
+            $loc->find($this->request->get['city']);
+        }
+
+        if (isset($this->request->get['postcode'])) {
+            $loc->find($this->request->get['postcode'], 'zipcode');
+        }
+
+        $loc->limit(5);
+
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput($loc->places->toJson());
+    }
 }

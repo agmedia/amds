@@ -144,6 +144,35 @@
 </div>
 </div>
 
+<script src="catalog/view/theme/basel/js/agmedia_common.js"></script>
+<script>
+    $(() => {
+        let key = 'payment';
+
+        $('#input-' + key + '-city, #input-' + key + '-postcode').keyup((e) => {
+            let target = e.currentTarget;
+
+            if (target.value.length > 1) {
+                if (target.id == 'input-' + key + '-city') {
+                    callPlaces('city', target.value, key);
+
+                }
+
+                if (target.id == 'input-' + key + '-postcode') {
+                    callPlaces('postcode', target.value, key);
+                }
+            }
+        });
+
+        $('#input-' + key + '-city, #input-' + key + '-postcode').on('blur', () => {
+            setTimeout(function() {
+                document.getElementById(key + '-city-drop').style['display'] = 'none';
+                document.getElementById(key + '-postcode-drop').style['display'] = 'none';
+            }, 300);
+        });
+    });
+</script>
+
 <script type="text/javascript"><!--
 // Payment address form function
 $(document).ready(function() {
