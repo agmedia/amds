@@ -64,6 +64,9 @@
 	<div{{ field == 'postcode' ? ' id="payment-postcode-required"' }} class="col-sm-6{{ attribute(_context, 'field_' ~ field).required ? ' required' }}">
 	  <label class="control-label" for="input-payment-{{ field|replace({'_' : '-'}) }}">{{ attribute(_context, 'entry_' ~ field) }}</label>
 	  <input type="text" name="{{ field }}" placeholder="{{ attribute(_context, 'field_' ~ field).placeholder }}" value="{{ attribute(_context, 'field_' ~ field).default }}" class="form-control"  id="input-payment-{{ field|replace({'_' : '-'}) }}" />
+        {% if field == 'postcode' or field == 'city' %}
+            <div id="payment-{{ field|replace({'_' : '-'}) }}-drop" class="dropdown-menu" style="display: none;"></div>
+        {% endif %}
 	</div>
 	{% else %}   
 	<input type="text" name="{{ field }}" value="{{ attribute(_context, 'field_' ~ field).default }}" class="hide" />

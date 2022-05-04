@@ -64,6 +64,9 @@
 	<div{{ field == 'postcode' ? ' id="shipping-postcode-required"' }} class="col-sm-6{{ attribute(_context, 'field_' ~ field).required ? ' required' }}">
 	  <label class="control-label" for="input-shipping-{{ field|replace({'_' : '-'}) }}">{{ attribute(_context, 'entry_' ~ field) }}</label>
 	  <input type="text" name="{{ field }}" placeholder="{{ attribute(_context, 'field_' ~ field).placeholder }}" value="{{ attribute(_context, 'field_' ~ field).default }}" class="form-control"  id="input-shipping-{{ field|replace({'_' : '-'}) }}" />
+        {% if field == 'postcode' or field == 'city' %}
+            <div id="shipping-{{ field|replace({'_' : '-'}) }}-drop" class="dropdown-menu" style="display: none;"></div>
+        {% endif %}
 	</div>
 	{% else %}   
 	<input type="text" name="{{ field }}" value="{{ attribute(_context, 'field_' ~ field).default }}" class="hide" />
@@ -143,6 +146,36 @@
   {% endfor %}
 </div>
 </div><!-- CLOSE WRAPPING BOX -->
+
+<script src="catalog/view/theme/basel/js/agmedia_common.js"></script>
+<script>
+    $(() => {
+        let key = 'payment';
+
+        $('#input-' + key + '-city, #input-' + key + '-postcode').keyup((e) => {
+            let target = e.currentTarget;
+
+            if (target.value.length > 1) {
+                if (target.id == 'input-' + key + '-city') {
+                    callPlaces('city', target.value, key);
+
+                }
+
+                if (target.id == 'input-' + key + '-postcode') {
+                    callPlaces('postcode', target.value, key);
+                }
+            }
+        });
+
+        $('#input-' + key + '-city, #input-' + key + '-postcode').on('blur', () => {
+            setTimeout(function() {
+                document.getElementById(key + '-city-drop').style['display'] = 'none';
+                document.getElementById(key + '-postcode-drop').style['display'] = 'none';
+            }, 300);
+        });
+    });
+</script>
+
 <script type="text/javascript"><!--
 // Shipping address form functions
 $(document).ready(function() {

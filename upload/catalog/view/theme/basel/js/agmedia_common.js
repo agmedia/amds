@@ -8,8 +8,6 @@ function callPlaces(target, value, idn = 'payment') {
         url: 'index.php?route=checkout/checkout/places&' + target + '=' + value,
         dataType: 'json',
         success: function(json) {
-            console.log(json);
-
             drawPlaces(target, json, idn);
         },
         error: function(xhr, ajaxOptions, thrownError) {
@@ -29,11 +27,7 @@ function drawPlaces(target, json, idn) {
     let link = '';
     let obj = Object.keys(json);
 
-    console.log(target)
-
     for (let i = 0; i < obj.length; i++) {
-        console.log(json[obj[i]].cityname);
-
         if (target == 'city') {
             naziv = '<strong>' + json[obj[i]].cityname + '</strong> ' + json[obj[i]].zipcode;
         } else {
@@ -59,8 +53,6 @@ function drawPlaces(target, json, idn) {
  * @param zip
  */
 function selectPlace(naziv, zip, idn) {
-    console.log(naziv, zip, idn)
-
     $('#input-' + idn + '-city').val(naziv);
     $('#input-' + idn + '-postcode').val(zip);
 }
