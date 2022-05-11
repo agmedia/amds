@@ -220,6 +220,7 @@ class ControllerExtensionEbabandonedCron extends Controller {
 		$data['carttotal'] = $this->model_extension_ebcart->getebcarttotalprice($ebabandonedcart_id);
 		
 		return $this->load->view('default/template/extension/ebcart/email_products', $data);
+
 	}
 	
 	public function SetCoupon($data,$email_data){
