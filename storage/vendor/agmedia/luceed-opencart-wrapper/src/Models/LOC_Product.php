@@ -208,7 +208,7 @@ class LOC_Product
                 $stock = $qty_sum ?: 0;
 
                 $stock_status_id = $stock ? agconf('import.default_stock_full') : agconf('import.default_stock_empty');
-                $query_str       .= '("' . $item->artikl . '", ' . $item->mpc . ', ' . $stock . ', ' . $stock_status_id . ', ' . ($stock > 1) ? 1 : 0 . '),';
+                $query_str       .= '("' . $item->artikl . '", ' . $item->mpc . ', ' . $stock . ', ' . $stock_status_id . ', ' . (($stock > 1) ? 1 : 0) . '),';
             }
         }
         

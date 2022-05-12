@@ -423,8 +423,8 @@ class LOC_Order
                 }
             }
 
-            $this->log('has_all_in_main_warehouse: ', $this->has_all_in_main_warehouse ? 'yes' : 'no');
-            $this->log('has_all_in_warehouses: ', $this->has_all_in_warehouses ? 'yes' : 'no');
+            $this->log('has_all_in_main_warehouse: ', ($this->has_all_in_main_warehouse ? 'yes' : 'no'));
+            $this->log('has_all_in_warehouses: ', ($this->has_all_in_warehouses ? 'yes' : 'no'));
 
             if ($this->has_all_in_warehouses && isset($this->has_all_in_warehouses[0])) {
                 return true;
