@@ -394,7 +394,7 @@ class LOC_Order
                 }
             }
 
-            //$this->log('Available products: ', $availables);
+            $this->log('Available products: ', $availables);
 
             // Check if all in MAIN warehouse.
             if (isset($availables[agconf('luceed.default_warehouse_luid')])) {
