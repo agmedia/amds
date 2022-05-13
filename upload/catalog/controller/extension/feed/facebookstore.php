@@ -37,7 +37,7 @@ class ControllerExtensionFeedFacebookstore extends Controller {
                 $description = str_replace('', '', $description);
 
 
-
+                if($product['special']==''){
 
                 $output .= '<item>';
 
@@ -54,11 +54,11 @@ class ControllerExtensionFeedFacebookstore extends Controller {
 
                 $output .= '<g:price>' . number_format($product['price'], '2','.','') . ' HRK</g:price>';
 
-                if($product['special']!=''){
+           /*     if($product['special']!=''){
 
                     $output .= '<g:sale_price>' .  number_format($product['special'], '2','.','') . ' HRK</g:sale_price>';
 
-                }
+                }*/
 
                 $output .= '<g:google_product_category>1604</g:google_product_category>';
 
@@ -68,7 +68,7 @@ class ControllerExtensionFeedFacebookstore extends Controller {
 
                 $output .= '</item>';
 
-
+                }
 
 
             }
