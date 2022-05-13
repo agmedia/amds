@@ -154,9 +154,11 @@ class ProductHelper
 
                 $response[6] = agconf('import.outlet_category');
             }
-
-            $response = array_values($response);
         }
+
+        $response[7] = 149;
+
+        $response = array_values($response);
 
         return $response;
     }
