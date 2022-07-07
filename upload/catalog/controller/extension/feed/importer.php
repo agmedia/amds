@@ -19,7 +19,7 @@ class ControllerExtensionFeedImporter extends Controller {
         $category_to = 400;
 
         // prepare xlsx, convert rows to array.
-        $inputFileName = DIR_STORAGE . 'upload/xls/ljetni_30.xlsx';
+        $inputFileName = DIR_STORAGE . 'upload/xls/ljetni_30_addon.xlsx';
         $inputFileType = 'Xlsx';
         $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReader($inputFileType);
         $spreadsheet = $reader->load($inputFileName);
@@ -28,9 +28,11 @@ class ControllerExtensionFeedImporter extends Controller {
         // unset title row
         unset($rows[0]);
 
+        //\Agmedia\Helpers\Log::store($rows, 'excel');
+
         $query = '';
         foreach ($rows as $row) {
-            $product = \Agmedia\Models\Product\Product::where('model', $row[5])->pluck('product_id')->first();
+            $product = \Agmedia\Models\Product\Product::where('model', $row[0])->pluck('product_id')->first();
 
             if ($product) {
                 $query .= '(' . $product . ', ' . $category_to . '),';
