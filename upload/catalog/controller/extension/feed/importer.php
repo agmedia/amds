@@ -4,7 +4,7 @@ class ControllerExtensionFeedImporter extends Controller {
 
     /**
      * http://www.amds.hr/index.php?route=extension/feed/importer/toCategoryFromExcel&key=v9jdnH6afskP92rdUatbcQQZLEu4QcW1
-     * 
+     *
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
     public function toCategoryFromExcel()
