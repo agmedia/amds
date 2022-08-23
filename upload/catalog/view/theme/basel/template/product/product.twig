@@ -78,11 +78,11 @@
                         {% if price %}
                             {% if  special %}
 
-                            <div class="old cd-old-price line-through" data-product_basic_price="4406_0">{{ price }}</div>
+                            <div class="old cd-old-price line-through" data-product_basic_price="4406_0">{{ price }} <small>{{ priceeur }}</small></div>
 
-                            <div class="current cd-current-price cd-discount-price" data-product_price="4406_0">{{ special }}</div>
+                            <div class="current cd-current-price cd-discount-price" data-product_price="4406_0">{{ special }}  <small>{{ specialeur }}</small></div>
                             {% else %}
-                                <div class="current cd-current-price " data-product_basic_price="4406_0">{{ price }}</div>
+                                <div class="current cd-current-price " data-product_basic_price="4406_0">{{ price }}  <small>{{ priceeur }}</small></div>
                         {% endif %}
 
 

@@ -289,9 +289,18 @@ class ControllerCheckoutCart extends Controller {
 			$data['totals'] = array();
 
 			foreach ($totals as $total) {
+
+                if($this->session->data['currency']=='HRK'){
+                    $text =  $this->currency->format($total['value'], $this->session->data['currency']).' <small>('.$this->currency->format($total['value'], 'EUR'). ')</small> ';
+                }
+                else{
+                    $text = $this->currency->format($total['value'], $this->session->data['currency']);
+                }
+
+
 				$data['totals'][] = array(
 					'title' => $total['title'],
-					'text'  => $this->currency->format($total['value'], $this->session->data['currency'])
+					'text'  => $text
 				);
 			}
 

@@ -116,15 +116,31 @@ class ControllerExtensionModuleBaselProducts extends Controller {
 					
 					if (($this->config->get('config_customer_price') && $this->customer->isLogged()) || !$this->config->get('config_customer_price')) {
 						$price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                        if($this->session->data['currency']=='HRK'){
+                            $priceeur = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), 'EUR');
+                        }
+                        else{
+                            $priceeur  ='';
+
+                        }
 					} else {
 						$price = false;
+                        $priceeur  ='';
 					}
 							
 					if ((float)$result['special']) {
 						$special = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                        if($this->session->data['currency']=='HRK'){
+                            $specialeur = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')),  'EUR');
+                        }
+                        else{
+                            $specialeur  ='';
+
+                        }
 						$date_end = $this->model_extension_basel_basel->getSpecialEndDate($result['product_id']);
 					} else {
 						$special = false;
+                        $specialeur  ='';
 						$date_end = false;
 					}
 					
@@ -206,6 +222,8 @@ class ControllerExtensionModuleBaselProducts extends Controller {
                         'options' => $data['options'],
 						'sale_badge' => $sale_badge,
 						'special' 	 => $special,
+                        'priceeur'       => $priceeur,
+                        'specialeur'     => $specialeur,
 						'tax'        => $tax,
 						'minimum'    => $result['minimum'] > 0 ? $result['minimum'] : 1,
 						'rating'     => $rating,

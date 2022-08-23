@@ -109,14 +109,24 @@ class ControllerCheckoutSuccess extends Controller {
 
         foreach ($totals as $total) {
 
+
             if ($total['title']=='Ukupno'){
 
                 $ukupno = $this->currency->format($total['value'], $oc_order['currency_code'], $oc_order['currency_value']);
                 $ukupnohub = number_format((float)$total['value'], 2, '.', '');
             }
+
+            if($oc_order['currency_code']=='HRK'){
+                $text =  $this->currency->format($total['value'], $oc_order['currency_code'], $oc_order['currency_value']).' <small>('.$this->currency->format($total['value'], 'EUR'). ')</small> ';
+            }
+            else{
+                $text = $this->currency->format($total['value'], $oc_order['currency_code'], $oc_order['currency_value']);
+            }
+
+
             $data['totals'][] = array(
                 'title' => $total['title'],
-                'text'  => $this->currency->format($total['value'], $oc_order['currency_code'], $oc_order['currency_value']),
+                'text'  => $text,
             );
         }
 
