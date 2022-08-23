@@ -156,14 +156,31 @@ class ControllerExtensionModuleDigitalElephantFilterGetProduct extends Controlle
 
             if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
                 $price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+
+                if($this->session->data['currency']=='HRK'){
+                    $priceeur = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), 'EUR');
+                }
+                else{
+                    $priceeur  ='';
+
+                }
             } else {
                 $price = false;
+                $priceeur  ='';
             }
 
             if ((float)$result['special']) {
                 $special = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                if($this->session->data['currency']=='HRK'){
+                    $specialeur = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')),  'EUR');
+                }
+                else{
+                    $specialeur  ='';
+
+                }
             } else {
                 $special = false;
+                $specialeur  ='';
             }
 			
 			$image2 = $this->model_catalog_product->getProductImages($result['product_id']);
@@ -255,6 +272,8 @@ class ControllerExtensionModuleDigitalElephantFilterGetProduct extends Controlle
                 'description' => $description,
                 'options' => $data['options'],
                 'price'       => $price,
+                'priceeur'       => $priceeur,
+                'specialeur'     => $specialeur,
 				'sale_badge'  => $sale_badge,
 				'new_label'   => $is_new,
                 'special'     => $special,
