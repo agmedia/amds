@@ -205,6 +205,10 @@ class LOC_Product
                     }
                 }
 
+                else {
+                    $qty_sum += $item->raspolozivo_kol;
+                }
+
                 $stock = $qty_sum ?: 0;
 
                 $stock_status_id = $stock ? agconf('import.default_stock_full') : agconf('import.default_stock_empty');
