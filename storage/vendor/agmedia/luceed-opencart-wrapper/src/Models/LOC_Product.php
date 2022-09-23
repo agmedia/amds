@@ -173,7 +173,7 @@ class LOC_Product
             $response[$this->existing[$i]] = $full_list->where('artikl', '==', $this->existing[$i])->first();
             $response[$this->existing[$i]]->opcije = ProductHelper::sortOptions($product_options);
         }
-
+        Log::store($response, 'response_arr');
         // Full list of products to update.
         $this->products_to_add = $response;
         
