@@ -158,9 +158,11 @@ class ProductHelper
 
         $response[7] = 149;
 
+        Log::store($response, 'Response_2022');
+        Log::store(array_unique($response), 'Response_2022_unique');
+
         $response = array_values($response);
 
-        Log::store($response, 'Response_2022');
 
         return $response;
     }
