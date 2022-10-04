@@ -160,6 +160,8 @@ class ProductHelper
 
         $response = array_values($response);
 
+        Log::store($response, 'Response_2022');
+
         return $response;
     }
 
