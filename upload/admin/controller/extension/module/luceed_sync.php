@@ -183,7 +183,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
      */
     public function importWarehouses()
     {
-        $temp = $this->db->query('SELECT * FROM temp;');
+        /*$temp = $this->db->query('SELECT * FROM temp;');
         $arr = [];
 
         foreach ($temp->rows as $row) {
@@ -199,14 +199,14 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
         $this->db->query("INSERT INTO " . DB_PREFIX . "product_to_category (product_id, category_id) VALUES " . substr($str, 0, -1) . ";");
 
-        return $this->response(1, 'warehouses');
+        return $this->response(1, 'warehouses');*/
 
-        
-        /*$_loc = new LOC_Warehouse(LuceedWarehouse::all());
+
+        $_loc = new LOC_Warehouse(LuceedWarehouse::all());
 
         $imported = $_loc->import($_loc->getWarehouses());
 
-        return $this->response($imported, 'warehouses');*/
+        return $this->response($imported, 'warehouses');
     }
 
 
