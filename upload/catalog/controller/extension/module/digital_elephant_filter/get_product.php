@@ -263,7 +263,7 @@ class ControllerExtensionModuleDigitalElephantFilterGetProduct extends Controlle
             }
 
             $getcat = $this->request->get['path'];
-            if ($getcat = 1){
+            if ($getcat == 1){
                 $cat = 1;
             }
             else{
