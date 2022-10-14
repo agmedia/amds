@@ -242,7 +242,13 @@ class ControllerProductCategory extends Controller {
                     );
                 }
 
-
+                $getcat = $this->request->get['path'];
+                if ($getcat = 1){
+                    $cat = 1;
+                }
+                else{
+                    $cat = substr($this->request->get['path'], 0, strpos($this->request->get['path'], '_'));
+                }
 
 
 				$data['products'][] = array(
@@ -255,7 +261,7 @@ class ControllerProductCategory extends Controller {
 					'special'     => $special,
                     'priceeur'       => $priceeur,
                     'specialeur'     => $specialeur,
-                    'cat' => substr($this->request->get['path'], 0, strpos($this->request->get['path'], '_')),
+                    'cat' => $cat,
 					'tax'         => $tax,
 					'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,
 					'rating'      => $result['rating'],
