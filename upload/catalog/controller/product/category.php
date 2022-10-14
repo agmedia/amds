@@ -255,6 +255,7 @@ class ControllerProductCategory extends Controller {
 					'special'     => $special,
                     'priceeur'       => $priceeur,
                     'specialeur'     => $specialeur,
+                    'cat' => strstr($this->request->get['path'], '_', true),
 					'tax'         => $tax,
 					'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,
 					'rating'      => $result['rating'],

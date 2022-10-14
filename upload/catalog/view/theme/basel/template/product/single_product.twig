@@ -10,7 +10,7 @@
     <div class="sale-counter id{{ product.product_id }}"></div>
     <span class="badge sale_badge"><i>{{ product.sale_badge }}</i></span>
 {% endif %}
-{% if product.new_label %}
+{% if product.new_label and product.cat !='1' %}
     <span class="badge new_badge"><i>{{ basel_text_new }}</i></span>
 {% endif %}
 {% if ((product.quantity < 1) and (stock_badge_status)) %}
@@ -42,7 +42,7 @@
     {% endif %}
 </div><!-- .image ends -->
 <div class="caption">
-<a class="product-name" href="{{ product.href }}">{{ product.name }}</a>
+<a class="product-name" href="{{ product.href }}">{{ product.name }} </a>
 {% if product.rating %}      
     <div class="rating">
     <span class="rating_stars rating r{{ product.rating }}">

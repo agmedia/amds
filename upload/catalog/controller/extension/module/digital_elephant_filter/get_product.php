@@ -274,6 +274,7 @@ class ControllerExtensionModuleDigitalElephantFilterGetProduct extends Controlle
                 'price'       => $price,
                 'priceeur'       => $priceeur,
                 'specialeur'     => $specialeur,
+				'cat' => strstr($this->request->get['path'], '_', true),
 				'sale_badge'  => $sale_badge,
 				'new_label'   => $is_new,
                 'special'     => $special,
