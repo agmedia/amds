@@ -246,8 +246,8 @@ class ControllerProductSearch extends Controller {
 					'special'     => $special,
                     'priceeur'       => $priceeur,
                     'specialeur'     => $specialeur,
-                    'cat' => strstr($this->request->get['path'], '_', true),
-					'tax'         => $tax,
+                    'cat' => substr($this->request->get['path'], 0, strpos($this->request->get['path'], '_')),
+                    'tax'         => $tax,
 					'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,
 					'rating'      => $result['rating'],
 					'href'        => $this->url->link('product/product', 'product_id=' . $result['product_id'] . $url)
