@@ -233,8 +233,6 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
         $new_products = $_loc->checkDiff()->getProductsToAdd();
 
-        Log::store($new_products->count(), 'importing');
-
         if ($new_products->count()) {
             $this->load->model('catalog/product');
 

@@ -90,7 +90,7 @@ class LOC_Order
     public function __construct(array $order = null)
     {
         $this->oc_order = $order;
-        $this->service = new Luceed();
+        $this->service  = new Luceed();
 
         $this->resolveCouponDiscount();
     }
@@ -199,22 +199,22 @@ class LOC_Order
             //$this->order['sa__skladiste_uid'] = agconf('luceed.default_warehouse_luid');
             //$this->order['na__skladiste_uid'] = '565-2987';
             //$this->order['skl_dokument'] = 'MSO';
-            $this->order['vrsta_isporuke_uid'] = '6-2987';
+            $this->order['vrsta_isporuke_uid']    = '6-2987';
             $this->order['korisnik__partner_uid'] = $this->customer_uid;
-            $this->call_raspis = false;
+            $this->call_raspis                    = false;
         }
 
-        if ( ! $this->has_all_in_main_warehouse &&$this->has_all_in_warehouses && isset($this->has_all_in_warehouses[0])) {
-            $this->order['sa__skladiste_uid'] = $this->has_all_in_warehouses[0];
-            $this->order['na__skladiste_uid'] = '565-2987';
-            $this->order['skl_dokument'] = 'MS';
-            $this->order['vrsta_isporuke_uid'] = '6-2987';
+        if ( ! $this->has_all_in_main_warehouse && $this->has_all_in_warehouses && isset($this->has_all_in_warehouses[0])) {
+            $this->order['sa__skladiste_uid']     = $this->has_all_in_warehouses[0];
+            $this->order['na__skladiste_uid']     = '565-2987';
+            $this->order['skl_dokument']          = 'MS';
+            $this->order['vrsta_isporuke_uid']    = '6-2987';
             $this->order['korisnik__partner_uid'] = $this->customer_uid;
         }
 
         if ( ! $this->has_all_in_main_warehouse && ! $this->has_all_in_warehouses) {
             $this->order['korisnik__partner_uid'] = $this->customer_uid;
-            $this->call_raspis = false;
+            $this->call_raspis                    = false;
         }
 
         $this->log('Order create method: $this->>order - LOC_Order #156', $this->order);
@@ -321,7 +321,7 @@ class LOC_Order
 
             // Collect update status query.
             foreach ($this->collection as $item) {
-                $this->query_update_status .= '(' . $item['order_id'] . ', ' . $item['oc_status_to'] . ', NULL, NULL),';
+                $this->query_update_status  .= '(' . $item['order_id'] . ', ' . $item['oc_status_to'] . ', NULL, NULL),';
                 $this->query_update_history = '(' . $item['order_id'] . ', ' . $item['oc_status_to'] . ', 1, "", "' . Carbon::now() . '"),';
             }
         }
@@ -362,7 +362,7 @@ class LOC_Order
 
         if ($order_products->count()) {
             $locations = Location::orderBy('prioritet')->get();
-            $units = $locations->pluck('skladiste')->flatten();
+            $units     = $locations->pluck('skladiste')->flatten();
 
             foreach ($order_products as $order_product) {
                 $option = OrderOption::where('order_id', $this->oc_order['order_id'])
@@ -408,7 +408,6 @@ class LOC_Order
 
                 unset($availables[agconf('luceed.default_warehouse_luid')]);
             }
-
 
             // Check & collect warehouses that have all items.
             foreach ($locations->where('stanje_web_shop', 1) as $store) {
@@ -611,6 +610,19 @@ class LOC_Order
                         'cijena'     => (float) $price['cijena'],
                         'rabat'      => (int) $price['rabat'],
                     ];
+
+                } else {
+                    $product = Product::query()->where('product_id', $order_product->product_id)->first();
+                    $price   = $this->getItemPrices($order_product->product_id, $order_product->price);
+
+                    if ($product) {
+                        $response[] = [
+                            'artikl'   => $order_product->model,
+                            'kolicina' => (int) $order_product->quantity,
+                            'cijena'   => (float) $price['cijena'],
+                            'rabat'    => (int) $price['rabat'],
+                        ];
+                    }
                 }
             }
         }
@@ -629,7 +641,7 @@ class LOC_Order
     private function resolveCouponDiscount(): void
     {
         $this->discount = 0;
-        $order_total = OrderTotal::where('order_id', $this->oc_order['order_id'])->get();
+        $order_total    = OrderTotal::where('order_id', $this->oc_order['order_id'])->get();
 
         $this->log('$order_total', $order_total->toArray());
 
@@ -715,7 +727,7 @@ class LOC_Order
         $product = Product::find($product_id);
 
         if ($price < $product->price) {
-            $cijena = number_format($product->price, 2, '.', '');
+            $cijena       = number_format($product->price, 2, '.', '');
             $return_rabat = number_format((($price / $product->price) * 100 - 100), 2);
 
             return [
@@ -783,6 +795,5 @@ class LOC_Order
             Log::store($data, 'procces_order_' . $this->oc_order['order_id']);
         }
     }
-
 
 }
