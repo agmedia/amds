@@ -277,18 +277,33 @@ class ControllerProductProduct extends Controller {
 
 			if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
 				$data['price'] = $this->currency->format($this->tax->calculate($product_info['price'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                       if($product_info['price_ponuda'] > 0){
+                           $data['price_ponuda'] = $this->currency->format($this->tax->calculate($product_info['price_ponuda'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                       }
+                       else{
+                           $data['price_ponuda'] ='';
+                         }
+
 
                 if($this->session->data['currency']=='HRK'){
-                    $data['priceeur'] = $this->currency->format($this->tax->calculate($product_info['price'], $product_info['tax_class_id'], $this->config->get('config_tax')), 'EUR');
 
+                    $data['priceeur'] = $this->currency->format($this->tax->calculate($product_info['price'], $product_info['tax_class_id'], $this->config->get('config_tax')), 'EUR');
+                    if($product_info['price_ponuda'] > 0){
+                    $data['price_ponudaeur'] = $this->currency->format($this->tax->calculate($product_info['price_ponuda'], $product_info['tax_class_id'], $this->config->get('config_tax')), 'EUR');
+                    }
+                    else{
+                        $data['price_ponuda'] ='';
+                    }
                 }
                 else{
                     $data['priceeur'] ='';
+                    $data['price_ponudaeur'] ='';
 
                 }
 
 			} else {
 				$data['price'] = false;
+                $data['price_ponuda'] = false;
 			}
 
 			if (!is_null($product_info['special']) && (float)$product_info['special'] >= 0) {

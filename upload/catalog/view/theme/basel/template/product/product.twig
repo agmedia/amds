@@ -83,6 +83,8 @@
                             <div class="current cd-current-price cd-discount-price" data-product_price="4406_0">{{ special }}  <small>{{ specialeur }}</small></div>
                             {% else %}
                                 <div class="current cd-current-price " data-product_basic_price="4406_0">{{ price }}  <small>{{ priceeur }}</small></div>
+
+
                         {% endif %}
 
 
@@ -99,8 +101,12 @@
                           {% endif %} <!-- if price ends -->
                     </div>
 
-                </div>
 
+
+                </div>
+                {% if  price_ponuda  %}
+                <p class="meta_description"><strong>Stara cijena: {{ price_ponuda }}  <small>{{ price_ponudaeur }}</small></strong></p>
+                {% endif %}
               {% if meta_description_status and meta_description %}
               <p class="meta_description">{{ meta_description }}</p>
               {% endif %}
