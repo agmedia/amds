@@ -24,6 +24,7 @@ use Agmedia\Models\Category\Category;
 use Agmedia\Models\Order\Order;
 use Agmedia\Models\Product\Product;
 use Agmedia\Models\Product\ProductCategory;
+use Agmedia\LuceedOpencartWrapper\Helpers\Helper;
 use Carbon\Carbon;
 
 class ControllerExtensionModuleLuceedSync extends Controller
@@ -478,6 +479,8 @@ class ControllerExtensionModuleLuceedSync extends Controller
         $_loc = new LOC_Product(LuceedProduct::shortList());
 
         $updated = $_loc->sortForUpdate()->update();
+
+        Helper::overwritePricesAndSpecialsFromTempTable();
 
         return $this->response($updated, 'update');
     }
