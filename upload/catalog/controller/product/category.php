@@ -171,16 +171,36 @@ class ControllerProductCategory extends Controller {
 
 				if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
 					$price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                        if($result['price_ponuda'] > 0){
+                            $price_ponuda = $this->currency->format($this->tax->calculate($result['price_ponuda'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                        }
+                        else{
+                            $price_ponuda = '';
+                            }
+
+
+
+
                     if($this->session->data['currency']=='HRK'){
+
+                        if($result['price_ponuda'] > 0){
+                            $price_ponudaeur = $this->currency->format($this->tax->calculate($result['price_ponuda'], $result['tax_class_id'], $this->config->get('config_tax')), 'EUR');
+                        }
+                        else{
+                            $price_ponudaeur = '';
+                        }
                         $priceeur = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), 'EUR');
                     }
                     else{
                         $priceeur  ='';
+                        $price_ponudaeur = '';
 
                     }
 				} else {
 					$price = false;
                     $priceeur  ='';
+                    $price_ponuda ='';
+                    $price_ponudaeur = '';
 				}
 
 				if (!is_null($result['special']) && (float)$result['special'] >= 0) {
@@ -257,6 +277,8 @@ class ControllerProductCategory extends Controller {
 					'name'        => $result['name'],
 					'description' => utf8_substr(trim(strip_tags(html_entity_decode($result['description'], ENT_QUOTES, 'UTF-8'))), 0, $this->config->get('theme_' . $this->config->get('config_theme') . '_product_description_length')) . '..',
 					'price'       => $price,
+                    'price_ponuda'       => $price_ponuda,
+                    'price_ponudaeur'       => $price_ponudaeur,
 					'options' => $data['options'],
 					'special'     => $special,
                     'priceeur'       => $priceeur,

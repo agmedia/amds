@@ -157,16 +157,32 @@ class ControllerExtensionModuleDigitalElephantFilterGetProduct extends Controlle
             if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
                 $price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
 
+                if($result['price_ponuda'] > 0){
+                    $price_ponuda = $this->currency->format($this->tax->calculate($result['price_ponuda'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                }
+                else{
+                    $price_ponuda = '';
+                }
+
                 if($this->session->data['currency']=='HRK'){
                     $priceeur = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), 'EUR');
+
+                    if($result['price_ponuda'] > 0){
+                        $price_ponudaeur = $this->currency->format($this->tax->calculate($result['price_ponuda'], $result['tax_class_id'], $this->config->get('config_tax')), 'EUR');
+                    }
+                    else{
+                        $price_ponudaeur = '';
+                    }
                 }
                 else{
                     $priceeur  ='';
-
+                    $price_ponudaeur = '';
                 }
             } else {
                 $price = false;
                 $priceeur  ='';
+                $price_ponuda = '';
+                $price_ponudaeur = '';
             }
 
             if ((float)$result['special']) {
@@ -280,6 +296,8 @@ class ControllerExtensionModuleDigitalElephantFilterGetProduct extends Controlle
                 'description' => $description,
                 'options' => $data['options'],
                 'price'       => $price,
+                'price_ponuda'       => $price_ponuda,
+                'price_ponudaeur'       => $price_ponudaeur,
                 'priceeur'       => $priceeur,
                 'specialeur'     => $specialeur,
                 'cat' => $cat,

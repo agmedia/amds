@@ -56,7 +56,7 @@
     {% if product.special %}
     <span class="price-old">{{ product.price }} <small>{{ product.priceeur }}</small></span><span class="price-new">{{ product.special }} <small>{{ product.specialeur }}</small></span>
     {% else %}
-    <span>{{ product.price }} <small>{{ product.priceeur }}</small></span>
+    <span>{{ product.price }} <small>{{ product.priceeur }}</small></span>  {% if product.price_ponuda %} <span class="price-old">{{ product.price_ponuda }} <small>{{ product.price_ponudaeur }}</small></span>{% endif %}
     {% endif %}
     {% if product.tax %}
     <span class="price-tax">{{ text_tax }} {{ product.tax }}</span>
