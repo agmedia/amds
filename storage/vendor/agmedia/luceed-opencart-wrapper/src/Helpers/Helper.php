@@ -22,7 +22,7 @@ class Helper
         $res = $db->query("SELECT * FROM temp;");
 
         if ($res->num_rows) {
-            $temps = collect($res->rows)->where('price', '!=', 0)->take(10);
+            $temps = collect($res->rows)->where('price', '!=', 0);
         }
 
         $arr = [];
