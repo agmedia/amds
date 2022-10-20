@@ -480,7 +480,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
         $updated = $_loc->sortForUpdate()->update();
 
-        Helper::overwritePricesAndSpecialsFromTempTable();
+        //Helper::overwritePricesAndSpecialsFromTempTable();
 
         return $this->response($updated, 'update');
     }
