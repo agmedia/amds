@@ -476,13 +476,13 @@ class ControllerExtensionModuleLuceedSync extends Controller
      */
     public function updatePricesAndQuantities()
     {
-        /*$_loc = new LOC_Product(LuceedProduct::shortList());
+        $_loc = new LOC_Product(LuceedProduct::shortList());
 
-        $updated = $_loc->sortForUpdate()->update();*/
+        $updated = $_loc->sortForUpdate()->update();
 
-        Helper::overwritePricesAndSpecialsFromTempTable();
+        //Helper::overwritePricesAndSpecialsFromTempTable();
 
-        return $this->response(1, 'update');
+        return $this->response($updated, 'update');
     }
 
 
