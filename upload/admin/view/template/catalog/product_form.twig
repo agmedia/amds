@@ -3,6 +3,7 @@
   <div class="page-header">
     <div class="container-fluid">
       <div class="pull-right">
+          <button type="button" id="luceed-update-btn" data-toggle="tooltip" title="Force update from Luceed" class="btn btn-default" style="margin-right: 10px;"><i class="fa fa-upload"></i> Luceed Update Image</button>
         <button type="submit" form="form-product" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
         <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
       <h1>{{ heading_title }}</h1>
@@ -1130,6 +1131,28 @@
   <script type="text/javascript" src="view/javascript/summernote/summernote-image-attributes.js"></script>
   <script type="text/javascript" src="view/javascript/summernote/opencart.js"></script>
   <script type="text/javascript"><!--
+
+      $(() => {
+          $('#luceed-update-btn').on('click', (e) => {
+              $('#luceed-update-btn').removeClass('btn-default');
+              $('#luceed-update-btn').addClass('btn-warning');
+              $('#luceed-update-btn').html('<i class="fa spin fa-spinner"></i> Updating..!');
+
+              $.ajax({
+                  url: 'index.php?route=catalog/product/luceed&user_token={{ user_token }}&sifra={{ model }}',
+                  dataType: 'json',
+                  success: function(json) {
+                      $('#luceed-update-btn').removeClass('btn-warning');
+                      $('#luceed-update-btn').addClass('btn-default');
+                      $('#luceed-update-btn').html('<i class="fa fa-upload"></i> Luceed Update');
+
+                      location.reload();
+                  }
+              });
+          });
+      });
+
+
   // Manufacturer
   $('input[name=\'manufacturer\']').autocomplete({
 	  'source': function(request, response) {
