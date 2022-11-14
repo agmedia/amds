@@ -156,6 +156,9 @@ class LOC_Product
      */
     public function sortForUpdate(string $products = null)
     {
+        Product::query()->where('model', '=', '')->update([
+            'status' => 0
+        ]);
         // List of existing product identifiers.
         $this->existing = Product::pluck('model')->toArray();
 
@@ -173,7 +176,6 @@ class LOC_Product
             $response[$this->existing[$i]] = $full_list->where('artikl', '==', $this->existing[$i])->first();
             $response[$this->existing[$i]]->opcije = ProductHelper::sortOptions($product_options);
         }
-        Log::store($response, 'response_arr');
         // Full list of products to update.
         $this->products_to_add = $response;
         
