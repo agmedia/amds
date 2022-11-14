@@ -214,14 +214,20 @@ class ControllerExtensionModuleLuceedSync extends Controller
     /**
      * @return mixed
      */
-    /*public function importPayments()
+    public function importPayments()
     {
-        $_loc = new LOC_Payment(LuceedPayments::all());
+        $_loc  = new LOC_Product(LuceedProduct::all());
+
+        $images = $_loc->collectImages();
+
+        return $this->response(1, 'payments');
+
+        /*$_loc = new LOC_Payment(LuceedPayments::all());
 
         $imported = $_loc->import($_loc->getList());
 
-        return $this->response($imported, 'payments');
-    }*/
+        return $this->response($imported, 'payments');*/
+    }
 
 
     /**

@@ -486,4 +486,25 @@ class LOC_Product
 
         return $prods->result[0]->artikli;
     }
+
+
+    public function collectImages()
+    {
+        $full_list = $this->getProducts()
+                          ->where('artikl', '!=', '')
+                          ->where('naziv', '!=', '')
+                          ->where('enabled', '!=', 'N')
+                          ->where('webshop', '!=', 'N')
+                          ->where('osnovni__artikl', '==', null);
+
+        foreach ($full_list as $item) {
+            Log::store($item, 'items');
+
+            /*$images     = ProductHelper::getImages(collect($item));
+            $image_path = isset($images[0]['image']) ? $images[0]['image'] : agconf('import.image_placeholder');
+            unset($images[0]);*/
+        }
+
+        return $this;
+    }
 }
