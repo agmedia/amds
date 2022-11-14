@@ -156,6 +156,7 @@ class LOC_Product
      */
     public function sortForUpdate(string $products = null)
     {
+        $db = new Database(DB_DATABASE);
         // List of existing product identifiers.
         $this->existing = Product::pluck('model')->toArray();
 
@@ -176,7 +177,6 @@ class LOC_Product
                 $response[$this->existing[$i]]->opcije = ProductHelper::sortOptions($product_options);
 
             } else {
-                Log::store($this->existing[$i], 'deactivated');
                 Product::query()->where('model', $this->existing[$i])->update([
                     'status' => 0
                 ]);
