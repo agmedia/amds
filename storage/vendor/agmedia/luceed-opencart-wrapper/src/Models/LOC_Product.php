@@ -176,6 +176,7 @@ class LOC_Product
                 $response[$this->existing[$i]]->opcije = ProductHelper::sortOptions($product_options);
 
             } else {
+                Log::store($this->existing[$i], 'deactivated');
                 Product::query()->where('model', $this->existing[$i])->update([
                     'status' => 0
                 ]);
