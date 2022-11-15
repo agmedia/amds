@@ -1330,15 +1330,13 @@ class ControllerCatalogProduct extends Controller {
     {
         $this->load->model('catalog/product');
 
-        \Agmedia\Helpers\Log::store($this->request->get, 'test');
-
         $product = new \Agmedia\LuceedOpencartWrapper\Models\LOC_Product(
             \Agmedia\Luceed\Facade\LuceedProduct::getById($this->request->get['sifra'])
         );
 
         $inserted = $product->collectImage();
 
-        \Agmedia\Helpers\Log::store('Pass', 'test');
+        \Agmedia\Helpers\Log::store('Pass', 'aa_single');
 
         $this->response->addHeader('Content-Type: application/json');
         $this->response->setOutput(json_encode(['status' => 200, 'result' => $inserted]));

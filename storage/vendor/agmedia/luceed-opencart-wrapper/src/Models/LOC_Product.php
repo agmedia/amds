@@ -488,6 +488,9 @@ class LOC_Product
     }
 
 
+    /**
+     * @return $this
+     */
     public function collectImages()
     {
         $full_list = $this->getProducts()
@@ -497,14 +500,70 @@ class LOC_Product
                           ->where('webshop', '!=', 'N')
                           ->where('osnovni__artikl', '==', null);
 
-        foreach ($full_list as $item) {
-            Log::store($item, 'items');
+        //$full_list_2 = $full_list->splice(1300);
 
-            /*$images     = ProductHelper::getImages(collect($item));
-            $image_path = isset($images[0]['image']) ? $images[0]['image'] : agconf('import.image_placeholder');
-            unset($images[0]);*/
+        Log::store($full_list->count(), 'aa_fotke');
+        //Log::store($full_list_2->count(), 'aa_fotke');
+
+        foreach ($full_list as $item) {
+            $this->updateImages($item);
         }
 
         return $this;
+    }
+
+
+    /**
+     * @return int
+     */
+    public function collectImage(): int
+    {
+        $item = $this->getProducts()->first();
+
+        if ($item) {
+            $stored = $this->updateImages($item);
+
+            if ($stored) {
+                return 1;
+            }
+        }
+
+        return 0;
+    }
+
+
+    /**
+     * @param $item
+     *
+     * @return bool
+     */
+    public function updateImages($item): bool
+    {
+        if ($item) {
+            $images     = ProductHelper::getImages(collect($item));
+            $image_path = isset($images[0]['image']) ? $images[0]['image'] : agconf('import.image_placeholder');
+            $product    = Product::query()->where('model', $item->artikl)->first();
+            unset($images[0]);
+
+            //Log::store($product->toArray(), 'aa_single');
+
+            if ($product) {
+                $db = new Database(DB_DATABASE);
+
+                $product->update([
+                    'image' => $image_path
+                ]);
+
+                $db->query("DELETE FROM " . DB_PREFIX . "product_image WHERE product_id = '" . (int)$product->product_id . "'");
+
+                foreach ($images as $product_image) {
+                    $db->query("INSERT INTO " . DB_PREFIX . "product_image SET product_id = '" . (int) $product->product_id . "', image = '" . $db->escape($product_image['image']) . "', sort_order = '" . (int) $product_image['sort_order'] . "'");
+                }
+
+                return true;
+            }
+        }
+
+        return false;
     }
 }
