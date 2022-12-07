@@ -204,8 +204,8 @@ class LOC_Order
             $this->call_raspis                    = false;
         }
 
-        if ( ! $this->has_all_in_main_warehouse && $this->has_all_in_warehouses && isset($this->has_all_in_warehouses[0])) {
-            $this->order['sa__skladiste_uid']     = $this->has_all_in_warehouses[0];
+        if ( ! $this->has_all_in_main_warehouse && $this->has_all_in_warehouses/* && isset($this->has_all_in_warehouses[0])*/) {
+            $this->order['sa__skladiste_uid']     = $this->has_all_in_warehouses;
             $this->order['na__skladiste_uid']     = '565-2987';
             $this->order['skl_dokument']          = 'MS';
             $this->order['vrsta_isporuke_uid']    = '6-2987';
@@ -384,9 +384,16 @@ class LOC_Order
 
                         if ($availables_data->count()) {
                             foreach ($availables_data as $available) {
+                                $all_available = 0;
+
+                                if ($available->raspolozivo_kol >= $order_product->quantity) {
+                                    $all_available = 1;
+                                }
+
                                 $availables[$available->skladiste_uid][] = [
                                     'uid' => $product->sifra,
-                                    'qty' => $available->raspolozivo_kol
+                                    'qty' => $available->raspolozivo_kol,
+                                    'all' => $all_available
                                 ];
                             }
                         }
@@ -409,23 +416,37 @@ class LOC_Order
                 unset($availables[agconf('luceed.default_warehouse_luid')]);
             }
 
-            // Check & collect warehouses that have all items.
-            foreach ($locations->where('stanje_web_shop', 1) as $store) {
-                if (isset($availables[$store['skladiste_uid']])) {
-                    if ($order_products->count() == count($availables[$store['skladiste_uid']])) {
-                        $this->has_all_in_warehouses[] = $store['skladiste_uid'];
-                    }
+            if ( ! $this->has_all_in_main_warehouse) {
+                // Check & collect warehouses that have all items.
+                foreach ($locations->where('stanje_web_shop', 1) as $store) {
+                    // if availables have a set store id.
+                    if (isset($availables[$store['skladiste_uid']])) {
+                        // if ordered products are accounted for.
+                        if ($order_products->count() == count($availables[$store['skladiste_uid']])) {
+                            $is_all_available_in_one_store = true;
+                            // and if quantity is ok.
+                            foreach ($availables[$store['skladiste_uid']] as $available_store) {
+                                if ( ! $available_store['all']) {
+                                    $is_all_available_in_one_store = false;
+                                }
+                            }
 
-                    /*if ($order_products->count() <= $availables[$store['skladiste_uid']][0]['qty']) {
-                        $this->has_all_in_warehouses[] = $store['skladiste_uid'];
-                    }*/
+                            if ($is_all_available_in_one_store) {
+                                $this->has_all_in_warehouses = $store['skladiste_uid'];
+                            }
+                        }
+
+                        /*if ($order_products->count() <= $availables[$store['skladiste_uid']][0]['qty']) {
+                            $this->has_all_in_warehouses[] = $store['skladiste_uid'];
+                        }*/
+                    }
                 }
             }
 
             $this->log('has_all_in_main_warehouse: ', ($this->has_all_in_main_warehouse ? 'yes' : 'no'));
             $this->log('has_all_in_warehouses: ', ($this->has_all_in_warehouses ? 'yes' : 'no'));
 
-            if ($this->has_all_in_warehouses && isset($this->has_all_in_warehouses[0])) {
+            if ($this->has_all_in_warehouses && $this->has_all_in_warehouses) {
                 return true;
             }
         }
