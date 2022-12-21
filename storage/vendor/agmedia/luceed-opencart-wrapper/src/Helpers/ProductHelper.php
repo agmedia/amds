@@ -13,6 +13,7 @@ use Agmedia\Models\Category\Category;
 use Agmedia\Models\Manufacturer\Manufacturer;
 use Agmedia\Models\Option\OptionValue;
 use Agmedia\Models\Option\OptionValueDescription;
+use Agmedia\Models\Product\ProductCategory;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -626,6 +627,30 @@ class ProductHelper
         }
 
         return $price - ($price * ($discount / 100));
+    }
+
+
+    /**
+     * @param int $product_id
+     *
+     * @return string
+     */
+    public static function getGender(int $product_id): string
+    {
+        $cats = ProductCategory::query()->whereIn('category_id', [2, 5, 8, 12])->get();
+
+        if ($cats) {
+            foreach ($cats as $cat) {
+                if (in_array($cat->category_id, [2, 12])) {
+                    return 'Ž';
+                }
+                if (in_array($cat->category_id, [5, 8])) {
+                    return 'M';
+                }
+            }
+        }
+
+        return 'U';
     }
 
 
