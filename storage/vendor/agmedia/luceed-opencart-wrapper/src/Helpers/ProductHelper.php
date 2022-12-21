@@ -637,7 +637,7 @@ class ProductHelper
      */
     public static function getGender(int $product_id): string
     {
-        $cats = ProductCategory::query()->whereIn('category_id', [2, 5, 8, 12])->get();
+        $cats = ProductCategory::query()->where('product_id', $product_id)->whereIn('category_id', [2, 5, 8, 12])->get();
 
         if ($cats) {
             foreach ($cats as $cat) {
