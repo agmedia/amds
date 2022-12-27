@@ -236,7 +236,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
             $product = \Agmedia\Models\Product\Product::query()->where('model', $row['sku'])->first();
 
             // put special
-            $p_str .= '(' . $product->product_id . ', 1, 0, ' . $row['special'] . ', "0000-00-00", "2022-01-27"),';
+            $p_str .= '(' . $product->product_id . ', 1, 0, ' . $row['special'] . ', "0000-00-00", "2023-01-27"),';
 
             $this->db->query("UPDATE " . DB_PREFIX . "product SET price = '" . $row['price'] . "' WHERE product_id = '" . $product->product_id . "'");
         }
