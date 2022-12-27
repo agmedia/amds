@@ -184,23 +184,51 @@ class ControllerExtensionModuleLuceedSync extends Controller
      */
     public function importWarehouses()
     {
-        /*$temp = $this->db->query('SELECT * FROM temp;');
+        $temp = $this->db->query('SELECT LEFT(sku, 6) as sku, price, special FROM temp GROUP BY LEFT(sku, 6);');
         $arr = [];
 
         foreach ($temp->rows as $row) {
-            array_push($arr, $row['temp']);
+            array_push($arr, $row['sku']);
         }
 
-        $ids = \Agmedia\Models\Product\ProductOption::whereIn('sifra', $arr)->groupBy('product_id')->pluck('product_id');
+        $ids = \Agmedia\Models\Product\Product::whereIn('model', $arr)->groupBy('product_id')->pluck('product_id');
+        $sezonsko = 429;
         $str = '';
 
         foreach ($ids as $id) {
-            $str .= '(' . $id . ', 1),';
+            $spol = 430; // Muški
+            $new_cat = 0;
+
+            $cats = ProductCategory::query()->where('product_id', $id)->get();
+
+            if ($cats->count()) {
+                foreach ($cats as $cat) {
+                    if (in_array($cat->category_id, [2, 12])) {
+                        $spol = 431; // Ženski
+                    }
+
+                    foreach (agconf('cats') as $old_cat_id => $new_cat_id) {
+                        if ($cat->category_id == $old_cat_id) {
+                            $new_cat = $new_cat_id;
+                        }
+                    }
+                }
+            }
+
+            ProductCategory::query()->where('product_id', $id)->delete();
+
+            $str .= '(' . $id . ', ' . $sezonsko . '),';
+            $str .= '(' . $id . ', ' . $spol . '),';
+            $str .= '(' . $id . ', ' . $new_cat . '),';
         }
 
-        $this->db->query("INSERT INTO " . DB_PREFIX . "product_to_category (product_id, category_id) VALUES " . substr($str, 0, -1) . ";");
+        $query = "INSERT INTO " . DB_PREFIX . "product_to_category (product_id, category_id) VALUES " . substr($str, 0, -1) . ";";
 
-        return $this->response(1, 'warehouses');*/
+        $this->db->query($query);
+
+        Helper::overwritePricesAndSpecialsFromTempTable();
+
+        return $this->response(1, 'warehouses');
 
 
         $_loc = new LOC_Warehouse(LuceedWarehouse::all());
@@ -488,7 +516,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
         //Helper::overwritePricesAndSpecialsFromTempTable();
 
-        return $this->response($updated, 'update');
+        return $this->response(1, 'update');
     }
 
 
