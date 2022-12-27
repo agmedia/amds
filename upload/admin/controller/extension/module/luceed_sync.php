@@ -191,18 +191,22 @@ class ControllerExtensionModuleLuceedSync extends Controller
             array_push($arr, $row['sku']);
         }
 
-        $ids = \Agmedia\Models\Product\Product::whereIn('model', $arr)->groupBy('product_id')->pluck('product_id');
+        $ids = \Agmedia\Models\Product\Product::query()->whereIn('model', $arr)->groupBy('product_id')->pluck('product_id');
         $sezonsko = 429;
+        $p_str = '';
         $str = '';
 
         foreach ($ids as $id) {
-            $spol = 430; // Muški
+            $spol = 0; // Muški
             $new_cat = 0;
 
             $cats = ProductCategory::query()->where('product_id', $id)->get();
 
             if ($cats->count()) {
                 foreach ($cats as $cat) {
+                    if (in_array($cat->category_id, [5, 8])) {
+                        $spol = 430; // Muški
+                    }
                     if (in_array($cat->category_id, [2, 12])) {
                         $spol = 431; // Ženski
                     }
@@ -218,15 +222,33 @@ class ControllerExtensionModuleLuceedSync extends Controller
             ProductCategory::query()->where('product_id', $id)->delete();
 
             $str .= '(' . $id . ', ' . $sezonsko . '),';
-            $str .= '(' . $id . ', ' . $spol . '),';
-            $str .= '(' . $id . ', ' . $new_cat . '),';
+
+            if ($spol) {
+                $str .= '(' . $id . ', ' . $spol . '),';
+            }
+
+            if ($new_cat) {
+                $str .= '(' . $id . ', ' . $new_cat . '),';
+            }
         }
 
+        foreach ($temp->rows as $row) {
+            $product = \Agmedia\Models\Product\Product::query()->where('model', $row['sku'])->first();
+
+            // put special
+            $p_str .= '(' . $product->product_id . ', 1, 0, ' . $row['special'] . ', "0000-00-00", "2022-01-27"),';
+
+            $this->db->query("UPDATE " . DB_PREFIX . "product SET price = '" . $row['price'] . "' WHERE product_id = '" . $product->product_id . "'");
+        }
+
+        Log::store($str, 'string_cats');
+        Log::store($p_str, 'string_prices');
+
         $query = "INSERT INTO " . DB_PREFIX . "product_to_category (product_id, category_id) VALUES " . substr($str, 0, -1) . ";";
+        $query_p = "INSERT INTO " . DB_PREFIX . "product_special (product_id, customer_group_id, priority, price, date_start, date_end) VALUES " . substr($p_str, 0, -1) . ";";
 
         $this->db->query($query);
-
-        Helper::overwritePricesAndSpecialsFromTempTable();
+        $this->db->query($query_p);
 
         return $this->response(1, 'warehouses');
 
