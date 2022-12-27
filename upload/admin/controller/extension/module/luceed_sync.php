@@ -184,7 +184,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
      */
     public function importWarehouses()
     {
-        $temp = $this->db->query('SELECT LEFT(sku, 6) as sku, price, special FROM temp GROUP BY LEFT(sku, 6);');
+        /*$temp = $this->db->query('SELECT LEFT(sku, 6) as sku, price, special FROM temp GROUP BY LEFT(sku, 6);');
         $arr = [];
 
         foreach ($temp->rows as $row) {
@@ -250,7 +250,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
         $this->db->query($query);
         $this->db->query($query_p);
 
-        return $this->response(1, 'warehouses');
+        return $this->response(1, 'warehouses');*/
 
 
         $_loc = new LOC_Warehouse(LuceedWarehouse::all());
