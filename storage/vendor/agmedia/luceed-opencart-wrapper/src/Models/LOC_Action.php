@@ -268,6 +268,26 @@ class LOC_Action
 
 
     /**
+     * @return bool|\stdClass
+     * @throws \Exception
+     */
+    public function updateSpecialsFromTemp()
+    {
+        $temp = $this->db->query('SELECT LEFT(sku, 6) as sku, price, special FROM temp GROUP BY LEFT(sku, 6);');
+
+        foreach ($temp->rows as $row) {
+            $product = Product::query()->where('model', $row['sku'])->first();
+
+            $p_str .= '(' . $product->product_id . ', 1, 0, ' . $row['special'] . ', "0000-00-00", "2023-01-27"),';
+        }
+
+        $query_p = "INSERT INTO " . DB_PREFIX . "product_special (product_id, customer_group_id, priority, price, date_start, date_end) VALUES " . substr($p_str, 0, -1) . ";";
+
+        return $this->db->query($query_p);
+    }
+
+
+    /**
      * @param string $time
      *
      * @return string

@@ -460,6 +460,8 @@ class ControllerExtensionModuleLuceedSync extends Controller
                          ->sortActions()
                          ->import();
 
+        $_loc->updateSpecialsFromTemp();
+
         return $this->response($imported, 'products_actions');
     }
 
