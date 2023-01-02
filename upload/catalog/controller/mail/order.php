@@ -283,7 +283,7 @@ class ControllerMailOrder extends Controller {
                 $text =  $this->currency->format($order_total['value'], $order_info['currency_code'], $order_info['currency_value']).' <small>('.$this->currency->format($order_total['value'], 'EUR'). ')</small> ';
             }
             else{
-                $text = $this->currency->format($order_total['value'], $order_info['currency_code'], $order_info['currency_value']);
+                $text =  $this->currency->format($order_total['value'], $order_info['currency_code'], $order_info['currency_value']).' <small>('.$this->currency->format($order_total['value'], 'HRK'). ')</small> ';
             }
 
 
