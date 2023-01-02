@@ -93,7 +93,7 @@ class ControllerProductSpecial extends Controller {
                     $priceeur = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), 'EUR');
                 }
                 else{
-                    $priceeur  ='';
+                    $priceeur = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), 'HRK');
 
                 }
 			} else {
@@ -107,7 +107,7 @@ class ControllerProductSpecial extends Controller {
                     $specialeur = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')),  'EUR');
                 }
                 else{
-                    $specialeur  ='';
+                    $specialeur = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')),  'HRKR');
 
                 }
 				$tax_price = (float)$result['special'];

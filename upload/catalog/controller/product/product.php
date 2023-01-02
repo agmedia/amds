@@ -305,8 +305,13 @@ class ControllerProductProduct extends Controller {
                     }
                 }
                 else{
-                    $data['priceeur'] ='';
-                    $data['price_ponudaeur'] ='';
+                    $data['priceeur'] = $this->currency->format($this->tax->calculate($product_info['price'], $product_info['tax_class_id'], $this->config->get('config_tax')), 'HRK');
+                    if($product_info['price_ponuda'] > 0){
+                        $data['price_ponudaeur'] = $this->currency->format($this->tax->calculate($product_info['price_ponuda'], $product_info['tax_class_id'], $this->config->get('config_tax')), 'HRK');
+                    }
+                    else{
+                        $data['price_ponuda'] ='';
+                    }
 
                 }
 
@@ -322,7 +327,7 @@ class ControllerProductProduct extends Controller {
                     $data['specialeur'] = $this->currency->format($this->tax->calculate($product_info['special'], $product_info['tax_class_id'], $this->config->get('config_tax')), 'EUR');
                 }
                 else{
-                    $data['specialeur']  ='';
+                    $data['specialeur'] = $this->currency->format($this->tax->calculate($product_info['special'], $product_info['tax_class_id'], $this->config->get('config_tax')), 'HRK');
 
                 }
 
@@ -442,7 +447,7 @@ class ControllerProductProduct extends Controller {
                         $priceeur = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), 'EUR');
                     }
                     else{
-                        $priceeur  ='';
+                        $priceeur = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), 'HRK');
 
                     }
 				} else {
@@ -457,7 +462,7 @@ class ControllerProductProduct extends Controller {
                         $specialeur = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')),  'EUR');
                     }
                     else{
-                        $specialeur  ='';
+                        $specialeur = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')),  'HRK');
 
                     }
 					$tax_price = (float)$result['special'];

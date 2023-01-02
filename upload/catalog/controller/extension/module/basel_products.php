@@ -120,7 +120,7 @@ class ControllerExtensionModuleBaselProducts extends Controller {
                             $priceeur = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), 'EUR');
                         }
                         else{
-                            $priceeur  ='';
+                            $priceeur = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), 'HRKR');
 
                         }
 					} else {
@@ -134,7 +134,7 @@ class ControllerExtensionModuleBaselProducts extends Controller {
                             $specialeur = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')),  'EUR');
                         }
                         else{
-                            $specialeur  ='';
+                            $specialeur = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')),  'HRK');
 
                         }
 						$date_end = $this->model_extension_basel_basel->getSpecialEndDate($result['product_id']);

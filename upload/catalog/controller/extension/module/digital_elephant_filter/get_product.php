@@ -175,8 +175,14 @@ class ControllerExtensionModuleDigitalElephantFilterGetProduct extends Controlle
                     }
                 }
                 else{
-                    $priceeur  ='';
-                    $price_ponudaeur = '';
+                    $priceeur = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), 'HRK');
+
+                    if($result['price_ponuda'] > 0){
+                        $price_ponudaeur = $this->currency->format($this->tax->calculate($result['price_ponuda'], $result['tax_class_id'], $this->config->get('config_tax')), 'HRK');
+                    }
+                    else{
+                        $price_ponudaeur = '';
+                    }
                 }
             } else {
                 $price = false;
@@ -191,7 +197,7 @@ class ControllerExtensionModuleDigitalElephantFilterGetProduct extends Controlle
                     $specialeur = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')),  'EUR');
                 }
                 else{
-                    $specialeur  ='';
+                    $specialeur = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')),  'HRK');
 
                 }
             } else {
