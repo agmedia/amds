@@ -184,7 +184,7 @@ class ControllerCheckoutSuccess extends Controller {
 
                 $postString = json_encode($hubstring);
 
-                $url = 'https://hub3.bigfish.software/api/v2/barcod';
+                $url = 'https://hub3.bigfish.software/api/v2/barcode';
                 $ch = curl_init($url);
 
                 # Setting our options
