@@ -110,26 +110,67 @@ class LOC_Places
      */
     public function load()
     {
-        $reader      = IOFactory::createReader("Xlsx");
-        $spreadsheet = $reader->load(DIR_STORAGE . 'upload/assets/zip.xlsx');
-        $list        = $spreadsheet->getActiveSheet()->toArray();
-        $response    = [];
+        $list     = $this->loadXlsx('zip');
+        $excluded = $this->loadExcluded();
+        $response = [];
 
         if ( ! empty($list)) {
-            for ($i = 0; $i < count($list); $i++) {
-                $response[] = [
-                    $list[0][0] => $list[$i][0],
-                    $list[0][1] => $list[$i][1],
-                    $list[0][2] => $list[$i][2],
-                ];
+            for ($i = 1; $i < count($list); $i++) {
+                if ( ! in_array($list[$i][2], $excluded)) {
+                    $response[] = [
+                        $list[0][0] => $list[$i][0],
+                        $list[0][1] => $list[$i][1],
+                        $list[0][2] => $list[$i][2],
+                    ];
+                }
             }
-
-            unset($response[0]);
 
             return collect($response);
         }
 
         return [];
+    }
+
+
+    /**
+     * $list[$i][...]
+     * [0] => Broj Poštanskog ureda
+     * [1] => Naziv poštanskogureda
+     * [2] => Naselje
+     *
+     * @return array
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     */
+    private function loadExcluded(): array
+    {
+        $list = $this->loadXlsx('excluded');
+
+        $response = [];
+
+        if ( ! empty($list)) {
+            for ($i = 2; $i < count($list); $i++) {
+                array_push($response, $list[$i][1]);
+            }
+
+            return collect($response)->unique()->flatten(2)->all();
+        }
+
+        return [];
+    }
+
+
+    /**
+     * @param string $name
+     *
+     * @return array
+     * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
+     */
+    private function loadXlsx(string $name): array
+    {
+        $reader      = IOFactory::createReader("Xlsx");
+        $spreadsheet = $reader->load(DIR_STORAGE . 'upload/assets/' . $name . '.xlsx');
+
+        return $spreadsheet->getActiveSheet()->toArray();
     }
 
 
