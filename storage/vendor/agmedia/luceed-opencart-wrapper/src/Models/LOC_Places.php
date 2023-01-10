@@ -23,6 +23,16 @@ class LOC_Places
      */
     private $list = [];
 
+    /**
+     * @var array
+     */
+    private $list_excluded_names = [];
+
+    /**
+     * @var array
+     */
+    private $list_excluded_numbers = [];
+
 
     /**
      * LOC_Places constructor.
@@ -31,6 +41,8 @@ class LOC_Places
      */
     public function __construct($places = null)
     {
+        $this->loadExcluded();
+
         if ($places) {
             $this->list = $this->setPlaces($places);
         } else {
@@ -111,12 +123,11 @@ class LOC_Places
     public function load()
     {
         $list     = $this->loadXlsx('zip');
-        $excluded = $this->loadExcluded();
         $response = [];
 
         if ( ! empty($list)) {
             for ($i = 1; $i < count($list); $i++) {
-                if ( ! in_array($list[$i][2], $excluded)) {
+                if ( ! in_array($list[$i][2], $this->list_excluded_names) && ! in_array($list[$i][1], $this->list_excluded_numbers)) {
                     $response[] = [
                         $list[0][0] => $list[$i][0],
                         $list[0][1] => $list[$i][1],
@@ -141,18 +152,18 @@ class LOC_Places
      * @return array
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
-    private function loadExcluded(): array
+    private function loadExcluded()
     {
         $list = $this->loadXlsx('excluded');
 
-        $response = [];
-
         if ( ! empty($list)) {
             for ($i = 2; $i < count($list); $i++) {
-                array_push($response, $list[$i][1]);
+                array_push($this->list_excluded_names, $list[$i][1]);
+                array_push($this->list_excluded_numbers, $list[$i][0]);
             }
 
-            return collect($response)->unique()->flatten(2)->all();
+            $this->list_excluded_names = collect($this->list_excluded_names)->unique()->flatten(2)->all();
+            $this->list_excluded_numbers = collect($this->list_excluded_numbers)->unique()->flatten(2)->all();
         }
 
         return [];
