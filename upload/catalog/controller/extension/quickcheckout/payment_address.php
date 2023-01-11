@@ -155,6 +155,19 @@ class ControllerExtensionQuickCheckoutPaymentAddress extends Controller {
 					}
 				}
 
+                // fj.agmedia.hr
+                $loc = new \Agmedia\LuceedOpencartWrapper\Models\LOC_Places();
+                $findc = $loc->getList()->find($this->request->post['city']);
+                if ( ! $findc->places->count()) {
+                    $json['error']['city'] = 'Morate odabrati grad sa liste!';
+                }
+                $findp = $loc->getList()->find($this->request->post['postcode'], 'zipcode');
+
+                if ( ! $findp->places->count()) {
+                    $json['error']['postcode'] = 'Morate odabrati poštanski broj sa liste!';
+                }
+                // END ::: fj.agmedia.hr
+
 				$city = $this->config->get('quickcheckout_field_city');
 
 				if (!empty($city['required'])) {

@@ -44,6 +44,19 @@ class ControllerApiPayment extends Controller {
 				$json['error']['address_1'] = $this->language->get('error_address_1');
 			}
 
+            // fj.agmedia.hr
+            $loc = new \Agmedia\LuceedOpencartWrapper\Models\LOC_Places();
+            $findc = $loc->getList()->find($this->request->post['city']);
+            if ( ! $findc->places->count()) {
+                $json['error']['city'] = 'Morate odabrati grad sa liste!';
+            }
+            $findp = $loc->getList()->find($this->request->post['postcode'], 'zipcode');
+
+            if ( ! $findp->places->count()) {
+                $json['error']['postcode'] = 'Morate odabrati poštanski broj sa liste!';
+            }
+            // END ::: fj.agmedia.hr
+
 			if ((utf8_strlen($this->request->post['city']) < 2) || (utf8_strlen($this->request->post['city']) > 32)) {
 				$json['error']['city'] = $this->language->get('error_city');
 			}
