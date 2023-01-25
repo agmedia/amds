@@ -80,7 +80,40 @@ class ControllerExtensionModuleDigitalElephantFilterHelperUrl extends Controller
                 $data_url['attribute'] = $this->request->get['attribute'];
             }
 
+
+            //sortiranje unutar poseba ponuda po sort_order, defaultno ostaje kako je i bilo (date_added).
+            $categorySorts = array(
+                'default'   => array('sort' => 'p.date_added', 'order' => 'DESC'),
+                '1'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+                '8'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+                '12'       => array('sort' => 'p.sort_order', 'order' => 'ASC')
+            );
+
+            $default = $categorySorts['default'];
+            if (isset($this->request->get['path'])) {
+                $parts = explode('_', (string)$this->request->get['path']);
+                $category_id = (int)array_pop($parts);
+                $this->log->write($category_id);
+                if (isset($categorySorts[$category_id])) {
+                    $default = $categorySorts[$category_id];
+                }
+            }
+
             if (isset($this->request->get['sort'])) {
+                $sort = $this->request->get['sort'];
+            } else {
+                $sort = $default['sort'];
+            }
+
+            if (isset($this->request->get['order'])) {
+                $order = $this->request->get['order'];
+            } else {
+                $order = $default['order'];
+            }
+
+
+
+        /*    if (isset($this->request->get['sort'])) {
                 $sort = $this->request->get['sort'];
             } else {
                 $sort = 'p.date_added';
@@ -90,7 +123,7 @@ class ControllerExtensionModuleDigitalElephantFilterHelperUrl extends Controller
                 $order = $this->request->get['order'];
             } else {
                 $order = 'DESC';
-            }
+            }*/
 
             if (isset($this->request->get['page'])) {
                 $page = $this->request->get['page'];
