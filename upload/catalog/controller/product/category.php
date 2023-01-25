@@ -20,7 +20,26 @@ class ControllerProductCategory extends Controller {
             'default'   => array('sort' => 'p.date_added', 'order' => 'DESC'),
             '1'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
             '8'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '12'       => array('sort' => 'p.sort_order', 'order' => 'ASC')
+            '12'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+            '92'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+            '108'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+            '138'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+            '22'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+            '52'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+            '10'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+            '33'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+            '17'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+            '84'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+            '104'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+            '139'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+            '45'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+            '56'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+            '129'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+            '80'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+            '54'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+            '35'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+            '69'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+            '14'       => array('sort' => 'p.sort_order', 'order' => 'ASC')
         );
 
         $default = $categorySorts['default'];
