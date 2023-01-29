@@ -619,7 +619,7 @@ class LOC_Order
                 if ($option) {
                     $product = ProductOption::where('product_option_value_id', $option->product_option_value_id)->first();
 
-                    $price = $this->getItemPrices($order_product->product_id, $order_product->price);
+                    //$price = $this->getItemPrices($order_product->product_id, $order_product->price);
 
                     /*if ( ! $price['rabat']) {
                         $price['rabat'] = $this->applyCouponDiscount();
@@ -628,20 +628,20 @@ class LOC_Order
                     $response[] = [
                         'artikl_uid' => $product->sku,
                         'kolicina'   => (int) $order_product->quantity,
-                        'cijena'     => (float) $price['cijena'],
-                        'rabat'      => (int) $price['rabat'],
+                        'cijena'     => (float) number_format($order_product->price, 2, '.', ''),
+                        'rabat'      => (int) 0,
                     ];
 
                 } else {
                     $product = Product::query()->where('product_id', $order_product->product_id)->first();
-                    $price   = $this->getItemPrices($order_product->product_id, $order_product->price);
+                    //$price   = $this->getItemPrices($order_product->product_id, $order_product->price);
 
                     if ($product) {
                         $response[] = [
                             'artikl'   => $order_product->model,
                             'kolicina' => (int) $order_product->quantity,
-                            'cijena'   => (float) $price['cijena'],
-                            'rabat'    => (int) $price['rabat'],
+                            'cijena'   => (float) number_format($order_product->price, 2, '.', ''),
+                            'rabat'    => (int) 0,
                         ];
                     }
                 }
