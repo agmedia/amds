@@ -176,6 +176,10 @@ class LOC_Product
                 $response[$this->existing[$i]]         = $main;
                 $response[$this->existing[$i]]->opcije = ProductHelper::sortOptions($product_options);
 
+                /*Product::query()->where('model', $this->existing[$i])->update([
+                    'status' => 1
+                ]);*/
+
             } else {
                 Product::query()->where('model', $this->existing[$i])->update([
                     'status' => 0
@@ -227,13 +231,13 @@ class LOC_Product
         // Check wich type of update to conduct.
         // Price and quantity or each individualy?
         if ($type == 'all') {
-            $updated = $db->query("UPDATE " . DB_PREFIX . "product p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.model = pt.uid SET p.quantity = pt.quantity, p.price = pt.price, p.stock_status_id = pt.stock_id");
+            $updated = $db->query("UPDATE " . DB_PREFIX . "product p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.model = pt.uid SET p.quantity = pt.quantity, p.price = pt.price, p.stock_status_id = pt.stock_id, p.status = pt.status");
         }
         if ($type == 'price' || $type == 'prices') {
-            $updated = $db->query("UPDATE " . DB_PREFIX . "product p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.model = pt.uid SET p.price = pt.price");
+            $updated = $db->query("UPDATE " . DB_PREFIX . "product p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.model = pt.uid SET p.price = pt.price, p.status = pt.status");
         }
         if ($type == 'quantity' || $type == 'quantities') {
-            $updated = $db->query("UPDATE " . DB_PREFIX . "product p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.model = pt.uid SET p.quantity = pt.quantity, p.stock_status_id = pt.stock_id");
+            $updated = $db->query("UPDATE " . DB_PREFIX . "product p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.model = pt.uid SET p.quantity = pt.quantity, p.stock_status_id = pt.stock_id, p.status = pt.status");
         }
 
         // Truncate the product_temp table.
