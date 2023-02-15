@@ -586,7 +586,7 @@ class ModelExtensionModuleDigitalElephantFilter extends Model
                 }
 
                 if ($option_ids) {
-                    $sql .= " AND pov" . $key . ".option_value_id IN (" . implode(',', $option_ids) . ")";
+                    $sql .= " AND pov" . $key . ".quantity > 0  AND pov" . $key . ".option_value_id IN (" . implode(',', $option_ids) . ")";
                 }
             }
         }
