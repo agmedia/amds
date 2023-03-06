@@ -127,7 +127,7 @@ class LOC_Places
 
         if ( ! empty($list)) {
             for ($i = 1; $i < count($list); $i++) {
-                if ( ! in_array($list[$i][2], $this->list_excluded_names) && ! in_array($list[$i][1], $this->list_excluded_numbers)) {
+                if ( ! in_array($list[$i][2], $this->list_excluded_names)/* && ! in_array($list[$i][1], $this->list_excluded_numbers)*/) {
                     $response[] = [
                         $list[0][0] => $list[$i][0],
                         $list[0][1] => $list[$i][1],
@@ -159,11 +159,11 @@ class LOC_Places
         if ( ! empty($list)) {
             for ($i = 2; $i < count($list); $i++) {
                 array_push($this->list_excluded_names, $list[$i][2]);
-                array_push($this->list_excluded_numbers, $list[$i][0]);
+                //array_push($this->list_excluded_numbers, $list[$i][0]);
             }
 
             $this->list_excluded_names = collect($this->list_excluded_names)->unique()->flatten(2)->all();
-            $this->list_excluded_numbers = collect($this->list_excluded_numbers)->unique()->flatten(2)->all();
+            //$this->list_excluded_numbers = collect($this->list_excluded_numbers)->unique()->flatten(2)->all();
         }
 
         return [];
