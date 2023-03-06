@@ -93,7 +93,7 @@ class LOC_Places
         $second_target = ($target == 'cityname') ? 'zipcode' : 'cityname';
         if ($request != '') {
             $this->places = $this->places->sortBy($second_target)->filter(function ($item) use ($request, $target) {
-                return stripos(strtolower($item[$target]), strtolower($request)) !== false;
+                return stripos($this->lowerName(strtolower($item[$target])), $this->lowerName(strtolower($request))) !== false;
             });
         }
 
@@ -182,6 +182,22 @@ class LOC_Places
         $spreadsheet = $reader->load(DIR_STORAGE . 'upload/assets/' . $name . '.xlsx');
 
         return $spreadsheet->getActiveSheet()->toArray();
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    private function lowerName(string $name): string
+    {
+        $name = str_replace('Š', 'š', $name);
+        $name = str_replace('Č', 'č', $name);
+        $name = str_replace('Ć', 'ć', $name);
+        $name = str_replace('Ž', 'ž', $name);
+        $name = str_replace('Đ', 'đ', $name);
+
+        return $name;
     }
 
 
