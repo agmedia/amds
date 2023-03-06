@@ -160,7 +160,7 @@ class ControllerCheckoutCheckout extends Controller {
             $loc->find($this->request->get['postcode'], 'zipcode');
         }
 
-        $loc->limit(5);
+        $loc->limit(20);
 
         $this->response->addHeader('Content-Type: application/json');
         $this->response->setOutput($loc->places->toJson());
