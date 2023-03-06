@@ -93,7 +93,7 @@ class LOC_Places
         $second_target = ($target == 'cityname') ? 'zipcode' : 'cityname';
         if ($request != '') {
             $this->places = $this->places->sortBy($second_target)->filter(function ($item) use ($request, $target) {
-                return stripos($item[$target], $request) !== false;
+                return stripos(strtolower($item[$target]), strtolower($request)) !== false;
             });
         }
 
