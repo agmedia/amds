@@ -158,7 +158,7 @@ class LOC_Places
 
         if ( ! empty($list)) {
             for ($i = 2; $i < count($list); $i++) {
-                array_push($this->list_excluded_names, $list[$i][1]);
+                array_push($this->list_excluded_names, $list[$i][2]);
                 array_push($this->list_excluded_numbers, $list[$i][0]);
             }
 
