@@ -224,6 +224,7 @@ class ControllerExtensionModuleBaselProducts extends Controller {
 						'special' 	 => $special,
                         'priceeur'       => $priceeur,
                         'specialeur'     => $specialeur,
+                        'imported'     => $result['imported'],
 						'tax'        => $tax,
 						'minimum'    => $result['minimum'] > 0 ? $result['minimum'] : 1,
 						'rating'     => $rating,

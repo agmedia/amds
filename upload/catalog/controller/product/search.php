@@ -279,6 +279,7 @@ class ControllerProductSearch extends Controller {
 					'special'     => $special,
                     'priceeur'       => $priceeur,
                     'specialeur'     => $specialeur,
+                    'imported'     => $result['imported'],
                     'cat' => $cat,
                     'tax'         => $tax,
 					'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,

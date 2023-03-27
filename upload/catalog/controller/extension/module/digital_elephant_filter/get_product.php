@@ -309,6 +309,7 @@ class ControllerExtensionModuleDigitalElephantFilterGetProduct extends Controlle
                 'cat' => $cat,
                 'sale_badge'  => $sale_badge,
 				'new_label'   => $is_new,
+                'imported'     => $result['imported'],
                 'special'     => $special,
                 'tax'         => $tax,
                 'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,

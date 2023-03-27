@@ -54,6 +54,13 @@ body, .product-name.main-font, .gridlist .single-product .product-name, .gridlis
 .price {
 	color:#040707;
 }
+.badge.outlet{
+	position: absolute!imp;
+	top: 10px;
+	z-index: 150;
+	border-radius: 0;
+	left: 10px;
+}
 
 ul.thumbsblog{
 	display: flex;

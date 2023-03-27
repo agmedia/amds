@@ -234,7 +234,7 @@ class ControllerProductProduct extends Controller {
 
 			$data['tab_review'] = sprintf($this->language->get('tab_review'), $product_info['reviews']);
 
-
+            $data['imported'] =  $product_info['imported'];
 
 
 			$data['product_id'] = (int)$this->request->get['product_id'];
@@ -493,6 +493,7 @@ class ControllerProductProduct extends Controller {
 					'special'     => $special,
                     'priceeur'       => $priceeur,
                     'specialeur'     => $specialeur,
+                    'imported'     => $result['imported'],
 					'tax'         => $tax,
 					'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,
 					'rating'      => $rating,
