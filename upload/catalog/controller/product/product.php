@@ -239,6 +239,8 @@ class ControllerProductProduct extends Controller {
 
 			$data['product_id'] = (int)$this->request->get['product_id'];
 
+            $data['ljetni'] = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::isLjetni($data['product_id']);
+
 
 
             $data['spol'] = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::getGender($data['product_id']);

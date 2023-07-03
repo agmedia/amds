@@ -324,7 +324,7 @@ class ControllerProductCategory extends Controller {
                     $cat = substr($this->request->get['path'], 0, strpos($this->request->get['path'], '_'));
                 }
 
-
+                $is_ljetni = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::isLjetni($result['product_id']);
 				$data['products'][] = array(
 					'product_id'  => $result['product_id'],
 					'thumb'       => $image,
@@ -339,6 +339,7 @@ class ControllerProductCategory extends Controller {
                     'specialeur'     => $specialeur,
                     'imported'     => $result['imported'],
                     'cat' => $cat,
+                    'ljetni' => $is_ljetni,
 					'tax'         => $tax,
 					'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,
 					'rating'      => $result['rating'],
