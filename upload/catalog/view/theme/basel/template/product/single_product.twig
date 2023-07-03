@@ -10,6 +10,10 @@
     <div class="sale-counter id{{ product.product_id }}"></div>
     <span class="badge sale_badge"><i>{{ product.sale_badge }}</i></span>
 {% endif %}
+
+    {% if product.price_ponuda and product.ljetni.cat_id == 429%}
+        <span class="badge sale_badge"><i>{{ product.ljetni.discount }}%</i></span>
+    {% endif %}
 {% if product.new_label and product.cat !='1' %}
     <span class="badge new_badge"><i>{{ basel_text_new }}</i></span>
 {% endif %}
@@ -59,7 +63,13 @@
     {% if product.special %}
     <span class="price-old">{{ product.price }} <small>{{ product.priceeur }}</small></span><span class="price-new">{{ product.special }} <small>{{ product.specialeur }}</small></span>
     {% else %}
-    <span>{{ product.price }} <small>{{ product.priceeur }}</small></span>  {% if product.price_ponuda %} <span class="price-old">{{ product.price_ponuda }} <small>{{ product.price_ponudaeur }}</small></span>{% endif %}
+    <span>{{ product.price }} <small>{{ product.priceeur }}</small></span>
+        {% if product.price_ponuda and product.ljetni.cat_id != 429%}
+            <span class="price-old">{{ product.price_ponuda }} <small>{{ product.price_ponudaeur }}</small></span>
+        {% endif %}
+        {% if product.price_ponuda and product.ljetni.cat_id == 429%}
+            <span class="price-old" style="text-decoration: unset;">NC 30 dana: {{ product.price_ponuda }} <small>{{ product.price_ponudaeur }}</small></span>
+        {% endif %}
     {% endif %}
     {% if product.tax %}
     <span class="price-tax">{{ text_tax }} {{ product.tax }}</span>
