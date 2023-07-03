@@ -13,6 +13,7 @@ use Agmedia\Models\Category\Category;
 use Agmedia\Models\Manufacturer\Manufacturer;
 use Agmedia\Models\Option\OptionValue;
 use Agmedia\Models\Option\OptionValueDescription;
+use Agmedia\Models\Product\Product;
 use Agmedia\Models\Product\ProductCategory;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -159,8 +160,8 @@ class ProductHelper
 
         $response[7] = 149;
 
-      //  Log::store($response, 'Response_2022');
-      //  Log::store(array_unique($response), 'Response_2022');
+        //  Log::store($response, 'Response_2022');
+        //  Log::store(array_unique($response), 'Response_2022');
 
         $response = array_unique(array_values($response));
 
@@ -631,6 +632,20 @@ class ProductHelper
 
 
     /**
+     * @param $list_price
+     *                   Stara cijena
+     * @param $seling_price
+     *                     Cijena po kojoj se prodaje
+     *
+     * @return float|int
+     */
+    public static function calculateDiscountBetweenPrices(float $list_price, float $seling_price)
+    {
+        return (($list_price - $seling_price) / $list_price) * 100;
+    }
+
+
+    /**
      * @param int $product_id
      *
      * @return string
@@ -654,10 +669,58 @@ class ProductHelper
     }
 
 
+    /**
+     * @param int $product_id
+     *
+     * @return array
+     */
+    public static function isLjetni(int $product_id): array
+    {
+        $cats = ProductCategory::query()->where('product_id', $product_id)->get();
+
+        if ($cats) {
+            foreach ($cats as $cat) {
+                if ($cat->category_id == 474) {
+                    $discount = static::getDiscount($product_id);
+
+                    return [
+                        'cat' => 'posebna',
+                        'cat_id' => 474,
+                        'discount' => round($discount)
+                    ];
+                }
+                if ($cat->category_id == 429) {
+                    $discount = static::getDiscount($product_id);
+
+                    return [
+                        'cat' => 'ljetni',
+                        'cat_id' => 429,
+                        'discount' => round($discount)
+                    ];
+                }
+            }
+        }
+
+        return ['cat' => 0, 'cat_id' => 0, 'discount' => 0];
+    }
+
+
     /*******************************************************************************
-    *                                Copyright : AGmedia                           *
-    *                              email: filip@agmedia.hr                         *
-    *******************************************************************************/
+     *                                Copyright : AGmedia                           *
+     *                              email: filip@agmedia.hr                         *
+     *******************************************************************************/
+
+    /**
+     * @param int $product_id
+     *
+     * @return float|int
+     */
+    private static function getDiscount(int $product_id)
+    {
+        $product = Product::query()->where('product_id', $product_id)->first();
+
+        return static::calculateDiscountBetweenPrices($product->price_ponuda, $product->price);
+    }
 
     /**
      * @param Collection $product
