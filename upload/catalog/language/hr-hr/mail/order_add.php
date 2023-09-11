@@ -3,7 +3,7 @@
 
 
 $_['text_subject']          = '%s - Narudžba %s';
-$_['text_greeting']         = 'Zahvaljujemo se na Vašem interesu za %s proizvode. Vaša narudžba je zaprimljena te se šalje na obradu. <strong>Tijekom rasprodaje, proces dostave bi mogao trajti malo dulje od uobičajenog roka dostave. Zahvaljujemo na vašem strpljenju i suradnji.</strong> ';
+$_['text_greeting']         = 'Zahvaljujemo se na Vašem interesu za %s proizvode. Vaša narudžba je zaprimljena te se šalje na obradu. ';
 $_['text_received']         = 'Zaprimili ste narudžbu.';
 $_['text_link']             = 'Da biste pregledali Vašu narudžbu, kliknite na link ispod:';
 $_['text_order_detail']     = 'Detalji narudžbe';
