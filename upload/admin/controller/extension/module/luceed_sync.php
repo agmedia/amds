@@ -534,7 +534,13 @@ class ControllerExtensionModuleLuceedSync extends Controller
      */
     public function updatePricesAndQuantities()
     {
+        $start = microtime(true);
+        
         $_loc = new LOC_Product(LuceedProduct::shortList());
+        
+        $end = microtime(true);
+        $time = number_format(($end - $start), 2, ',', '.');
+        Log::store('Download time ::: ' . $time . ' sec.');
 
         $updated = $_loc->sortForUpdate()->update();
 

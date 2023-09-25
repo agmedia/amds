@@ -156,6 +156,8 @@ class LOC_Product
      */
     public function sortForUpdate(string $products = null)
     {
+        $start = microtime(true);
+        
         $db = new Database(DB_DATABASE);
         // List of existing product identifiers.
         $this->existing = Product::pluck('model')->toArray();
@@ -186,6 +188,11 @@ class LOC_Product
                 ]);
             }
         }
+        
+        $end = microtime(true);
+        $time = number_format(($end - $start), 2, ',', '.');
+        Log::store('SortForUpdate time ::: ' . $time . ' sec.');
+        
         // Full list of products to update.
         $this->products_to_add = $response;
 
@@ -201,6 +208,8 @@ class LOC_Product
      */
     public function update(string $type = 'all')
     {
+        $start = microtime(true);
+        
         $db = new Database(DB_DATABASE);
 
         // Sort the temporary products DB import string.
@@ -225,9 +234,19 @@ class LOC_Product
                 $query_str       .= '("' . $item->artikl . '", ' . $item->mpc . ', ' . $stock . ', ' . $stock_status_id . ', ' . (($stock > 1) ? 1 : 0) . '),';
             }
         }
+        
+        $end = microtime(true);
+        $time = number_format(($end - $start), 2, ',', '.');
+        Log::store('Update - Make query time ::: ' . $time . ' sec.');
+        $start = microtime(true);
 
         $db->query("INSERT INTO " . DB_PREFIX . "product_temp (uid, price, quantity, stock_id, status) VALUES " . substr($query_str, 0, -1) . ";");
-
+        
+        $end = microtime(true);
+        $time = number_format(($end - $start), 2, ',', '.');
+        Log::store('Update - Query time ::: ' . $time . ' sec.');
+        $start = microtime(true);
+        
         // Check wich type of update to conduct.
         // Price and quantity or each individualy?
         if ($type == 'all') {
@@ -239,11 +258,20 @@ class LOC_Product
         if ($type == 'quantity' || $type == 'quantities') {
             $updated = $db->query("UPDATE " . DB_PREFIX . "product p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.model = pt.uid SET p.quantity = pt.quantity, p.stock_status_id = pt.stock_id, p.status = pt.status");
         }
-
+        
+        $end = microtime(true);
+        $time = number_format(($end - $start), 2, ',', '.');
+        Log::store('Update - Query 2 time ::: ' . $time . ' sec.');
+        $start = microtime(true);
+        
         // Truncate the product_temp table.
         $db->query("TRUNCATE TABLE `" . DB_PREFIX . "product_temp`");
 
         $this->updateOptions();
+        
+        $end = microtime(true);
+        $time = number_format(($end - $start), 2, ',', '.');
+        Log::store('Update - Options time ::: ' . $time . ' sec.');
 
         // Return products count if updated.
         // False if update error occurs.
