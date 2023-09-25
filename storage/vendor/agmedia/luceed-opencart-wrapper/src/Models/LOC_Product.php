@@ -191,7 +191,7 @@ class LOC_Product
         
         $end = microtime(true);
         $time = number_format(($end - $start), 2, ',', '.');
-        Log::store('SortForUpdate time ::: ' . $time . ' sec.');
+        Log::store('SortForUpdate time ::: ' . $time . ' sec.', 'testing_update_time');
         
         // Full list of products to update.
         $this->products_to_add = $response;
@@ -237,14 +237,14 @@ class LOC_Product
         
         $end = microtime(true);
         $time = number_format(($end - $start), 2, ',', '.');
-        Log::store('Update - Make query time ::: ' . $time . ' sec.');
+        Log::store('Update - Make query time ::: ' . $time . ' sec.', 'testing_update_time');
         $start = microtime(true);
 
         $db->query("INSERT INTO " . DB_PREFIX . "product_temp (uid, price, quantity, stock_id, status) VALUES " . substr($query_str, 0, -1) . ";");
         
         $end = microtime(true);
         $time = number_format(($end - $start), 2, ',', '.');
-        Log::store('Update - Query time ::: ' . $time . ' sec.');
+        Log::store('Update - Query time ::: ' . $time . ' sec.', 'testing_update_time');
         $start = microtime(true);
         
         // Check wich type of update to conduct.
@@ -261,7 +261,7 @@ class LOC_Product
         
         $end = microtime(true);
         $time = number_format(($end - $start), 2, ',', '.');
-        Log::store('Update - Query 2 time ::: ' . $time . ' sec.');
+        Log::store('Update - Query 2 time ::: ' . $time . ' sec.', 'testing_update_time');
         $start = microtime(true);
         
         // Truncate the product_temp table.
@@ -271,7 +271,7 @@ class LOC_Product
         
         $end = microtime(true);
         $time = number_format(($end - $start), 2, ',', '.');
-        Log::store('Update - Options time ::: ' . $time . ' sec.');
+        Log::store('Update - Options time ::: ' . $time . ' sec.', 'testing_update_time');
 
         // Return products count if updated.
         // False if update error occurs.

@@ -540,7 +540,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
         
         $end = microtime(true);
         $time = number_format(($end - $start), 2, ',', '.');
-        Log::store('Download time ::: ' . $time . ' sec.');
+        Log::store('Download time ::: ' . $time . ' sec.', 'testing_update_time');
 
         $updated = $_loc->sortForUpdate()->update();
 
