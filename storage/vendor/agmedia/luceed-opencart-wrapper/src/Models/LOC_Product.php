@@ -178,9 +178,9 @@ class LOC_Product
                 $response[$this->existing[$i]]         = $main;
                 $response[$this->existing[$i]]->opcije = ProductHelper::sortOptions($product_options);
 
-                /*Product::query()->where('model', $this->existing[$i])->update([
+                Product::query()->where('model', $this->existing[$i])->update([
                     'status' => 1
-                ]);*/
+                ]);
 
             } else {
                 Product::query()->where('model', $this->existing[$i])->update([
