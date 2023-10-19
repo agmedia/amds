@@ -183,9 +183,9 @@ class LOC_Product
                 ]);*/
 
             } else {
-                Product::query()->where('model', $this->existing[$i])->update([
+                /*Product::query()->where('model', $this->existing[$i])->update([
                     'status' => 0
-                ]);
+                ]);*/
             }
         }
         
@@ -234,6 +234,8 @@ class LOC_Product
                 $query_str       .= '("' . $item->artikl . '", ' . $item->mpc . ', ' . $stock . ', ' . $stock_status_id . ', ' . (($stock > 0) ? 1 : 0) . '),';
             }
         }
+        
+        Log::store($query_str, 'query_string');
         
         $end = microtime(true);
         $time = number_format(($end - $start), 2, ',', '.');
