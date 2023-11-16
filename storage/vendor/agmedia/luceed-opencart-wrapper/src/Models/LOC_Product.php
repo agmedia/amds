@@ -157,10 +157,9 @@ class LOC_Product
     public function sortForUpdate(string $products = null)
     {
         $start = microtime(true);
-        
-        $db = new Database(DB_DATABASE);
         // List of existing product identifiers.
-        $this->existing = Product::pluck('model')->toArray();
+
+        $this->existing = Product::query()->pluck('model')->take(300)->toArray();
 
         $full_list = $this->getProducts()
                           ->where('artikl', '!=', '')
@@ -168,15 +167,28 @@ class LOC_Product
                           ->where('enabled', '!=', 'N')
                           ->where('webshop', '!=', 'N');
 
+        //$this->existing = Product::query()->pluck('model')->diff($full_list->pluck('artikl'))->toArray();
+
+        //$list = $full_list->where('osnovni__artikl', '==', null);
+
+        Log::info(count($this->existing));
+
         $response = [];
 
+        $product_options = $full_list->where('osnovni__artikl', '!=', null)->groupBy('osnovni__artikl')->all();
+
         for ($i = 0; $i < count($this->existing); $i++) {
-            $product_options = $full_list->where('osnovni__artikl', '==', $this->existing[$i])->all();
             $main            = $full_list->where('artikl', '==', $this->existing[$i])->first();
 
-            if (isset($main->artikl) && $main) {
+            //Log::info($product_options[$this->existing[$i]]->toArray());
+
+            if (isset($main->artikl)) {
                 $response[$this->existing[$i]]         = $main;
-                $response[$this->existing[$i]]->opcije = ProductHelper::sortOptions($product_options);
+                $response[$this->existing[$i]]->opcije = [];
+
+                if ($product_options[$this->existing[$i]]) {
+                    $response[$this->existing[$i]]->opcije = ProductHelper::sortOptions($product_options[$this->existing[$i]]->toArray());
+                }
 
                 /*Product::query()->where('model', $this->existing[$i])->update([
                     'status' => 1
@@ -188,11 +200,11 @@ class LOC_Product
                 ]);*/
             }
         }
-        
-        $end = microtime(true);
+
+        $end  = microtime(true);
         $time = number_format(($end - $start), 2, ',', '.');
         Log::store('SortForUpdate time ::: ' . $time . ' sec.', 'testing_update_time');
-        
+
         // Full list of products to update.
         $this->products_to_add = $response;
 
@@ -208,10 +220,7 @@ class LOC_Product
      */
     public function update(string $type = 'all')
     {
-        $start = microtime(true);
-        
         $db = new Database(DB_DATABASE);
-
         // Sort the temporary products DB import string.
         // (uid, price, quantity, stock_id)
         $query_str = '';
@@ -230,46 +239,39 @@ class LOC_Product
 
                 $stock = $qty_sum ?: 0;
 
-                $stock_status_id = $stock ? agconf('import.default_stock_full') : agconf('import.default_stock_empty');
-                $query_str       .= '("' . $item->artikl . '", ' . $item->mpc . ', ' . $stock . ', ' . $stock_status_id . ', ' . (($stock > 0) ? 1 : 0) . '),';
+                if ($stock) {
+                    $stock_status_id = $stock ? agconf('import.default_stock_full') : agconf('import.default_stock_empty');
+                    $query_str       .= '("' . $item->artikl . '", ' . $item->mpc . ', ' . $stock . ', ' . $stock_status_id . ', ' . (($stock > 0) ? 1 : 0) . '),';
+                }
+
             }
         }
         
         Log::store($query_str, 'query_string');
-        
-        $end = microtime(true);
-        $time = number_format(($end - $start), 2, ',', '.');
-        Log::store('Update - Make query time ::: ' . $time . ' sec.', 'testing_update_time');
-        $start = microtime(true);
 
-        $db->query("INSERT INTO " . DB_PREFIX . "product_temp (uid, price, quantity, stock_id, status) VALUES " . substr($query_str, 0, -1) . ";");
-        
-        $end = microtime(true);
-        $time = number_format(($end - $start), 2, ',', '.');
-        Log::store('Update - Query time ::: ' . $time . ' sec.', 'testing_update_time');
-        $start = microtime(true);
-        
-        // Check wich type of update to conduct.
-        // Price and quantity or each individualy?
-        if ($type == 'all') {
-            $updated = $db->query("UPDATE " . DB_PREFIX . "product p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.model = pt.uid SET p.quantity = pt.quantity, p.price = pt.price, p.stock_status_id = pt.stock_id, p.status = pt.status");
+        if ($query_str != '') {
+            $db->query("INSERT INTO " . DB_PREFIX . "product_temp (uid, price, quantity, stock_id, status) VALUES " . substr($query_str, 0, -1) . ";");
+            // Check wich type of update to conduct.
+            // Price and quantity or each individualy?
+            if ($type == 'all') {
+                $db->query("UPDATE " . DB_PREFIX . "product p SET p.quantity = 0, p.status = 0");
+                $updated = $db->query("UPDATE " . DB_PREFIX . "product p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.model = pt.uid SET p.quantity = pt.quantity, p.price = pt.price, p.stock_status_id = pt.stock_id, p.status = pt.status");
+            }
+            if ($type == 'price' || $type == 'prices') {
+                $updated = $db->query("UPDATE " . DB_PREFIX . "product p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.model = pt.uid SET p.price = pt.price, p.status = pt.status");
+            }
+            if ($type == 'quantity' || $type == 'quantities') {
+                $db->query("UPDATE " . DB_PREFIX . "product p SET p.quantity = 0, p.status = 0");
+                $updated = $db->query("UPDATE " . DB_PREFIX . "product p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.model = pt.uid SET p.quantity = pt.quantity, p.stock_status_id = pt.stock_id, p.status = pt.status");
+            }
         }
-        if ($type == 'price' || $type == 'prices') {
-            $updated = $db->query("UPDATE " . DB_PREFIX . "product p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.model = pt.uid SET p.price = pt.price, p.status = pt.status");
-        }
-        if ($type == 'quantity' || $type == 'quantities') {
-            $updated = $db->query("UPDATE " . DB_PREFIX . "product p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.model = pt.uid SET p.quantity = pt.quantity, p.stock_status_id = pt.stock_id, p.status = pt.status");
-        }
-        
-        $end = microtime(true);
-        $time = number_format(($end - $start), 2, ',', '.');
-        Log::store('Update - Query 2 time ::: ' . $time . ' sec.', 'testing_update_time');
+
         $start = microtime(true);
         
         // Truncate the product_temp table.
         $db->query("TRUNCATE TABLE `" . DB_PREFIX . "product_temp`");
 
-        $this->updateOptions();
+        $this->updateOptions($type);
         
         $end = microtime(true);
         $time = number_format(($end - $start), 2, ',', '.');
@@ -286,33 +288,37 @@ class LOC_Product
 
 
     /**
+     * @param string $type
+     *
      * @return bool
      * @throws \Exception
      */
-    private function updateOptions()
+    private function updateOptions(string $type = '')
     {
         $db = new Database(DB_DATABASE);
-
+        $updated = false;
         $query_str = '';
 
         foreach ($this->products_to_add as $item) {
             if ( ! empty($item->opcije)) {
                 foreach ($item->opcije as $option) {
                     $stock     = $option['raspolozivo_kol'] ?: 0;
-                    $query_str .= '("' . $option['uid'] . '", 0, ' . $stock . ', 0),';
+
+                    if ($stock) {
+                        $query_str .= '("' . $option['uid'] . '", 0, ' . $stock . ', 0),';
+                    }
                 }
             }
         }
 
-        if ($query_str == '') {
-            return true;
+        if ($query_str != '') {
+            $db->query("INSERT INTO " . DB_PREFIX . "product_temp (uid, price, quantity, stock_id) VALUES " . substr($query_str, 0, -1) . ";");
+
+            $db->query("UPDATE " . DB_PREFIX . "product_option_value p SET p.quantity = 0");
+            $updated = $db->query("UPDATE " . DB_PREFIX . "product_option_value p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.sku = pt.uid SET p.quantity = pt.quantity");
+
+            $db->query("TRUNCATE TABLE `" . DB_PREFIX . "product_temp`");
         }
-
-        $db->query("INSERT INTO " . DB_PREFIX . "product_temp (uid, price, quantity, stock_id) VALUES " . substr($query_str, 0, -1) . ";");
-
-        $updated = $db->query("UPDATE " . DB_PREFIX . "product_option_value p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.sku = pt.uid SET p.quantity = pt.quantity");
-
-        $db->query("TRUNCATE TABLE `" . DB_PREFIX . "product_temp`");
 
         return $updated ? true : false;
     }

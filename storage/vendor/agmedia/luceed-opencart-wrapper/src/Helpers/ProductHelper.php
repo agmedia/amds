@@ -599,16 +599,18 @@ class ProductHelper
         $response = [];
 
         foreach ($products as $product) {
-            $response[] = [
-                'uid' => $product->artikl_uid,
-                'artikl' => $product->artikl,
-                'barcode' => $product->barcode,
-                'mpc' => $product->mpc,
-                'velicina_uid' => $product->velicina_uid,
-                'velicina' => $product->velicina,
-                'velicina_naziv' => $product->velicina_naziv,
-                'raspolozivo_kol' => $product->raspolozivo_kol
-            ];
+            if ($product->raspolozivo_kol > 0) {
+                $response[] = [
+                    'uid' => $product->artikl_uid,
+                    'artikl' => $product->artikl,
+                    'barcode' => $product->barcode,
+                    'mpc' => $product->mpc,
+                    'velicina_uid' => $product->velicina_uid,
+                    'velicina' => $product->velicina,
+                    'velicina_naziv' => $product->velicina_naziv,
+                    'raspolozivo_kol' => $product->raspolozivo_kol
+                ];
+            }
         }
 
         return $response;
