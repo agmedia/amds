@@ -159,7 +159,7 @@ class LOC_Product
         $start = microtime(true);
         // List of existing product identifiers.
 
-        $this->existing = Product::query()->pluck('model')->take(300)->toArray();
+        $this->existing = Product::query()->pluck('model')->toArray();
 
         $full_list = $this->getProducts()
                           ->where('artikl', '!=', '')
