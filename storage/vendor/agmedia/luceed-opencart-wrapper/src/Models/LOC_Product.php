@@ -67,6 +67,8 @@ class LOC_Product
      */
     private $image_path;
 
+    private $product_view_limit = 5;
+
 
     /**
      * LOC_Product constructor.
@@ -158,7 +160,6 @@ class LOC_Product
     {
         $start = microtime(true);
         // List of existing product identifiers.
-
         $this->existing = Product::query()->pluck('model')->toArray();
 
         $full_list = $this->getProducts()
@@ -167,37 +168,20 @@ class LOC_Product
                           ->where('enabled', '!=', 'N')
                           ->where('webshop', '!=', 'N');
 
-        //$this->existing = Product::query()->pluck('model')->diff($full_list->pluck('artikl'))->toArray();
-
-        //$list = $full_list->where('osnovni__artikl', '==', null);
-
-        Log::info(count($this->existing));
-
         $response = [];
 
         $product_options = $full_list->where('osnovni__artikl', '!=', null)->groupBy('osnovni__artikl')->all();
 
         for ($i = 0; $i < count($this->existing); $i++) {
-            $main            = $full_list->where('artikl', '==', $this->existing[$i])->first();
-
-            //Log::info($product_options[$this->existing[$i]]->toArray());
+            $main = $full_list->where('artikl', '==', $this->existing[$i])->first();
 
             if (isset($main->artikl)) {
                 $response[$this->existing[$i]]         = $main;
                 $response[$this->existing[$i]]->opcije = [];
 
                 if ($product_options[$this->existing[$i]]) {
-                    $response[$this->existing[$i]]->opcije = ProductHelper::sortOptions($product_options[$this->existing[$i]]->toArray());
+                    $response[$this->existing[$i]]->opcije = ProductHelper::sortOptions($product_options[$this->existing[$i]]->toArray(), $this->product_view_limit);
                 }
-
-                /*Product::query()->where('model', $this->existing[$i])->update([
-                    'status' => 1
-                ]);*/
-
-            } else {
-                /*Product::query()->where('model', $this->existing[$i])->update([
-                    'status' => 0
-                ]);*/
             }
         }
 
@@ -231,7 +215,9 @@ class LOC_Product
 
                 if ( ! empty($item->opcije)) {
                     foreach ($item->opcije as $option) {
-                        $qty_sum += $option['raspolozivo_kol'];
+                        if ($option['raspolozivo_kol'] >= $this->product_view_limit) {
+                            $qty_sum += $option['raspolozivo_kol'];
+                        }
                     }
                 } else {
                     $qty_sum += $item->raspolozivo_kol;
@@ -239,7 +225,7 @@ class LOC_Product
 
                 $stock = $qty_sum ?: 0;
 
-                if ($stock) {
+                if ($stock >= $this->product_view_limit) {
                     $stock_status_id = $stock ? agconf('import.default_stock_full') : agconf('import.default_stock_empty');
                     $query_str       .= '("' . $item->artikl . '", ' . $item->mpc . ', ' . $stock . ', ' . $stock_status_id . ', ' . (($stock > 0) ? 1 : 0) . '),';
                 }
@@ -304,7 +290,7 @@ class LOC_Product
                 foreach ($item->opcije as $option) {
                     $stock     = $option['raspolozivo_kol'] ?: 0;
 
-                    if ($stock) {
+                    if ($stock >= $this->product_view_limit) {
                         $query_str .= '("' . $option['uid'] . '", 0, ' . $stock . ', 0),';
                     }
                 }

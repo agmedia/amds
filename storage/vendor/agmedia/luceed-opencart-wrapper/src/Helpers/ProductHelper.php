@@ -594,12 +594,12 @@ class ProductHelper
      *
      * @return array
      */
-    public static function sortOptions(array $products): array
+    public static function sortOptions(array $products, int $product_view_limit): array
     {
         $response = [];
 
         foreach ($products as $product) {
-            if ($product->raspolozivo_kol > 0) {
+            if ($product->raspolozivo_kol >= $product_view_limit) {
                 $response[] = [
                     'uid' => $product->artikl_uid,
                     'artikl' => $product->artikl,
