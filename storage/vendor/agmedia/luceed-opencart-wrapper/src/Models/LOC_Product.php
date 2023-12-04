@@ -179,7 +179,7 @@ class LOC_Product
                 $response[$this->existing[$i]]         = $main;
                 $response[$this->existing[$i]]->opcije = [];
 
-                if ($product_options[$this->existing[$i]]) {
+                if (isset($product_options[$this->existing[$i]]) && $product_options[$this->existing[$i]]) {
                     $response[$this->existing[$i]]->opcije = ProductHelper::sortOptions($product_options[$this->existing[$i]]->toArray(), $this->product_view_limit);
                 }
             }
