@@ -139,7 +139,7 @@ class LOC_Product
 
         for ($i = 0; $i < $products_to_add->count(); $i++) {
             $product_options             = $full_list->where('osnovni__artikl', '==', $products_to_add[$i]->artikl)->all();
-            $products_to_add[$i]->opcije = ProductHelper::sortOptions($product_options);
+            $products_to_add[$i]->opcije = ProductHelper::sortOptions($product_options, $this->product_view_limit);
 
             $response[$products_to_add[$i]->artikl] = $products_to_add[$i];
         }
