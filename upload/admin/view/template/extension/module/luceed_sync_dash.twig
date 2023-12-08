@@ -104,6 +104,20 @@
                             </div>
                         </div>
 
+                        <div class="panel panel-info">
+                            <div class="panel-heading darker-bg">
+                                <h3 class="panel-title"><i class="fa fa-list"></i> Export</h3>
+                            </div>
+                            <div class="panel-body form-horizontal">
+                                <div class="form-group">
+                                    <div class="col-sm-5 text-center">
+                                        <a href="{{ generate_excel_link }}" data-toggle="tooltip" title="Export excel liste artikala" class="btn btn-warning btn-block">Export Excel Proizvoda</a>
+                                    </div>
+                                    <p class="col-sm-7">Export excel liste artikala sa šifrom, nazivom i kategorijama..</p>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
                     <div class="col-sm-12 col-md-7">
@@ -358,6 +372,8 @@
             //
             $('#import-initial-manufacturer').on('click', e => { callApi(e, 'importInitialManufacturers'); });
             $('#import-initial-customers')   .on('click', e => { callApi(e, 'importInitialCustomers'); });
+            //
+            $('#export-excel-1')   .on('click', e => { callApi(e, 'generateExcel'); });
         });
 
         /**

@@ -25,6 +25,7 @@ use Agmedia\Models\Order\Order;
 use Agmedia\Models\Product\Product;
 use Agmedia\Models\Product\ProductCategory;
 use Agmedia\LuceedOpencartWrapper\Helpers\Helper;
+use Agmedia\Models\Product\ProductDescription;
 use Carbon\Carbon;
 
 class ControllerExtensionModuleLuceedSync extends Controller
@@ -103,6 +104,8 @@ class ControllerExtensionModuleLuceedSync extends Controller
         } else {
             $data['success'] = '';
         }
+
+        $data['generate_excel_link'] = $this->url->link('extension/module/luceed_sync/generateExcel', 'user_token=' . $this->session->data['user_token'], true);
 
         $data['user_token'] = $this->session->data['user_token'];
 
@@ -546,7 +549,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
         //Helper::overwritePricesAndSpecialsFromTempTable();
 
-        return $this->response(1, 'update');
+        return $this->response($updated, 'update');
     }
 
 
@@ -625,6 +628,48 @@ class ControllerExtensionModuleLuceedSync extends Controller
         }
 
         return $this->response($updated, 'orders');
+    }
+
+
+    /**
+     * @return mixed
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Writer\Exception
+     */
+    public function generateExcel()
+    {
+        $this->load->model('catalog/product');
+        $this->load->model('catalog/category');
+
+        $products = [];
+        $ids = Product::query()->pluck('product_id');
+
+        foreach ($ids as $product_id) {
+            $categories = $this->model_catalog_product->getProductCategories($product_id);
+
+            $data = [];
+
+            foreach ($categories as $category_id) {
+                $category_info = $this->model_catalog_category->getCategory($category_id);
+
+                if ($category_info) {
+                    $data[] = array(
+                        'category_id' => $category_info['category_id'],
+                        'name'        => ($category_info['path']) ? htmlspecialchars_decode(str_replace('&nbsp;', ' ', $category_info['path'] . ' &gt; ' . $category_info['name'])) : $category_info['name']
+                    );
+                }
+            }
+
+            $products[] = [
+                'id' => $product_id,
+                'title' => ProductDescription::query()->where('product_id', $product_id)->first()->name,
+                'categories' => $data
+            ];
+        }
+
+        $excel = new \Agmedia\LuceedOpencartWrapper\Helpers\Excel('simple', $products);
+
+        return $excel->make()->response('stream');
     }
 
 
