@@ -642,7 +642,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
         $this->load->model('catalog/category');
 
         $products = [];
-        $ids = Product::query()->pluck('product_id');
+        $ids = Product::query()->where('quantity', '>', 0)->pluck('product_id');
 
         foreach ($ids as $product_id) {
             $categories = $this->model_catalog_product->getProductCategories($product_id);
