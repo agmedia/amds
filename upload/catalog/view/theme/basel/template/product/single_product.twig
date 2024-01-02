@@ -61,14 +61,14 @@
 {% if product.price %}
 <div class="price">
     {% if product.special %}
-    <span class="price-old">{{ product.price }} <small>{{ product.priceeur }}</small></span><span class="price-new">{{ product.special }} <small>{{ product.specialeur }}</small></span>
+    <span class="price-old">{{ product.price }} </span><span class="price-new">{{ product.special }} </span>
     {% else %}
-    <span>{{ product.price }} <small>{{ product.priceeur }}</small></span>
+    <span>{{ product.price }} </span>
         {% if product.price_ponuda and product.ljetni.cat_id != 429%}
-            <span class="price-old">{{ product.price_ponuda }} <small>{{ product.price_ponudaeur }}</small></span>
+            <span class="price-old">{{ product.price_ponuda }} </span>
         {% endif %}
         {% if product.price_ponuda and product.ljetni.cat_id == 429%}
-            <span class="price-old" style="text-decoration: unset;">NC 30 dana: {{ product.price_ponuda }} <small>{{ product.price_ponudaeur }}</small></span>
+            <span class="price-old" style="text-decoration: unset;">NC 30 dana: {{ product.price_ponuda }} </span>
         {% endif %}
     {% endif %}
     {% if product.tax %}

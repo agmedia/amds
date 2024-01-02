@@ -118,10 +118,10 @@ class ControllerCheckoutSuccess extends Controller {
             }
 
             if($oc_order['currency_code']=='HRK'){
-                $text =  $this->currency->format($total['value'], $oc_order['currency_code'], $oc_order['currency_value']).' <small>('.$this->currency->format($total['value'], 'EUR'). ')</small> ';
+                $text =  $this->currency->format($total['value'], $oc_order['currency_code'], $oc_order['currency_value']);
             }
             else{
-                $text =  $this->currency->format($total['value'], $oc_order['currency_code'], $oc_order['currency_value']).' <small>('.$this->currency->format($total['value'], 'HRK'). ')</small> ';
+                $text =  $this->currency->format($total['value'], $oc_order['currency_code'], $oc_order['currency_value']);
             }
 
 

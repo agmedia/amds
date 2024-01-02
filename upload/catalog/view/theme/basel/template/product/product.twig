@@ -78,11 +78,11 @@
                         {% if price %}
                             {% if  special %}
 
-                            <div class="old cd-old-price line-through" data-product_basic_price="4406_0">{{ price }} <small>{{ priceeur }}</small></div>
+                            <div class="old cd-old-price line-through" data-product_basic_price="4406_0">{{ price }} </div>
 
-                            <div class="current cd-current-price cd-discount-price" data-product_price="4406_0">{{ special }}  <small>{{ specialeur }}</small></div>
+                            <div class="current cd-current-price cd-discount-price" data-product_price="4406_0">{{ special }}  </div>
                             {% else %}
-                                <div class="current cd-current-price " data-product_basic_price="4406_0">{{ price }}  <small>{{ priceeur }}</small></div>
+                                <div class="current cd-current-price " data-product_basic_price="4406_0">{{ price }} </div>
 
 
                         {% endif %}
@@ -105,11 +105,11 @@
 
                 </div>
                 {% if  price_ponuda and ljetni.cat_id == 429 %}
-                <p class="meta_description"><strong>Najniža cijena u zadnjih 30 dana: {{ price_ponuda }}  <small>{{ price_ponudaeur }}</small> - {{ ljetni.discount }} %</strong></p>
+                <p class="meta_description"><strong>Najniža cijena u zadnjih 30 dana: {{ price_ponuda }}   - {{ ljetni.discount }} %</strong></p>
                 {% endif %}
 
                 {% if  price_ponuda and ljetni.cat_id != 429 %}
-                    <p class="meta_description"><strong>Stara cijena: {{ price_ponuda }}  <small>{{ price_ponudaeur }}</small></strong></p>
+                    <p class="meta_description"><strong>Stara cijena: {{ price_ponuda }}  </strong></p>
                 {% endif %}
 
                 {% if imported =='1' %}

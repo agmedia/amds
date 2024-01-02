@@ -51,10 +51,10 @@ class ControllerExtensionQuickCheckoutCart extends Controller {
 			
 			foreach ($total_data as $total) {
                 if($this->session->data['currency']=='HRK'){
-                    $text =  $this->currency->format($total['value'], $this->session->data['currency']).' <small>('.$this->currency->format($total['value'], 'EUR'). ')</small> ';
+                    $text =  $this->currency->format($total['value'], $this->session->data['currency']);
                 }
                 else{
-                    $text =  $this->currency->format($total['value'], $this->session->data['currency']).' <small>('.$this->currency->format($total['value'], 'HRK'). ')</small> ';
+                    $text =  $this->currency->format($total['value'], $this->session->data['currency']);
                 }
 				
 				$data['totals'][] = array(
