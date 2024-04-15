@@ -170,6 +170,85 @@ class ProductHelper
     }
 
 
+    /**
+     * @param array $product
+     *
+     * @return array
+     */
+    public static function getCategoriesFromAttributes(array $product): array
+    {
+        $lc = new LOC_Category();
+        $response = [0 => agconf('import.default_category')];
+
+        $kategorija_uid = collect($product['atributi'])->where('atribut', 'web_kategorija')->first(); // nadgrupa_artikla
+        $grupa_uid = collect($product['atributi'])->where('atribut', 'web_grupa')->first(); // grupa_artikla_uid
+        $podgrupa_uid = collect($product['atributi'])->where('atribut', 'web_podgrupa')->first();
+
+        /**
+         * SPOL Kategorija (Top)
+         */
+        if (isset($kategorija_uid->atribut_uid)) {
+            $spol_kategorija = Category::where('luceed_uid', $kategorija_uid->atribut_uid)->first();
+
+            if ( ! $spol_kategorija) {
+                $save_category = [];
+                $save_category['grupa_artikla'] = $kategorija_uid->atribut_uid;
+                $save_category['naziv'] = $kategorija_uid->vrijednost;
+
+                $main_id = $lc->save($save_category);
+                $spol_kategorija = Category::where('category_id', $main_id)->first();
+            }
+
+            $response[0] = $spol_kategorija->category_id;
+        }
+
+        /**
+         * Glavna Kategorija
+         */
+        if (isset($grupa_uid->atribut_uid)) {
+            $glavna_kategorija = Category::where('luceed_uid', $grupa_uid->atribut_uid)->first();
+
+            if ( ! $glavna_kategorija) {
+                $save_category = [];
+                $save_category['grupa_artikla'] = $grupa_uid->atribut_uid;
+                $save_category['naziv'] = $grupa_uid->vrijednost;
+
+                $id = $lc->save($save_category, $spol_kategorija->category_id);
+                $glavna_kategorija = Category::where('category_id', $id)->first();
+            }
+
+            $response[1] = $glavna_kategorija->category_id;
+        }
+
+        /**
+         * Pod Kategorija
+         */
+        if (isset($podgrupa_uid->atribut_uid)) {
+            $pod_kategorija = Category::where('luceed_uid', $podgrupa_uid->atribut_uid)->first();
+
+            if ( ! $pod_kategorija) {
+                $save_category = [];
+                $save_category['grupa_artikla'] = $podgrupa_uid->atribut_uid;
+                $save_category['naziv'] = $podgrupa_uid->vrijednost;
+
+                $id = $lc->save($save_category, $glavna_kategorija->category_id);
+                $pod_kategorija = Category::where('category_id', $id)->first();
+            }
+
+            $response[2] = $pod_kategorija->category_id;
+        }
+
+
+        return $response;
+    }
+
+
+    /**
+     * @param Collection $product
+     * @param int        $parent
+     *
+     * @return mixed
+     */
     private static function getStrukId(Collection $product, int $parent)
     {
         $lc = new LOC_Category();
@@ -188,6 +267,12 @@ class ProductHelper
     }
 
 
+    /**
+     * @param Collection $product
+     * @param int        $parent
+     *
+     * @return mixed
+     */
     private static function getNosivostId(Collection $product, int $parent)
     {
         $lc = new LOC_Category();

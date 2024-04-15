@@ -1341,4 +1341,35 @@ class ControllerCatalogProduct extends Controller {
         $this->response->addHeader('Content-Type: application/json');
         $this->response->setOutput(json_encode(['status' => 200, 'result' => $inserted]));
     }
+
+
+    /**
+     * @return mixed
+     */
+    public function updateSingleProduct()
+    {
+        $this->load->model('catalog/product');
+
+        $feed = \Agmedia\Luceed\Facade\LuceedProduct::getById($this->request->get['sifra']);
+        $product = new \Agmedia\LuceedOpencartWrapper\Models\LOC_Product($feed);
+
+        if ($product->getProducts()->count()) {
+            $product_array = collect($product->getProducts()->first())->toArray();
+
+            \Agmedia\Helpers\Log::write($product_array, 'prod');
+
+            $cats_arr = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::getCategoriesFromAttributes($product_array);
+
+            \Agmedia\Helpers\Log::write($cats_arr, 'prod');
+
+            $this->response->addHeader('Content-Type: application/json');
+            return $this->response->setOutput(json_encode(['status' => 200, 'result' => 1]));
+        }
+
+        \Agmedia\Helpers\Log::write($this->request->get['sifra'], 'prod');
+        \Agmedia\Helpers\Log::write($feed, 'prod');
+
+        $this->response->addHeader('Content-Type: application/json');
+        return $this->response->setOutput(json_encode(['status' => 300, 'result' => 0]));
+    }
 }

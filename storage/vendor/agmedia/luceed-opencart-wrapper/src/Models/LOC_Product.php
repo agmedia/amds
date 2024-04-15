@@ -514,6 +514,16 @@ class LOC_Product
     }
 
 
+    public function setCategories()
+    {
+        $item = $this->getProducts()->first();
+
+        if ($item) {
+
+        }
+    }
+
+
     /**
      * @return $this
      */
