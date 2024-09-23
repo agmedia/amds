@@ -118,22 +118,22 @@ class LOC_Product
         // List of product identifiers without
         // existing products.
         $list_diff = $this->getProducts()
-                          ->where('artikl', '!=', '')
-                          ->where('naziv', '!=', '')
-                          ->where('enabled', '!=', 'N')
-                          ->where('webshop', '!=', 'N')
-                          ->where('osnovni__artikl', '==', null)
-                          ->pluck('artikl')
-                          ->diff($this->existing)
-                          ->flatten();
+            ->where('artikl', '!=', '')
+            ->where('naziv', '!=', '')
+            ->where('enabled', '!=', 'N')
+            ->where('webshop', '!=', 'N')
+            ->where('osnovni__artikl', '==', null)
+            ->pluck('artikl')
+            ->diff($this->existing)
+            ->flatten();
 
         // Full list of products to add to DB.
         $products_to_add = $this->getProducts()->whereIn('artikl', $list_diff)->values();
         $full_list       = $this->getProducts()
-                                ->where('artikl', '!=', '')
-                                ->where('naziv', '!=', '')
-                                ->where('enabled', '!=', 'N')
-                                ->where('webshop', '!=', 'N');
+            ->where('artikl', '!=', '')
+            ->where('naziv', '!=', '')
+            ->where('enabled', '!=', 'N')
+            ->where('webshop', '!=', 'N');
 
         $response = [];
 
@@ -163,10 +163,10 @@ class LOC_Product
         $this->existing = Product::query()->pluck('model')->toArray();
 
         $full_list = $this->getProducts()
-                          ->where('artikl', '!=', '')
-                          ->where('naziv', '!=', '')
-                          ->where('enabled', '!=', 'N')
-                          ->where('webshop', '!=', 'N');
+            ->where('artikl', '!=', '')
+            ->where('naziv', '!=', '')
+            ->where('enabled', '!=', 'N')
+            ->where('webshop', '!=', 'N');
 
         $response = [];
 
@@ -232,7 +232,7 @@ class LOC_Product
 
             }
         }
-        
+
         Log::store($query_str, 'query_string');
 
         if ($query_str != '') {
@@ -242,6 +242,7 @@ class LOC_Product
             if ($type == 'all') {
                 $db->query("UPDATE " . DB_PREFIX . "product p SET p.quantity = 0, p.status = 0");
                 $updated = $db->query("UPDATE " . DB_PREFIX . "product p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.model = pt.uid SET p.quantity = pt.quantity, p.price = pt.price, p.stock_status_id = pt.stock_id, p.status = pt.status");
+                //$updated = $db->query("UPDATE " . DB_PREFIX . "product p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.model = pt.uid SET p.quantity = pt.quantity, p.stock_status_id = pt.stock_id, p.status = pt.status");
             }
             if ($type == 'price' || $type == 'prices') {
                 $updated = $db->query("UPDATE " . DB_PREFIX . "product p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.model = pt.uid SET p.price = pt.price, p.status = pt.status");
@@ -253,12 +254,12 @@ class LOC_Product
         }
 
         $start = microtime(true);
-        
+
         // Truncate the product_temp table.
         $db->query("TRUNCATE TABLE `" . DB_PREFIX . "product_temp`");
 
         $this->updateOptions($type);
-        
+
         $end = microtime(true);
         $time = number_format(($end - $start), 2, ',', '.');
         Log::store('Update - Options time ::: ' . $time . ' sec.', 'testing_update_time');
@@ -320,10 +321,10 @@ class LOC_Product
         $db    = new Database(DB_DATABASE);
 
         $luceed_products = $this->getProducts()
-                                ->where('artikl', '!=', '')
-                                ->where('naziv', '!=', '')
-                                ->where('webshop', '!=', 'N')
-                                ->all();
+            ->where('artikl', '!=', '')
+            ->where('naziv', '!=', '')
+            ->where('webshop', '!=', 'N')
+            ->all();
 
         $query_str = '';
 
@@ -514,27 +515,17 @@ class LOC_Product
     }
 
 
-    public function setCategories()
-    {
-        $item = $this->getProducts()->first();
-
-        if ($item) {
-
-        }
-    }
-
-
     /**
      * @return $this
      */
     public function collectImages()
     {
         $full_list = $this->getProducts()
-                          ->where('artikl', '!=', '')
-                          ->where('naziv', '!=', '')
-                          ->where('enabled', '!=', 'N')
-                          ->where('webshop', '!=', 'N')
-                          ->where('osnovni__artikl', '==', null);
+            ->where('artikl', '!=', '')
+            ->where('naziv', '!=', '')
+            ->where('enabled', '!=', 'N')
+            ->where('webshop', '!=', 'N')
+            ->where('osnovni__artikl', '==', null);
 
         //$full_list_2 = $full_list->splice(1300);
 
