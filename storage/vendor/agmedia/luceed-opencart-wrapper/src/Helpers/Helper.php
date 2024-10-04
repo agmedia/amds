@@ -28,8 +28,8 @@ class Helper
         $arr = [];
 
         foreach ($temps as $temp) {
-            $model       = substr($temp['sku'], 0, strrpos($temp['sku'], '-'));
-            $arr[$model] = [
+            //$model       = substr($temp['sku'], 0, strrpos($temp['sku'], '-'));
+            $arr[$temp['sku']] = [
                 'price'        => $temp['special'],
                 'price_ponuda' => $temp['price']
             ];

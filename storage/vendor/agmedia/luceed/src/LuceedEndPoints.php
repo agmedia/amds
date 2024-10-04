@@ -40,6 +40,8 @@ class LuceedEndPoints
             'product_0730222201' => 'artikl_0730222201.json',
             'product_0730161301' => 'artikl_0730161301.json',
             'product_9001002044' => 'artikl_9001002044.json',
+            //
+            'product_126807' => 'artikl_126807.json'
         ];
     }
 

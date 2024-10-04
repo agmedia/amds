@@ -10,6 +10,7 @@ use Agmedia\Luceed\Facade\LuceedWarehouse;
 use Agmedia\Luceed\Models\LuceedProductForRevision;
 use Agmedia\Luceed\Models\LuceedProductForRevisionData;
 use Agmedia\Luceed\Models\LuceedProductForUpdate;
+use Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper;
 use Agmedia\LuceedOpencartWrapper\Models\LOC_Action;
 use Agmedia\LuceedOpencartWrapper\Models\LOC_Category;
 use Agmedia\LuceedOpencartWrapper\Models\LOC_Customer;
@@ -142,6 +143,40 @@ class ControllerExtensionModuleLuceedSync extends Controller
         return $this->response($updated, 'categories');
     }*/
 
+    public function reimportCategories()
+    {
+        $all_products = Product::query()->pluck('model', 'product_id');
+
+        foreach ($all_products->toArray() as $id => $sifra) {
+            if ($sifra) {
+                Log::store($id . '___' . $sifra, 'sifra');
+                $feed    = LuceedProduct::getById((string) $sifra);
+                $product = new LOC_Product($feed);
+
+                if ($product->getProducts()->count()) {
+                    $product_array = collect($product->getProducts()->first())->toArray();
+                    $cats_arr      = ProductHelper::getCategoriesFromAttributes($product_array);
+
+                    Log::store($cats_arr, 'sifra');
+
+                    if ($cats_arr && ! empty($cats_arr)) {
+                        $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int) $id . "'");
+
+                        foreach ($cats_arr as $cat_id) {
+                            $pc = ProductCategory::query()->where('category_id', $cat_id)->where('product_id', $id)->first();
+
+                            if ( ! $pc) {
+                                $this->db->query("INSERT INTO " . DB_PREFIX . "product_to_category SET product_id = '" . (int) $id . "', category_id = '" . (int) $cat_id . "'");
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return $this->response(Product::query()->count(), 'categories');
+    }
+
 
     /**
      * @return mixed
@@ -187,7 +222,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
      */
     public function importWarehouses()
     {
-        /*$temp = $this->db->query('SELECT LEFT(sku, 6) as sku, price, special FROM temp GROUP BY LEFT(sku, 6);');
+        $temp = $this->db->query('SELECT LEFT(sku, 6) as sku, special FROM temp GROUP BY LEFT(sku, 6);');
         $arr = [];
 
         foreach ($temp->rows as $row) {
@@ -195,7 +230,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
         }
 
         $ids = \Agmedia\Models\Product\Product::query()->whereIn('model', $arr)->groupBy('product_id')->pluck('product_id');
-        $sezonsko = 429;
+        $sezonsko = 401;
         $p_str = '';
         $str = '';
 
@@ -208,17 +243,17 @@ class ControllerExtensionModuleLuceedSync extends Controller
             if ($cats->count()) {
                 foreach ($cats as $cat) {
                     if (in_array($cat->category_id, [5, 8])) {
-                        $spol = 430; // Muški
+                        $spol = 571; // Muški
                     }
                     if (in_array($cat->category_id, [2, 12])) {
-                        $spol = 431; // Ženski
+                        $spol = 572; // Ženski
                     }
 
-                    foreach (agconf('cats') as $old_cat_id => $new_cat_id) {
+                 /*   foreach (agconf('cats') as $old_cat_id => $new_cat_id) {
                         if ($cat->category_id == $old_cat_id) {
                             $new_cat = $new_cat_id;
                         }
-                    }
+                    }*/
                 }
             }
 
@@ -239,9 +274,9 @@ class ControllerExtensionModuleLuceedSync extends Controller
             $product = \Agmedia\Models\Product\Product::query()->where('model', $row['sku'])->first();
 
             // put special
-            $p_str .= '(' . $product->product_id . ', 1, 0, ' . $row['special'] . ', "0000-00-00", "2023-01-27"),';
+            $p_str .= '(' . $product->product_id . ', 1, 0, ' . $row['special'] . ', "0000-00-00", "2024-01-27"),';
 
-            $this->db->query("UPDATE " . DB_PREFIX . "product SET price = '" . $row['price'] . "' WHERE product_id = '" . $product->product_id . "'");
+          //  $this->db->query("UPDATE " . DB_PREFIX . "product SET price = '" . $row['price'] . "' WHERE product_id = '" . $product->product_id . "'");
         }
 
         Log::store($str, 'string_cats');
@@ -253,7 +288,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
         $this->db->query($query);
         $this->db->query($query_p);
 
-        return $this->response(1, 'warehouses');*/
+        return $this->response(1, 'warehouses');
 
 
         $_loc = new LOC_Warehouse(LuceedWarehouse::all());
@@ -297,9 +332,11 @@ class ControllerExtensionModuleLuceedSync extends Controller
             $this->load->model('catalog/product');
 
             foreach ($new_products as $product) {
-                $this->model_catalog_product->addProduct(
+                /*$this->model_catalog_product->addProduct(
                     $_loc->make($product)
-                );
+                );*/
+
+                Log::write($product, 'prods');
 
                 $count++;
             }

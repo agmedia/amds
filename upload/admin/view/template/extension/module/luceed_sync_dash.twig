@@ -138,7 +138,7 @@
                                 <a href="javascript:void(0)" id="import-detail-product" data-toggle="tooltip" title="Import Detalja Novih Proizvoda" class="btn btn-info btn-block" style="margin-top: 9px;">Import Detalja Novih Proizvoda</a>
                             </div>
                             <p class="col-sm-8" style="margin-top: 9px;">OPREZ..! Import detalja svih proizvoda je veoma dugotrajan. Najbolje ga je raditi kada je promet stranice najmanji.</p>
-                        </div>#}
+                            </div>#}
 
                                 <div class="form-group">
                                     <div class="col-sm-4 text-center">
@@ -168,6 +168,20 @@
                                     <p class="col-sm-8" style="margin-top: 9px;">{{ help_products_update_pq }}</p>
                                 </div>
 
+                            </div>
+                        </div>
+
+                        <div class="panel panel-info">
+                            <div class="panel-heading darker-bg">
+                                <h3 class="panel-title"><i class="fa fa-list"></i> Proizvodi i kategorije</h3>
+                            </div>
+                            <div class="panel-body form-horizontal">
+                                <div class="form-group">
+                                    <div class="col-sm-5 text-center">
+                                        <a href="javascript:void(0)" id="import-products-categories" data-toggle="tooltip" title="Import načina plaćanja" class="btn btn-info btn-block">Import Proizvoda i Kategorija</a>
+                                    </div>
+                                    <p class="col-sm-7">Kompletan import svih kategorija i proizvoda...</p>
+                                </div>
                             </div>
                         </div>
 
@@ -355,6 +369,7 @@
             //
             $('#import-new-categories')     .on('click', e => { callApi(e, 'importCategories'); });
             $('#update-categories')         .on('click', e => { callApi(e, 'updateCategories'); });
+            $('#import-products-categories').on('click', e => { callApi(e, 'reimportCategories'); });
             $('#import-new-manufacturer')   .on('click', e => { callApi(e, 'importManufacturers'); });
             $('#import-new-warehouse')      .on('click', e => { callApi(e, 'importWarehouses'); });
             $('#import-new-payments')       .on('click', e => { callApi(e, 'importPayments'); });

@@ -259,7 +259,7 @@ class LOC_Category
         $naziv = isset($category->naziv) ? $category->naziv : $category['naziv'];
 
         $id = Category::insertGetId([
-            'parent_id'     => $parent_id,
+            'parent_id'     => $parent_id ?: 0,
             'luceed_uid'    => $uid,
             'top'           => $parent_id ? 0 : 1,
             'column'        => 1,
@@ -268,6 +268,9 @@ class LOC_Category
             'date_added'    => Carbon::now(),
             'date_modified' => Carbon::now()
         ]);
+
+        Log::store('public function save($category, $parent_id = 0, $sort = 0) :: insertGetId', 'sifra');
+        Log::store($id, 'sifra');
 
         // Provjera ima li kategorija crticu na početku naziva.
         // Brisanje ako ima...
@@ -314,6 +317,8 @@ class LOC_Category
                 'category_id' => $id,
                 'store_id'    => 0
             ]);
+
+            SeoUrl::query()->where('query', 'category_id=' . $id)->delete();
 
             SeoUrl::insert([
                 'store_id'    => 0,

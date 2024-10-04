@@ -405,8 +405,8 @@ class LOC_Order
             $this->log('Available products: ', $availables);
 
             // Check if all in MAIN warehouse.
-            if (isset($availables[agconf('luceed.default_warehouse_luid')])) {
-                if ($order_products->count() == count($availables[agconf('luceed.default_warehouse_luid')])) {
+            if (isset($availables[agconf('luceed.default_warehouse_uid')])) {
+                if ($order_products->count() == count($availables[agconf('luceed.default_warehouse_uid')])) {
                     $this->has_all_in_main_warehouse = true;
                 }
 
@@ -414,7 +414,7 @@ class LOC_Order
                     $this->has_all_in_main_warehouse = true;
                 }*/
 
-                unset($availables[agconf('luceed.default_warehouse_luid')]);
+                unset($availables[agconf('luceed.default_warehouse_uid')]);
             }
 
             if ( ! $this->has_all_in_main_warehouse) {
