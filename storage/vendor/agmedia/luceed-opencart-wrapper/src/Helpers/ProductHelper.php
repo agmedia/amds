@@ -2,6 +2,7 @@
 
 namespace Agmedia\LuceedOpencartWrapper\Helpers;
 
+use Agmedia\Helpers\Database;
 use Agmedia\Helpers\Log;
 use Agmedia\Kaonekad\AttributeHelper;
 use Agmedia\Kaonekad\ScaleHelper;
@@ -178,6 +179,7 @@ class ProductHelper
      */
     public static function getCategoriesFromAttributes(array $product): array
     {
+        $db = new Database();
         $lc = new LOC_Category();
         $response = [0 => agconf('import.default_category')];
 
@@ -191,8 +193,9 @@ class ProductHelper
         /**
          * SPOL Kategorija (Top)
          */
-        if (isset($kategorija_uid->vrijednost)) {
-            $spol_kategorija = CategoryDescription::query()->where('name', $kategorija_uid->vrijednost)->first();
+        if (isset($kategorija_uid->vrijednost) && $kategorija_uid->vrijednost != '') {
+            //$spol_kategorija = CategoryDescription::query()->where('name', $kategorija_uid->vrijednost)->first();
+            $spol_kategorija = $db->query("SELECT * FROM oc_category c LEFT JOIN oc_category_description cd ON c.category_id = cd.category_id WHERE c.parent_id = 0 AND cd.name = '" . $kategorija_uid->vrijednost . "'");
 
             if ( ! $spol_kategorija) {
                 $save_category = [];
@@ -200,16 +203,16 @@ class ProductHelper
                 $save_category['naziv'] = $kategorija_uid->vrijednost;
 
                 $main_id = $lc->save(collect($save_category));
-                $spol_kategorija = Category::query()->where('category_id', $main_id)->first();
             }
 
-            $response[0] = $spol_kategorija->category_id;
+            $response[0] = $spol_kategorija->row->category_id;
 
             /**
              * Glavna Kategorija
              */
-            if (isset($grupa_uid->vrijednost)) {
-                $glavna_kategorija = CategoryDescription::query()->where('name', $grupa_uid->vrijednost)->first();
+            if (isset($grupa_uid->vrijednost) && $grupa_uid->vrijednost != '') {
+                //$glavna_kategorija = CategoryDescription::query()->where('name', $grupa_uid->vrijednost)->first();
+                $glavna_kategorija = $db->query("SELECT * FROM oc_category c LEFT JOIN oc_category_description cd ON c.category_id = cd.category_id WHERE c.parent_id = " . $spol_kategorija->row->category_id . " AND cd.name = '" . $grupa_uid->vrijednost . "'");
 
                 if ( ! $glavna_kategorija) {
                     $save_category = [];
@@ -217,16 +220,17 @@ class ProductHelper
                     $save_category['naziv'] = $grupa_uid->vrijednost;
 
                     $id = $lc->save(collect($save_category), $spol_kategorija->category_id);
-                    $glavna_kategorija = Category::query()->where('category_id', $id)->first();
+                    //$glavna_kategorija = Category::query()->where('category_id', $id)->first();
                 }
 
-                $response[1] = $glavna_kategorija->category_id;
+                $response[1] = $glavna_kategorija->row->category_id;
 
                 /**
                  * Pod Kategorija
                  */
-                if (isset($podgrupa_uid->vrijednost)) {
-                    $pod_kategorija = CategoryDescription::query()->where('name', $podgrupa_uid->vrijednost)->first();
+                if (isset($podgrupa_uid->vrijednost) && $podgrupa_uid->vrijednost != '') {
+                    //$pod_kategorija = CategoryDescription::query()->where('name', $podgrupa_uid->vrijednost)->first();
+                    $pod_kategorija = $db->query("SELECT * FROM oc_category c LEFT JOIN oc_category_description cd ON c.category_id = cd.category_id WHERE c.parent_id = " . $glavna_kategorija->row->category_id . " AND cd.name = '" . $podgrupa_uid->vrijednost . "'");
 
                     if ( ! $pod_kategorija) {
                         $save_category = [];
@@ -234,10 +238,10 @@ class ProductHelper
                         $save_category['naziv'] = $podgrupa_uid->vrijednost;
 
                         $id = $lc->save(collect($save_category), $glavna_kategorija->category_id);
-                        $pod_kategorija = Category::query()->where('category_id', $id)->first();
+                        //$pod_kategorija = Category::query()->where('category_id', $id)->first();
                     }
 
-                    $response[2] = $pod_kategorija->category_id;
+                    $response[2] = $pod_kategorija->row->category_id;
                 }
             }
         }
