@@ -320,12 +320,27 @@ class LOC_Category
 
             SeoUrl::query()->where('query', 'category_id=' . $id)->delete();
 
-            SeoUrl::insert([
-                'store_id'    => 0,
-                'language_id' => 2,
-                'query'       => 'category_id=' . $id,
-                'keyword'     => Str::slug($naziv)
-            ]);
+            if($parent_id = 0){
+
+                SeoUrl::insert([
+                    'store_id'    => 0,
+                    'language_id' => 2,
+                    'query'       => 'category_id=' . $id,
+                    'keyword'     => Str::slug($naziv)
+                ]);
+
+            }else{
+
+                SeoUrl::insert([
+                    'store_id'    => 0,
+                    'language_id' => 2,
+                    'query'       => 'category_id=' . $id,
+                    'keyword'     => Str::slug($id.'-'.$naziv)
+                ]);
+
+            }
+
+
 
             return $id;
         }
