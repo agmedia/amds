@@ -187,8 +187,8 @@ class ProductHelper
         $grupa_uid = collect($product['atributi'])->where('atribut', 'web_grupa')->first(); // grupa_artikla_uid
         $podgrupa_uid = collect($product['atributi'])->where('atribut', 'web_podgrupa')->first();
 
-        Log::store($kategorija_uid->atribut_uid . ' --- ' . $kategorija_uid->vrijednost, 'sifra');
-        Log::store($grupa_uid->atribut_uid . ' --- ' . $grupa_uid->vrijednost, 'sifra');
+        //Log::store($kategorija_uid->atribut_uid . ' --- ' . $kategorija_uid->vrijednost, 'sifra');
+        //Log::store($grupa_uid->atribut_uid . ' --- ' . $grupa_uid->vrijednost, 'sifra');
 
         /**
          * SPOL Kategorija (Top)
@@ -197,51 +197,65 @@ class ProductHelper
             //$spol_kategorija = CategoryDescription::query()->where('name', $kategorija_uid->vrijednost)->first();
             $spol_kategorija = $db->query("SELECT * FROM oc_category c LEFT JOIN oc_category_description cd ON c.category_id = cd.category_id WHERE c.parent_id = 0 AND cd.name = '" . $kategorija_uid->vrijednost . "'");
 
-            if ( ! $spol_kategorija) {
+            if ( ! $spol_kategorija->num_rows) {
                 $save_category = [];
                 $save_category['grupa_artikla'] = $kategorija_uid->atribut_uid;
                 $save_category['naziv'] = $kategorija_uid->vrijednost;
 
                 $main_id = $lc->save(collect($save_category));
+                $spol_kategorija->row['category_id'] = $main_id;
             }
 
-            $response[0] = $spol_kategorija->row->category_id;
+            //Log::store('SPOL KATEGORIJA:::::::::::::::::::::::', 'sifra');
+            //Log::store($spol_kategorija, 'sifra');
+
+            $response[0] = $spol_kategorija->row['category_id'];
 
             /**
              * Glavna Kategorija
              */
             if (isset($grupa_uid->vrijednost) && $grupa_uid->vrijednost != '') {
                 //$glavna_kategorija = CategoryDescription::query()->where('name', $grupa_uid->vrijednost)->first();
-                $glavna_kategorija = $db->query("SELECT * FROM oc_category c LEFT JOIN oc_category_description cd ON c.category_id = cd.category_id WHERE c.parent_id = " . $spol_kategorija->row->category_id . " AND cd.name = '" . $grupa_uid->vrijednost . "'");
+                $glavna_kategorija = $db->query("SELECT * FROM oc_category c LEFT JOIN oc_category_description cd ON c.category_id = cd.category_id WHERE c.parent_id = " . $spol_kategorija->row['category_id'] . " AND cd.name = '" . $grupa_uid->vrijednost . "'");
 
-                if ( ! $glavna_kategorija) {
+                //Log::store('GLAVNA KATEGORIJA:::::::::::::::::::::::', 'sifra');
+                //Log::store($glavna_kategorija, 'sifra');
+
+                if ( ! $glavna_kategorija->num_rows) {
                     $save_category = [];
                     $save_category['grupa_artikla'] = $grupa_uid->atribut_uid;
                     $save_category['naziv'] = $grupa_uid->vrijednost;
 
-                    $id = $lc->save(collect($save_category), $spol_kategorija->category_id);
-                    //$glavna_kategorija = Category::query()->where('category_id', $id)->first();
+                    $id = $lc->save(collect($save_category), $spol_kategorija->row['category_id']);
+                    $glavna_kategorija->row['category_id'] = $id;
                 }
 
-                $response[1] = $glavna_kategorija->row->category_id;
+                //Log::store($glavna_kategorija, 'sifra');
+
+                $response[1] = $glavna_kategorija->row['category_id'];
 
                 /**
                  * Pod Kategorija
                  */
                 if (isset($podgrupa_uid->vrijednost) && $podgrupa_uid->vrijednost != '') {
                     //$pod_kategorija = CategoryDescription::query()->where('name', $podgrupa_uid->vrijednost)->first();
-                    $pod_kategorija = $db->query("SELECT * FROM oc_category c LEFT JOIN oc_category_description cd ON c.category_id = cd.category_id WHERE c.parent_id = " . $glavna_kategorija->row->category_id . " AND cd.name = '" . $podgrupa_uid->vrijednost . "'");
+                    $pod_kategorija = $db->query("SELECT * FROM oc_category c LEFT JOIN oc_category_description cd ON c.category_id = cd.category_id WHERE c.parent_id = " . $glavna_kategorija->row['category_id'] . " AND cd.name = '" . $podgrupa_uid->vrijednost . "'");
 
-                    if ( ! $pod_kategorija) {
+                    //Log::store('POD KATEGORIJA :::::::::::::::::::::::', 'sifra');
+                    //Log::store($pod_kategorija, 'sifra');
+
+                    if ( ! $pod_kategorija->num_rows) {
                         $save_category = [];
                         $save_category['grupa_artikla'] = $podgrupa_uid->atribut_uid;
                         $save_category['naziv'] = $podgrupa_uid->vrijednost;
 
-                        $id = $lc->save(collect($save_category), $glavna_kategorija->category_id);
-                        //$pod_kategorija = Category::query()->where('category_id', $id)->first();
+                        $id = $lc->save(collect($save_category), $glavna_kategorija->row['category_id']);
+                        $pod_kategorija->row['category_id'] = $id;
                     }
 
-                    $response[2] = $pod_kategorija->row->category_id;
+                    //Log::store($pod_kategorija, 'sifra');
+
+                    $response[2] = $pod_kategorija->row['category_id'];
                 }
             }
         }

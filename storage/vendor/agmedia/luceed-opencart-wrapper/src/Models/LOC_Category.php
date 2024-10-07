@@ -269,8 +269,8 @@ class LOC_Category
             'date_modified' => Carbon::now()
         ]);
 
-        Log::store('public function save($category, $parent_id = 0, $sort = 0) :: insertGetId', 'sifra');
-        Log::store($id, 'sifra');
+        //Log::store('public function save($category, $parent_id = 0, $sort = 0) :: insertGetId', 'sifra');
+        //Log::store($id, 'sifra');
 
         // Provjera ima li kategorija crticu na početku naziva.
         // Brisanje ako ima...

@@ -157,7 +157,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
                     $product_array = collect($product->getProducts()->first())->toArray();
                     $cats_arr      = ProductHelper::getCategoriesFromAttributes($product_array);
 
-                    Log::store($cats_arr, 'sifra');
+                    //Log::store($cats_arr, 'sifra');
 
                     if ($cats_arr && ! empty($cats_arr)) {
                         $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int) $id . "'");
