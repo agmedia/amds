@@ -47,7 +47,7 @@ class ControllerExtensionModuleCategory extends Controller {
 
                         $children_data[] = array(
                             'category_id' => $child['category_id'],
-                            'name' => ucwords(strtolower($child['name'])) . ($this->config->get('config_product_count') ? ' (' . $this->model_catalog_product->getTotalProducts($filter_data) . ')' : ''),
+                            'name' => $child['name'] . ($this->config->get('config_product_count') ? ' (' . $this->model_catalog_product->getTotalProducts($filter_data) . ')' : ''),
                             'href' => $this->url->link('product/category', 'path=' . $category['category_id'] . '_' . $child['category_id'])
                         );
 
@@ -62,7 +62,7 @@ class ControllerExtensionModuleCategory extends Controller {
 
                 $data['categories'][] = array(
                     'category_id' => $category['category_id'],
-                    'name'        => ucwords(strtolower($category['name'])) . ($this->config->get('config_product_count') ? ' (' . $this->model_catalog_product->getTotalProducts($filter_data) . ')' : ''),
+                    'name'        => $category['name'] . ($this->config->get('config_product_count') ? ' (' . $this->model_catalog_product->getTotalProducts($filter_data) . ')' : ''),
                     'children'    => $children_data,
                     'href'        => $this->url->link('product/category', 'path=' . $category['category_id'])
                 );
