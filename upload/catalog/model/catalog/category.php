@@ -12,6 +12,8 @@ class ModelCatalogCategory extends Model {
 		return $query->rows;
 	}
 
+
+
 	public function getCategoryFilters($category_id) {
 		$implode = array();
 
