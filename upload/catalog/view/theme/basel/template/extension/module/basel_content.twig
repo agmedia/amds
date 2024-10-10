@@ -53,24 +53,114 @@
     </div>
     {% endif %}
 {% elseif column.type == "tm" %}
-    <!-- Testimonial type -->
-    {% if testimonials %}
-    <div class="grid-holder {{ column.data8 }} tm_module grid{{ column.data7 }}">
-    {% for testimonial in testimonials %}
-    <div class="item single-testimonial">
-        <div class="testimonial-wrap">
-        {% if testimonial.image %}
-        <p><img src="{{ testimonial.image }}" alt=""/></p>
-        {% endif %}
-        <p>{{ testimonial.description }}</p>
-        <p><b>{{ testimonial.name }}</b>{% if testimonial.org %} - {{ testimonial.org }}{% endif %}</p> 
-        </div>    
+
+   <div class="cm_item_wrapper">
+        <div class="cm_item {{ column.data7 }}">
+           <div class="sm-content">
+
+					<div class="sm-item sm-item-1">
+						<h2 class="sm-title"><a href="zene">Žene</a></h2>
+							<ul class="sm-list">
+
+								<li>
+									<a href="zene"><strong>Novo</strong></a>
+								</li>
+
+								<li class="gap">
+									<a href="zene/zenske-hlace">Hlače</a>
+								</li>
+
+								<li>
+									<a href="zene/zene-jakne-i-kaputi">Jakne i kaputi</a>
+								</li>
+
+								<li>
+									<a href="zene/majice">Majice</a>
+								</li>
+
+								<li>
+									<a href="zene/modni-dodaci">Modni dodaci</a>
+								</li>
+
+								<li>
+									<a href="zene/sakoi">Sakoi</a>
+								</li>
+
+								<li>
+									<a href="zene/suknje">Suknje</a>
+								</li>
+
+								<li>
+									<a href="zene/tajice">Tajice</a>
+								</li>
+
+								<li>
+									<a href="zene/zene-trenirke">Trenirke</a>
+								</li>
+
+								<li>
+									<a href="zene/traper-hlace">Traper Hlače</a>
+								</li>
+
+								<li>
+									<a href="zene/traper-hlace">Veste</a>
+								</li>
+
+								<li>
+									<a href="zene/"><strong>Prikaži sve</strong></a>
+								</li>
+					</ul>
+											</div>
+
+					<div class="sm-item sm-item-2">
+						<h2 class="sm-title"><a href="muskarci">Muškarci</a></h2>
+						<ul class="sm-list">
+
+								<li>
+									<a href="muskarci"><strong>Novo</strong></a>
+								</li>
+
+
+
+								<li class="gap">
+
+										<a href="muskarci/muskarci-hlace">Hlače</a>
+								</li>
+
+
+
+								<li>
+									<a href="muskarci/jakne">Jakne</a>
+								</li>
+
+								<li>
+
+								</li>
+
+								<li>
+									<a href="muskarci/muske-traper-hlace">Traper hlače</a>
+								</li>
+
+								<li>
+									<a href="muskarci/trenirke">Trenirke</a>
+								</li>
+
+							<!--	<li>
+									<a href="muskarci/muske-modni-dodaci/">Modni dodaci</a>
+								</li>-->
+
+								<li>
+									<a href="muskarci/"><strong>Prikaži sve</strong></a>
+								</li>
+															</ul>
+											</div>
+													<div class="sm-social">
+					<p><a class="btn" href="https://www.facebook.com/amds.jeans.hr" target="_blank">Facebook</a> <a class="btn" href="https://www.instagram.com/amds.jeans/" target="_blank">Instagram</a></p>
+				</div>
+			</div>
+        </div>
     </div>
-    {% endfor %}
-    </div>
-    {% else %}
-    No testimonials found
-    {% endif %}
+
 {% else %}
     <!-- HTML/Newsletter type -->
     <div class="cm_item_wrapper">
