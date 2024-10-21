@@ -74,7 +74,7 @@ class CategoryHelper
     {
         $response = new \stdClass();
 
-        if ($data['jamstvo'] != '' && $data['jamstvo'] == 'slim') {
+        if ($data['jamstvo'] != '') {
             $response->vrijednost = $data['jamstvo_naziv'];
             $response->atribut_uid = $data['jamstvo_uid	'];
         }
