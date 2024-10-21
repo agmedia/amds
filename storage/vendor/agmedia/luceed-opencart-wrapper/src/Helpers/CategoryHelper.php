@@ -74,9 +74,14 @@ class CategoryHelper
     {
         $response = new \stdClass();
 
-        if ($data['jamstvo'] != '') {
+        if ($data['jamstvo'] != '' || $data['jamstvo_naziv'] != '') {
             $response->vrijednost = $data['jamstvo_naziv'];
             $response->atribut_uid = $data['jamstvo_uid	'];
+        }
+
+        if ($data['marker'] != '' || $data['marker_naziv'] != '') {
+            $response->vrijednost = $data['marker_naziv'];
+            $response->atribut_uid = $data['marker_uid'];
         }
 
         return $response;
