@@ -145,7 +145,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
     public function reimportCategories()
     {
-        /*$all_products = Product::query()->pluck('model', 'product_id');
+        $all_products = Product::query()->pluck('model', 'product_id');
 
         foreach ($all_products->toArray() as $id => $sifra) {
             if ($sifra) {
@@ -171,7 +171,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
                     }
                 }
             }
-        }*/
+        }
 
         $this->disableEmptyCategories();
         $this->setNovoProducts();
