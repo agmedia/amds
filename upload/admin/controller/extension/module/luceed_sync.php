@@ -145,19 +145,18 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
     public function reimportCategories()
     {
-        $all_products = Product::query()->pluck('model', 'product_id');
+        /*$all_products = Product::query()->pluck('model', 'product_id');
 
         foreach ($all_products->toArray() as $id => $sifra) {
             if ($sifra) {
-                Log::store($id . '___' . $sifra, 'sifra');
                 $feed    = LuceedProduct::getById((string) $sifra);
                 $product = new LOC_Product($feed);
+
+                Log::store($id . '___' . $sifra, 'sifra');
 
                 if ($product->getProducts()->count()) {
                     $product_array = collect($product->getProducts()->first())->toArray();
                     $cats_arr      = ProductHelper::getCategoriesFromAttributes($product_array);
-
-                    //Log::store($cats_arr, 'sifra');
 
                     if ($cats_arr && ! empty($cats_arr)) {
                         $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int) $id . "'");
@@ -172,9 +171,49 @@ class ControllerExtensionModuleLuceedSync extends Controller
                     }
                 }
             }
-        }
+        }*/
+
+        $this->disableEmptyCategories();
+        $this->setNovoProducts();
 
         return $this->response(Product::query()->count(), 'categories');
+    }
+
+
+    /**
+     * @return int
+     */
+    public function disableEmptyCategories()
+    {
+        $all_cats = Category::query()->pluck('category_id');
+        $cats = ProductCategory::query()->get()->unique('category_id')->pluck('category_id');
+
+        $diff = $all_cats->diff($cats);
+
+        if ($diff->count() > 0) {
+            foreach ($diff as $id) {
+                Category::query()->where('category_id', $id)->update(['status' => 0]);
+            }
+        }
+
+        return $diff->count();
+    }
+
+
+    /**
+     * @return void
+     */
+    public function setNovoProducts()
+    {
+        $cat_id = agconf('import.novo_category') ?: 111;
+        //$prods = Product::query()->orderBy('product_id', 'desc')->take(200)->pluck('product_id');
+        $prods = Product::query()->where('date_modified', '>', Carbon::now()->subMonth())->pluck('product_id');
+
+        $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_category WHERE category_id = '" . (int) $cat_id . "'");
+
+        foreach ($prods as $id) {
+            $this->db->query("INSERT INTO " . DB_PREFIX . "product_to_category SET product_id = '" . (int) $id . "', category_id = '" . (int) $cat_id . "'");
+        }
     }
 
 
