@@ -17,29 +17,7 @@ class ControllerProductCategory extends Controller {
 
 		//sortiranje unutar poseba ponuda po sort_order, defaultno ostaje kako je i bilo (date_added).
         $categorySorts = array(
-            'default'   => array('sort' => 'p.date_added', 'order' => 'DESC'),
-            '1'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '8'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '12'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '92'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '108'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '138'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '22'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '52'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '10'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '33'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '17'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '84'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '104'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '139'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '45'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '56'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '129'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '80'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '54'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '35'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '69'       => array('sort' => 'p.sort_order', 'order' => 'ASC'),
-            '14'       => array('sort' => 'p.sort_order', 'order' => 'ASC')
+            'default'   => array('sort' => 'p.date_added', 'order' => 'DESC')
         );
 
         $default = $categorySorts['default'];
@@ -189,11 +167,13 @@ class ControllerProductCategory extends Controller {
 					'filter_category_id'  => $result['category_id'],
 					'filter_sub_category' => true
 				);
+                if($this->model_catalog_product->getTotalProducts($filter_data) > 0){
+                    $data['categories'][] = array(
+                        'name' => $result['name'] . ($this->config->get('config_product_count') ? ' (' . $this->model_catalog_product->getTotalProducts($filter_data) . ')' : ''),
+                        'href' => $this->url->link('product/category', 'path=' . $this->request->get['path'] . '_' . $result['category_id'] . $url)
+                    );
 
-				$data['categories'][] = array(
-					'name' => $result['name'] . ($this->config->get('config_product_count') ? ' (' . $this->model_catalog_product->getTotalProducts($filter_data) . ')' : ''),
-					'href' => $this->url->link('product/category', 'path=' . $this->request->get['path'] . '_' . $result['category_id'] . $url)
-				);
+                }
 			}
 
 			$data['products'] = array();
