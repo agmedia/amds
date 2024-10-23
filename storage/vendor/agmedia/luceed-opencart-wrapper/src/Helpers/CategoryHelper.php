@@ -80,8 +80,12 @@ class CategoryHelper
         }
 
         if ($data['marker'] != '' || $data['marker_naziv'] != '') {
-            $response->vrijednost = $data['marker_naziv'];
-            $response->atribut_uid = $data['marker_uid'];
+            $partner = new \stdClass();
+
+            $partner->vrijednost = $data['marker_naziv'];
+            $partner->atribut_uid = $data['marker_uid'];
+
+            $response->partner = $partner;
         }
 
         return $response;
@@ -98,5 +102,24 @@ class CategoryHelper
         $response->atribut_uid = '';
 
         return $response;
+    }
+
+
+    /**
+     * @param \stdClass $item
+     *
+     * @return bool
+     */
+    public static function hasValue(\stdClass $item = null): bool
+    {
+        if (is_null($item)) {
+            return false;
+        }
+
+        if (isset($item->vrijednost) && $item->vrijednost != '') {
+            return true;
+        }
+
+        return false;
     }
 }

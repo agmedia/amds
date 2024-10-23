@@ -188,13 +188,10 @@ class ProductHelper
         $pod_podgrupa_uid = CategoryHelper::checkSlimfitCategory($product);
         $pod_pod_podgrupa_uid = CategoryHelper::getDefault();
 
-        //Log::store($kategorija_uid->atribut_uid . ' --- ' . $kategorija_uid->vrijednost, 'sifra');
-        //Log::store($grupa_uid->atribut_uid . ' --- ' . $grupa_uid->vrijednost, 'sifra');
-
         /**
          * SPOL Kategorija (Top)
          */
-        if (isset($kategorija_uid->vrijednost) && $kategorija_uid->vrijednost != '') {
+        if (CategoryHelper::hasValue($kategorija_uid)) {
             $spol_kategorija = CategoryHelper::getCategory($kategorija_uid->vrijednost, 0);
 
             if ( ! $spol_kategorija->num_rows) {
@@ -204,100 +201,130 @@ class ProductHelper
                 $spol_kategorija->row['category_id'] = $main_id;
             }
 
-            //Log::store('SPOL KATEGORIJA:::::::::::::::::::::::', 'sifra');
-            //Log::store($spol_kategorija, 'sifra');
+            array_push($response, $spol_kategorija->row['category_id']);
 
-            $response[0] = $spol_kategorija->row['category_id'];
-
+            // If top is POSEBNA move values down
             if ($kategorija_uid->vrijednost == 'POSEBNA PONUDA') {
                 $pod_pod_podgrupa_uid = $pod_podgrupa_uid;
                 $pod_podgrupa_uid = $podgrupa_uid;
                 $podgrupa_uid = $grupa_uid;
                 $grupa_uid = CategoryHelper::setGenderCategory($product);
             }
+        } else {
+            return $response;
+        }
+
+        /**
+         * Glavna Kategorija
+         */
+        if (CategoryHelper::hasValue($grupa_uid)) {
+            $glavna_kategorija = CategoryHelper::getCategory($grupa_uid->vrijednost, $spol_kategorija->row['category_id']);
+
+            if ( ! $glavna_kategorija->num_rows) {
+                $save_category = CategoryHelper::setCategory($grupa_uid);
+
+                $id = $lc->save(collect($save_category), $spol_kategorija->row['category_id']);
+                $glavna_kategorija->row['category_id'] = $id;
+            }
+
+            array_push($response, $glavna_kategorija->row['category_id']);
+        }
+
+        /**
+         * Pod Kategorija
+         */
+        if (CategoryHelper::hasValue($podgrupa_uid)) {
+            $pod_kategorija = CategoryHelper::getCategory($podgrupa_uid->vrijednost, $glavna_kategorija->row['category_id']);
+
+            if ( ! $pod_kategorija->num_rows) {
+                $save_category = CategoryHelper::setCategory($podgrupa_uid);
+
+                $id = $lc->save(collect($save_category), $glavna_kategorija->row['category_id']);
+                $pod_kategorija->row['category_id'] = $id;
+            }
+
+            array_push($response, $pod_kategorija->row['category_id']);
+        }
+
+        /**
+         * Pod Pod Kategorija
+         */
+        if (CategoryHelper::hasValue($pod_podgrupa_uid)) {
+            if ( ! isset($pod_kategorija->row['category_id'])) {
+                $pod_kategorija->row['category_id'] = $glavna_kategorija->row['category_id'];
+            }
+
+            $pod_pod_kategorija = CategoryHelper::getCategory($pod_podgrupa_uid->vrijednost, $pod_kategorija->row['category_id']);
+
+            if ( ! $pod_pod_kategorija->num_rows) {
+                $save_category = CategoryHelper::setCategory($pod_podgrupa_uid);
+
+                $id = $lc->save(collect($save_category), $pod_kategorija->row['category_id']);
+                $pod_pod_kategorija->row['category_id'] = $id;
+            }
+
+            array_push($response, $pod_pod_kategorija->row['category_id']);
 
             /**
-             * Glavna Kategorija
+             * Has partner same level aditional category.
              */
-            if (isset($grupa_uid->vrijednost) && $grupa_uid->vrijednost != '') {
-                $glavna_kategorija = CategoryHelper::getCategory($grupa_uid->vrijednost, $spol_kategorija->row['category_id']);
-                //Log::store('GLAVNA KATEGORIJA:::::::::::::::::::::::', 'sifra');
-                //Log::store($glavna_kategorija, 'sifra');
+            if (isset($pod_podgrupa_uid->partner) && CategoryHelper::hasValue($pod_podgrupa_uid->partner)) {
+                Log::store('has marker...$pod_podgrupa_uid...' . $pod_podgrupa_uid->partner->vrijednost, 'sifra');
 
-                if ( ! $glavna_kategorija->num_rows) {
-                    $save_category = CategoryHelper::setCategory($grupa_uid);
+                $partner_kategorija = CategoryHelper::getCategory($pod_podgrupa_uid->partner->vrijednost, $pod_kategorija->row['category_id']);
 
-                    $id = $lc->save(collect($save_category), $spol_kategorija->row['category_id']);
-                    $glavna_kategorija->row['category_id'] = $id;
+                if ( ! $partner_kategorija->num_rows) {
+                    $save_category = CategoryHelper::setCategory($pod_podgrupa_uid->partner);
+
+                    $id = $lc->save(collect($save_category), $pod_kategorija->row['category_id']);
+                    $partner_kategorija->row['category_id'] = $id;
                 }
 
-                //Log::store($glavna_kategorija, 'sifra');
-
-                $response[1] = $glavna_kategorija->row['category_id'];
-
-                /**
-                 * Pod Kategorija
-                 */
-                if (isset($podgrupa_uid->vrijednost) && $podgrupa_uid->vrijednost != '') {
-                    $pod_kategorija = CategoryHelper::getCategory($podgrupa_uid->vrijednost, $glavna_kategorija->row['category_id']);
-                    //Log::store('POD KATEGORIJA :::::::::::::::::::::::', 'sifra');
-                    //Log::store($pod_kategorija, 'sifra');
-
-                    if ( ! $pod_kategorija->num_rows) {
-                        $save_category = CategoryHelper::setCategory($podgrupa_uid);
-
-                        $id = $lc->save(collect($save_category), $glavna_kategorija->row['category_id']);
-                        $pod_kategorija->row['category_id'] = $id;
-                    }
-
-                    //Log::store($pod_kategorija, 'sifra');
-
-                    $response[2] = $pod_kategorija->row['category_id'];
-
-                    /**
-                     * Pod Pod Kategorija
-                     */
-                    if (isset($pod_podgrupa_uid->vrijednost) && $pod_podgrupa_uid->vrijednost != '') {
-                        $pod_pod_kategorija = CategoryHelper::getCategory($pod_podgrupa_uid->vrijednost, $pod_kategorija->row['category_id']);
-                        //Log::store('POD KATEGORIJA :::::::::::::::::::::::', 'sifra');
-                        //Log::store($pod_kategorija, 'sifra');
-
-                        if ( ! $pod_pod_kategorija->num_rows) {
-                            $save_category = CategoryHelper::setCategory($pod_podgrupa_uid);
-
-                            $id = $lc->save(collect($save_category), $pod_kategorija->row['category_id']);
-                            $pod_pod_kategorija->row['category_id'] = $id;
-                        }
-
-                        //Log::store($pod_kategorija, 'sifra');
-
-                        $response[3] = $pod_pod_kategorija->row['category_id'];
-
-
-                        /**
-                         * Pod Pod Kategorija
-                         */
-                        if (isset($pod_pod_podgrupa_uid->vrijednost) && $pod_pod_podgrupa_uid->vrijednost != '') {
-                            $pod_pod_pod_kategorija = CategoryHelper::getCategory($pod_pod_podgrupa_uid->vrijednost, $pod_pod_kategorija->row['category_id']);
-                            //Log::store('POD KATEGORIJA :::::::::::::::::::::::', 'sifra');
-                            //Log::store($pod_kategorija, 'sifra');
-
-                            if ( ! $pod_pod_pod_kategorija->num_rows) {
-                                $save_category = CategoryHelper::setCategory($pod_pod_podgrupa_uid);
-
-                                $id = $lc->save(collect($save_category), $pod_pod_kategorija->row['category_id']);
-                                $pod_pod_pod_kategorija->row['category_id'] = $id;
-                            }
-
-                            //Log::store($pod_kategorija, 'sifra');
-
-                            $response[4] = $pod_pod_pod_kategorija->row['category_id'];
-                        }
-                    }
-                }
+                array_push($response, $partner_kategorija->row['category_id']);
             }
         }
 
+        /**
+         * Pod Pod Kategorija
+         */
+        if (CategoryHelper::hasValue($pod_pod_podgrupa_uid)) {
+            if ( ! isset($pod_pod_kategorija->row['category_id'])) {
+                $pod_pod_kategorija->row['category_id'] = $pod_kategorija->row['category_id'];
+            }
+
+            $pod_pod_pod_kategorija = CategoryHelper::getCategory($pod_pod_podgrupa_uid->vrijednost, $pod_pod_kategorija->row['category_id']);
+
+            if ( ! $pod_pod_pod_kategorija->num_rows) {
+                $save_category = CategoryHelper::setCategory($pod_pod_podgrupa_uid);
+
+                $id = $lc->save(collect($save_category), $pod_pod_kategorija->row['category_id']);
+                $pod_pod_pod_kategorija->row['category_id'] = $id;
+            }
+
+            array_push($response, $pod_pod_pod_kategorija->row['category_id']);
+
+            /**
+             * Has partner same level aditional category.
+             */
+            if (isset($pod_pod_podgrupa_uid->partner) && CategoryHelper::hasValue($pod_pod_podgrupa_uid->partner)) {
+                Log::store('has marker...$pod_pod_podgrupa_uid...' . $pod_pod_podgrupa_uid->partner->vrijednost, 'sifra');
+
+                $partner_pod_kategorija = CategoryHelper::getCategory($pod_pod_podgrupa_uid->partner->vrijednost, $pod_pod_kategorija->row['category_id']);
+
+                if ( ! $partner_pod_kategorija->num_rows) {
+                    $save_category = CategoryHelper::setCategory($pod_pod_podgrupa_uid->partner);
+
+                    $id = $lc->save(collect($save_category), $pod_pod_kategorija->row['category_id']);
+                    $partner_pod_kategorija->row['category_id'] = $id;
+                }
+
+                array_push($response, $partner_pod_kategorija->row['category_id']);
+            }
+        }
+
+        /**
+         *
+         */
         return $response;
     }
 
