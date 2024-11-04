@@ -362,7 +362,7 @@ class LOC_Order
         //Log::store($order_products->toArray());
 
         if ($order_products->count()) {
-            $locations = Location::orderBy('prioritet')->get();
+            $locations = Location::query()->where('stanje_web_shop', 1)->orderBy('prioritet')->get();
             $units     = $locations->pluck('skladiste')->flatten();
 
             foreach ($order_products as $order_product) {
