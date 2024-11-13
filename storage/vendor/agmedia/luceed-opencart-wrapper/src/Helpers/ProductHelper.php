@@ -889,7 +889,7 @@ class ProductHelper
         $db = new Database(DB_DATABASE);
         $query = $db->query("SELECT `product_id` FROM `" . DB_PREFIX . "coupon_product` WHERE `coupon_id` = 112 AND `product_id` = '" . (int)$product_id . "'");
 
-        if ($query->num_rows) {
+        if ($query->num_rows && date("d") > 13) {
             return true;
         }
 

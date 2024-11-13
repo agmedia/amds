@@ -261,6 +261,10 @@ class ControllerProductProduct extends Controller {
 				$data['stock'] = $this->language->get('text_instock');
 			}
 
+            $is_badge = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::isBadge($data['product_id']);
+
+            $data['is_badge'] = $is_badge;
+
 			$this->load->model('tool/image');
 
 			if ($product_info['image']) {
