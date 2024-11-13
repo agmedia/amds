@@ -371,11 +371,11 @@ class ControllerExtensionModuleLuceedSync extends Controller
             $this->load->model('catalog/product');
 
             foreach ($new_products as $product) {
-                /*$this->model_catalog_product->addProduct(
+                $this->model_catalog_product->addProduct(
                     $_loc->make($product)
-                );*/
+                );
 
-                Log::write($product, 'prods');
+
 
                 $count++;
             }
