@@ -17,7 +17,7 @@
 {% if product.new_label and product.cat !='1' %}
     <span class="badge new_badge"><i>{{ basel_text_new }}</i></span>
 {% endif %}
-    {% if product.is_badge =='1' %}
+    {% if product.badge =='1' %}
         <span class="badge new_badge"><i>-20% uz kod BLACK20</i></span>
     {% endif %}
 {% if ((product.quantity < 1) and (stock_badge_status)) %}
