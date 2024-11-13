@@ -122,6 +122,7 @@ class LOC_Product
             ->where('naziv', '!=', '')
             ->where('enabled', '!=', 'N')
             ->where('webshop', '!=', 'N')
+            ->where('sezona_naziv', '==', 'ZIMA 2024')
             ->where('osnovni__artikl', '==', null)
             ->pluck('artikl')
             ->diff($this->existing)
