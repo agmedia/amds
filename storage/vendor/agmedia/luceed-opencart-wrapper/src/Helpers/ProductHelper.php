@@ -878,6 +878,25 @@ class ProductHelper
     }
 
 
+    /**
+     * @param int $product_id
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public function isBadge(int $product_id): bool
+    {
+        $db = new Database(DB_DATABASE);
+        $query = $db->query("SELECT `product_id` FROM `" . DB_PREFIX . "coupon_product` WHERE `coupon_id` = 112 AND `product_id` = '" . (int)$product_id . "'");
+
+        if ($query->num_rows) {
+            return true;
+        }
+
+        return false;
+    }
+
+
     /*******************************************************************************
      *                                Copyright : AGmedia                           *
      *                              email: filip@agmedia.hr                         *
