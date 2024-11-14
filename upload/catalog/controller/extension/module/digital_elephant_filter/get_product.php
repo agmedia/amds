@@ -292,6 +292,10 @@ class ControllerExtensionModuleDigitalElephantFilterGetProduct extends Controlle
                 $cat = substr($this->request->get['path'], 0, strpos($this->request->get['path'], '_'));
             }
             $is_ljetni = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::isLjetni($result['product_id']);
+
+            $is_badge = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::isBadge($result['product_id']);
+
+
             $products[] = array(
                 'product_id'  => $result['product_id'],
                 'thumb'       => $image,
@@ -308,6 +312,7 @@ class ControllerExtensionModuleDigitalElephantFilterGetProduct extends Controlle
                 'specialeur'     => $specialeur,
                 'cat' => $cat,
                 'ljetni' => $is_ljetni,
+                'badge'           => $is_badge,
                 'sale_badge'  => $sale_badge,
 				'new_label'   => $is_new,
                 'imported'     => $result['imported'],
