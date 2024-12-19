@@ -207,7 +207,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
     {
         $cat_id = agconf('import.novo_category') ?: 111;
         //$prods = Product::query()->orderBy('product_id', 'desc')->take(200)->pluck('product_id');
-        $prods = Product::query()->where('date_modified', '>', Carbon::now()->subMonth())->pluck('product_id');
+        $prods = Product::query()->where('date_modified', '>', Carbon::now()->subMonth(2))->pluck('product_id');
 
         $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_category WHERE category_id = '" . (int) $cat_id . "'");
 
