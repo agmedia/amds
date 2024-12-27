@@ -501,6 +501,8 @@ class ControllerProductProduct extends Controller {
                     'specialeur'     => $specialeur,
                     'imported'     => $result['imported'],
 					'tax'         => $tax,
+                    'sale_badge' => $sale_badge,
+                    'sale_end_date' => $date_end['date_end'] ?? '',
 					'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,
 					'rating'      => $rating,
 					'href'        => $this->url->link('product/product', 'product_id=' . $result['product_id'])
