@@ -280,7 +280,11 @@ class LOC_Action
 
             $p_str .= '("' . $product->product_id . '", 1, 0, ' . $row['special'] . ', "0000-00-00", "2025-01-17"),';
 
-            $c_str .= '("' . $product->product_id . '", 191),';
+            if($product->product_id){
+                $c_str .= '("' . $product->product_id . '", 191),';
+            }
+
+
         }
 
      //   $query_p = "INSERT INTO " . DB_PREFIX . "product_special (product_id, customer_group_id, priority, price, date_start, date_end) VALUES " . substr($p_str, 0, -1) . ";";
