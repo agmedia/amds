@@ -278,9 +278,9 @@ class LOC_Action
         foreach ($temp->rows as $row) {
             $product = Product::query()->where('model', $row['sku'])->first();
 
-            $p_str .= '(' . $product->product_id . ', 1, 0, ' . $row['special'] . ', "0000-00-00", "2025-01-17"),';
+            $p_str .= '("' . $product->product_id . '", 1, 0, ' . $row['special'] . ', "0000-00-00", "2025-01-17"),';
 
-            $c_str .= '(' . $product->product_id . ', 191),';
+            $c_str .= '("' . $product->product_id . '", 191),';
         }
 
         $query_p = "INSERT INTO " . DB_PREFIX . "product_special (product_id, customer_group_id, priority, price, date_start, date_end) VALUES " . substr($p_str, 0, -1) . ";";
