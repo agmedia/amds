@@ -273,28 +273,17 @@ class LOC_Action
      */
     public function updateSpecialsFromTemp()
     {
-        $temp = $this->db->query('SELECT LEFT(sku, 6) as sku, price, special FROM tempns GROUP BY LEFT(sku, 6);');
+        $temp = $this->db->query('SELECT LEFT(sku, 6) as sku, price, special FROM temp GROUP BY LEFT(sku, 6);');
 
         foreach ($temp->rows as $row) {
             $product = Product::query()->where('model', $row['sku'])->first();
 
-            $p_str .= '("' . $product->product_id . '", 1, 0, ' . $row['special'] . ', "0000-00-00", "2025-01-17"),';
-
-            if($product->product_id){
-                $c_str .= '("' . $product->product_id . '", 191),';
-            }
-
-
+            $p_str .= '(' . $product->product_id . ', 1, 0, ' . $row['special'] . ', "0000-00-00", "2023-01-27"),';
         }
 
-     //   $query_p = "INSERT INTO " . DB_PREFIX . "product_special (product_id, customer_group_id, priority, price, date_start, date_end) VALUES " . substr($p_str, 0, -1) . ";";
+        $query_p = "INSERT INTO " . DB_PREFIX . "product_special (product_id, customer_group_id, priority, price, date_start, date_end) VALUES " . substr($p_str, 0, -1) . ";";
 
-
-        $query_c = "INSERT INTO " . DB_PREFIX . "product_to_category (product_id, category_id) VALUES " . substr($c_str, 0, -1) . ";";
-
-       // $this->db->query($query_p);
-
-        return $this->db->query($query_c);
+        return $this->db->query($query_p);
     }
 
 

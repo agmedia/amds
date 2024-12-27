@@ -535,13 +535,13 @@ class ControllerExtensionModuleLuceedSync extends Controller
     {
         $_loc = new LOC_Action(LuceedProduct::getActions());
 
-       /* $imported = $_loc->collectActive()
+        $imported = $_loc->collectActive()
                          ->sortActions()
-                         ->import(); */
+                         ->import();
 
         $_loc->updateSpecialsFromTemp();
 
-        return $this->response(1, 'products_actions');
+        return $this->response($imported, 'products_actions');
     }
 
 
