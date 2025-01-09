@@ -221,7 +221,7 @@ class LOC_Order
             $data = explode(';', $this->oc_order['boxnow']);
 
             $this->order['dropoff_sifra'] = $data[1] ?: '';
-            $this->order['naziv']         = $data[0] ?: '';
+            $this->order['dropoff_naziv']         = $data[0] ?: '';
         }
 
         $this->log('Order create method: $this->>order - LOC_Order #156', $this->order);
