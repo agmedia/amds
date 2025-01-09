@@ -33,6 +33,19 @@ class ControllerExtensionQuickCheckoutConfirm extends Controller {
 		if ((!$this->cart->hasProducts() && empty($this->session->data['vouchers'])) || (!$this->cart->hasStock() && !$this->config->get('config_stock_checkout'))) {
 			$redirect = $this->url->link('checkout/cart');
 		}
+
+        //boxnow
+        if($this->session->data['shipping_method']['code'] == 'weight.weight_5' ){
+
+            if(empty($this->session->data['boxnow'])){
+
+                $redirect = $this->url->link('checkout/checkout', '', true);
+            }
+
+
+        } else{
+            $this->session->data['boxnow']= '';
+        }
 		
 		// Validate minimum quantity requirements.
 		$products = $this->cart->getProducts();
@@ -171,6 +184,11 @@ class ControllerExtensionQuickCheckoutConfirm extends Controller {
 				$order_data['shipping_country_id'] = $this->session->data['shipping_address']['country_id'];
 				$order_data['shipping_address_format'] = $this->session->data['shipping_address']['address_format'];
 				$order_data['shipping_custom_field'] = $this->session->data['shipping_address']['custom_field'];
+
+                $order_data['boxnow'] = '';
+                if (!empty($this->session->data['shipping_method']['code']) && $this->session->data['shipping_method']['code'] == 'weight.weight_5'  ) {
+                    $order_data['boxnow'] = (!empty($this->session->data['boxnow'])) ? $this->session->data['boxnow'] : '';
+                }
 
 				if (isset($this->session->data['shipping_method']['title'])) {
 					$order_data['shipping_method'] = $this->session->data['shipping_method']['title'];
