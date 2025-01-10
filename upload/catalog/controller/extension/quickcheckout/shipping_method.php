@@ -218,6 +218,8 @@ class ControllerExtensionQuickCheckoutShippingMethod extends Controller {
         $data['shipping_reload'] = $this->config->get('quickcheckout_shipping_reload');
         $data['language_id'] = $this->config->get('config_language_id');
 
+        $data['boxnow'] = (!empty($this->session->data['boxnow'])) ? $this->session->data['boxnow'] : '';
+
         if ($this->config->get('quickcheckout_delivery_min')) {
             $data['delivery_min'] = date('Y-m-d', strtotime('+' . $this->config->get('quickcheckout_delivery_min') . ' days'));
         } else {
@@ -407,5 +409,17 @@ class ControllerExtensionQuickCheckoutShippingMethod extends Controller {
 
         $this->response->addHeader('Content-Type: application/json');
         $this->response->setOutput(json_encode($json));
+    }
+
+    public function saveBranchOrder() {
+        $json = array();
+        if(!empty($this->request->post['boxnow'])){
+            $this->session->data['boxnow'] = $this->request->post['boxnow'];
+
+        }
+
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(json_encode($json));
+
     }
 }
