@@ -19,7 +19,8 @@ class ModelExtensionPaymentCOD extends Model {
 
         $method_data = array();
 
-        if (isset($this->session->data['shipping_method']['code']) && $this->session->data['shipping_method']['code'] == 'flat.flat') {
+
+        if (isset($this->session->data['shipping_method']['code']) && $this->session->data['shipping_method']['code'] == 'flat.flat' || $this->session->data['shipping_method']['code'] == 'free.free') {
 
             $ptitle = $this->language->get('text_title');
             $pdescription='';
