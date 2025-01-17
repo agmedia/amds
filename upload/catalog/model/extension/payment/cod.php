@@ -25,8 +25,11 @@ class ModelExtensionPaymentCOD extends Model {
             $ptitle = $this->language->get('text_title');
             $pdescription='';
         }else{
-            $ptitle = 'Plaćanje prilikom preuzimanja paketa BOX NOW';
-            $pdescription = '<br>Plaćanje se vrši isključivo digitalnim plaćanjem, bez gotovine putem povenice koju dobijete u svojoj e-pošti i sms-u prije preuzimanja pakteta.';
+           // $ptitle = 'Plaćanje prilikom preuzimanja paketa BOX NOW';
+           // $pdescription = '<br>Plaćanje se vrši isključivo digitalnim plaćanjem, bez gotovine putem povenice koju dobijete u svojoj e-pošti i sms-u prije preuzimanja pakteta.';
+
+            $ptitle = $this->language->get('text_title');
+            $pdescription='';
         }
 
         if ($status) {
