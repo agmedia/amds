@@ -20,13 +20,12 @@ class ModelExtensionPaymentCOD extends Model {
         $method_data = array();
 
 
-        if (isset($this->session->data['shipping_method']['code']) && $this->session->data['shipping_method']['code'] == 'flat.flat' || isset($this->session->data['shipping_method']['code']) && $this->session->data['shipping_method']['code'] == 'free.free') {
+        if (isset($this->session->data['shipping_method']['code']) && $this->session->data['shipping_method']['code'] == 'weight.weight_5') {
+            $ptitle = 'Plaćanje prilikom preuzimanja paketa BOX NOW';
+            $pdescription = '<br>Plaćanje se vrši isključivo digitalnim plaćanjem, bez gotovine putem povenice koju dobijete u svojoj e-pošti i sms-u prije preuzimanja pakteta.';
 
-            $ptitle = $this->language->get('text_title');
-            $pdescription='';
         }else{
-           // $ptitle = 'Plaćanje prilikom preuzimanja paketa BOX NOW';
-           // $pdescription = '<br>Plaćanje se vrši isključivo digitalnim plaćanjem, bez gotovine putem povenice koju dobijete u svojoj e-pošti i sms-u prije preuzimanja pakteta.';
+
 
             $ptitle = $this->language->get('text_title');
             $pdescription='';
