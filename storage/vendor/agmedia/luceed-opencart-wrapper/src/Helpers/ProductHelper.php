@@ -862,12 +862,12 @@ class ProductHelper
                         'discount' => round($discount)
                     ];
                 }
-                if ($cat->category_id == 429) {
+                if ($cat->category_id == 191) {
                     $discount = static::getDiscount($product_id);
 
                     return [
                         'cat' => 'ljetni',
-                        'cat_id' => 429,
+                        'cat_id' => 191,
                         'discount' => round($discount)
                     ];
                 }
