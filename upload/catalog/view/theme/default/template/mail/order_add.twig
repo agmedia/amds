@@ -45,6 +45,15 @@
       <tr>
         <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; background-color: #EFEFEF; font-weight: bold; text-align: left; padding: 7px; color: #222222;">{{ text_instruction }}</td>
       </tr>
+
+      {% if payment_code =='bank_transfer' %}
+      <tr>
+        <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">
+        <img src="{{ scanimage }}" class="img-responsive"/>
+        </td>
+      </tr>      {% endif %}
+
+
     </thead>
     <tbody>
       <tr>

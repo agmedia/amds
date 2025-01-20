@@ -153,6 +153,16 @@ class ControllerMailOrder extends Controller {
 			$data['comment'] = '';
 		}
 
+        if ($order_info['payment_code'] == 'bank_transfer') {
+
+         
+
+            $data['scanimage'] = HTTP_SERVER.'image/tmp/'.$order_info['order_id'].'.png';
+
+
+
+        }
+
 		if ($order_info['payment_address_format']) {
 			$format = $order_info['payment_address_format'];
 		} else {
