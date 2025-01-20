@@ -47,11 +47,13 @@
       </tr>
 
       {% if payment_code =='bank_transfer' %}
-      <tr>
-        <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">
-        <img src="{{ scanimage }}" class="img-responsive"/>
-        </td>
-      </tr>      {% endif %}
+        <tr>
+          <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">
+            <img src="{{ scanimage }}" class="img-responsive"/>
+          </td>
+        </tr>      {% endif %}
+
+
 
 
     </thead>
@@ -59,6 +61,7 @@
       <tr>
         <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">{{ comment }}</td>
       </tr>
+
     </tbody>
   </table>
   {% endif %}

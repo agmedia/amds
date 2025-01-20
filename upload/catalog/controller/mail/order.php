@@ -139,6 +139,8 @@ class ControllerMailOrder extends Controller {
 		$data['telephone'] = $order_info['telephone'];
 		$data['ip'] = $order_info['ip'];
 
+        $data['payment_code'] = $order_info['payment_code'];
+
 		$order_status_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_status WHERE order_status_id = '" . (int)$order_status_id . "' AND language_id = '" . (int)$order_info['language_id'] . "'");
 	
 		if ($order_status_query->num_rows) {
@@ -155,7 +157,7 @@ class ControllerMailOrder extends Controller {
 
         if ($order_info['payment_code'] == 'bank_transfer') {
 
-         
+
 
             $data['scanimage'] = HTTP_SERVER.'image/tmp/'.$order_info['order_id'].'.png';
 
