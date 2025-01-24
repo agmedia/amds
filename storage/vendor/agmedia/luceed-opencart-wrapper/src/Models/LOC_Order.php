@@ -547,6 +547,10 @@ class LOC_Order
     private function getPaymentType()
     {
         if ($this->oc_order['payment_code'] == 'cod') {
+            if ($this->oc_order['shipping_method'] == 'BOX NOW' && $this->oc_order['boxnow'] != '') {
+                return agconf('luceed.payment.cod_boxnow');
+            }
+            
             return agconf('luceed.payment.cod');
         }
 
