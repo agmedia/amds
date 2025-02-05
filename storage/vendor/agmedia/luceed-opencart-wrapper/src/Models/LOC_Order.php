@@ -428,6 +428,10 @@ class LOC_Order
             }
 
             if ( ! $this->has_all_in_main_warehouse) {
+                // Check if is boxnow & remove stores
+                if ($this->oc_order['shipping_method'] == 'BOX NOW' && $this->oc_order['boxnow'] != '') {
+                    $locations = $locations->whereNotIn('location_id', [3, 10, 43, 58])->get();
+                }
                 // Check & collect warehouses that have all items.
                 foreach ($locations->where('stanje_web_shop', 1) as $store) {
                     // if availables have a set store id.
