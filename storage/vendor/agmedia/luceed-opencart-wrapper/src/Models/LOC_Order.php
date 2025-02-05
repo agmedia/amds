@@ -223,6 +223,8 @@ class LOC_Order
             $this->order['dropoff_sifra'] = $data[1] ?: '';
             $this->order['dropoff_naziv']         = $data[0] ?: '';
             $this->order['vrsta_isporuke_uid']    = '7-2987';
+
+            $this->order['skl_dokument']          = '';
         }
 
         $this->log('Order create method: $this->>order - LOC_Order #156', $this->order);
