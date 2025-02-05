@@ -630,6 +630,12 @@ class LOC_Order
         $this->log('$order_products', $order_products->toArray());
 
         if ($order_products->count()) {
+            //
+            $rabat = 0;
+            if ($order_products->count() > 1) {
+                $rabat = 20;
+            }
+
             foreach ($order_products as $order_product) {
                 $option = OrderOption::where('order_id', $this->oc_order['order_id'])
                                      ->where('order_product_id', $order_product->order_product_id)
@@ -648,7 +654,7 @@ class LOC_Order
                         'artikl_uid' => $product->sku,
                         'kolicina'   => (int) $order_product->quantity,
                         'cijena'     => (float) number_format($order_product->price, 2, '.', ''),
-                        'rabat'      => (int) 0,
+                        'rabat'      => (int) $rabat,
                     ];
 
                 } else {
@@ -660,7 +666,7 @@ class LOC_Order
                             'artikl'   => $order_product->model,
                             'kolicina' => (int) $order_product->quantity,
                             'cijena'   => (float) number_format($order_product->price, 2, '.', ''),
-                            'rabat'    => (int) 0,
+                            'rabat'    => (int) $rabat,
                         ];
                     }
                 }
