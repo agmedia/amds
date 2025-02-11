@@ -227,6 +227,10 @@ class LOC_Order
             $this->order['skl_dokument']          = '';
         }
 
+        if ($this->call_raspis) {
+            unset($this->order['vrsta_isporuke_uid']);
+        }
+
         $this->log('Order create method: $this->>order - LOC_Order #156', $this->order);
     }
 
