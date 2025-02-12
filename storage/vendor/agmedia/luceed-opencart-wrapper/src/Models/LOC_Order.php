@@ -227,7 +227,7 @@ class LOC_Order
             $this->order['skl_dokument']          = '';
         }
 
-        if ($this->call_raspis) {
+        if ( ! $this->call_raspis) {
             unset($this->order['vrsta_isporuke_uid']);
         }
 
