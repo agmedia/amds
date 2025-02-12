@@ -641,6 +641,11 @@ class LOC_Order
             }
 
             foreach ($order_products as $order_product) {
+                //
+                if ($order_product->quantity > 1) {
+                    $rabat = 20;
+                }
+
                 $option = OrderOption::where('order_id', $this->oc_order['order_id'])
                                      ->where('order_product_id', $order_product->order_product_id)
                                      ->first();
