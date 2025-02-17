@@ -231,15 +231,18 @@
 		partnerId: 4944,
 		parentElement: "#boxnowmap",
 		afterSelect: function (selected) {
+			if(selected.boxnowLockerPostalCode !== 'undefined'){
+				document.getElementById('boxnow').value = selected.boxnowLockerPostalCode + ', ' + selected.boxnowLockerAddressLine1 + '_' + selected.boxnowLockerId;
 
-			document.getElementById('boxnow').value = selected.boxnowLockerPostalCode + ', ' + selected.boxnowLockerAddressLine1 + '_' + selected.boxnowLockerId;
 
-			$.ajax({
-				url: 'index.php?route=extension/quickcheckout/shipping_method/saveBranchOrder',
-				type: "POST",
-				data: {boxnow : selected.boxnowLockerPostalCode+', '+selected.boxnowLockerAddressLine1+';'+selected.boxnowLockerId},
-				dataType: 'json'
-			});
+				$.ajax({
+					url: 'index.php?route=extension/quickcheckout/shipping_method/saveBranchOrder',
+					type: "POST",
+					data: {boxnow : selected.boxnowLockerPostalCode+', '+selected.boxnowLockerAddressLine1+';'+selected.boxnowLockerId},
+					dataType: 'json'
+				});
+
+			}
 
 
 		}

@@ -37,7 +37,7 @@ class ControllerExtensionQuickCheckoutConfirm extends Controller {
         //boxnow
         if($this->session->data['shipping_method']['code'] == 'weight.weight_5' ){
 
-            if(empty($this->session->data['boxnow']) || $this->session->data['boxnow'] = 'undefined, undefined;undefined'){
+            if(empty($this->session->data['boxnow']) || $this->session->data['boxnow'] == 'undefined, undefined;undefined'){
 
                 $redirect = $this->url->link('checkout/checkout', '', true);
             }
