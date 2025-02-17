@@ -884,7 +884,7 @@ class ProductHelper
      * @return bool
      * @throws \Exception
      */
-    public function isBadge(int $product_id): bool
+    public static function isBadge(int $product_id): bool
     {
         $db = new Database(DB_DATABASE);
         $query = $db->query("SELECT `product_id` FROM `" . DB_PREFIX . "coupon_product` WHERE `coupon_id` = 112 AND `product_id` = '" . (int)$product_id . "'");
