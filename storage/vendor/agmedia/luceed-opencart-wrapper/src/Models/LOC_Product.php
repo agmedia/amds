@@ -122,7 +122,7 @@ class LOC_Product
             ->where('naziv', '!=', '')
             ->where('enabled', '!=', 'N')
             ->where('webshop', '!=', 'N')
-            ->where('sezona_naziv', '==', 'ZIMA 2024')
+            ->where('sezona_naziv', '==', agconf('import.default_sezona_naziv'))
             ->where('osnovni__artikl', '==', null)
             ->pluck('artikl')
             ->diff($this->existing)
@@ -491,7 +491,7 @@ class LOC_Product
             'product_description' => $description,
             'product_image'       => $images,
             'product_layout'      => [0 => ''],
-            'product_category'    => ProductHelper::getCategoriesFromAttributes($product),
+            'product_category'    => ProductHelper::getCategoriesFromAttributes($product->toArray()),
             'product_seo_url'     => [0 => ProductHelper::getSeoUrl($product)],
             'product_option'      => ProductHelper::getOptions($product),
         ];

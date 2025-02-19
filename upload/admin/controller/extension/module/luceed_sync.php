@@ -366,16 +366,14 @@ class ControllerExtensionModuleLuceedSync extends Controller
         $count = 0;
 
         $new_products = $_loc->checkDiff()->getProductsToAdd();
-
+        
         if ($new_products->count()) {
             $this->load->model('catalog/product');
 
-            foreach ($new_products as $product) {
+            foreach ($new_products->all() as $product) {
                 $this->model_catalog_product->addProduct(
                     $_loc->make($product)
                 );
-
-
 
                 $count++;
             }
