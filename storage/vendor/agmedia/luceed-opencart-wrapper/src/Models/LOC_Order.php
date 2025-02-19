@@ -636,13 +636,13 @@ class LOC_Order
             //
             $rabat = 0;
             if ($order_products->count() > 1) {
-                $rabat = 20;
+              //  $rabat = 20;
             }
 
             foreach ($order_products as $order_product) {
                 //
                 if ($order_product->quantity > 1) {
-                    $rabat = 20;
+                   // $rabat = 20;
                 }
 
                 $option = OrderOption::where('order_id', $this->oc_order['order_id'])
