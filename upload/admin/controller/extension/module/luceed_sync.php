@@ -379,6 +379,8 @@ class ControllerExtensionModuleLuceedSync extends Controller
             }
         }
 
+        $this->setNovoProducts();
+
         return $this->response($count, 'products');
     }
 
