@@ -199,7 +199,7 @@ class LOC_Order
             //$this->order['sa__skladiste_uid'] = agconf('luceed.default_warehouse_luid');
             //$this->order['na__skladiste_uid'] = '565-2987';
             //$this->order['skl_dokument'] = 'MSO';
-            $this->order['vrsta_isporuke_uid']    = '6-2987';
+            $this->order['vrsta_isporuke_uid']    = '4-2987';
             $this->order['korisnik__partner_uid'] = $this->customer_uid;
             $this->call_raspis                    = false;
         }
@@ -208,7 +208,7 @@ class LOC_Order
             $this->order['sa__skladiste_uid']     = $this->has_all_in_warehouses;
             $this->order['na__skladiste_uid']     = '565-2987';
             $this->order['skl_dokument']          = 'MS';
-            $this->order['vrsta_isporuke_uid']    = '6-2987';
+            $this->order['vrsta_isporuke_uid']    = '4-2987';
             $this->order['korisnik__partner_uid'] = $this->customer_uid;
         }
 
