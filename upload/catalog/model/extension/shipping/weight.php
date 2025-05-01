@@ -51,6 +51,10 @@ class ModelExtensionShippingWeight extends Model {
                     }
                 }
 
+                if ($this->cart->getSubTotal() > 50) {
+                    $cost = 0;
+                }
+
                 if ((string)$cost != '') {
                     $quote_data['weight_' . $result['geo_zone_id']] = array(
                         'code'         => 'weight.weight_' . $result['geo_zone_id'],
