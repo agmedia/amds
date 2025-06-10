@@ -225,6 +225,10 @@ class LOC_Order
             $this->order['vrsta_isporuke_uid'] = '7-2987';
             $this->order['skl_dokument']       = '';
 
+            if ($this->has_all_in_warehouses) {
+                $this->order['skl_dokument'] = 'MS';
+            }
+
             if ( ! $this->has_all_in_main_warehouse && ! $this->has_all_in_warehouses) {
                 unset($this->order['vrsta_isporuke_uid']);
             }
