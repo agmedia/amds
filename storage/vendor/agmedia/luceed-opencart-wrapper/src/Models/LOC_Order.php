@@ -638,7 +638,7 @@ class LOC_Order
 
         if ($order_products->count()) {
             //
-            $rabat = 0;
+            $rabat = 30;
             if ($order_products->count() > 1) {
               //  $rabat = 20;
             }
