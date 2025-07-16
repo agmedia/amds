@@ -16,6 +16,7 @@ use Agmedia\Models\Order\OrderProduct;
 use Agmedia\Models\Order\OrderStatus;
 use Agmedia\Models\Order\OrderTotal;
 use Agmedia\Models\Product\Product;
+use Agmedia\Models\Product\ProductCategory;
 use Agmedia\Models\Product\ProductOption;
 use Illuminate\Support\Carbon;
 
@@ -638,15 +639,19 @@ class LOC_Order
 
         if ($order_products->count()) {
             //
-            $rabat = 30;
+            $rabat = 0;
             if ($order_products->count() > 1) {
               //  $rabat = 20;
             }
 
             foreach ($order_products as $order_product) {
                 //
-                if ($order_product->quantity > 1) {
-                   // $rabat = 20;
+                $cats = ProductCategory::query()->where('product_id', $order_product->product_id)
+                                                ->where('category_id', 1)
+                                                ->get();
+                //
+                if ($cats->count() > 0) {
+                   $rabat = 30;
                 }
 
                 $option = OrderOption::where('order_id', $this->oc_order['order_id'])
