@@ -11,9 +11,9 @@
     <span class="badge sale_badge"><i>{{ product.sale_badge }}</i></span>
 {% endif %}
 
-
- <!--   <span class="badge sale_badge"><i>-30%</i></span>-->
-
+    {% if  product.cat =='1' %}
+   <span class="badge sale_badge"><i>-30%</i></span>
+    {% endif %}
     {% if product.price_ponuda %}
         <span class="badge sale_badge"><i>{{ product.ljetni.discount }}%</i></span>
     {% endif %}
