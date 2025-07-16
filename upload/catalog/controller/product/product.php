@@ -156,6 +156,25 @@ class ControllerProductProduct extends Controller {
 
 		$this->load->model('catalog/product');
 
+
+        $target_category_id = 1;
+        $is_in_category = false;
+
+        $categories = $this->model_catalog_product->getCategories($product_id);
+
+        foreach ($categories as $category) {
+            if ((int)$category['category_id'] === $target_category_id) {
+                $is_in_category = true;
+                break;
+            }
+        }
+
+        if ($is_in_category) {
+            $data['is_posebna_ponuda'] = '1';
+        } else {
+            $data['is_posebna_ponuda'] = '0';
+        }
+
 		$product_info = $this->model_catalog_product->getProduct($product_id);
 
 		if ($product_info) {
