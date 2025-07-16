@@ -874,7 +874,9 @@ class ProductHelper
             }
         }
 
-        return ['cat' => 0, 'cat_id' => 0, 'discount' => 0];
+        $discount = static::getDiscount($product_id);
+
+        return ['cat' => 0, 'cat_id' => 0, 'discount' => round($discount)];
     }
 
 
