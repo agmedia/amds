@@ -637,56 +637,80 @@ class LOC_Order
 
         $this->log('$order_products', $order_products->toArray());
 
-        if ($order_products->count()) {
-            //
-            $rabat = 0;
-            if ($order_products->count() > 1) {
-              //  $rabat = 20;
+        if ($order_products->isEmpty()) {
+            if ($this->discount) {
+                $response[] = $this->coupon_item;
             }
+            return $response;
+        }
 
-            foreach ($order_products as $order_product) {
-                //
-                $cats = ProductCategory::query()->where('product_id', $order_product->product_id)
-                                                ->where('category_id', 1)
-                                                ->get();
-                //
-                if ($cats->count() > 0) {
-                   $rabat = 30;
-                }
+        // --- Priprema podataka za bulk lookupe ---
+        $productIds       = $order_products->pluck('product_id')->filter()->unique()->values();
+        $orderProductIds  = $order_products->pluck('order_product_id')->unique()->values();
 
-                $option = OrderOption::where('order_id', $this->oc_order['order_id'])
-                                     ->where('order_product_id', $order_product->order_product_id)
-                                     ->first();
+        // Set product_id-a koji su u category_id = 1
+        $inCategory = ProductCategory::query()
+            ->whereIn('product_id', $productIds)
+            ->where('category_id', 1)
+            ->pluck('product_id')
+            ->unique()
+            ->mapWithKeys(fn ($pid) => [$pid => true]); // za brzi isset()
 
-                if ($option) {
-                    $product = ProductOption::where('product_option_value_id', $option->product_option_value_id)->first();
+        // Sve opcije za ove order_product_id-ove (po jedan red najčešće)
+        $orderOptions = OrderOption::query()
+            ->where('order_id', $this->oc_order['order_id'])
+            ->whereIn('order_product_id', $orderProductIds)
+            ->get()
+            ->keyBy('order_product_id');
 
-                    //$price = $this->getItemPrices($order_product->product_id, $order_product->price);
+        // Map product_option_value_id => sku
+        $povIds = $orderOptions->pluck('product_option_value_id')->filter()->unique()->values();
+        $productOptionsByPov = $povIds->isNotEmpty()
+            ? ProductOption::query()
+                ->whereIn('product_option_value_id', $povIds)
+                ->get()
+                ->keyBy('product_option_value_id')
+            : collect();
 
-                    /*if ( ! $price['rabat']) {
-                        $price['rabat'] = $this->applyCouponDiscount();
-                    }*/
+        // Map product_id => Product (radi modela)
+        $productsById = Product::query()
+            ->whereIn('product_id', $productIds)
+            ->get()
+            ->keyBy('product_id');
 
+        // --- Gradnja response-a ---
+        foreach ($order_products as $order_product) {
+            // Rabat po artiklu (reset u svakoj iteraciji)
+            $rabat = isset($inCategory[$order_product->product_id]) ? 30 : 0;
+
+            // Ako ćeš nekad vraćati strogo float, bolje round nego number_format+float cast
+            $price = (float) number_format((float) $order_product->price, 2, '.', '');
+
+            // Ima li ovaj order_product opciju?
+            $option = $orderOptions->get($order_product->order_product_id);
+
+            if ($option) {
+                $po = $productOptionsByPov->get($option->product_option_value_id);
+                if ($po && !empty($po->sku)) {
                     $response[] = [
-                        'artikl_uid' => $product->sku,
+                        'artikl_uid' => $po->sku,
                         'kolicina'   => (int) $order_product->quantity,
-                        'cijena'     => (float) number_format($order_product->price, 2, '.', ''),
+                        'cijena'     => $price,
                         'rabat'      => (int) $rabat,
                     ];
-
-                } else {
-                    $product = Product::query()->where('product_id', $order_product->product_id)->first();
-                    //$price   = $this->getItemPrices($order_product->product_id, $order_product->price);
-
-                    if ($product) {
-                        $response[] = [
-                            'artikl'   => $order_product->model,
-                            'kolicina' => (int) $order_product->quantity,
-                            'cijena'   => (float) number_format($order_product->price, 2, '.', ''),
-                            'rabat'    => (int) $rabat,
-                        ];
-                    }
+                    continue;
                 }
+                // Fallback ako nema SKU-a za opciju – padni na "običan" artikl
+            }
+
+            $product = $productsById->get($order_product->product_id);
+            if ($product) {
+                $response[] = [
+                    'artikl'   => $order_product->model, // ili $product->model ako ti treba iz Producta
+                    'kolicina' => (int) $order_product->quantity,
+                    'cijena'   => $price,
+                    'rabat'    => (int) $rabat,
+                ];
             }
         }
 
@@ -696,6 +720,7 @@ class LOC_Order
 
         return $response;
     }
+
 
 
     /**
