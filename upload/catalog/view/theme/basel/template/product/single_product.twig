@@ -11,7 +11,7 @@
 
     {% if product.isbn == 1 %}
 
-        {% set badge = product.sale_badge|replace({'%':''})|int %}
+        {% set badge = (product.sale_badge|replace({'%':''}))|round(0, 'floor') %}
 
         {% set badge = badge - 20 %}
 
