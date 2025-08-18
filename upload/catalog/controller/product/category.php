@@ -320,6 +320,7 @@ class ControllerProductCategory extends Controller {
                     'priceeur'        => $priceeur,
                     'specialeur'      => $specialeur,
                     'imported'        => $result['imported'],
+                    'isbn'        => $result['isbn'],
                     'cat'             => $cat,
                     'ljetni'          => $is_ljetni,
                     'badge'           => $is_badge,

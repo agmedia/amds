@@ -8,7 +8,22 @@
     </a>
 {% if product.price and product.special and salebadge_status %}
     <div class="sale-counter id{{ product.product_id }}"></div>
-    <span class="badge sale_badge"><i>{{ product.sale_badge }}</i></span>
+
+    {% if product.isbn == 1 %}
+
+        {% set badge = product.sale_badge|replace({'%':''})|int %}
+
+        {% set badge = badge - 20 %}
+
+      <span class="badge sale_badge"><i>{{ badge }}%</i></span>
+        <span class="badge sale_badge"  style="width: auto;text-transform: lowercase;top:35px"><i>dodatnih -20%</i></span>
+
+
+    {% else %}
+        <span class="badge sale_badge"><i>{{ product.sale_badge }}</i></span>
+    {% endif %}
+
+
 {% endif %}
 
     {% if  product.cat =='1' %}
