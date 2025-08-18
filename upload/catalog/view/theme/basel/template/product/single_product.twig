@@ -9,7 +9,7 @@
 {% if product.price and product.special and salebadge_status %}
     <div class="sale-counter id{{ product.product_id }}"></div>
 
-    {% if product.isbn == 1 %}
+    {% if product.isbn = 1 %}
 
         {% set badge = (product.sale_badge|replace({'%':''}))|round(0, 'floor') %}
 
