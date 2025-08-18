@@ -301,9 +301,9 @@ class LOC_Order
     {
         $statuses = OrderStatus::where('luceed_status_id', '!=', '')->get();
         $orders   = Order::select('order_id', 'luceed_uid', 'email', 'payment_code', 'order_status_id', 'order_status_changed')
-                         ->where('order_status_id', '!=', 0)
-                         ->where('date_added', '>', Carbon::now()->subMonth())
-                         ->get();
+            ->where('order_status_id', '!=', 0)
+            ->where('date_added', '>', Carbon::now()->subMonth())
+            ->get();
 
         // Check if status have changed.
         foreach ($orders as $order) {
@@ -385,8 +385,8 @@ class LOC_Order
 
             foreach ($order_products as $order_product) {
                 $option = OrderOption::where('order_id', $this->oc_order['order_id'])
-                                     ->where('order_product_id', $order_product->order_product_id)
-                                     ->first();
+                    ->where('order_product_id', $order_product->order_product_id)
+                    ->first();
 
                 if ($option) {
                     $product = ProductOption::where('product_option_value_id', $option->product_option_value_id)->first();
@@ -564,7 +564,7 @@ class LOC_Order
             if ($this->oc_order['shipping_method'] == 'BOX NOW' && $this->oc_order['boxnow'] != '') {
                 return agconf('luceed.payment.cod_boxnow');
             }
-            
+
             return agconf('luceed.payment.cod');
         }
 
