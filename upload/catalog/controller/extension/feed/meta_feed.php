@@ -180,7 +180,7 @@ class ControllerExtensionFeedMetaFeed extends Controller {
     private function buildProductTypeBreadcrumbs($product_id) {
         $this->load->model('catalog/product');
         $this->load->model('catalog/category');
-        $cats = $this->model_catalog_product->getProductCategories($product_id);
+        $cats = $this->model_catalog_product->getCategories($product_id);
         $names = [];
         foreach ($cats as $category_id) {
             $path = $this->getCategoryPath($category_id);
