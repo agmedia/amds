@@ -44,12 +44,7 @@ class ControllerExtensionFeedMetaFeed extends Controller {
 
     public function index() {
         // Optional key gate
-        $req_key = isset($this->request->get['key']) ? $this->request->get['key'] : '';
-        if ($this->secret !== '' && $req_key !== $this->secret) {
-            $this->response->addHeader('HTTP/1.1 403 Forbidden');
-            $this->response->setOutput('Forbidden');
-            return;
-        }
+
 
         // Load deps
         $this->load->model('catalog/product');
