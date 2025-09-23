@@ -3,15 +3,53 @@
  * OpenCart 3.x Controller: Meta (Facebook/Instagram) Product XML Feed (RSS 2.0 + Google namespace)
  * Route: index.php?route=extension/feed/meta_feed[&key=YOUR_SECRET]
  * Place at: catalog/controller/extension/feed/meta_feed.php
- * Optional: set SECRET below or pass &key=... to restrict access.
+ * Notes:
+ *  - Content-Type: application/xml, Content-Disposition: inline (da se XML prikazuje u browseru).
+ *  - Polja: id, title, description, link, image_link (+additional_image_link do 10), price, sale_price,
+ *    sale_price_effective_date, availability, condition, brand, gtin/mpn, item_group_id, product_type,
+ *    google_product_category (mapirano iz breadcrumbs-a).
  */
 class ControllerExtensionFeedMetaFeed extends Controller {
-    /** @var string Optional access key; leave empty to disable key check */
+    /** Optional access key; leave empty to disable key check */
     private $secret = '';
+
+    /** Mapiranje lokalnih kategorija → Google Product Taxonomy. Dopuni prema stvarnim kategorijama. */
+    private $googleCategoryMap = [
+        // Odjeća i obuća
+        'majice' => 'Apparel & Accessories > Clothing > Shirts & Tops',
+        'hlače' => 'Apparel & Accessories > Clothing > Pants',
+        'hlace' => 'Apparel & Accessories > Clothing > Pants',
+        'haljine' => 'Apparel & Accessories > Clothing > Dresses',
+        'jakne' => 'Apparel & Accessories > Clothing > Outerwear',
+        'kaputi' => 'Apparel & Accessories > Clothing > Outerwear',
+        'tenisice' => 'Apparel & Accessories > Shoes',
+        'cipele' => 'Apparel & Accessories > Shoes',
+        'torbe' => 'Luggage & Bags > Handbags, Wallets & Cases > Handbags',
+        'satovi' => 'Apparel & Accessories > Jewelry > Watches',
+        'naocale' => 'Apparel & Accessories > Clothing Accessories > Sunglasses',
+        'naočale' => 'Apparel & Accessories > Clothing Accessories > Sunglasses',
+        'kupaći kostimi' => 'Apparel & Accessories > Clothing > Swimwear',
+        'kupaci kostimi' => 'Apparel & Accessories > Clothing > Swimwear',
+        // Sport
+        'sportska oprema' => 'Sporting Goods',
+        'fitness' => 'Sporting Goods > Exercise & Fitness',
+        // Dom
+        'namještaj' => 'Furniture',
+        'namjestaj' => 'Furniture',
+        'dekoracije' => 'Home & Garden > Decor',
+        // Elektronika
+        'mobiteli' => 'Electronics > Communications > Telephony > Mobile Phones',
+        'laptopi' => 'Computers > Laptops',
+    ];
 
     public function index() {
         // Optional key gate
-
+        $req_key = isset($this->request->get['key']) ? $this->request->get['key'] : '';
+        if ($this->secret !== '' && $req_key !== $this->secret) {
+            $this->response->addHeader('HTTP/1.1 403 Forbidden');
+            $this->response->setOutput('Forbidden');
+            return;
+        }
 
         // Load deps
         $this->load->model('catalog/product');
@@ -55,8 +93,7 @@ class ControllerExtensionFeedMetaFeed extends Controller {
         $customer_group_id = (int)$this->config->get('config_customer_group_id');
 
         foreach ($products as $p) {
-            // Skip products without required basics
-            if (!$p['product_id'] || !$p['name']) continue;
+            if (!$p['product_id'] || !$p['name']) continue; // sanity
 
             $item = $xml->createElement('item');
 
@@ -72,7 +109,7 @@ class ControllerExtensionFeedMetaFeed extends Controller {
             $product_url = $this->url->link('product/product', 'product_id=' . (int)$p['product_id']);
             $item->appendChild($this->g($xml, 'link', $product_url));
 
-            // Image URL (use main image, resize to decent size if available)
+            // Image URL (main)
             $image_link = '';
             if (!empty($p['image'])) {
                 try {
@@ -84,16 +121,39 @@ class ControllerExtensionFeedMetaFeed extends Controller {
             if ($image_link) {
                 $item->appendChild($this->g($xml, 'image_link', $image_link));
             }
+            // Additional images (up to 10)
+            $images = $this->model_catalog_product->getProductImages((int)$p['product_id']);
+            $count = 0;
+            foreach ($images as $img) {
+                if (empty($img['image'])) continue;
+                try {
+                    $link = $this->model_tool_image->resize($img['image'], 1200, 1200);
+                } catch (\Exception $e) {
+                    $link = rtrim($server, '/') . '/image/' . $img['image'];
+                }
+                if ($link) {
+                    $item->appendChild($this->g($xml, 'additional_image_link', $link));
+                    if (++$count >= 10) break;
+                }
+            }
 
-            // Price & tax handling (Meta expects number + space + currency, e.g. "199.00 EUR")
+            // Price & tax (Meta expects "199.00 EUR")
             $price_inc_tax = $this->tax->calculate((float)$p['price'], (int)$p['tax_class_id'], (bool)$this->config->get('config_tax'));
             $item->appendChild($this->g($xml, 'price', $this->formatPrice($price_inc_tax, $currency_code)));
 
-            // Special (sale) price if active
-            $special = $this->getActiveSpecial((int)$p['product_id'], $customer_group_id);
-            if ($special !== null && $special < $p['price']) {
-                $special_inc_tax = $this->tax->calculate((float)$special, (int)$p['tax_class_id'], (bool)$this->config->get('config_tax'));
+            // Special (sale) price + effective date window
+            $specialInfo = $this->getActiveSpecial((int)$p['product_id'], $customer_group_id);
+            if ($specialInfo && isset($specialInfo['price']) && $specialInfo['price'] < $p['price']) {
+                $special_inc_tax = $this->tax->calculate((float)$specialInfo['price'], (int)$p['tax_class_id'], (bool)$this->config->get('config_tax'));
                 $item->appendChild($this->g($xml, 'sale_price', $this->formatPrice($special_inc_tax, $currency_code)));
+                if (!empty($specialInfo['date_start']) || !empty($specialInfo['date_end'])) {
+                    $start = (!empty($specialInfo['date_start']) && $specialInfo['date_start'] != '0000-00-00') ? date('c', strtotime($specialInfo['date_start'])) : '';
+                    $end   = (!empty($specialInfo['date_end'])   && $specialInfo['date_end']   != '0000-00-00') ? date('c', strtotime($specialInfo['date_end']))   : '';
+                    $range = $start && $end ? ($start . '/' . $end) : ($start ?: $end);
+                    if ($range) {
+                        $item->appendChild($this->g($xml, 'sale_price_effective_date', $range));
+                    }
+                }
             }
 
             // Brand (manufacturer)
@@ -104,31 +164,43 @@ class ControllerExtensionFeedMetaFeed extends Controller {
             }
             if ($brand) {
                 $item->appendChild($this->g($xml, 'brand', $this->strip($brand)));
+            } elseif (!empty($p['manufacturer'])) {
+                $item->appendChild($this->g($xml, 'brand', $this->strip($p['manufacturer'])));
             }
 
-            // Availability
+            // Availability & condition
             $availability = ((int)$p['quantity'] > 0 && (int)$p['status'] === 1) ? 'in stock' : 'out of stock';
             $item->appendChild($this->g($xml, 'availability', $availability));
+            $item->appendChild($this->g($xml, 'condition', 'new'));
 
             // Product type (breadcrumb of categories)
             $product_types = $this->buildProductTypeBreadcrumbs((int)$p['product_id']);
             if ($product_types) {
                 $item->appendChild($this->g($xml, 'product_type', implode(' > ', $product_types)));
+                // Mapiraj na Google Product Taxonomy
+                $google_cat = $this->mapGoogleCategory($product_types);
+                if ($google_cat) {
+                    $item->appendChild($this->g($xml, 'google_product_category', $google_cat));
+                }
             }
 
-            // Optional: GTIN/MPN if available in custom fields (adapt if stored elsewhere)
-            if (!empty($p['upc'])) {
-                $item->appendChild($this->g($xml, 'gtin', $p['upc']));
-            }
-            if (!empty($p['mpn'])) {
-                $item->appendChild($this->g($xml, 'mpn', $p['mpn']));
-            }
+            // Identifikatori
+            if (!empty($p['upc'])) $item->appendChild($this->g($xml, 'gtin', $p['upc']));
+            if (!empty($p['ean'])) $item->appendChild($this->g($xml, 'gtin', $p['ean']));
+            if (!empty($p['mpn'])) $item->appendChild($this->g($xml, 'mpn', $p['mpn']));
 
-            // Append item
+            // Grupiranje varijanti (item_group_id)
+            $groupId = '';
+            if (!empty($p['model'])) $groupId = $p['model'];
+            if (empty($groupId) && !empty($p['sku'])) $groupId = $p['sku'];
+            if (!empty($groupId)) $item->appendChild($this->g($xml, 'item_group_id', $this->strip($groupId)));
+
+            // Append
             $channel->appendChild($item);
         }
 
-        $this->response->addHeader('Content-Type: application/rss+xml; charset=UTF-8');
+        $this->response->addHeader('Content-Type: application/xml; charset=UTF-8');
+        $this->response->addHeader('Content-Disposition: inline; filename="meta.xml"');
         $this->response->setOutput($xml->saveXML());
     }
 
@@ -161,12 +233,21 @@ class ControllerExtensionFeedMetaFeed extends Controller {
         return number_format((float)$price, 2, '.', '') . ' ' . $currency_code;
     }
 
-    /** Return active special price or null */
+    /** Active special (price + optional dates) */
     private function getActiveSpecial($product_id, $customer_group_id) {
-        $sql = "SELECT price FROM `" . DB_PREFIX . "product_special` WHERE product_id = " . (int)$product_id . " AND customer_group_id = " . (int)$customer_group_id . " AND ((date_start IS NULL OR date_start = '0000-00-00' OR date_start <= NOW()) AND (date_end IS NULL OR date_end = '0000-00-00' OR date_end >= NOW())) ORDER BY priority ASC, price ASC LIMIT 1";
-        $query = $this->db->query($sql);
-        if ($query->num_rows) {
-            return (float)$query->row['price'];
+        $sql = "SELECT price, date_start, date_end FROM `" . DB_PREFIX . "product_special`
+                WHERE product_id = " . (int)$product_id . "
+                  AND customer_group_id = " . (int)$customer_group_id . "
+                  AND ((date_start IS NULL OR date_start = '0000-00-00' OR date_start <= NOW())
+                   AND (date_end   IS NULL OR date_end   = '0000-00-00' OR date_end   >= NOW()))
+                ORDER BY priority ASC, price ASC LIMIT 1";
+        $q = $this->db->query($sql);
+        if ($q->num_rows) {
+            return [
+                'price'      => (float)$q->row['price'],
+                'date_start' => $q->row['date_start'] ?? null,
+                'date_end'   => $q->row['date_end'] ?? null,
+            ];
         }
         return null;
     }
@@ -175,14 +256,11 @@ class ControllerExtensionFeedMetaFeed extends Controller {
     private function buildProductTypeBreadcrumbs($product_id) {
         $this->load->model('catalog/product');
         $this->load->model('catalog/category');
-        $cats = $this->model_catalog_product->getCategories($product_id);
+        $cats = $this->model_catalog_product->getProductCategories($product_id);
         $names = [];
         foreach ($cats as $category_id) {
             $path = $this->getCategoryPath($category_id);
-            if ($path) {
-                $names = $path; // take the first non-empty path (most specific)
-                break;
-            }
+            if ($path) { $names = $path; break; }
         }
         return $names;
     }
@@ -207,5 +285,25 @@ class ControllerExtensionFeedMetaFeed extends Controller {
             $names[] = $this->strip($n);
         }
         return $names;
+    }
+
+    /** Normalize (lowercase + bez dijakritika) */
+    private function normalizeText($s) {
+        $s = strtolower(trim($this->strip($s)));
+        $t = @iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $s);
+        return $t !== false ? $t : $s;
+    }
+
+    /** Breadcrumbs → Google Product Taxonomy */
+    private function mapGoogleCategory($product_types) {
+        if (empty($product_types)) return '';
+        // Kreni od najkonkretnije kategorije
+        for ($i = count($product_types) - 1; $i >= 0; $i--) {
+            $key = $this->normalizeText($product_types[$i]);
+            if (isset($this->googleCategoryMap[$key])) {
+                return $this->googleCategoryMap[$key];
+            }
+        }
+        return '';
     }
 }
