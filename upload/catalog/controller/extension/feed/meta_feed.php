@@ -251,23 +251,18 @@ class ControllerExtensionFeedMetaFeed extends Controller {
     private function buildProductTypeBreadcrumbs($product_id) {
         $this->load->model('catalog/category');
 
-        // Pokušaj koristiti model ako postoji metoda
         $cats = [];
         if (isset($this->model_catalog_product) &&
             method_exists($this->model_catalog_product, 'getProductCategories')) {
             $cats = $this->model_catalog_product->getProductCategories($product_id);
         } else {
-            // Fallback: čitaj iz product_to_category
             $cats = $this->getProductCategoryIdsFallback($product_id);
         }
 
         $names = [];
         foreach ($cats as $category_id) {
             $path = $this->getCategoryPath($category_id);
-            if ($path) {
-                $names = $path; // uzmi prvi smisleni path (najspecifičniji)
-                break;
-            }
+            if ($path) { $names = $path; break; }
         }
         return $names;
     }
@@ -283,12 +278,7 @@ class ControllerExtensionFeedMetaFeed extends Controller {
               AND c.status = '1'
               AND c2s.store_id = '" . (int)$this->config->get('config_store_id') . "'";
         $q = $this->db->query($sql);
-
-        $ids = [];
-        foreach ($q->rows as $row) {
-            $ids[] = (int)$row['category_id'];
-        }
-        return $ids;
+        return array_map('intval', array_column($q->rows, 'category_id'));
     }
 
     private function getCategoryPath($category_id) {
