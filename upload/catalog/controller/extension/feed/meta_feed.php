@@ -254,15 +254,46 @@ class ControllerExtensionFeedMetaFeed extends Controller {
 
     /** Build product_type from category hierarchy */
     private function buildProductTypeBreadcrumbs($product_id) {
-        $this->load->model('catalog/product');
         $this->load->model('catalog/category');
-        $cats = $this->model_catalog_product->getProductCategories($product_id);
+
+        // Pokušaj koristiti model ako postoji metoda
+        $cats = [];
+        if (isset($this->model_catalog_product) &&
+            method_exists($this->model_catalog_product, 'getProductCategories')) {
+            $cats = $this->model_catalog_product->getProductCategories($product_id);
+        } else {
+            // Fallback: čitaj iz product_to_category
+            $cats = $this->getProductCategoryIdsFallback($product_id);
+        }
+
         $names = [];
         foreach ($cats as $category_id) {
             $path = $this->getCategoryPath($category_id);
-            if ($path) { $names = $path; break; }
+            if ($path) {
+                $names = $path; // uzmi prvi smisleni path (najspecifičniji)
+                break;
+            }
         }
         return $names;
+    }
+
+
+    /** Fallback: vrati ID-eve kategorija za proizvod (ako model nema getProductCategories) */
+    private function getProductCategoryIdsFallback($product_id) {
+        $sql = "SELECT c.category_id
+            FROM `" . DB_PREFIX . "product_to_category` pc
+            INNER JOIN `" . DB_PREFIX . "category` c ON c.category_id = pc.category_id
+            INNER JOIN `" . DB_PREFIX . "category_to_store` c2s ON c2s.category_id = c.category_id
+            WHERE pc.product_id = " . (int)$product_id . "
+              AND c.status = '1'
+              AND c2s.store_id = '" . (int)$this->config->get('config_store_id') . "'";
+        $q = $this->db->query($sql);
+
+        $ids = [];
+        foreach ($q->rows as $row) {
+            $ids[] = (int)$row['category_id'];
+        }
+        return $ids;
     }
 
     private function getCategoryPath($category_id) {
