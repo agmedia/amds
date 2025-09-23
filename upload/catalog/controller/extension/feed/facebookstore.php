@@ -91,15 +91,16 @@ class ControllerExtensionFeedFacebookstore extends Controller {
         $output .= '</rss>';
 
 
-        $dom = new DOMDocument;
+        $dom = new DOMDocument('1.0', 'UTF-8');
         $dom->preserveWhiteSpace = false;
-        $dom->loadXml($output);
-        $xpath = new DOMXPath($dom);
-        foreach ($xpath->query('//text()') as $domText) {
-            $domText->data = trim($domText->nodeValue);
-        }
         $dom->formatOutput = true;
-        echo $dom->saveXml();
+        $dom->loadXML($output);
+
+// isporuči kroz OpenCart response s pravim headerima
+        $this->response->addHeader('Content-Type: application/xml; charset=UTF-8');
+        $this->response->addHeader('Content-Disposition: inline; filename="facebook-feed.xml"');
+        $this->response->setOutput($dom->saveXML());
+        return;
 
 
         // $this->response->addHeader('Content-Type: application/xml');
@@ -110,11 +111,10 @@ class ControllerExtensionFeedFacebookstore extends Controller {
     }
 
 
-    private function wrapInCDATA($in)
-    {
-        return "<![CDATA[ " . $in . " ]]>";
-        //return $in;
+    private function wrapInCDATA($in) {
+        return "<![CDATA[" . $in . "]]>";
     }
+
 
 
     private function removeChar($string, $char)
