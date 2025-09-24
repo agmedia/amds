@@ -54,9 +54,7 @@
             {% if thumb and category_thumb_status %}
                 <img class="category-main-thumb" src="{{ thumb }}" alt="{{ heading_title }}" title="{{ heading_title }}" />
             {% endif %}
-            {% if description and description != '<p><br></p>' %}
-                <div id="page-description" class="category-description">{{ description }}</div>
-            {% endif %}
+
         {% endif %}
       
       {% if categories and category_subs_status %}
@@ -86,6 +84,11 @@
        <!-- <div class="col-sm-6 xs-text-center pagination-navigation">{{ pagination }}</div>
         <div class="col-sm-6 text-right xs-text-center"><span class="pagination-text">{{ results }}</span></div>-->
       </div>
+
+
+          {% if description and description != '<p><br></p>' %}
+              <div id="page-description" class="category-description">{{ description }}</div>
+          {% endif %}
       
       {% endif %}
       
