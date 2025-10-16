@@ -41,7 +41,7 @@ class ControllerApiCoupon extends Controller {
             return;
         }
         $auth = $this->request->server['HTTP_AUTHORIZATION'] ?? '';
-        if ($auth !== 'Bearer YOUR_SHARED_SECRET_TOKEN') {
+        if ($auth !== 'Bearer Bakanal40#') {
             $this->response->addHeader('HTTP/1.1 401 Unauthorized');
             return;
         }
