@@ -35,16 +35,32 @@ class ControllerApiCoupon extends Controller {
 	}
 
     private function getAuthHeader() {
-        $auth = $this->request->server['HTTP_AUTHORIZATION'] ?? '';
-        if (!$auth && function_exists('getallheaders')) {
+        // pokušaj standardni server var
+        if (!empty($this->request->server['HTTP_AUTHORIZATION'])) {
+            return $this->request->server['HTTP_AUTHORIZATION'];
+        }
+        // fallback za neke Apache/Nginx konfiguracije
+        if (!empty($this->request->server['REDIRECT_HTTP_AUTHORIZATION'])) {
+            return $this->request->server['REDIRECT_HTTP_AUTHORIZATION'];
+        }
+        // getallheaders (ovisno o PHP/FPM)
+        if (function_exists('getallheaders')) {
             $headers = getallheaders();
-            if (!empty($headers['Authorization'])) {
-                $auth = $headers['Authorization'];
-            } elseif (!empty($headers['authorization'])) {
-                $auth = $headers['authorization'];
+            foreach (['Authorization','authorization','X-Webhook-Token','x-webhook-token'] as $k) {
+                if (!empty($headers[$k])) {
+                    // za X-Webhook-Token normaliziraj na Bearer format
+                    if (stripos($k, 'webhook-token') !== false) {
+                        return 'Bearer ' . $headers[$k];
+                    }
+                    return $headers[$k];
+                }
             }
         }
-        return $auth;
+        // kao krajnji fallback: query string ?token=...
+        if (!empty($this->request->get['token'])) {
+            return 'Bearer ' . $this->request->get['token'];
+        }
+        return '';
     }
 
     public function issue() {
@@ -52,6 +68,7 @@ class ControllerApiCoupon extends Controller {
             $this->response->addHeader('HTTP/1.1 405 Method Not Allowed');
             return;
         }
+
         $auth = $this->getAuthHeader();
         if ($auth !== 'Bearer Bakanal40#') {
             $this->response->addHeader('HTTP/1.1 401 Unauthorized');
