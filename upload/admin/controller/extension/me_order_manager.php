@@ -461,6 +461,7 @@ class ControllerExtensionMeordermanager extends Controller {
 				'store_url'      => $order_info['store_url'],
 				'payment_method'      => $order_info['payment_method'],
 				'shipping_method'      => $order_info['shipping_method'],
+                'boxnow'      => $order_info['boxnow'],
 				'comment'      => $order_info['comment'],
 				'language_code'      => $order_info['language_code'],
 				'currency_code'      => $order_info['currency_code'],
@@ -1254,6 +1255,7 @@ class ControllerExtensionMeordermanager extends Controller {
 			$data['telephone'] = $order_info['telephone'];
 
 			$data['shipping_method'] = $order_info['shipping_method'];
+            $data['boxnow'] = $order_info['boxnow'];
 			$data['payment_method'] = $order_info['payment_method'];
 
 			// Payment Address

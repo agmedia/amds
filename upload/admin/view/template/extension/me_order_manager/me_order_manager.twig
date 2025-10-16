@@ -387,7 +387,9 @@
 							<td class="shipping_address">{{ order.shipping_address }}</td>
 						{% endif %}
 						{% if key == 'shipping_method' %}
-							<td class="shipping_method">{{ order.shipping_method }}</td>
+							<td class="shipping_method">{{ order.shipping_method }} {% if order.boxnow is not null %}
+									<br>{{ order.boxnow }}
+								{% endif %}</td>
 						{% endif %}
 						{% if key == 'comment' %}
 							<td class="comment">{{ order.comment }}</td>
