@@ -1,6 +1,6 @@
 <?php
 // Heading
-$_['heading_title']    = 'FAQ';
+$_['heading_title']    = 'Česta pitanja (FAQ)';
 $_['heading_payment']  = 'Payment';
 
 // Text
