@@ -1,4 +1,7 @@
 <?php
+
+use Agmedia\LuceedOpencartWrapper\Models\LOC_Customer;
+use Agmedia\LuceedOpencartWrapper\Models\LOC_Order;
 class ControllerExtensionPaymentWSPay extends Controller
 {
     /** Helper: odabir endpointa */
@@ -188,6 +191,48 @@ class ControllerExtensionPaymentWSPay extends Controller
         $this->response->setOutput('OK');
     }
 
+
+    /** Push narudžbe u Luceed (idempotentno: preskače ako postoji luceed_uid) */
+    private function pushToLuceed($order_id) {
+        $this->load->model('checkout/order');
+        $oc_order = $this->model_checkout_order->getOrder((int)$order_id);
+        if (!$oc_order) return false;
+
+        // Ako je već poslana u Luceed (ima UID), nemoj duplo
+        if (!empty($oc_order['luceed_uid'])) return true;
+
+        try {
+            $order    = new LOC_Order($oc_order);
+            $customer = new LOC_Customer($order->getCustomerData());
+
+            // provjeri količine po skladištima
+            $has_qty = $order->collectProductsFromWarehouses();
+            if (!$has_qty) {
+                if (method_exists($order, 'recordError')) $order->recordError();
+                return false;
+            }
+
+            if (!$customer->exist()) {
+                $customer->store();
+            }
+
+            $sent = $order->setCustomerUid($customer->getUid())->store();
+            if (!$sent) {
+                if (method_exists($order, 'recordError')) $order->recordError();
+                return false;
+            }
+        } catch (\Throwable $e) {
+            if (class_exists('Log')) {
+                $log = new Log('luceed_error.log');
+                $log->write('Luceed push error for order ' . (int)$order_id . ': ' . $e->getMessage());
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+
     /** ========== 4) CRON fallback: StatusCheck za “missing/pending” ========== */
     public function statusCheck() {
         // 0) Zaštita URL-om s ključem (iz config.php)
@@ -277,6 +322,7 @@ class ControllerExtensionPaymentWSPay extends Controller
                         'WSPay approval (cron): ' . $approvalCode,
                         true // ← pošalji standardan mail kupcu (prvo postavljanje statusa)
                     );
+                    $this->pushToLuceed((int)$cartId);
                     $updated++;
                 }
                 // Ako slučajno više nije missing (netko ga je ručno promijenio),
