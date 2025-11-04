@@ -190,7 +190,7 @@ class ControllerExtensionPaymentWSPay extends Controller
 
     /** ========== 4) CRON fallback: StatusCheck za “missing/pending” ========== */
     public function statusCheck() {
-        // jednostavna zaštita URL-om s ključem
+        // 0) Zaštita URL-om s ključem (iz config.php)
         $key = isset($this->request->get['key']) ? $this->request->get['key'] : '';
         $cronKey = defined('WSPAY_CRON_KEY') ? WSPAY_CRON_KEY : '';
         if (empty($cronKey) || !hash_equals($cronKey, $key)) {
@@ -199,72 +199,92 @@ class ControllerExtensionPaymentWSPay extends Controller
             return;
         }
 
-        // 1) Povuci “problematične” narudžbe (npr. status = pending / missing)
-        $pending_status_id = defined('WSPAY_MISSING_STATUS_ID') ? WSPAY_MISSING_STATUS_ID : 1;
-        $orders = $this->db->query("SELECT order_id, total FROM `" . DB_PREFIX . "order` WHERE order_status_id = " . (int)$pending_status_id . " ORDER BY date_added DESC LIMIT 100")->rows;
+        // 1) Uzmimo baš "missing" (status 0 ili kako si definirao u configu)
+        //    Preporuka: u config.php postavi define('WSPAY_MISSING_STATUS_ID', 0);
+        $missing_status_id = defined('WSPAY_MISSING_STATUS_ID') ? (int)WSPAY_MISSING_STATUS_ID : 0;
+
+        $orders = $this->db->query("
+        SELECT order_id, total
+        FROM `" . DB_PREFIX . "order`
+        WHERE order_status_id = " . (int)$missing_status_id . "
+        ORDER BY date_added DESC
+        LIMIT 200
+    ")->rows;
 
         if (!$orders) {
-            $this->response->setOutput('No pending orders');
+            $this->response->setOutput('No missing orders');
             return;
         }
 
-        $shopId    = $this->config->get('payment_wspay_merchant');
-        $secretKey = $this->config->get('payment_wspay_password');
+        $shopId         = $this->config->get('payment_wspay_merchant');
+        $secretKey      = $this->config->get('payment_wspay_password');
+        $paid_status_id = (int)$this->config->get('payment_wspay_order_status_id');
 
-        $apiBase = $this->config->get('payment_wspay_test')
-            ? 'https://public.wspay.biz/api/services'
-            : 'https://public.wspay.biz/api/services'; // isti base; WSPay razlikuje po ShopID-u
+        // 2) WSPay statusCheck endpoint (isti base; razlikovanje po ShopID-u)
+        $apiBase = 'https://public.wspay.biz/api/services';
 
         $updated = 0;
 
         foreach ($orders as $o) {
             $cartId = (string)$o['order_id'];
 
-            // StatusCheck payload – najčešće: ShopID, ShoppingCartID, Signature
-            // (neki setupovi traže dodatna polja; po potrebi proširi)
-            $sig = $this->sha512($shopId . $secretKey . $cartId . $secretKey);
+            // 2.1) Potpis za statusCheck
+            $sig = hash('sha512', $shopId . $secretKey . $cartId . $secretKey);
 
             $payload = json_encode([
-                'Version' => '2.0',
-                'ShopID' => $shopId,
+                'Version'        => '2.0',
+                'ShopID'         => $shopId,
                 'ShoppingCartID' => $cartId,
-                'Signature' => $sig
+                'Signature'      => $sig
             ]);
 
-            // cURL poziv
+            // 2.2) cURL poziv prema WSPay
             $ch = curl_init($apiBase . '/statusCheck');
             curl_setopt_array($ch, [
                 CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_POST => true,
-                CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
-                CURLOPT_POSTFIELDS => $payload,
-                CURLOPT_TIMEOUT => 20,
+                CURLOPT_POST           => true,
+                CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+                CURLOPT_POSTFIELDS     => $payload,
+                CURLOPT_TIMEOUT        => 20,
             ]);
             $resp = curl_exec($ch);
             $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
             curl_close($ch);
 
-            if ($http !== 200 || !$resp) continue;
+            if ($http !== 200 || !$resp) {
+                continue;
+            }
 
             $json = json_decode($resp, true);
-            if (!$json) continue;
+            if (!$json) {
+                continue;
+            }
 
-            // Ovisno o odgovoru, tražimo Success/ApprovalCode (nazivi mogu varirati po verziji)
+            // 2.3) Parsiraj odgovor: tražimo potvrdu naplate
             $success      = isset($json['Success']) ? (string)$json['Success'] : '0';
             $approvalCode = isset($json['ApprovalCode']) ? (string)$json['ApprovalCode'] : '';
 
             if ($success === '1' && !empty($approvalCode)) {
                 $this->load->model('checkout/order');
-                $this->model_checkout_order->addOrderHistory(
-                    (int)$cartId,
-                    $this->config->get('payment_wspay_order_status_id'),
-                    'WSPay approval (cron): ' . $approvalCode,
-                    true
-                );
-                $updated++;
+                $order_info = $this->model_checkout_order->getOrder((int)$cartId);
+
+                // 3) Ako je narudžba još uvijek MISSING (status = 0 ili onaj iz configa),
+                //    sad PRVI PUT postavljamo status -> OC će poslati STANDARDAN "order confirmation" mail kupcu.
+                if ((int)$order_info['order_status_id'] === (int)$missing_status_id) {
+                    $this->model_checkout_order->addOrderHistory(
+                        (int)$cartId,
+                        $paid_status_id,
+                        'WSPay approval (cron): ' . $approvalCode,
+                        true // ← pošalji standardan mail kupcu (prvo postavljanje statusa)
+                    );
+                    $updated++;
+                }
+                // Ako slučajno više nije missing (netko ga je ručno promijenio),
+                // preskačemo da ne šaljemo dupli mail. Po potrebi ovdje možeš slati "update" mail.
             }
         }
 
         $this->response->setOutput('Updated: ' . (int)$updated);
     }
+
 }
