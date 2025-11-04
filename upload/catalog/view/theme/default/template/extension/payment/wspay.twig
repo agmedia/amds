@@ -1,33 +1,38 @@
 <form name="pay" action="{{ action }}" method="post">
- <input type="hidden" name="ShopID" value="{{ merchant }}">
-<input type="hidden" name="ShoppingCartID" value="{{ order_id }}">
-<input type="hidden" name="TotalAmount" value="{{ total }}">
-<input type="hidden" name="Signature" value="{{ md5 }}">
-<input type="hidden" name="CustomerFirstname" value="{{ firstname }}">
-<input type="hidden" name="CustomerLastName" value="{{ lastname }}">
-<input type="hidden" name="CustomerAddress" value="{{ address }}">
-<input type="hidden" name="CustomerCity" value="{{ city }}">
-<input type="hidden" name="CustomerCountry" value="{{ country }}">
-<input type="hidden" name="CustomerZIP" value="{{ postcode }}">
-<input type="hidden" name="CustomerPhone" value="{{ telephone }}">
-<input type="hidden" name="CustomerEmail" value="{{ email }}">
+    <!-- Obavezna polja (WSPay v2.0) -->
+    <input type="hidden" name="Version" value="{{ Version }}">
+    <input type="hidden" name="ShopID" value="{{ ShopID }}">
+    <input type="hidden" name="ShoppingCartID" value="{{ ShoppingCartID }}">
+    <input type="hidden" name="TotalAmount" value="{{ TotalAmount }}">
+    <input type="hidden" name="Currency" value="{{ Currency }}">
+    <input type="hidden" name="Language" value="{{ Language }}">
 
-<input type="hidden" name="Lang" value="HR">
+    <!-- Podaci o kupcu -->
+    <input type="hidden" name="CustomerFirstName" value="{{ CustomerFirstName }}">
+    <input type="hidden" name="CustomerLastName"  value="{{ CustomerLastName }}">
+    <input type="hidden" name="CustomerAddress"   value="{{ CustomerAddress }}">
+    <input type="hidden" name="CustomerCity"      value="{{ CustomerCity }}">
+    <input type="hidden" name="CustomerZIP"       value="{{ CustomerZIP }}">
+    <input type="hidden" name="CustomerCountry"   value="{{ CustomerCountry }}">
+    <input type="hidden" name="CustomerPhone"     value="{{ CustomerPhone }}">
+    <input type="hidden" name="CustomerEmail"     value="{{ CustomerEmail }}">
 
-<input type="hidden" name="valuta" value="{{ currency }}">
+    <!-- Povratni URL-ovi -->
+    <input type="hidden" name="ReturnMethod" value="{{ ReturnMethod }}">
+    <input type="hidden" name="ReturnURL" value="{{ ReturnURL }}">
+    <input type="hidden" name="ReturnErrorURL" value="{{ ReturnErrorURL }}">
+    <input type="hidden" name="CancelURL" value="{{ CancelURL }}">
 
-<input type="hidden" name="tecaj" value="{{ tecaj }}">
+    <!-- Server-to-server obavijest -->
+    <input type="hidden" name="CallbackURL" value="{{ CallbackURL }}">
 
-<input type="hidden" name="ReturnErrorURL" value="{{ cancel_url }}">
-<input type="hidden" name="ReturnURL" value="{{ return_url }}">
-<input type="hidden" name="CancelURL" value="{{ cancel_url }}">
+    <!-- Potpis (SHA512) -->
+    <input type="hidden" name="Signature" value="{{ Signature }}">
 
-
-<div class="buttons pull-right">
-     <input type="submit" value="{{ button_confirm }}" class="btn btn-primary" />
-        
-        
+    <!-- Gumb potvrde -->
+    <div class="buttons pull-right">
+        <input type="submit" value="{{ button_confirm }}" class="btn btn-primary" />
     </div>
-    <div class="clearfix"></div>
-    
+
+
 </form>

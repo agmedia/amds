@@ -1,149 +1,270 @@
 <?php
-class ControllerExtensionPaymentWSPay extends Controller {
-  public function index() {
-      $data['button_confirm'] = $this->language->get('button_confirm');
+class ControllerExtensionPaymentWSPay extends Controller
+{
+    /** Helper: odabir endpointa */
+    private function getGatewayUrl() {
+        $test = $this->config->get('payment_wspay_test');
+        return $test ? 'https://formtest.wspay.biz/Authorization.aspx'
+            : 'https://form.wspay.biz/Authorization.aspx';
+    }
 
-    $this->load->model('checkout/order');
+    /** Helper: format za polje TotalAmount (zarez), npr. "3650,35" */
+    private function formatAmountForForm($amount) {
+        return number_format((float)$amount, 2, ',', '');
+    }
 
+    /** Helper: format za potpis (bez zareza/točaka), npr. 365035 */
+    private function formatAmountForSignature($amount) {
+        // 2 decimale, ukloni sve što nije znamenka
+        $s = number_format((float)$amount, 2, ',', '');
+        return preg_replace('/\D+/', '', $s);
+    }
+
+    /** Helper: SHA512 potpis */
+    private function sha512($data) {
+        return hash('sha512', $data);
+    }
+
+    /** Potpis za FORM (Version=2.0) */
+    private function signForm($shopId, $secret, $cartId, $totalFormattedForSig) {
+        // ShopID + SecretKey + ShoppingCartID + SecretKey + TotalAmount(sig) + SecretKey
+        return $this->sha512($shopId . $secret . $cartId . $secret . $totalFormattedForSig . $secret);
+    }
+
+    /** Potpis za RETURN (browser povrat) i za server-to-server NOTIFY */
+    private function signReturnOrNotify($shopId, $secret, $cartId, $success, $approvalCode) {
+        // ShopID + SecretKey + ShoppingCartID + SecretKey + Success + SecretKey + ApprovalCode + SecretKey
+        return $this->sha512($shopId . $secret . $cartId . $secret . $success . $secret . $approvalCode . $secret);
+    }
+
+    /** Sigurno čitanje JSON-a (za server-to-server notify) ili POST-a (za return) */
+    private function readJsonBody() {
+        $raw = file_get_contents('php://input');
+        if (!$raw) return null;
+        $json = json_decode($raw, true);
+        return (json_last_error() === JSON_ERROR_NONE) ? $json : null;
+    }
+
+    /** ========== 1) PLAĆANJE – prikaz WSPay forme ========== */
+    public function index() {
         $this->load->language('extension/payment/wspay');
-    
-       $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']); 
-
-       $this->load->model('localisation/currency');
-      //$this->data['allcurrencies'] = array();
-      $results = $this->model_localisation_currency->getCurrencies();   
- 
-
-     $kn = ($results['HRK']['value']);
-
-    //live url  
-    if (!$this->config->get('payment_wspay_test')){
-      $data['action'] = 'https://form.wspay.biz/Authorization.aspx';   
-    }else{
-    //test url
-      $data['action'] = 'https://formtest.wspay.biz/Authorization.aspx';   
-    }
-    
-    //$data['callback'] = $this->config->get('callback');
-
-
-
-
-      $data['merchant'] = $this->config->get('payment_wspay_merchant');
-      $data['password'] = $this->config->get('payment_wspay_password');
-        $data['order_id'] = $order_info['order_id'];
-        $data['currency'] = $order_info['currency_code'];
-         $data['tecaj'] = $order_info['currency_value'];
-        $data['description'] = $this->config->get('config_name') . ' - #' . $order_info['order_id'];      
-        $data['total'] = number_format($order_info['total'],2, ',', '');
-
-        $data['address'] = $order_info['payment_address_1'];
-        $data['city'] = $order_info['payment_city'];
-        $data['firstname'] = $order_info['payment_firstname'];
-        $data['lastname'] = $order_info['payment_lastname'];      
-        $data['postcode'] = $order_info['payment_postcode'];
-        $data['country'] = $order_info['payment_iso_code_2'];
-        $data['telephone'] = $order_info['telephone'];
-        $data['email'] = $order_info['email'];
-
-        $data['return_url'] = $this->url->link('checkout/success');
-    $data['cancel_url'] = $this->url->link('checkout/checkout', '', true);
-    $data['return_url'] = $this->url->link('extension/payment/wspay/callback');
-        
-        
-        $a= $data['total'];
-        $b = str_replace( ',', '', $a );
-
-        //readability
-
-      $keym = $data['merchant'] ;
-      $wpass = $data['password'];
-            
-      $data['md5']  = md5($keym.$wpass.$data['order_id'].$wpass.$b.$wpass);
-
-     
-      return $this->load->view('extension/payment/wspay', $data);
-     
-        
-        $this->render();
-    }
-    
-    public function callback() {
-
         $this->load->model('checkout/order');
 
-        $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
-        // Lets get wspay response parameters
-        $posted = $_REQUEST;
-
-
-        // Variables for readability
-
-        $ShopID = $data['merchant'] = $this->config->get('payment_wspay_merchant');
-        $SecretKey = $data['password'] = $this->config->get('payment_wspay_password');
-        $ShoppingCartID = $posted['ShoppingCartID'];
-        $Success = $posted['Success'];
-        $ApprovalCode = $posted['ApprovalCode'];
-
-        $PaymentCard  = $posted['PaymentType'];
-        $PaymentPlan  = $posted['PaymentPlan'];
-
-        if($PaymentCard == 'MAESTRO' && $PaymentPlan != '0000' ){
-            $kartica = 'MAESTRO RATE';
-        }
-        else if($PaymentCard == 'MAESTRO' && $PaymentPlan == '0000'){
-            $kartica = 'MAESTRO';
+        if (empty($this->session->data['order_id'])) {
+            return ''; // nema narudžbe
         }
 
-        else if($PaymentCard == 'MASTERCARD' && $PaymentPlan != '0000' ){
-            $kartica = 'MASTERCARD RATE';
-        }
-        else if($PaymentCard == 'MASTERCARD' && $PaymentPlan == '0000'){
-            $kartica = 'MASTERCARD';
-        }
+        $order = $this->model_checkout_order->getOrder($this->session->data['order_id']);
+        if (!$order) return '';
 
-        else if($PaymentCard == 'VISA' && $PaymentPlan != '0000' ){
-            $kartica = 'VISA RATE';
-        }
-        else if($PaymentCard == 'VISA' && $PaymentPlan == '0000'){
-            $kartica = 'VISA';
-        }
+        $shopId    = $this->config->get('payment_wspay_merchant');
+        $secretKey = $this->config->get('payment_wspay_password');
+        $cartId    = (string)$order['order_id'];
+        $totalForm = $this->formatAmountForForm($order['total']);
+        $totalSig  = $this->formatAmountForSignature($order['total']);
 
+        $data = [];
+        $data['action']       = $this->getGatewayUrl();
+        $data['Version']      = '2.0';
+        $data['ShopID']       = $shopId;
+        $data['ShoppingCartID'] = $cartId;
+        $data['TotalAmount']  = $totalForm;
+        $data['Language']     = 'HR';
+        $data['Currency']     = $order['currency_code']; // npr. HRK/EUR
+        $data['CustomerFirstName'] = $order['payment_firstname'];
+        $data['CustomerLastName']  = $order['payment_lastname'];
+        $data['CustomerAddress']   = $order['payment_address_1'];
+        $data['CustomerCity']      = $order['payment_city'];
+        $data['CustomerZIP']       = $order['payment_postcode'];
+        $data['CustomerCountry']   = $order['payment_iso_code_2'];
+        $data['CustomerPhone']     = $order['telephone'];
+        $data['CustomerEmail']     = $order['email'];
 
-        $this->db->query("UPDATE `" . DB_PREFIX . "order` SET payment_card = '" . $this->db->escape($kartica) . "', installment  = '" . $this->db->escape($PaymentPlan) . "' WHERE order_id = '" . (int)$ShoppingCartID . "'");
+        // Povratni URL-ovi (browser). Method=POST je uredniji; primarni izvor istine je NOTIFY.
+        $data['ReturnMethod']     = 'POST';
+        $data['ReturnURL']        = $this->url->link('extension/payment/wspay/return', '', true);
+        $data['ReturnErrorURL']   = $this->url->link('extension/payment/wspay/error', '', true);
+        $data['CancelURL']        = $this->url->link('extension/payment/wspay/cancel', '', true);
 
+        // Server-to-server NOTIFY (Transaction report – CallbackURL) – konfigurira se u WSPay konzoli;
+        // ipak ga šaljemo i ovdje ako WSPay form podržava prosljeđivanje (nije obavezno):
+        $data['CallbackURL']      = $this->url->link('extension/payment/wspay/notify', '', true);
 
-        $str = $ShopID.$SecretKey.$ShoppingCartID.$SecretKey.$Success.$SecretKey.$ApprovalCode.$SecretKey;
-        $hash = md5($str);
+        // Potpis (SHA512)
+        $data['Signature'] = $this->signForm($shopId, $secretKey, $cartId, $totalSig);
 
-        if( ($posted['Success'] == 1) && (!empty($posted['ApprovalCode'])) && ($hash == $posted['Signature']) ) {
+        // Gumb u checkoutu
+        $data['button_confirm'] = $this->language->get('button_confirm');
 
-            $this->model_checkout_order->addOrderHistory($this->session->data['order_id'], $this->config->get('payment_wspay_order_status_id'), '', true);
+        return $this->load->view('extension/payment/wspay', $data);
+    }
 
-            $order_id =$this->session->data['order_id'];
+    /** ========== 2) BROWSER POVRAT – ne presudno, ali korisno za UX ========== */
+    public function return() {
+        // WSPay pošalje Success, ApprovalCode, ShoppingCartID, Signature (POST ako smo stavili ReturnMethod=POST)
+        $post = $this->request->post ?: $this->request->get;
 
+        $shopId    = $this->config->get('payment_wspay_merchant');
+        $secretKey = $this->config->get('payment_wspay_password');
 
+        $cartId       = isset($post['ShoppingCartID']) ? (string)$post['ShoppingCartID'] : '';
+        $success      = isset($post['Success']) ? (string)$post['Success'] : '0';
+        $approvalCode = isset($post['ApprovalCode']) ? (string)$post['ApprovalCode'] : '';
+        $signature    = isset($post['Signature']) ? (string)$post['Signature'] : '';
 
-            $this->response->redirect($this->url->link('checkout/success', '', 'SSL'));
+        $calc = $this->signReturnOrNotify($shopId, $secretKey, $cartId, $success, $approvalCode);
 
-        } else if( $posted['Success'] == 1 && $hash !== $posted['Signature'] ){
-
-            // Kill futher operations
-            die( 'Illegal access detected!' );
-            /**
-             * Transaction Rejected
-             */
-        } else if( ($posted['ErrorMessage']) == 'ODBIJENO' ) {
-
-            $this->response->redirect($this->url->link('checkout/checkout', '', 'SSL'));
+        if ($cartId && $success === '1' && !empty($approvalCode) && hash_equals($calc, $signature)) {
+            $this->load->model('checkout/order');
+            $this->model_checkout_order->addOrderHistory(
+                (int)$cartId,
+                $this->config->get('payment_wspay_order_status_id'),
+                '', true
+            );
+            $this->response->redirect($this->url->link('checkout/success'));
+        } else {
+            // ako je nešto sumnjivo, pošalji korisnika na checkout uz poruku
+            $this->session->data['error'] = 'Plaćanje nije potvrđeno. Ako je iznos terećen, kontaktirajte podršku.';
+            $this->response->redirect($this->url->link('checkout/checkout'));
         }
     }
 
+    public function error() {
+        // neuspješno plaćanje po browser povratu
+        $this->session->data['error'] = 'Transakcija je odbijena.';
+        $this->response->redirect($this->url->link('checkout/checkout'));
+    }
 
+    public function cancel() {
+        $this->session->data['error'] = 'Plaćanje je otkazano.';
+        $this->response->redirect($this->url->link('checkout/checkout'));
+    }
 
+    /** ========== 3) SERVER-TO-SERVER NOTIFY (glavni izvor istine) ========== */
+    public function notify() {
+        // WSPay šalje JSON (Transaction report – CallbackURL)
+        $json = $this->readJsonBody();
 
+        // neki setupovi znaju slati kao application/x-www-form-urlencoded; fallback:
+        if ($json === null && !empty($this->request->post)) {
+            $json = $this->request->post;
+        }
 
+        if (!$json || empty($json['ShoppingCartID'])) {
+            $this->response->addHeader('HTTP/1.1 400 Bad Request');
+            $this->response->setOutput('Missing payload');
+            return;
+        }
 
+        $shopId    = $this->config->get('payment_wspay_merchant');
+        $secretKey = $this->config->get('payment_wspay_password');
 
+        $cartId       = (string)$json['ShoppingCartID'];
+        $success      = isset($json['Success']) ? (string)$json['Success'] : '0';
+        $approvalCode = isset($json['ApprovalCode']) ? (string)$json['ApprovalCode'] : '';
+        $signature    = isset($json['Signature']) ? (string)$json['Signature'] : '';
+
+        // Validacija potpisa
+        $calc = $this->signReturnOrNotify($shopId, $secretKey, $cartId, $success, $approvalCode);
+        if (!hash_equals($calc, $signature)) {
+            $this->response->addHeader('HTTP/1.1 400 Bad Signature');
+            $this->response->setOutput('Invalid signature');
+            return;
+        }
+
+        // Ako je uspjeh i ApprovalCode postoji – zaključaj narudžbu i pošalji mail (bez sessiona!)
+        if ($success === '1' && !empty($approvalCode)) {
+            $this->load->model('checkout/order');
+            $this->model_checkout_order->addOrderHistory(
+                (int)$cartId,
+                $this->config->get('payment_wspay_order_status_id'),
+                'WSPay approval: ' . $approvalCode,
+                true // email kupcu
+            );
+        }
+
+        // Odgovor 200 OK (WSPay očekuje 200 da ne bi ponovno slali)
+        $this->response->addHeader('Content-Type: text/plain; charset=utf-8');
+        $this->response->setOutput('OK');
+    }
+
+    /** ========== 4) CRON fallback: StatusCheck za “missing/pending” ========== */
+    public function statusCheck() {
+        // jednostavna zaštita URL-om s ključem
+        $key = isset($this->request->get['key']) ? $this->request->get['key'] : '';
+        $cronKey = defined('WSPAY_CRON_KEY') ? WSPAY_CRON_KEY : '';
+        if (empty($cronKey) || !hash_equals($cronKey, $key)) {
+            $this->response->addHeader('HTTP/1.1 403 Forbidden');
+            $this->response->setOutput('Forbidden');
+            return;
+        }
+
+        // 1) Povuci “problematične” narudžbe (npr. status = pending / missing)
+        $pending_status_id = defined('WSPAY_MISSING_STATUS_ID') ? WSPAY_MISSING_STATUS_ID : 1;
+        $orders = $this->db->query("SELECT order_id, total FROM `" . DB_PREFIX . "order` WHERE order_status_id = " . (int)$pending_status_id . " ORDER BY date_added DESC LIMIT 100")->rows;
+
+        if (!$orders) {
+            $this->response->setOutput('No pending orders');
+            return;
+        }
+
+        $shopId    = $this->config->get('payment_wspay_merchant');
+        $secretKey = $this->config->get('payment_wspay_password');
+
+        $apiBase = $this->config->get('payment_wspay_test')
+            ? 'https://public.wspay.biz/api/services'
+            : 'https://public.wspay.biz/api/services'; // isti base; WSPay razlikuje po ShopID-u
+
+        $updated = 0;
+
+        foreach ($orders as $o) {
+            $cartId = (string)$o['order_id'];
+
+            // StatusCheck payload – najčešće: ShopID, ShoppingCartID, Signature
+            // (neki setupovi traže dodatna polja; po potrebi proširi)
+            $sig = $this->sha512($shopId . $secretKey . $cartId . $secretKey);
+
+            $payload = json_encode([
+                'Version' => '2.0',
+                'ShopID' => $shopId,
+                'ShoppingCartID' => $cartId,
+                'Signature' => $sig
+            ]);
+
+            // cURL poziv
+            $ch = curl_init($apiBase . '/statusCheck');
+            curl_setopt_array($ch, [
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                CURLOPT_POSTFIELDS => $payload,
+                CURLOPT_TIMEOUT => 20,
+            ]);
+            $resp = curl_exec($ch);
+            $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            curl_close($ch);
+
+            if ($http !== 200 || !$resp) continue;
+
+            $json = json_decode($resp, true);
+            if (!$json) continue;
+
+            // Ovisno o odgovoru, tražimo Success/ApprovalCode (nazivi mogu varirati po verziji)
+            $success      = isset($json['Success']) ? (string)$json['Success'] : '0';
+            $approvalCode = isset($json['ApprovalCode']) ? (string)$json['ApprovalCode'] : '';
+
+            if ($success === '1' && !empty($approvalCode)) {
+                $this->load->model('checkout/order');
+                $this->model_checkout_order->addOrderHistory(
+                    (int)$cartId,
+                    $this->config->get('payment_wspay_order_status_id'),
+                    'WSPay approval (cron): ' . $approvalCode,
+                    true
+                );
+                $updated++;
+            }
+        }
+
+        $this->response->setOutput('Updated: ' . (int)$updated);
+    }
 }
-?>
