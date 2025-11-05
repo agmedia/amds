@@ -217,11 +217,15 @@ class LOC_Order
             $this->call_raspis                    = false;
         }
 
-        if ($this->oc_order['shipping_method'] == 'BOX NOW' && $this->oc_order['boxnow'] != '') {
-            $data = explode(';', $this->oc_order['boxnow']);
+        if (
+            (($this->oc_order['shipping_method'] ?? '') == 'BOX NOW') &&
+            !empty($this->oc_order['boxnow'] ?? null)
+        ) {
+            $bn   = (string) ($this->oc_order['boxnow'] ?? '');
+            $data = explode(';', $bn);
 
-            $this->order['dropoff_sifra']      = $data[1] ?: '';
-            $this->order['dropoff_naziv']      = $data[0] ?: '';
+            $this->order['dropoff_sifra']      = $data[1] ?? '';
+            $this->order['dropoff_naziv']      = $data[0] ?? '';
             $this->order['vrsta_isporuke_uid'] = '7-2987';
             $this->order['skl_dokument']       = '';
 
@@ -436,7 +440,10 @@ class LOC_Order
 
             if ( ! $this->has_all_in_main_warehouse) {
                 // Check if is boxnow & remove stores
-                if ($this->oc_order['shipping_method'] == 'BOX NOW' && $this->oc_order['boxnow'] != '') {
+                if (
+                    (($this->oc_order['shipping_method'] ?? '') == 'BOX NOW') &&
+                    !empty($this->oc_order['boxnow'] ?? null)
+                ) {
                     $locations = $locations->whereNotIn('location_id', [3, 10, 43, 58]);
                 }
                 // Check & collect warehouses that have all items.
