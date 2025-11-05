@@ -687,7 +687,10 @@ class LOC_Order
         // --- Gradnja response-a ---
         foreach ($order_products as $order_product) {
             // Rabat po artiklu (reset u svakoj iteraciji)
-            $rabat = isset($inCategory[$order_product->product_id]) ? 30 : 0;
+           //$rabat = isset($inCategory[$order_product->product_id]) ? 30 : 0;
+
+            $rabat = 0;
+
 
             // Ako ćeš nekad vraćati strogo float, bolje round nego number_format+float cast
             $price = (float) number_format((float) $order_product->price, 2, '.', '');
