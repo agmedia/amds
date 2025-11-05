@@ -4,7 +4,6 @@ namespace Agmedia\LuceedOpencartWrapper\Models;
 
 use Agmedia\Helpers\Database;
 use Agmedia\Helpers\Log;
-use Agmedia\Kaonekad\Models\ShippingCollector;
 use Agmedia\Luceed\Facade\LuceedProduct;
 use Agmedia\Luceed\Luceed;
 use Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper;
