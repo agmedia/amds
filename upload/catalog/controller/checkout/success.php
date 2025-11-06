@@ -45,7 +45,11 @@ class ControllerCheckoutSuccess extends Controller {
                 $order    = new LOC_Order($oc_order);
                 $customer = new LOC_Customer($order->getCustomerData());
 
+                \Agmedia\Helpers\Log::store($oc_order, 'luceed_success');
+
                 $has_qty = $order->collectProductsFromWarehouses();
+
+                \Agmedia\Helpers\Log::store($has_qty ? 'Ima qty' : 'Nema qty', 'luceed_success');
 
                 if ($has_qty) {
                     if ( ! $customer->exist()) {
@@ -53,6 +57,8 @@ class ControllerCheckoutSuccess extends Controller {
                     }
 
                     $sent = $order->setCustomerUid($customer->getUid())->store();
+
+                    \Agmedia\Helpers\Log::store($sent ? 'Success sent' : 'Error sent', 'luceed_success');
 
                     if ( ! $sent) {
                         $order->recordError();

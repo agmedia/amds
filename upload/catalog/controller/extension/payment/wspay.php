@@ -205,8 +205,13 @@ class ControllerExtensionPaymentWSPay extends Controller
             $order    = new LOC_Order($oc_order);
             $customer = new LOC_Customer($order->getCustomerData());
 
+            \Agmedia\Helpers\Log::store($order, 'luceed_wspay');
+
             // provjeri količine po skladištima
             $has_qty = $order->collectProductsFromWarehouses();
+
+            \Agmedia\Helpers\Log::store($has_qty ? 'Ima qty' : 'Nema qty', 'luceed_wspay');
+
             if (!$has_qty) {
                 if (method_exists($order, 'recordError')) $order->recordError();
                 return false;
@@ -217,6 +222,9 @@ class ControllerExtensionPaymentWSPay extends Controller
             }
 
             $sent = $order->setCustomerUid($customer->getUid())->store();
+
+            \Agmedia\Helpers\Log::store($sent ? 'Success sent' : 'Error sent', 'luceed_wspay');
+
             if (!$sent) {
                 if (method_exists($order, 'recordError')) $order->recordError();
                 return false;
