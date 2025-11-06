@@ -5,7 +5,7 @@ $_['heading_title'] = 'Koristi kod za popust';
 
 // Text
 $_['text_coupon']   = 'Kupon za popust (%s)';
-$_['text_success']  = 'Uspješno: Vaš kupon kod za popust je primjenjen! Kupon ne vrijedi za artikle na akciji';
+$_['text_success']  = 'Uspješno: Vaš kupon kod za popust je primjenjen! <strong>Kupon ne vrijedi za artikle na akciji!</strong>';
 
 // Entry
 $_['entry_coupon']  = 'Unesite Vaš kupon kod';
