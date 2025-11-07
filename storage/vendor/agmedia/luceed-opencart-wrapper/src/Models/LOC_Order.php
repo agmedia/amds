@@ -6,6 +6,7 @@ use Agmedia\Helpers\Database;
 use Agmedia\Helpers\Log;
 use Agmedia\Luceed\Facade\LuceedProduct;
 use Agmedia\Luceed\Luceed;
+use Agmedia\LuceedOpencartWrapper\Helpers\Helper;
 use Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper;
 use Agmedia\Models\Coupon;
 use Agmedia\Models\Location;
@@ -688,9 +689,12 @@ class LOC_Order
         foreach ($order_products as $order_product) {
             // Rabat po artiklu (reset u svakoj iteraciji)
            //$rabat = isset($inCategory[$order_product->product_id]) ? 30 : 0;
-
             $rabat = 0;
+            $orig_product = $productsById->get($order_product->product_id);
 
+            if ($orig_product && $orig_product->price > $order_product->price) {
+                $rabat = ProductHelper::calculateDiscountBetweenPrices($orig_product->price, $order_product->price);
+            }
 
             // Ako ćeš nekad vraćati strogo float, bolje round nego number_format+float cast
             $price = (float) number_format((float) $order_product->price, 2, '.', '');
