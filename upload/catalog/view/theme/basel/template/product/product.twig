@@ -116,6 +116,11 @@
                <!-- <p><span class="badge new_badge outlet"><i>-20% uz kod BLACK20</i></span></p> -->
                 {% endif %}
 
+
+                {% if price and special and sale_badge %}
+                    <span class="badge sale_badge"><i>{{ sale_badge }}</i></span>
+                {% endif %}
+
                 {% if is_posebna_ponuda =='1' %}
                   <!--  <p><span class="badge new_badge outlet"><i>-30% popusta na obračunu plaćanja</i></span></p> -->
 
