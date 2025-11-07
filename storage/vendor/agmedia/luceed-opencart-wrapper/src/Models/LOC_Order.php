@@ -691,13 +691,13 @@ class LOC_Order
            //$rabat = isset($inCategory[$order_product->product_id]) ? 30 : 0;
             $rabat = 0;
             $orig_product = $productsById->get($order_product->product_id);
-
-            if ($orig_product && $orig_product->price > $order_product->price) {
-                $rabat = ProductHelper::calculateDiscountBetweenPrices($orig_product->price, $order_product->price);
-            }
-
             // Ako ćeš nekad vraćati strogo float, bolje round nego number_format+float cast
             $price = (float) number_format((float) $order_product->price, 2, '.', '');
+
+            if ($orig_product && $orig_product->price > $order_product->price) {
+                $price = (float) number_format((float) $orig_product->price, 2, '.', '');
+                $rabat = ProductHelper::calculateDiscountBetweenPrices($orig_product->price, $order_product->price);
+            }
 
             // Ima li ovaj order_product opciju?
             $option = $orderOptions->get($order_product->order_product_id);
