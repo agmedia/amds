@@ -121,7 +121,7 @@ class ControllerExtensionPaymentWSPay extends Controller
             $this->load->model('checkout/order');
             $this->model_checkout_order->addOrderHistory(
                 (int)$cartId,
-                $this->config->get('payment_wspay_order_status_id'),
+                1,
                 '', true
             );
             $this->response->redirect($this->url->link('checkout/success'));
