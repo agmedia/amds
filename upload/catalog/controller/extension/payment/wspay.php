@@ -271,7 +271,7 @@ class ControllerExtensionPaymentWSPay extends Controller
 
         $shopId         = $this->config->get('payment_wspay_merchant');
         $secretKey      = $this->config->get('payment_wspay_password');
-        $paid_status_id = (int)$this->config->get('payment_wspay_order_status_id');
+        $paid_status_id = 1;//(int)$this->config->get('payment_wspay_order_status_id');
 
         // 2) WSPay statusCheck endpoint (isti base; razlikovanje po ShopID-u)
         $apiBase = 'https://public.wspay.biz/api/services';
