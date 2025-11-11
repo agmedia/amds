@@ -117,6 +117,9 @@ class ControllerExtensionPaymentWSPay extends Controller
 
         $calc = $this->signReturnOrNotify($shopId, $secretKey, $cartId, $success, $approvalCode);
 
+        \Agmedia\Helpers\Log::store($cartId, 'luceed_return');
+        \Agmedia\Helpers\Log::store($post, 'luceed_return');
+
         if ($cartId && $success === '1' && !empty($approvalCode) && hash_equals($calc, $signature)) {
             $this->load->model('checkout/order');
             $this->model_checkout_order->addOrderHistory(
@@ -317,9 +320,14 @@ class ControllerExtensionPaymentWSPay extends Controller
             $success      = isset($json['Success']) ? (string)$json['Success'] : '0';
             $approvalCode = isset($json['ApprovalCode']) ? (string)$json['ApprovalCode'] : '';
 
+            \Agmedia\Helpers\Log::store($cartId, 'luceed_statusCheck');
+            \Agmedia\Helpers\Log::store($success . ' - ' . $approvalCode, 'luceed_statusCheck');
+
             if ($success === '1' && !empty($approvalCode)) {
                 $this->load->model('checkout/order');
                 $order_info = $this->model_checkout_order->getOrder((int)$cartId);
+
+                \Agmedia\Helpers\Log::store($order_info, 'luceed_statusCheck');
 
                 // 3) Ako je narudžba još uvijek MISSING (status = 0 ili onaj iz configa),
                 //    sad PRVI PUT postavljamo status -> OC će poslati STANDARDAN "order confirmation" mail kupcu.

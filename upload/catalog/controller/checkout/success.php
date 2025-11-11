@@ -39,7 +39,7 @@ class ControllerCheckoutSuccess extends Controller {
             $data['paymethod'] = $oc_order['payment_code'];
             $data['order_id'] = $order_id;
 
-
+            \Agmedia\Helpers\Log::store($data, 'luceed_success');
 
             if (empty($oc_order['luceed_uid'])) {
                 $order    = new LOC_Order($oc_order);
