@@ -123,10 +123,7 @@ class LOC_Product
             ->where('naziv', '!=', '')
             ->where('enabled', '!=', 'N')
             ->where('webshop', '!=', 'N')
-            ->where(function ($q) {
-                $q->where('sezona_naziv', agconf('import.default_sezona_naziv'))
-                    ->orWhere('sezona_naziv', agconf('import.default_sezona_naziv_dva'));
-            })
+            ->where('sezona_naziv', '==', agconf('import.default_sezona_naziv'))
             ->where('osnovni__artikl', '==', null)
             ->pluck('artikl')
             ->diff($this->existing)
