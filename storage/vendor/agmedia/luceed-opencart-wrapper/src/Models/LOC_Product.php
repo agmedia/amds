@@ -118,6 +118,7 @@ class LOC_Product
         // List of product identifiers without
         // existing products.
         $list_diff = $this->getProducts()
+
             ->where('artikl', '!=', '')
             ->where('naziv', '!=', '')
             ->where('enabled', '!=', 'N')
