@@ -260,12 +260,23 @@ class ControllerExtensionPaymentWSPay extends Controller
         $missing_status_id = defined('WSPAY_MISSING_STATUS_ID') ? (int)WSPAY_MISSING_STATUS_ID : 0;
 
         $orders = $this->db->query("
-        SELECT order_id, total
-        FROM `" . DB_PREFIX . "order`
-        WHERE order_status_id = " . (int)$missing_status_id . "
-        ORDER BY date_added DESC
-        LIMIT 200
-    ")->rows;
+    SELECT order_id, total
+    FROM `" . DB_PREFIX . "order`
+    WHERE 
+      (
+        order_status_id = " . (int)$missing_status_id . "
+        AND " . (int)$missing_status_id . " <> 1
+      )
+      OR
+      (
+        order_status_id = 1
+        AND payment_code = 'wspay'
+        AND (luceed_uid = '' OR luceed_uid IS NULL)
+      )
+    ORDER BY date_added DESC
+    LIMIT 200
+")->rows;
+
 
         if (!$orders) {
             $this->response->setOutput('No missing orders');
@@ -331,7 +342,7 @@ class ControllerExtensionPaymentWSPay extends Controller
 
                 // 3) Ako je narudžba još uvijek MISSING (status = 0 ili onaj iz configa),
                 //    sad PRVI PUT postavljamo status -> OC će poslati STANDARDAN "order confirmation" mail kupcu.
-                if ((int)$order_info['order_status_id'] === (int)$missing_status_id) {
+               // if ((int)$order_info['order_status_id'] === (int)$missing_status_id) {
                     $this->model_checkout_order->addOrderHistory(
                         (int)$cartId,
                         $paid_status_id,
@@ -340,7 +351,7 @@ class ControllerExtensionPaymentWSPay extends Controller
                     );
                     $this->pushToLuceed((int)$cartId);
                     $updated++;
-                }
+               // }
                 // Ako slučajno više nije missing (netko ga je ručno promijenio),
                 // preskačemo da ne šaljemo dupli mail. Po potrebi ovdje možeš slati "update" mail.
             }
