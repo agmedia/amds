@@ -264,17 +264,16 @@ class ControllerExtensionPaymentWSPay extends Controller
     FROM `" . DB_PREFIX . "order`
     WHERE 
       (
-        order_status_id = " . (int)$missing_status_id . "
-        AND " . (int)$missing_status_id . " <> 1
+        order_status_id = 0 AND DATE(date_added) = CURDATE()
       )
       OR
       (
         order_status_id = 1
         AND payment_code = 'wspay'
         AND (luceed_uid = '' OR luceed_uid IS NULL)
-      )
-    ORDER BY date_added DESC
-    LIMIT 200
+          AND DATE(date_added) = CURDATE()
+      ) 
+ORDER BY `oc_order`.`order_status_id` DESC
 ")->rows;
 
 
