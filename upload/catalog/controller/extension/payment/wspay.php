@@ -274,10 +274,10 @@ class ControllerExtensionPaymentWSPay extends Controller
           AND DATE(date_added) = CURDATE()
       ) 
 ORDER BY `oc_order`.`order_status_id` DESC
-")->rows;
+");
 
 
-        if (!$orders) {
+        if (!$orders->num_rows) {
             $this->response->setOutput('No missing orders');
             return;
         }
@@ -291,7 +291,7 @@ ORDER BY `oc_order`.`order_status_id` DESC
 
         $updated = 0;
 
-        foreach ($orders as $o) {
+        foreach ($orders->rows as $o) {
             $cartId = (string)$o['order_id'];
 
             // 2.1) Potpis za statusCheck
