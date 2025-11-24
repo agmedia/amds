@@ -80,7 +80,7 @@
 {% if product.price %}
 <div class="price">
     {% if product.special %}
-    <span class="price-old">{{ product.price }} </span><span class="price-new">{{ product.special }} </span>
+    <span class="price-old"><s>{{ product.price }} </s></span><span class="price-new">{{ product.special }} </span>
     {% else %}
     <span>{{ product.price }} </span>
         {% if product.price_ponuda and product.ljetni.cat_id != 429%}
