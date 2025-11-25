@@ -91,30 +91,62 @@
       </tr>
     </thead>
     <tbody>
-    
+
     {% for product in products %}
-    <tr>
-      <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">{{ product.name }}
-        {% for option in product.option %}<br />
-        &nbsp;<small> - {{ option.name }}: {{ option.value }}</small>{% endfor %}</td>
-      <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">{{ product.model }}</td>
-      <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: right; padding: 7px;">{{ product.quantity }}</td>
-      <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: right; padding: 7px;">
-        {% if product.price_regular %}
-          <span style="text-decoration: line-through; color:#999;">{{ product.price_regular }}</span><br />
-        {% endif %}
-        <span>{{ product.price }}</span>
-      </td>
+      <tr>
+        <!-- Naziv + opcije -->
+        <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">
+          {{ product.name }}
+          {% for option in product.option %}<br />
+            &nbsp;<small> - {{ option.name }}: {{ option.value }}</small>
+          {% endfor %}
+        </td>
 
-      <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: right; padding: 7px;">
-        {% if product.total_regular %}
-          <span style="text-decoration: line-through; color:#999;">{{ product.total_regular }}</span><br />
-        {% endif %}
-        <span>{{ product.total }}</span>
-      </td>
+        <!-- Model -->
+        <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">
+          {{ product.model }}
+        </td>
 
-    </tr>
+        <!-- Količina -->
+        <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: right; padding: 7px;">
+          {{ product.quantity }}
+        </td>
+
+        <!-- Cijena (precrtana puna + akcijska) -->
+        <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: right; padding: 7px;">
+          {% if product.price_regular %}
+            <span style="text-decoration: line-through; color:#999;">{{ product.price_regular }}</span><br />
+          {% endif %}
+          <span><b>{{ product.price }}</b></span>
+        </td>
+
+        <!-- % Rabat – SAMO ako ima special -->
+        <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: right; padding: 7px; ">
+          {% if product.discount_percent %}
+            <b>{{ product.discount_percent }}%</b>
+          {% endif %}
+        </td>
+
+        <!-- Iznos rabata – SAMO ako ima special -->
+        <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: right; padding: 7px; ">
+          {% if product.discount_amount %}
+            {{ product.discount_amount }}
+          {% endif %}
+        </td>
+
+        <!-- Ukupno (precrtano puno + akcijsko) -->
+        <td style="font-size: 12px; border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: right; padding: 7px;">
+          {% if product.total_regular %}
+            <span style="text-decoration: line-through; color:#999;">{{ product.total_regular }}</span><br />
+          {% endif %}
+          <span>{{ product.total }}</span>
+        </td>
+      </tr>
     {% endfor %}
+
+
+
+
     {% for voucher in vouchers %}
     <tr>
       <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: left; padding: 7px;">{{ voucher.description }}</td>
@@ -130,7 +162,7 @@
     
     {% for total in totals %}
     <tr>
-      <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: right; padding: 7px;" colspan="4"><b>{{ total.title }}:</b></td>
+      <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: right; padding: 7px;" colspan="6"><b>{{ total.title }}:</b></td>
       <td style="font-size: 12px;	border-right: 1px solid #DDDDDD; border-bottom: 1px solid #DDDDDD; text-align: right; padding: 7px;">{{ total.text }}</td>
     </tr>
     {% endfor %}

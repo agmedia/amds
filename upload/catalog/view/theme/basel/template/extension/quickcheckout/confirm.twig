@@ -2,49 +2,85 @@
   {% if confirmation_page %} 
 	<div class="table">
 	  <table class="table table-bordered table-hover">
-		<thead>
+		  <thead>
 		  <tr>
-			<td class="text-left">{{ column_name }}</td>
-
-			<td class="text-right">{{ column_price }}</td>
-			<td class="text-right">{{ column_total }}</td>
+			  <td class="text-left">{{ column_name }}</td>
+			  <td class="text-right">{{ column_price }}</td>
+			  <td class="text-right">% Rabat</td>
+			  <td class="text-right">Iznos rabata</td>
+			  <td class="text-right">{{ column_total }}</td>
 		  </tr>
-		</thead>
+		  </thead>
 		<tbody>
-		  {% for product in products %} 
-		  <tr>
-			<td class="text-left">{{ product.quantity }} x <a href="{{ product.href }}">{{ product.name }}</a>
-			  <br /><small>({{ product.model }})</small>
-			  {% for option in product.option %} 
-			  <br />
-			  &nbsp;<small>- {{ option.name }}: {{ option.value }}</small>
-			  {% endfor %} 
-			  {% if product.recurring %} 
-			  <br />
-			  <span class="label label-info">{{ text_recurring }}</span> <small>{{ product.recurring }}</small>
-			  {% endif %}</td>
+		{% for product in products %}
+			<tr>
+				<td class="text-left">
+					{{ product.quantity }} x <a href="{{ product.href }}">{{ product.name }}</a>
+					<br /><small>({{ product.model }})</small>
+					{% for option in product.option %}
+						<br />
+						&nbsp;<small>- {{ option.name }}: {{ option.value }}</small>
+					{% endfor %}
+					{% if product.recurring %}
+						<br />
+						<span class="label label-info">{{ text_recurring }}</span> <small>{{ product.recurring }}</small>
+					{% endif %}
+				</td>
 
-			<td class="text-right">{{ product.price }}</td>
-			<td class="text-right">{{ product.total }}</td>
-		  </tr>
-		  {% endfor %}
-		  {% for voucher in vouchers %} 
-		  <tr>
-			<td class="text-left">{{ voucher.description }}</td>
+				<!-- Cijena -->
+				<td class="text-right">
+					{% if product.price_regular %}
+						<span style="text-decoration: line-through; color:#999;">{{ product.price_regular }}</span><br />
+					{% endif %}
+					<span><b>{{ product.price }}</b></span>
+				</td>
 
-			<td class="text-right">{{ voucher.amount }}</td>
-			<td class="text-right">{{ voucher.amount }}</td>
-		  </tr>
-		  {% endfor %} 
+				<!-- % Rabat -->
+				<td class="text-right" style="background:#fff59d;">
+					{% if product.discount_percent %}
+						<b>{{ product.discount_percent }}%</b>
+					{% else %}
+						&nbsp;
+					{% endif %}
+				</td>
+
+				<!-- Iznos rabata -->
+				<td class="text-right" style="background:#fff59d;">
+					{% if product.discount_amount %}
+						{{ product.discount_amount }}
+					{% else %}
+						&nbsp;
+					{% endif %}
+				</td>
+
+				<!-- Ukupno -->
+				<td class="text-right">
+					{% if product.total_regular %}
+						<span style="text-decoration: line-through; color:#999;">{{ product.total_regular }}</span><br />
+					{% endif %}
+					<span>{{ product.total }}</span>
+				</td>
+			</tr>
+		{% endfor %}
+
+		{% for voucher in vouchers %}
+			<tr>
+				<td class="text-left">{{ voucher.description }}</td>
+				<td class="text-right">{{ voucher.amount }}</td>
+				<td class="text-right"></td>
+				<td class="text-right"></td>
+				<td class="text-right">{{ voucher.amount }}</td>
+			</tr>
+		{% endfor %}
 		</tbody>
-		<tfoot>
-		  {% for total in totals %} 
-		  <tr>
-			<td colspan="2" class="text-right"><strong>{{ total.title }}:</strong></td>
-			<td class="text-right">{{ total.text }}</td>
-		  </tr>
-		  {% endfor %} 
-		</tfoot>
+		  <tfoot>
+		  {% for total in totals %}
+			  <tr>
+				  <td colspan="4" class="text-right"><strong>{{ total.title }}:</strong></td>
+				  <td class="text-right">{{ total.text }}</td>
+			  </tr>
+		  {% endfor %}
+		  </tfoot>
 	  </table>
 	</div>
   {% endif %}

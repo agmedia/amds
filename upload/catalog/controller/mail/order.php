@@ -263,39 +263,47 @@ class ControllerMailOrder extends Controller {
                 );
             }
 
-            // osnovne vrijednosti iz narudžbe (plaćena cijena)
+            // osnovne vrijednosti iz narudžbe (backup ako nema speciala)
             $price_order = $order_product['price'];
             $total_order = $order_product['total'];
 
             // default – pretpostavi da nema akcije
-            $price_regular = '';
-            $total_regular = '';
+            $price_regular     = '';
+            $total_regular     = '';
+            $discount_percent  = '';
+            $discount_amount   = '';
 
-            // dohvati proizvod da vidiš ima li special
             $product_info = $this->model_catalog_product->getProduct($order_product['product_id']);
 
             if ($product_info && (float)$product_info['special'] > 0) {
-                // regularna cijena (prije popusta)
-                $regular = $product_info['price'];
-                // akcijska cijena (special)
-                $special = $product_info['special'];
+                // regular i special cijena
+                $regular = (float)$product_info['price'];
+                $special = (float)$product_info['special'];
 
                 if ($this->config->get('config_tax')) {
                     $regular = $regular + $this->tax->getTax($regular, $product_info['tax_class_id']);
                     $special = $special + $this->tax->getTax($special, $product_info['tax_class_id']);
                 }
 
+                // formatirane cijene
                 $price_regular = $this->currency->format($regular, $order_info['currency_code'], $order_info['currency_value']);
                 $price_special = $this->currency->format($special, $order_info['currency_code'], $order_info['currency_value']);
 
                 $total_regular = $this->currency->format($regular * $order_product['quantity'], $order_info['currency_code'], $order_info['currency_value']);
                 $total_special = $this->currency->format($special * $order_product['quantity'], $order_info['currency_code'], $order_info['currency_value']);
 
-                // u mail šaljemo akcijsku kao "price" i "total"
+                // u mail šaljemo *akcijsku* kao glavnu cijenu
                 $price_formatted = $price_special;
                 $total_formatted = $total_special;
+
+                // rabat (prikazuje se samo ako ima special)
+                $discount = $regular - $special;
+                if ($discount > 0) {
+                    $discount_percent = round(($discount / $regular) * 100);
+                    $discount_amount  = $this->currency->format($discount * $order_product['quantity'], $order_info['currency_code'], $order_info['currency_value']);
+                }
             } else {
-                // nema special - koristi cijene iz narudžbe kao i prije
+                // nema speciala – klasično ponašanje
                 $price = $price_order + ($this->config->get('config_tax') ? $order_product['tax'] : 0);
                 $total = $total_order + ($this->config->get('config_tax') ? ($order_product['tax'] * $order_product['quantity']) : 0);
 
@@ -304,16 +312,19 @@ class ControllerMailOrder extends Controller {
             }
 
             $data['products'][] = array(
-                'name'          => $order_product['name'],
-                'model'         => $order_product['model'],
-                'option'        => $option_data,
-                'quantity'      => $order_product['quantity'],
-                'price'         => $price_formatted,      // cijena koju plaća
-                'total'         => $total_formatted,      // total koji plaća
-                'price_regular' => $price_regular,        // puna cijena (ako postoji)
-                'total_regular' => $total_regular         // puni total (ako postoji)
+                'name'             => $order_product['name'],
+                'model'            => $order_product['model'],
+                'option'           => $option_data,
+                'quantity'         => $order_product['quantity'],
+                'price'            => $price_formatted,      // cijena koju plaća
+                'total'            => $total_formatted,      // total koji plaća
+                'price_regular'    => $price_regular,        // puna cijena (samo ako ima special)
+                'total_regular'    => $total_regular,        // puni total (samo ako ima special)
+                'discount_percent' => $discount_percent,     // % popusta (samo ako ima special)
+                'discount_amount'  => $discount_amount       // iznos popusta (samo ako ima special)
             );
         }
+
 
 
         // Vouchers

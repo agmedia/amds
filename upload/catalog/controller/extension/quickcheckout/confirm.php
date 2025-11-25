@@ -384,72 +384,116 @@ class ControllerExtensionQuickCheckoutConfirm extends Controller {
 
 			$this->load->model('tool/upload');
 
-			$data['products'] = array();
+            $this->load->model('catalog/product'); // DODANO
 
-			foreach ($this->cart->getProducts() as $product) {
-				$option_data = array();
+            $data['products'] = array();
 
-				foreach ($product['option'] as $option) {
-					if ($option['type'] != 'file') {
-						$value = $option['value'];
-					} else {
-						$upload_info = $this->model_tool_upload->getUploadByCode($option['value']);
+            foreach ($this->cart->getProducts() as $product) {
+                $option_data = array();
 
-						if ($upload_info) {
-							$value = $upload_info['name'];
-						} else {
-							$value = '';
-						}
-					}
+                foreach ($product['option'] as $option) {
+                    if ($option['type'] != 'file') {
+                        $value = $option['value'];
+                    } else {
+                        $upload_info = $this->model_tool_upload->getUploadByCode($option['value']);
 
-					$option_data[] = array(
-						'name'  => $option['name'],
-						'value' => (utf8_strlen($value) > 20 ? utf8_substr($value, 0, 20) . '..' : $value)
-					);
-				}
+                        if ($upload_info) {
+                            $value = $upload_info['name'];
+                        } else {
+                            $value = '';
+                        }
+                    }
 
-				$recurring = '';
+                    $option_data[] = array(
+                        'name'  => $option['name'],
+                        'value' => (utf8_strlen($value) > 20 ? utf8_substr($value, 0, 20) . '..' : $value)
+                    );
+                }
 
-				if ($product['recurring']) {
-					$frequencies = array(
-						'day'        => $this->language->get('text_day'),
-						'week'       => $this->language->get('text_week'),
-						'semi_month' => $this->language->get('text_semi_month'),
-						'month'      => $this->language->get('text_month'),
-						'year'       => $this->language->get('text_year'),
-					);
+                $recurring = '';
 
-					if ($product['recurring']['trial']) {
-						$recurring = sprintf($this->language->get('text_trial_description'), $this->currency->format($this->tax->calculate($product['recurring']['trial_price'] * $product['quantity'], $product['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']), $product['recurring']['trial_cycle'], $frequencies[$product['recurring']['trial_frequency']], $product['recurring']['trial_duration']) . ' ';
-					}
+                if ($product['recurring']) {
+                    $frequencies = array(
+                        'day'        => $this->language->get('text_day'),
+                        'week'       => $this->language->get('text_week'),
+                        'semi_month' => $this->language->get('text_semi_month'),
+                        'month'      => $this->language->get('text_month'),
+                        'year'       => $this->language->get('text_year'),
+                    );
 
-					if ($product['recurring']['duration']) {
-						$recurring .= sprintf($this->language->get('text_payment_description'), $this->currency->format($this->tax->calculate($product['recurring']['price'] * $product['quantity'], $product['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']), $product['recurring']['cycle'], $frequencies[$product['recurring']['frequency']], $product['recurring']['duration']);
-					} else {
-						$recurring .= sprintf($this->language->get('text_payment_cancel'), $this->currency->format($this->tax->calculate($product['recurring']['price'] * $product['quantity'], $product['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']), $product['recurring']['cycle'], $frequencies[$product['recurring']['frequency']], $product['recurring']['duration']);
-					}
-				}
-				
-				$price = $this->currency->format($this->tax->calculate($product['price'], $product['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
-				$total = $this->currency->format($this->tax->calculate($product['price'], $product['tax_class_id'], $this->config->get('config_tax')) * $product['quantity'], $this->session->data['currency']);
+                    if ($product['recurring']['trial']) {
+                        $recurring = sprintf($this->language->get('text_trial_description'), $this->currency->format($this->tax->calculate($product['recurring']['trial_price'] * $product['quantity'], $product['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']), $product['recurring']['trial_cycle'], $frequencies[$product['recurring']['trial_frequency']], $product['recurring']['trial_duration']) . ' ';
+                    }
 
-				$data['products'][] = array(
-					'key'        => isset($product['key']) ? $product['key'] : $product['cart_id'],
-					'cart_id'	 => isset($product['cart_id']) ? $product['cart_id'] : $product['key'],
-					'product_id' => $product['product_id'],
-					'name'       => $product['name'],
-					'model'      => $product['model'],
-					'option'     => $option_data,
-					'recurring'  => $recurring,
-					'quantity'   => $product['quantity'],
-					'subtract'   => $product['subtract'],
-					'price'      => $price,
-					'total'      => $total,
-					'href'       => $this->url->link('product/product', 'product_id=' . $product['product_id']),
-				);
-			}
+                    if ($product['recurring']['duration']) {
+                        $recurring .= sprintf($this->language->get('text_payment_description'), $this->currency->format($this->tax->calculate($product['recurring']['price'] * $product['quantity'], $product['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']), $product['recurring']['cycle'], $frequencies[$product['recurring']['frequency']], $product['recurring']['duration']);
+                    } else {
+                        $recurring .= sprintf($this->language->get('text_payment_cancel'), $this->currency->format($this->tax->calculate($product['recurring']['price'] * $product['quantity'], $product['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']), $product['recurring']['cycle'], $frequencies[$product['recurring']['frequency']], $product['recurring']['duration']);
+                    }
+                }
 
-			// Gift Voucher
+                // --- SPECIAL / REGULAR / RABAT ---
+
+                $currency = $this->session->data['currency'];
+
+                $price_regular    = '';
+                $total_regular    = '';
+                $discount_percent = '';
+                $discount_amount  = '';
+
+                $product_info = $this->model_catalog_product->getProduct($product['product_id']);
+
+                if ($product_info && (float)$product_info['special'] > 0) {
+
+                    // BRUTO regular & special (s porezom)
+                    $regular_raw = $this->tax->calculate($product_info['price'], $product['tax_class_id'], $this->config->get('config_tax'));
+                    $special_raw = $this->tax->calculate($product_info['special'], $product['tax_class_id'], $this->config->get('config_tax'));
+
+                    // formatirano za prikaz
+                    $price_regular = $this->currency->format($regular_raw, $currency);
+                    $price         = $this->currency->format($special_raw, $currency);
+
+                    $total_regular = $this->currency->format($regular_raw * $product['quantity'], $currency);
+                    $total         = $this->currency->format($special_raw * $product['quantity'], $currency);
+
+                    // rabat
+                    $discount_raw = $regular_raw - $special_raw;
+                    if ($discount_raw > 0) {
+                        $discount_percent = round(($discount_raw / $regular_raw) * 100);
+                        $discount_amount  = $this->currency->format($discount_raw * $product['quantity'], $currency);
+                    }
+                } else {
+                    // nema special – standardni prikaz
+                    $price_raw = $this->tax->calculate($product['price'], $product['tax_class_id'], $this->config->get('config_tax'));
+                    $total_raw = $price_raw * $product['quantity'];
+
+                    $price = $this->currency->format($price_raw, $currency);
+                    $total = $this->currency->format($total_raw, $currency);
+                }
+
+                $data['products'][] = array(
+                    'key'            => isset($product['key']) ? $product['key'] : $product['cart_id'],
+                    'cart_id'	    => isset($product['cart_id']) ? $product['cart_id'] : $product['key'],
+                    'product_id'     => $product['product_id'],
+                    'name'           => $product['name'],
+                    'model'          => $product['model'],
+                    'option'         => $option_data,
+                    'recurring'      => $recurring,
+                    'quantity'       => $product['quantity'],
+                    'subtract'       => $product['subtract'],
+                    'price'          => $price,
+                    'total'          => $total,
+                    'price_regular'  => $price_regular,
+                    'total_regular'  => $total_regular,
+                    'discount_percent' => $discount_percent,
+                    'discount_amount'  => $discount_amount,
+                    'href'           => $this->url->link('product/product', 'product_id=' . $product['product_id']),
+                );
+            }
+
+
+
+            // Gift Voucher
 			$data['vouchers'] = array();
 
 			if (!empty($this->session->data['vouchers'])) {
