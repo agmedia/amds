@@ -580,11 +580,11 @@ class LOC_Order
         }
 
         if ($this->oc_order['payment_code'] == 'wspay') {
-            foreach (agconf('luceed.payment.cards') as $card => $uid) {
+          /*  foreach (agconf('luceed.payment.cards') as $card => $uid) {
                 if ($card == $this->oc_order['payment_card']) {
                     return $uid;
                 }
-            }
+            }*/
 
             return agconf('luceed.payment.card_default');
         }
@@ -734,7 +734,7 @@ class LOC_Order
         return $response;
     }
 
-
+            
 
     /**
      * Resolve if an order has coupon discount.
