@@ -234,45 +234,89 @@ class ControllerMailOrder extends Controller {
 		$data['shipping_address'] = str_replace(array("\r\n", "\r", "\n"), '<br />', preg_replace(array("/\s\s+/", "/\r\r+/", "/\n\n+/"), '<br />', trim(str_replace($find, $replace, $format))));
 
 		$this->load->model('tool/upload');
+        $this->load->model('catalog/product'); // DODANO
 
 		// Products
 		$data['products'] = array();
 
-		foreach ($order_products as $order_product) {
-			$option_data = array();
+        foreach ($order_products as $order_product) {
+            $option_data = array();
 
-			$order_options = $this->model_checkout_order->getOrderOptions($order_info['order_id'], $order_product['order_product_id']);
+            $order_options = $this->model_checkout_order->getOrderOptions($order_info['order_id'], $order_product['order_product_id']);
 
-			foreach ($order_options as $order_option) {
-				if ($order_option['type'] != 'file') {
-					$value = $order_option['value'];
-				} else {
-					$upload_info = $this->model_tool_upload->getUploadByCode($order_option['value']);
+            foreach ($order_options as $order_option) {
+                if ($order_option['type'] != 'file') {
+                    $value = $order_option['value'];
+                } else {
+                    $upload_info = $this->model_tool_upload->getUploadByCode($order_option['value']);
 
-					if ($upload_info) {
-						$value = $upload_info['name'];
-					} else {
-						$value = '';
-					}
-				}
+                    if ($upload_info) {
+                        $value = $upload_info['name'];
+                    } else {
+                        $value = '';
+                    }
+                }
 
-				$option_data[] = array(
-					'name'  => $order_option['name'],
-					'value' => (utf8_strlen($value) > 20 ? utf8_substr($value, 0, 20) . '..' : $value)
-				);
-			}
+                $option_data[] = array(
+                    'name'  => $order_option['name'],
+                    'value' => (utf8_strlen($value) > 20 ? utf8_substr($value, 0, 20) . '..' : $value)
+                );
+            }
 
-			$data['products'][] = array(
-				'name'     => $order_product['name'],
-				'model'    => $order_product['model'],
-				'option'   => $option_data,
-				'quantity' => $order_product['quantity'],
-				'price'    => $this->currency->format($order_product['price'] + ($this->config->get('config_tax') ? $order_product['tax'] : 0), $order_info['currency_code'], $order_info['currency_value']),
-				'total'    => $this->currency->format($order_product['total'] + ($this->config->get('config_tax') ? ($order_product['tax'] * $order_product['quantity']) : 0), $order_info['currency_code'], $order_info['currency_value'])
-			);
-		}
+            // osnovne vrijednosti iz narudžbe (plaćena cijena)
+            $price_order = $order_product['price'];
+            $total_order = $order_product['total'];
 
-		// Vouchers
+            // default – pretpostavi da nema akcije
+            $price_regular = '';
+            $total_regular = '';
+
+            // dohvati proizvod da vidiš ima li special
+            $product_info = $this->model_catalog_product->getProduct($order_product['product_id']);
+
+            if ($product_info && (float)$product_info['special'] > 0) {
+                // regularna cijena (prije popusta)
+                $regular = $product_info['price'];
+                // akcijska cijena (special)
+                $special = $product_info['special'];
+
+                if ($this->config->get('config_tax')) {
+                    $regular = $regular + $this->tax->getTax($regular, $product_info['tax_class_id']);
+                    $special = $special + $this->tax->getTax($special, $product_info['tax_class_id']);
+                }
+
+                $price_regular = $this->currency->format($regular, $order_info['currency_code'], $order_info['currency_value']);
+                $price_special = $this->currency->format($special, $order_info['currency_code'], $order_info['currency_value']);
+
+                $total_regular = $this->currency->format($regular * $order_product['quantity'], $order_info['currency_code'], $order_info['currency_value']);
+                $total_special = $this->currency->format($special * $order_product['quantity'], $order_info['currency_code'], $order_info['currency_value']);
+
+                // u mail šaljemo akcijsku kao "price" i "total"
+                $price_formatted = $price_special;
+                $total_formatted = $total_special;
+            } else {
+                // nema special - koristi cijene iz narudžbe kao i prije
+                $price = $price_order + ($this->config->get('config_tax') ? $order_product['tax'] : 0);
+                $total = $total_order + ($this->config->get('config_tax') ? ($order_product['tax'] * $order_product['quantity']) : 0);
+
+                $price_formatted = $this->currency->format($price, $order_info['currency_code'], $order_info['currency_value']);
+                $total_formatted = $this->currency->format($total, $order_info['currency_code'], $order_info['currency_value']);
+            }
+
+            $data['products'][] = array(
+                'name'          => $order_product['name'],
+                'model'         => $order_product['model'],
+                'option'        => $option_data,
+                'quantity'      => $order_product['quantity'],
+                'price'         => $price_formatted,      // cijena koju plaća
+                'total'         => $total_formatted,      // total koji plaća
+                'price_regular' => $price_regular,        // puna cijena (ako postoji)
+                'total_regular' => $total_regular         // puni total (ako postoji)
+            );
+        }
+
+
+        // Vouchers
 		$data['vouchers'] = array();
 
 		$order_vouchers = $this->model_checkout_order->getOrderVouchers($order_info['order_id']);
