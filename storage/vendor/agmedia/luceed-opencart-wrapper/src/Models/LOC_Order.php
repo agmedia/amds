@@ -655,14 +655,12 @@ class LOC_Order
         $productIds      = $order_products->pluck('product_id')->filter()->unique()->values();
         $orderProductIds = $order_products->pluck('order_product_id')->unique()->values();
 
-        // Opcije po order_product_id
         $orderOptions = OrderOption::query()
             ->where('order_id', $this->oc_order['order_id'])
             ->whereIn('order_product_id', $orderProductIds)
             ->get()
             ->keyBy('order_product_id');
 
-        // pov → sku
         $povIds = $orderOptions->pluck('product_option_value_id')->filter()->unique()->values();
         $productOptionsByPov = $povIds->isNotEmpty()
             ? ProductOption::query()
@@ -671,7 +669,6 @@ class LOC_Order
                 ->keyBy('product_option_value_id')
             : collect();
 
-        // product_id → Product model
         $productsById = Product::query()
             ->whereIn('product_id', $productIds)
             ->get()
@@ -680,13 +677,48 @@ class LOC_Order
         // --- Build stavke ---
         foreach ($order_products as $order_product) {
 
-            // OC cijena je NETTO i mora ići direktno u Lineage
-            $price = (float) number_format((float) $order_product->price, 2, '.', '');
+            $final_price = (float) number_format((float) $order_product->price, 2, '.', '');
 
-            // Rabat se u Lineage NE SMIJE preračunavati → mora biti 0
-            $rabat = 0;
+            $orig_product = $productsById->get($order_product->product_id);
+            $orig_price   = $orig_product ? (float)$orig_product->price : $final_price;
 
-            // Provjeri opciju i SKU
+            // 1. inicijalni rabat iz razlike
+            if ($orig_price > 0) {
+                $rabat = round(100 - ($final_price / $orig_price * 100));
+            } else {
+                $rabat = 0;
+            }
+
+            // 2. provjera slaganja s Lineage round logikom
+            $expected = round($orig_price * (1 - $rabat / 100), 2);
+
+            // 3. korekcija ako ne odgovara OC final_price
+            if ($expected != $final_price) {
+
+                // probaj rabat ±1 sve dok ne pogodiš
+                for ($try = -3; $try <= 3; $try++) {
+                    $test = $rabat + $try;
+                    if ($test < 0) continue;
+
+                    $recalc = round($orig_price * (1 - $test / 100), 2);
+
+                    if ($recalc == $final_price) {
+                        $rabat = $test;
+                        break;
+                    }
+                }
+            }
+
+            // Ako i dalje ne pogađa (teoretski rijetko) → forsiraj rabat=0 i orig=final
+            if (round($orig_price * (1 - $rabat / 100), 2) != $final_price) {
+                $rabat = 0;
+                $orig_price = $final_price;
+            }
+
+            // Sada šaljemo ORIG cijenu i RABAT
+            $send_price = (float) number_format($orig_price, 2, '.', '');
+
+            // Opcija → artikl_uid
             $option = $orderOptions->get($order_product->order_product_id);
 
             if ($option) {
@@ -695,32 +727,29 @@ class LOC_Order
                     $response[] = [
                         'artikl_uid' => $po->sku,
                         'kolicina'   => (int) $order_product->quantity,
-                        'cijena'     => $price,
-                        'rabat'      => 0,
+                        'cijena'     => $send_price,
+                        'rabat'      => $rabat,
                     ];
                     continue;
                 }
             }
 
-            // Fallback: artikl = model iz order_product
-            $product = $productsById->get($order_product->product_id);
-            if ($product) {
-                $response[] = [
-                    'artikl'   => $order_product->model,
-                    'kolicina' => (int) $order_product->quantity,
-                    'cijena'   => $price,
-                    'rabat'    => 0,
-                ];
-            }
+            // Bez opcije → model
+            $response[] = [
+                'artikl'   => $order_product->model,
+                'kolicina' => (int) $order_product->quantity,
+                'cijena'   => $send_price,
+                'rabat'    => $rabat,
+            ];
         }
 
-        // Kupon kao zadnja stavka ako postoji
         if ($this->discount) {
             $response[] = $this->coupon_item;
         }
 
         return $response;
     }
+
 
 
 
