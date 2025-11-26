@@ -651,26 +651,18 @@ class LOC_Order
             return $response;
         }
 
-        // --- Priprema podataka za bulk lookupe ---
-        $productIds       = $order_products->pluck('product_id')->filter()->unique()->values();
-        $orderProductIds  = $order_products->pluck('order_product_id')->unique()->values();
+        // --- Bulk lookups ---
+        $productIds      = $order_products->pluck('product_id')->filter()->unique()->values();
+        $orderProductIds = $order_products->pluck('order_product_id')->unique()->values();
 
-        // Set product_id-a koji su u category_id = 1
-        $inCategory = ProductCategory::query()
-            ->whereIn('product_id', $productIds)
-            ->where('category_id', 1)
-            ->pluck('product_id')
-            ->unique()
-            ->mapWithKeys(fn ($pid) => [$pid => true]); // za brzi isset()
-
-        // Sve opcije za ove order_product_id-ove (po jedan red najčešće)
+        // Opcije po order_product_id
         $orderOptions = OrderOption::query()
             ->where('order_id', $this->oc_order['order_id'])
             ->whereIn('order_product_id', $orderProductIds)
             ->get()
             ->keyBy('order_product_id');
 
-        // Map product_option_value_id => sku
+        // pov → sku
         $povIds = $orderOptions->pluck('product_option_value_id')->filter()->unique()->values();
         $productOptionsByPov = $povIds->isNotEmpty()
             ? ProductOption::query()
@@ -679,27 +671,22 @@ class LOC_Order
                 ->keyBy('product_option_value_id')
             : collect();
 
-        // Map product_id => Product (radi modela)
+        // product_id → Product model
         $productsById = Product::query()
             ->whereIn('product_id', $productIds)
             ->get()
             ->keyBy('product_id');
 
-        // --- Gradnja response-a ---
+        // --- Build stavke ---
         foreach ($order_products as $order_product) {
-            // Rabat po artiklu (reset u svakoj iteraciji)
-           //$rabat = isset($inCategory[$order_product->product_id]) ? 30 : 0;
-            $rabat = 0;
-            $orig_product = $productsById->get($order_product->product_id);
-            // Ako ćeš nekad vraćati strogo float, bolje round nego number_format+float cast
+
+            // OC cijena je NETTO i mora ići direktno u Lineage
             $price = (float) number_format((float) $order_product->price, 2, '.', '');
 
-            if ($orig_product && $orig_product->price > $order_product->price) {
-                $price = (float) number_format((float) $orig_product->price, 2, '.', '');
-                $rabat = ProductHelper::calculateDiscountBetweenPrices($orig_product->price, $order_product->price);
-            }
+            // Rabat se u Lineage NE SMIJE preračunavati → mora biti 0
+            $rabat = 0;
 
-            // Ima li ovaj order_product opciju?
+            // Provjeri opciju i SKU
             $option = $orderOptions->get($order_product->order_product_id);
 
             if ($option) {
@@ -709,24 +696,25 @@ class LOC_Order
                         'artikl_uid' => $po->sku,
                         'kolicina'   => (int) $order_product->quantity,
                         'cijena'     => $price,
-                        'rabat'      => (int) $rabat,
+                        'rabat'      => 0,
                     ];
                     continue;
                 }
-                // Fallback ako nema SKU-a za opciju – padni na "običan" artikl
             }
 
+            // Fallback: artikl = model iz order_product
             $product = $productsById->get($order_product->product_id);
             if ($product) {
                 $response[] = [
-                    'artikl'   => $order_product->model, // ili $product->model ako ti treba iz Producta
+                    'artikl'   => $order_product->model,
                     'kolicina' => (int) $order_product->quantity,
                     'cijena'   => $price,
-                    'rabat'    => (int) $rabat,
+                    'rabat'    => 0,
                 ];
             }
         }
 
+        // Kupon kao zadnja stavka ako postoji
         if ($this->discount) {
             $response[] = $this->coupon_item;
         }
@@ -734,7 +722,8 @@ class LOC_Order
         return $response;
     }
 
-            
+
+
 
     /**
      * Resolve if an order has coupon discount.
