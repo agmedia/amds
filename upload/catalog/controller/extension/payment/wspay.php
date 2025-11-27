@@ -295,7 +295,13 @@ ORDER BY `oc_order`.`order_status_id` DESC
             $cartId = (string)$o['order_id'];
 
             // 2.1) Potpis za statusCheck
-            $sig = hash('sha512', $shopId . $secretKey . $cartId . $secretKey);
+            $sig = hash('sha512',
+                $shopId .
+                $secretKey .
+                $cartId .
+                $secretKey .
+                $secretKey
+            );
 
             $payload = json_encode([
                 'Version'        => '2.0',
