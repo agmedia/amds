@@ -315,7 +315,19 @@ ORDER BY `oc_order`.`order_status_id` DESC
             ]);
             $resp = curl_exec($ch);
             $http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+            // Ako je cURL error
+            if ($resp === false) {
+                \Agmedia\Helpers\Log::store('CURL ERROR: ' . curl_error($ch), 'luceed_statusCheck_raw');
+            }
+
+
             curl_close($ch);
+
+            // LOG - da vidiš što vraća WSPay
+            \Agmedia\Helpers\Log::store('ORDER: ' . $cartId, 'luceed_statusCheck_raw');
+            \Agmedia\Helpers\Log::store('HTTP: ' . $http, 'luceed_statusCheck_raw');
+            \Agmedia\Helpers\Log::store('RESP: ' . $resp, 'luceed_statusCheck_raw');
 
             if ($http !== 200 || !$resp) {
                 continue;
