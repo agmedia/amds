@@ -300,7 +300,8 @@ ORDER BY `oc_order`.`order_status_id` DESC
                 $secretKey .
                 $cartId .
                 $secretKey .
-                $secretKey
+                $shopId .
+                $cartId
             );
 
             $payload = json_encode([
