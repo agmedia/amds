@@ -376,34 +376,175 @@ class LOC_Order
     /**
      * @return bool
      */
+//    public function collectProductsFromWarehouses(): bool
+//    {
+//        $availables     = [];
+//        $order_products = OrderProduct::where('order_id', $this->oc_order['order_id'])->get();
+//
+//        //Log::store($order_products->toArray());
+//
+//        if ($order_products->count()) {
+//            $locations = Location::query()->where('stanje_web_shop', 1)->orderBy('prioritet')->get();
+//            // mapiranje: skladiste_uid => prioritet
+//            $locationPriorities = $locations
+//                ->pluck('prioritet', 'skladiste_uid'); // prilagodi key ako treba
+//
+//            $units     = $locations->pluck('skladiste')->flatten();
+//
+//            foreach ($order_products as $order_product) {
+//                $option = OrderOption::where('order_id', $this->oc_order['order_id'])
+//                    ->where('order_product_id', $order_product->order_product_id)
+//                    ->first();
+//
+//                if ($option) {
+//                    $product = ProductOption::where('product_option_value_id', $option->product_option_value_id)->first();
+//
+//                    if ($product && $product->sifra) {
+//                        $availables_data = collect(
+//                            $this->setAvailables(
+//                                LuceedProduct::stock($this->getUnitsQuery($units), urlencode($product->sifra))
+//                            )
+//                        )
+//                            ->where('raspolozivo_kol', '>', 0)
+//                            ->sortBy(function ($available) use ($locationPriorities) {
+//                                // pretpostavka da ima $available->skladiste_uid
+//                                return $locationPriorities[$available->skladiste_uid] ?? PHP_INT_MAX;
+//                            })
+//                            ->values(); // resetira indekse
+//
+//                        /*Log::store($product->sifra);
+//                        Log::store($availables_data->toArray());*/
+//
+//                        if ($availables_data->count()) {
+//                            foreach ($availables_data as $available) {
+//                                $all_available = 0;
+//
+//                                if ($available->raspolozivo_kol >= $order_product->quantity) {
+//                                    $all_available = 1;
+//                                }
+//
+//                                $availables[$available->skladiste_uid][] = [
+//                                    'uid' => $product->sifra,
+//                                    'qty' => $available->raspolozivo_kol,
+//                                    'all' => $all_available
+//                                ];
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//
+//            $this->log('Available products: ', $availables);
+//
+//            // Check if all in MAIN warehouse.
+//            if (isset($availables[agconf('luceed.default_warehouse_uid')])) {
+//                if ($order_products->count() == count($availables[agconf('luceed.default_warehouse_uid')])) {
+//                    $this->has_all_in_main_warehouse = true;
+//                }
+//
+//                /*if ($order_products->count() <= $availables[agconf('luceed.default_warehouse_luid')][0]['qty']) {
+//                    $this->has_all_in_main_warehouse = true;
+//                }*/
+//
+//                unset($availables[agconf('luceed.default_warehouse_uid')]);
+//            }
+//
+//            if ( ! $this->has_all_in_main_warehouse) {
+//                // Check if is boxnow & remove stores
+//                if (
+//                    (($this->oc_order['shipping_method'] ?? '') == 'BOX NOW') &&
+//                    !empty($this->oc_order['boxnow'] ?? null)
+//                ) {
+//                    $locations = $locations->whereNotIn('location_id', [3, 10, 43, 58]);
+//                }
+//                // Check & collect warehouses that have all items.
+//                foreach ($locations->where('stanje_web_shop', 1) as $store) {
+//                    // if availables have a set store id.
+//                    if (isset($availables[$store['skladiste_uid']])) {
+//                        // if ordered products are accounted for.
+//                        if ($order_products->count() == count($availables[$store['skladiste_uid']])) {
+//                            $is_all_available_in_one_store = true;
+//                            // and if quantity is ok.
+//                            foreach ($availables[$store['skladiste_uid']] as $available_store) {
+//                                if ( ! $available_store['all']) {
+//                                    $is_all_available_in_one_store = false;
+//                                }
+//                            }
+//
+//                            if ($is_all_available_in_one_store) {
+//                                $this->has_all_in_warehouses = $store['skladiste_uid'];
+//                            }
+//                        }
+//
+//                        /*if ($order_products->count() <= $availables[$store['skladiste_uid']][0]['qty']) {
+//                            $this->has_all_in_warehouses[] = $store['skladiste_uid'];
+//                        }*/
+//                    }
+//                }
+//            }
+//
+//            $this->log('has_all_in_main_warehouse: ', ($this->has_all_in_main_warehouse ? 'yes' : 'no'));
+//            $this->log('has_all_in_warehouses: ', ($this->has_all_in_warehouses ? 'yes' : 'no'));
+//
+//            if ($this->has_all_in_warehouses && $this->has_all_in_warehouses) {
+//                return true;
+//            }
+//        }
+//
+//        return true;
+//    }
+
     public function collectProductsFromWarehouses(): bool
     {
         $availables     = [];
         $order_products = OrderProduct::where('order_id', $this->oc_order['order_id'])->get();
 
-        //Log::store($order_products->toArray());
-
         if ($order_products->count()) {
-            $locations = Location::query()->where('stanje_web_shop', 1)->orderBy('prioritet')->get();
-            $units     = $locations->pluck('skladiste')->flatten();
+            // Lokacije sortirane po prioritetu
+            $locations = Location::query()
+                                 ->where('stanje_web_shop', 1)
+                                 ->orderBy('prioritet')
+                                 ->get();
+
+            // Ovo koristiš za upit prema Luceedu (pretpostavka kao i do sada)
+            $units = $locations->pluck('skladiste')->flatten();
+
+            // Ovo koristimo za sortiranje po prioritetu (skladiste_uid == ono što vraća Luceed)
+            $warehouseOrder = $locations->pluck('skladiste_uid')->values()->all();
 
             foreach ($order_products as $order_product) {
                 $option = OrderOption::where('order_id', $this->oc_order['order_id'])
-                    ->where('order_product_id', $order_product->order_product_id)
-                    ->first();
+                                     ->where('order_product_id', $order_product->order_product_id)
+                                     ->first();
 
                 if ($option) {
                     $product = ProductOption::where('product_option_value_id', $option->product_option_value_id)->first();
 
                     if ($product && $product->sifra) {
-                        $availables_data = collect(
-                            $this->setAvailables(
-                                LuceedProduct::stock($this->getUnitsQuery($units), urlencode($product->sifra))
+                        // Dohvati raw availables iz Luceeda
+                        $rawAvailables = $this->setAvailables(
+                            LuceedProduct::stock(
+                                $this->getUnitsQuery($units),
+                                urlencode($product->sifra)
                             )
-                        )->where('raspolozivo_kol', '>', 0);
+                        );
 
-                        /*Log::store($product->sifra);
-                        Log::store($availables_data->toArray());*/
+                        // Pretvori u kolekciju, filtriraj > 0 i POSLOŽI po prioritetu lokacija
+                        $availables_data = collect($rawAvailables)
+                            ->where('raspolozivo_kol', '>', 0)
+                            ->sortBy(function ($available) use ($warehouseOrder) {
+                                // $available je JEDAN element iz kolekcije (isti onaj iz tvojeg foreacha)
+                                // npr. $available->skladiste_uid == "107-2987"
+                                $index = array_search($available->skladiste_uid, $warehouseOrder, true);
+
+                                return $index === false ? PHP_INT_MAX : $index;
+                            })
+                            ->values();
+
+                        /* Debug ako treba:
+                        Log::store($product->sifra);
+                        Log::store($availables_data->toArray());
+                        */
 
                         if ($availables_data->count()) {
                             foreach ($availables_data as $available) {
@@ -426,49 +567,59 @@ class LOC_Order
 
             $this->log('Available products: ', $availables);
 
-            // Check if all in MAIN warehouse.
+            // 1) Provjeri je li sve u GLAVNOM skladištu
             if (isset($availables[agconf('luceed.default_warehouse_uid')])) {
                 if ($order_products->count() == count($availables[agconf('luceed.default_warehouse_uid')])) {
                     $this->has_all_in_main_warehouse = true;
                 }
 
-                /*if ($order_products->count() <= $availables[agconf('luceed.default_warehouse_luid')][0]['qty']) {
+                /*
+                if ($order_products->count() <= $availables[agconf('luceed.default_warehouse_luid')][0]['qty']) {
                     $this->has_all_in_main_warehouse = true;
-                }*/
+                }
+                */
 
+                // Makni glavno skladište iz daljnje kombinatorike
                 unset($availables[agconf('luceed.default_warehouse_uid')]);
             }
 
-            if ( ! $this->has_all_in_main_warehouse) {
-                // Check if is boxnow & remove stores
+            // 2) Ako nije sve u glavnom, tražimo skladišta koja imaju sve artikle
+            if (!$this->has_all_in_main_warehouse) {
+                // BOX NOW – makni određene lokacije
                 if (
                     (($this->oc_order['shipping_method'] ?? '') == 'BOX NOW') &&
                     !empty($this->oc_order['boxnow'] ?? null)
                 ) {
                     $locations = $locations->whereNotIn('location_id', [3, 10, 43, 58]);
                 }
-                // Check & collect warehouses that have all items.
+
+                // Prođi po lokacijama koje su i dalje aktivne za web (stanje_web_shop = 1)
                 foreach ($locations->where('stanje_web_shop', 1) as $store) {
-                    // if availables have a set store id.
-                    if (isset($availables[$store['skladiste_uid']])) {
-                        // if ordered products are accounted for.
-                        if ($order_products->count() == count($availables[$store['skladiste_uid']])) {
+                    $storeUid = $store['skladiste_uid'];
+
+                    // Ako imamo nešto dostupno u tom skladištu
+                    if (isset($availables[$storeUid])) {
+                        // Ako broj artikala u tom skladištu == broj naručenih artikala
+                        if ($order_products->count() == count($availables[$storeUid])) {
                             $is_all_available_in_one_store = true;
-                            // and if quantity is ok.
-                            foreach ($availables[$store['skladiste_uid']] as $available_store) {
-                                if ( ! $available_store['all']) {
+
+                            // Provjeri da je za svaki artikl quantity dovoljan
+                            foreach ($availables[$storeUid] as $available_store) {
+                                if (!$available_store['all']) {
                                     $is_all_available_in_one_store = false;
                                 }
                             }
 
                             if ($is_all_available_in_one_store) {
-                                $this->has_all_in_warehouses = $store['skladiste_uid'];
+                                $this->has_all_in_warehouses = $storeUid;
                             }
                         }
 
-                        /*if ($order_products->count() <= $availables[$store['skladiste_uid']][0]['qty']) {
-                            $this->has_all_in_warehouses[] = $store['skladiste_uid'];
-                        }*/
+                        /*
+                        if ($order_products->count() <= $availables[$storeUid][0]['qty']) {
+                            $this->has_all_in_warehouses[] = $storeUid;
+                        }
+                        */
                     }
                 }
             }
@@ -476,6 +627,8 @@ class LOC_Order
             $this->log('has_all_in_main_warehouse: ', ($this->has_all_in_main_warehouse ? 'yes' : 'no'));
             $this->log('has_all_in_warehouses: ', ($this->has_all_in_warehouses ? 'yes' : 'no'));
 
+            // Ovdje imaš bug u originalnom kodu (provjeravaš istu var dva puta),
+            // ali ostavljam kako si imao, da ne mijenjamo logiku:
             if ($this->has_all_in_warehouses && $this->has_all_in_warehouses) {
                 return true;
             }
@@ -483,6 +636,7 @@ class LOC_Order
 
         return true;
     }
+
 
 
     /**
