@@ -599,27 +599,26 @@ class LOC_Order
 
                     // Ako imamo nešto dostupno u tom skladištu
                     if (isset($availables[$storeUid])) {
+
                         // Ako broj artikala u tom skladištu == broj naručenih artikala
                         if ($order_products->count() == count($availables[$storeUid])) {
+
                             $is_all_available_in_one_store = true;
 
                             // Provjeri da je za svaki artikl quantity dovoljan
                             foreach ($availables[$storeUid] as $available_store) {
                                 if (!$available_store['all']) {
                                     $is_all_available_in_one_store = false;
+                                    break; // nema smisla dalje provjeravati
                                 }
                             }
 
+                            // Ako je sve OK → SPREMI I IZLAZI IZ PETLJE
                             if ($is_all_available_in_one_store) {
                                 $this->has_all_in_warehouses = $storeUid;
+                                break; // ← OVDE GA ZAUSTAVLJAŠ
                             }
                         }
-
-                        /*
-                        if ($order_products->count() <= $availables[$storeUid][0]['qty']) {
-                            $this->has_all_in_warehouses[] = $storeUid;
-                        }
-                        */
                     }
                 }
             }
