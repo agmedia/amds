@@ -361,6 +361,7 @@ class ControllerCheckoutCart extends Controller {
 		}
 
 		$this->load->model('catalog/product');
+        $this->load->model('tool/image');
 
 		$product_info = $this->model_catalog_product->getProduct($product_id);
 
@@ -461,7 +462,39 @@ class ControllerCheckoutCart extends Controller {
 				}
 
 				$json['total'] = sprintf($this->language->get('text_items'), $this->cart->countProducts() + (isset($this->session->data['vouchers']) ? count($this->session->data['vouchers']) : 0), $this->currency->format($total, $this->session->data['currency']));
-			} else {
+
+                // --- Klaviyo payload: Added to Cart (price with VAT), EUR ---
+                $image_url = '';
+                if (!empty($product_info['image'])) {
+                    // 600x600 je ok za email; promijeni po želji
+                    $image_url = $this->model_tool_image->resize($product_info['image'], 600, 600);
+                }
+
+// Price with VAT (PDV) using OpenCart tax settings
+                $price_gross = (float)$this->tax->calculate(
+                    $product_info['price'],
+                    $product_info['tax_class_id'],
+                    $this->config->get('config_tax')
+                );
+
+// Ako želite uzeti u obzir opcije koje mijenjaju cijenu (price_prefix +/-),
+// to možemo dodatno proširiti — za sada šaljemo baznu cijenu s PDV-om.
+
+                $json['klaviyo'] = array(
+                    'event'       => 'Added to Cart',
+                    'ProductID'   => (string)$product_info['product_id'],
+                    'ProductName' => $product_info['name'],
+                    'ProductURL'  => str_replace('&amp;', '&', $this->url->link('product/product', 'product_id=' . (int)$product_info['product_id'])),
+                    'ImageURL'    => $image_url,
+                    'Price'       => $price_gross,
+                    'Quantity'    => (int)$quantity,
+                    'Currency'    => 'EUR'
+                );
+// --- /Klaviyo payload ---
+
+
+
+            } else {
 				$json['redirect'] = str_replace('&amp;', '&', $this->url->link('product/product', 'product_id=' . $this->request->post['product_id']));
 			}
 		}

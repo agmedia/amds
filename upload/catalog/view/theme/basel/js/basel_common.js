@@ -335,7 +335,21 @@ var cart = {
 			},
 			
 			success: function(json) {
-			$('[data-toggle=\'tooltip\']').tooltip('hide');
+
+				// Klaviyo: Added to Cart
+				if (json.klaviyo && window._learnq) {
+					_learnq.push(['track', json.klaviyo.event, {
+						ProductID: json.klaviyo.ProductID,
+						ProductName: json.klaviyo.ProductName,
+						ProductURL: json.klaviyo.ProductURL,
+						ImageURL: json.klaviyo.ImageURL,
+						Price: json.klaviyo.Price,
+						Quantity: json.klaviyo.Quantity,
+						Currency: json.klaviyo.Currency
+					}]);
+				}
+
+				$('[data-toggle=\'tooltip\']').tooltip('hide');
 
 				if (json['redirect']) {
 					location = json['redirect'];

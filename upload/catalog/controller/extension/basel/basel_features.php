@@ -125,8 +125,45 @@ public function add_to_cart() {
 				} else {
 				$json['image'] = $this->model_tool_image->resize('placeholder.png', $this->config->get('theme_default_image_cart_width'), $this->config->get('theme_default_image_cart_height'));
 				}
-				
-				// Unset all shipping and payment methods
+
+                $this->load->model('tool/image');
+                if ($product_info['image']) {
+                    $json['image'] = $this->model_tool_image->resize($product_info['image'],
+                        $this->config->get('theme_default_image_cart_width'),
+                        $this->config->get('theme_default_image_cart_height')
+                    );
+                } else {
+                    $json['image'] = $this->model_tool_image->resize('placeholder.png',
+                        $this->config->get('theme_default_image_cart_width'),
+                        $this->config->get('theme_default_image_cart_height')
+                    );
+                }
+
+                /* ✅ OVDJE UBACITI */
+                $image_url = $json['image']; // već resize-an
+
+                $price_gross = (float)$this->tax->calculate(
+                    $product_info['price'],
+                    $product_info['tax_class_id'],
+                    $this->config->get('config_tax')
+                );
+
+                $json['klaviyo'] = array(
+                    'event'       => 'Added to Cart',
+                    'ProductID'   => (string)$product_info['product_id'],
+                    'ProductName' => $product_info['name'],
+                    'ProductURL'  => str_replace('&amp;', '&',
+                        $this->url->link('product/product', 'product_id=' . (int)$product_info['product_id'])
+                    ),
+                    'ImageURL'    => $image_url,
+                    'Price'       => $price_gross,
+                    'Quantity'    => (int)$quantity,
+                    'Currency'    => 'EUR'
+                );
+                /* ✅ /OVDJE UBACITI */
+
+
+                // Unset all shipping and payment methods
 				unset($this->session->data['shipping_method']);
 				unset($this->session->data['shipping_methods']);
 				unset($this->session->data['payment_method']);
