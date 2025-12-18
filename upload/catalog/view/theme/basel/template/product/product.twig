@@ -2633,6 +2633,27 @@ $('#button-cart').on('click', function() {
 	});
 });
 //--></script>
+
+
+<script>
+    document.addEventListener('click', function(e) {
+        var target = e.target.closest('a');
+
+        if (!target) return;
+
+        // checkout link
+        if (target.href && target.href.indexOf('route=checkout/checkout') !== -1) {
+
+            window._learnq = window._learnq || [];
+
+            window._learnq.push(['track', 'Started Checkout', {
+                Currency: 'EUR'
+            }]);
+
+            console.log('Klaviyo: Started Checkout sent');
+        }
+    });
+</script>
 <script><!--
 $('.date').datetimepicker({
 	pickTime: false

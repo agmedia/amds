@@ -90,6 +90,15 @@
       {{ content_bottom }}</div>
     {{ column_right }}</div>
 </div>
+
+<script>
+    window._learnq = window._learnq || [];
+    window._learnq.push(['track', 'Started Checkout', {
+        CartValue: {{ total|json_encode|raw }},
+        Currency: 'EUR'
+    }]);
+
+</script>
 <script><!--
 $(document).on('change', 'input[name=\'account\']', function() {
 	if ($('#collapse-payment-address').parent().find('.panel-heading .panel-title > *').is('a')) {
