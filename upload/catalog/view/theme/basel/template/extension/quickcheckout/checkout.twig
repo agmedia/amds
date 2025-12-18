@@ -130,7 +130,18 @@
 <style type="text/css">
 {{ custom_css }}
 </style>
-{% endif %} 
+{% endif %}
+
+<script>
+	window._learnq = window._learnq || [];
+	window._learnq.push(['track', 'Started Checkout', {
+		CartValue: {{ total|json_encode|raw }},
+		Currency: 'EUR'
+	}]);
+
+</script>
+
+
 <script type="text/javascript"><!--
 {% if countdown and countdown_end %} 
 $('#quickcheckout-countdown').countdown({

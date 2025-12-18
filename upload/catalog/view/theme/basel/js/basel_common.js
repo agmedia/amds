@@ -319,6 +319,22 @@ var unsubscribe = function(module) {
 	});
 }
 
+document.addEventListener('click', function(e) {
+	var a = e.target.closest('a');
+	if (!a || !a.href) return;
+
+	// QuickCheckout link
+	if (a.href.indexOf('route=extension/quickcheckout/checkout') !== -1) {
+		window._learnq = window._learnq || [];
+		window._learnq.push(['track', 'Started Checkout', {
+			Currency: 'EUR'
+		}]);
+
+		console.log('Klaviyo: Started Checkout sent (quickcheckout)');
+	}
+});
+
+
 
 
 // Cart add remove functions
