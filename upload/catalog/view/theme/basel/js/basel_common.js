@@ -319,21 +319,6 @@ var unsubscribe = function(module) {
 	});
 }
 
-document.addEventListener('click', function(e) {
-	var a = e.target.closest('a');
-	if (!a || !a.href) return;
-
-	// QuickCheckout link
-	if (a.href.indexOf('route=extension/quickcheckout/checkout') !== -1) {
-		window._learnq = window._learnq || [];
-		window._learnq.push(['track', 'Started Checkout', {
-			Currency: 'EUR'
-		}]);
-
-		console.log('Klaviyo: Started Checkout sent (quickcheckout)');
-	}
-});
-
 
 
 
@@ -697,3 +682,23 @@ var contact_form_send = function(form_id) {
 		});
 	}
 })(window.jQuery);
+
+// Klaviyo: Started Checkout (Basel theme / OpenCart)
+document.addEventListener('click', function (e) {
+	var a = e.target.closest('a');
+	if (!a || !a.href) return;
+
+	// standard checkout
+	if (a.href.indexOf('route=checkout/checkout') !== -1) {
+		window._learnq = window._learnq || [];
+		window._learnq.push(['track', 'Started Checkout', { Currency: 'EUR' }]);
+		console.log('Klaviyo: Started Checkout sent');
+	}
+
+	// quickcheckout (ako se nekad koristi ovaj route)
+	if (a.href.indexOf('route=extension/quickcheckout/checkout') !== -1) {
+		window._learnq = window._learnq || [];
+		window._learnq.push(['track', 'Started Checkout', { Currency: 'EUR' }]);
+		console.log('Klaviyo: Started QuickCheckout sent');
+	}
+});
