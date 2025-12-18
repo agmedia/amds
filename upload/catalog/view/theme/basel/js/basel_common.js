@@ -336,9 +336,10 @@ var cart = {
 			
 			success: function(json) {
 
-				// Klaviyo: Added to Cart
-				if (json.klaviyo && window._learnq) {
-					_learnq.push(['track', json.klaviyo.event, {
+				window._learnq = window._learnq || [];
+
+				if (json.klaviyo) {
+					window._learnq.push(['track', 'Added to Cart', {
 						ProductID: json.klaviyo.ProductID,
 						ProductName: json.klaviyo.ProductName,
 						ProductURL: json.klaviyo.ProductURL,
