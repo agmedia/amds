@@ -337,6 +337,7 @@ var cart = {
 			success: function(json) {
 
 				window._learnq = window._learnq || [];
+				console.log('Klaviyo track fired', json.klaviyo);
 
 				if (json.klaviyo) {
 					window._learnq.push(['track', 'Added to Cart', {
