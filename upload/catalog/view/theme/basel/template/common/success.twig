@@ -1,4 +1,18 @@
 {{ header }}
+
+<script>
+  window._learnq = window._learnq || [];
+
+  window._learnq.push(['track', 'Placed Order', {
+    OrderID: '{{ klaviyo_order.OrderID }}',
+    $value: {{ klaviyo_order.$value }},
+    Currency: '{{ klaviyo_order.Currency }}'
+  }]);
+
+  console.log('Klaviyo: Placed Order with value sent');
+</script>
+
+
 <div class="container">
   <div class="wrapper ">
   <ul class="breadcrumb">

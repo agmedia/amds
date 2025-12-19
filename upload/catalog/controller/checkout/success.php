@@ -39,6 +39,15 @@ class ControllerCheckoutSuccess extends Controller {
             $data['paymethod'] = $oc_order['payment_code'];
             $data['order_id'] = $order_id;
 
+            $order_id = $this->session->data['order_id'];
+            $order_info = $this->model_checkout_order->getOrder($order_id);
+
+            $data['klaviyo_order'] = [
+                'OrderID'  => $order_id,
+                '$value'   => (float)$order_info['total'],
+                'Currency'=> $order_info['currency_code']
+            ];
+
             \Agmedia\Helpers\Log::store($data, 'luceed_success');
 
             if (empty($oc_order['luceed_uid'])) {
