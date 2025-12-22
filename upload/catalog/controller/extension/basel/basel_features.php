@@ -128,16 +128,11 @@ public function add_to_cart() {
 
                 $this->load->model('tool/image');
                 if ($product_info['image']) {
-                    $json['image'] = $this->model_tool_image->resize($product_info['image'],
-                        $this->config->get('theme_default_image_cart_width'),
-                        $this->config->get('theme_default_image_cart_height')
-                    );
+                    $json['image'] = $this->config->get('config_url') . 'image/' . $product_info['image'];
                 } else {
-                    $json['image'] = $this->model_tool_image->resize('placeholder.png',
-                        $this->config->get('theme_default_image_cart_width'),
-                        $this->config->get('theme_default_image_cart_height')
-                    );
+                    $json['image'] = $this->config->get('config_url') . 'image/placeholder.png';
                 }
+
 
                 /* ✅ OVDJE UBACITI */
                 $image_url = $json['image']; // već resize-an
