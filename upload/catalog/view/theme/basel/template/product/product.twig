@@ -126,7 +126,8 @@
 
                 {% endif %}
                 {% if isbn =='1' %}
-                    <p><span class="badge new_badge outlet"><i>-20% popusta na obračunu plaćanja</i></span></p>
+                    {% set badge = (ljetni.discount|replace({'%':''}))|round(0, 'floor') %}
+                    <p><span class="badge new_badge outlet"><i>{{ badge }}%</i></span></p>
 
                 {% endif %}
 

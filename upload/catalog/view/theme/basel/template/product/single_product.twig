@@ -1,7 +1,7 @@
 <div class="item single-product">
 <div class="image" {% if columns == 'list' %}style="width:{{ img_width }}px"{% endif %}>
     <a href="{{ product.href }}">
-    <img loading="lazy" src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" />
+    <img loading="lazy" src="https://placehold.co/400x400" alt="{{ product.name }}" title="{{ product.name }}" />
     {% if product.thumb2 %}
     <img loading="lazy" class="thumb2" src="{{ product.thumb2 }}" alt="{{ product.name }}" title="{{ product.name }}" />
     {% endif %}
@@ -20,10 +20,10 @@
 
             {% set badge = (product.ljetni.discount|replace({'%':''}))|round(0, 'floor') %}
 
-            {% set badge = badge - 20 %}
 
-            <!--<span class="badge sale_badge"><i>{{ badge }}%</i></span>-->
-            <span class="badge sale_badge"  style="width: auto;"><i style="text-transform:lowercase;">dodatnih -20%</i></span>
+
+            <span class="badge sale_badge"><i>{{ badge }}%</i></span>
+         <!--   <span class="badge sale_badge"  style="width: auto;"><i style="text-transform:lowercase;">dodatnih -20%</i></span>-->
 
 
         {% else %}
