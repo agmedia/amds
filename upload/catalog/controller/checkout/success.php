@@ -39,7 +39,7 @@ class ControllerCheckoutSuccess extends Controller {
             $data['paymethod'] = $oc_order['payment_code'];
             $data['order_id'] = $order_id;
 
-            $order_id = $this->session->data['order_id'];
+            $order_id = $data['order_id'];
             $order_info = $this->model_checkout_order->getOrder($order_id);
 
             $data['klaviyo_order'] = [
