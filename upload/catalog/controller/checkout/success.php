@@ -43,9 +43,9 @@ class ControllerCheckoutSuccess extends Controller {
             $order_info = $this->model_checkout_order->getOrder($order_id);
 
             $data['klaviyo_order'] = [
-                'OrderID'  => $order_id,
-                '$value'   => (float)$order_info['total'],
-                'Currency'=> $order_info['currency_code']
+                'OrderID'   => $order_id,
+                'value'     => (float)$order_info['total'],
+                'Currency'  => $order_info['currency_code']
             ];
 
             \Agmedia\Helpers\Log::store($data, 'luceed_success');
