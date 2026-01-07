@@ -177,6 +177,13 @@ class ControllerExtensionModuleBaselProducts extends Controller {
 						$rating = false;
 					}
 
+                    if($result['price_ponuda'] > 0){
+                        $price_ponuda = $this->currency->format($this->tax->calculate($result['price_ponuda'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+                    }
+                    else{
+                        $price_ponuda = '';
+                    }
+
 
                     $data['options'] = array();
                     foreach ($this->model_catalog_product->getProductOptions($result['product_id']) as $option) {
@@ -209,6 +216,9 @@ class ControllerExtensionModuleBaselProducts extends Controller {
                             'required'             => $option['required']
                         );
                     }
+
+                    $is_ljetni = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::isLjetni($result['product_id']);
+                    $is_badge = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::isBadge($result['product_id']);
 					
 					$products[] = array(
 						'product_id' => $result['product_id'],
@@ -224,6 +234,10 @@ class ControllerExtensionModuleBaselProducts extends Controller {
 						'special' 	 => $special,
                         'priceeur'       => $priceeur,
                         'specialeur'     => $specialeur,
+                        'price_ponuda'    => $price_ponuda,
+                        'isbn'        => $result['isbn'],
+                        'ljetni'          => $is_ljetni,
+                        'badge'           => $is_badge,
                         'imported'     => $result['imported'],
 						'tax'        => $tax,
 						'minimum'    => $result['minimum'] > 0 ? $result['minimum'] : 1,
