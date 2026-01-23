@@ -83,13 +83,11 @@
     {% endif %}
 <div class="price-wrapper">
 {% if product.price %}
-<span class="price">
+<div class="price">
     {% if product.special %}
     <span class="price-old"><s>{{ product.price }} </s></span><span class="price-new">{{ product.special }} </span>
     {% else %}
     <span>{{ product.price }} </span>
-
-
         {% if product.price_ponuda and product.ljetni.cat_id != 429%}
             <span class="price-old">{{ product.price_ponuda }} </span>
         {% endif %}
@@ -101,7 +99,6 @@
     <span class="price-tax">{{ text_tax }} {{ product.tax }}</span>
     {% endif %}
 </div><!-- .price -->
-
 {% endif %}
 <p class="description">{% if product.description %}{{ product.description }}{% endif %}</p>
 
