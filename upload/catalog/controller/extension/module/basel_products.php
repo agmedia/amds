@@ -194,12 +194,24 @@ class ControllerExtensionModuleBaselProducts extends Controller {
                     }
 
                         $lowest_price_30d = '';
+                        $lowest_price_30d_value = 0.0;
+                        $lowest_price_30d_pct = 0;
 
                         if (!empty($result['model']) && isset($temp_prices[$result['model']])) {
+                            $lowest_price_30d_value = (float)$temp_prices[$result['model']];
+
                             $lowest_price_30d = $this->currency->format(
-                                (float)$temp_prices[$result['model']],
+                                $lowest_price_30d_value,
                                 $this->session->data['currency']
                             );
+
+                            // trenutna cijena = special ako postoji, inače price (sirove vrijednosti iz $result)
+                            $current = ((float)$result['special'] > 0) ? (float)$result['special'] : (float)$result['price'];
+
+                            if ($lowest_price_30d_value > 0 && $current > 0) {
+                                $pct = (($current - $lowest_price_30d_value) / $lowest_price_30d_value) * 100;
+                                $lowest_price_30d_pct = (int)floor($pct); // ili round()
+                            }
                         }
 
 
@@ -251,6 +263,7 @@ class ControllerExtensionModuleBaselProducts extends Controller {
 						'sale_badge' => $sale_badge,
 						'special' 	 => $special,
                         'lowest_price_30d' => $lowest_price_30d,
+                        'lowest_price_30d_pct' => $lowest_price_30d_pct,
                         'priceeur'       => $priceeur,
                         'specialeur'     => $specialeur,
                         'price_ponuda'    => $price_ponuda,
