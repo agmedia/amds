@@ -262,25 +262,40 @@ class ControllerProductProduct extends Controller {
 
 
             // Najniža cijena u prethodnih 30 dana (iz temp_third_data po modelu)
+            // Najniža cijena u prethodnih 30 dana (iz temp_third_data po modelu)
             $data['lowest_price_30d'] = '';
+            $data['lowest_price_30d_value'] = 0.0;   // sirova brojčana vrijednost
+            $data['lowest_price_30d_pct'] = 0;        // postotak razlike prema trenutnoj cijeni
 
             if (!empty($product_info['model'])) {
                 $model = $this->db->escape($product_info['model']);
 
-                // (Opcionalno) provjera postoji li temp tablica u ovoj sesiji
                 $tbl = $this->db->query("SHOW TABLES LIKE 'temp_third_data'");
                 if ($tbl->num_rows) {
                     $q = $this->db->query("SELECT price FROM temp_third_data WHERE model = '" . $model . "' LIMIT 1");
 
                     if ($q->num_rows && isset($q->row['price'])) {
-                        $price = (float)$q->row['price'];
+                        $data['lowest_price_30d_value'] = (float)$q->row['price'];
 
-                        // Formatiranje u valutu trgovine (npr. 74,50€)
-                        $formatted = $this->currency->format($price, $this->session->data['currency']);
-
+                        $formatted = $this->currency->format($data['lowest_price_30d_value'], $this->session->data['currency']);
                         $data['lowest_price_30d'] = 'Najniža cijena u prethodnih 30 dana: ' . $formatted;
                     }
                 }
+            }
+
+// Izračun postotka: (trenutna - najniža30d) / najniža30d * 100
+// "Trenutna" = special ako postoji, inače price
+            $current = 0.0;
+
+            if (!is_null($product_info['special']) && (float)$product_info['special'] >= 0) {
+                $current = (float)$product_info['special'];
+            } else {
+                $current = (float)$product_info['price'];
+            }
+
+            if ($data['lowest_price_30d_value'] > 0 && $current > 0) {
+                $pct = (($current - $data['lowest_price_30d_value']) / $data['lowest_price_30d_value']) * 100;
+                $data['lowest_price_30d_pct'] = (int)floor($pct); // ili round()
             }
 
 
