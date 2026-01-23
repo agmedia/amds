@@ -606,4 +606,35 @@ class ModelCatalogProduct extends Model {
 			return 0;
 		}
 	}
+
+    public function getTempThirdPricesByModels(array $models) {
+        $out = [];
+
+        // očisti prazne + unique
+        $models = array_values(array_unique(array_filter($models)));
+        if (!$models) return $out;
+
+        // provjeri postoji li temp tablica u ovoj sesiji
+        $tbl = $this->db->query("SHOW TABLES LIKE 'temp_third_data'");
+        if (!$tbl->num_rows) return $out;
+
+        // IN lista
+        $escaped = [];
+        foreach ($models as $m) {
+            $escaped[] = "'" . $this->db->escape($m) . "'";
+        }
+
+        $sql = "SELECT model, price
+            FROM temp_third_data
+            WHERE model IN (" . implode(',', $escaped) . ")";
+
+        $q = $this->db->query($sql);
+
+        foreach ($q->rows as $row) {
+            $out[$row['model']] = (float)$row['price'];
+        }
+
+        return $out;
+    }
+
 }

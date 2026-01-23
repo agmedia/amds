@@ -76,13 +76,20 @@
     </span>
     </div>
 {% endif %}
+    {% if product.lowest_price_30d %}
+        <p class="mb-0"><small>
+                Najniža cijena u prethodnih 30 dana: {{ product.lowest_price_30d }}
+            </small></p>
+    {% endif %}
 <div class="price-wrapper">
 {% if product.price %}
-<div class="price">
+<span class="price">
     {% if product.special %}
     <span class="price-old"><s>{{ product.price }} </s></span><span class="price-new">{{ product.special }} </span>
     {% else %}
     <span>{{ product.price }} </span>
+
+
         {% if product.price_ponuda and product.ljetni.cat_id != 429%}
             <span class="price-old">{{ product.price_ponuda }} </span>
         {% endif %}
@@ -94,6 +101,7 @@
     <span class="price-tax">{{ text_tax }} {{ product.tax }}</span>
     {% endif %}
 </div><!-- .price -->
+
 {% endif %}
 <p class="description">{% if product.description %}{{ product.description }}{% endif %}</p>
 

@@ -191,6 +191,19 @@ class ControllerProductCategory extends Controller {
 
 			$results = $this->model_catalog_product->getProducts($filter_data);
 
+            // Priprema modela za batch upit
+            $models = [];
+
+            foreach ($results as $r) {
+                if (!empty($r['model'])) {
+                    $models[] = $r['model'];
+                }
+            }
+
+// Dohvat cijena iz temp_third_data (po modelu)
+            $this->load->model('catalog/product');
+            $temp_prices = $this->model_catalog_product->getTempThirdPricesByModels($models);
+
 			foreach ($results as $result) {
 				if ($result['image']) {
 					$image = $this->model_tool_image->resize($result['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_product_height'));
@@ -307,6 +320,15 @@ class ControllerProductCategory extends Controller {
                 $is_ljetni = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::isLjetni($result['product_id']);
                 $is_badge = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::isBadge($result['product_id']);
 
+                $lowest_price_30d = '';
+
+                if (!empty($result['model']) && isset($temp_prices[$result['model']])) {
+                    $lowest_price_30d = $this->currency->format(
+                        (float)$temp_prices[$result['model']],
+                        $this->session->data['currency']
+                    );
+                }
+
                 $data['products'][] = array(
                     'product_id'      => $result['product_id'],
                     'thumb'           => $image,
@@ -315,6 +337,7 @@ class ControllerProductCategory extends Controller {
                     'price'           => $price,
                     'price_ponuda'    => $price_ponuda,
                     'price_ponudaeur' => $price_ponudaeur,
+                    'lowest_price_30d' => $lowest_price_30d,
                     'options'         => $data['options'],
                     'special'         => $special,
                     'priceeur'        => $priceeur,
