@@ -261,6 +261,28 @@ class ControllerProductProduct extends Controller {
             $data['ljetni'] = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::isLjetni($data['product_id']);
 
 
+            // Najniža cijena u prethodnih 30 dana (iz temp_third_data po modelu)
+            $data['lowest_price_30d'] = '';
+
+            if (!empty($product_info['model'])) {
+                $model = $this->db->escape($product_info['model']);
+
+                // (Opcionalno) provjera postoji li temp tablica u ovoj sesiji
+                $tbl = $this->db->query("SHOW TABLES LIKE 'temp_third_data'");
+                if ($tbl->num_rows) {
+                    $q = $this->db->query("SELECT price FROM temp_third_data WHERE model = '" . $model . "' LIMIT 1");
+
+                    if ($q->num_rows && isset($q->row['price'])) {
+                        $price = (float)$q->row['price'];
+
+                        // Formatiranje u valutu trgovine (npr. 74,50€)
+                        $formatted = $this->currency->format($price, $this->session->data['currency']);
+
+                        $data['lowest_price_30d'] = 'Najniža cijena u prethodnih 30 dana: ' . $formatted;
+                    }
+                }
+            }
+
 
             $data['spol'] = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::getGender($data['product_id']);
 
