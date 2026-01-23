@@ -105,6 +105,12 @@
     </span>
                         </div>
                     {% endif %}
+
+                    {% if product.lowest_price_30d %}
+                        <p style="margin-bottom:5px"><small>
+                                Najniža cijena u prethodnih 30 dana: {{ product.lowest_price_30d }}
+                            </small></p>
+                    {% endif %}
                     <div class="price-wrapper">
                         {% if product.price %}
                             <div class="price">

@@ -83,24 +83,33 @@ class ControllerExtensionModuleBaselProducts extends Controller {
 				}	
 	
 				$products = array();
-	
-				switch ($tab['data_source']) {
-					case 'SP': //Select Products
-						$results = $this->getSelectProducts($tab,$setting['limit']);
-						break;
-					case 'PG': //Product Group
-						$results = $this->getProductGroups($tab,$setting['limit']);
-						break;
-					case 'CQ': //Custom Query
-						$results = $this->getCustomQuery($tab,$setting['limit']);
-						break;
-					default: // Empty
-						$this->log->write('SHOW_IN_TAB::ERROR: The tab don\'t have product configured.');
-						break;
-				}
-				
-				if (isset($results)) {
-				foreach ($results as $result) {
+
+                switch ($tab['data_source']) {
+                    case 'SP': //Select Products
+                        $results = $this->getSelectProducts($tab, $setting['limit']);
+                        break;
+                    case 'PG': //Product Group
+                        $results = $this->getProductGroups($tab, $setting['limit']);
+                        break;
+                    case 'CQ': //Custom Query
+                        $results = $this->getCustomQuery($tab, $setting['limit']);
+                        break;
+                    default:
+                        $this->log->write('SHOW_IN_TAB::ERROR: The tab don\'t have product configured.');
+                        $results = [];
+                        break;
+                }
+
+                if (!empty($results)) {
+
+                    // Batch dohvat cijena iz temp_third_data po modelu
+                    $models = [];
+                    foreach ($results as $r) {
+                        if (!empty($r['model'])) $models[] = $r['model'];
+                    }
+                    $temp_prices = $this->model_catalog_product->getTempThirdPricesByModels($models);
+
+                    foreach ($results as $result) {
 					if ($result['image']) {
 					$image = $this->model_tool_image->resize($result['image'], $setting['image_width'], $setting['image_height']);
 					} else {
@@ -184,6 +193,15 @@ class ControllerExtensionModuleBaselProducts extends Controller {
                         $price_ponuda = '';
                     }
 
+                        $lowest_price_30d = '';
+
+                        if (!empty($result['model']) && isset($temp_prices[$result['model']])) {
+                            $lowest_price_30d = $this->currency->format(
+                                (float)$temp_prices[$result['model']],
+                                $this->session->data['currency']
+                            );
+                        }
+
 
                     $data['options'] = array();
                     foreach ($this->model_catalog_product->getProductOptions($result['product_id']) as $option) {
@@ -232,6 +250,7 @@ class ControllerExtensionModuleBaselProducts extends Controller {
                         'options' => $data['options'],
 						'sale_badge' => $sale_badge,
 						'special' 	 => $special,
+                        'lowest_price_30d' => $lowest_price_30d,
                         'priceeur'       => $priceeur,
                         'specialeur'     => $specialeur,
                         'price_ponuda'    => $price_ponuda,
