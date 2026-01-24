@@ -14,12 +14,15 @@
     {% if  product.cat =='1' %}
   <!-- <span class="badge sale_badge"><i>-30%</i></span>-->
     {% endif %}
+    {% if product.price_ponuda %}
 
         {% if product.isbn == '1' and product.lowest_price_30d_pct %}
             <span class="badge sale_badge"><i>{{ product.lowest_price_30d_pct }}%</i></span>
         {% else %}
             <span class="badge sale_badge"><i>{{ product.ljetni.discount }}%</i></span>
         {% endif %}
+
+    {% endif %}
 
 {% if product.new_label and product.cat !='1' %}
     <span class="badge new_badge"><i>{{ basel_text_new }}</i></span>
