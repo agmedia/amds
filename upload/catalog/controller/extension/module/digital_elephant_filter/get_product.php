@@ -296,6 +296,27 @@ class ControllerExtensionModuleDigitalElephantFilterGetProduct extends Controlle
             $is_badge = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::isBadge($result['product_id']);
 
 
+            $lowest_price_30d = '';
+            $lowest_price_30d_value = 0.0;
+            $lowest_price_30d_pct = 0;
+
+            if (!empty($result['model']) && isset($temp_prices[$result['model']])) {
+                $lowest_price_30d_value = (float)$temp_prices[$result['model']];
+
+                $lowest_price_30d = $this->currency->format(
+                    $lowest_price_30d_value,
+                    $this->session->data['currency']
+                );
+
+                $current = ((float)$result['special'] > 0) ? (float)$result['special'] : (float)$result['price'];
+
+                if ($lowest_price_30d_value > 0 && $current > 0) {
+                    $pct = (($current - $lowest_price_30d_value) / $lowest_price_30d_value) * 100;
+                    $lowest_price_30d_pct = (int)floor($pct);
+                }
+            }
+
+
             $products[] = array(
                 'product_id'  => $result['product_id'],
                 'thumb'       => $image,
@@ -307,6 +328,8 @@ class ControllerExtensionModuleDigitalElephantFilterGetProduct extends Controlle
                 'description' => $description,
                 'options' => $data['options'],
                 'price'       => $price,
+                'lowest_price_30d' => $lowest_price_30d,
+                'lowest_price_30d_pct' => $lowest_price_30d_pct,
                 'price_ponuda'       => $price_ponuda,
                 'price_ponudaeur'       => $price_ponudaeur,
                 'priceeur'       => $priceeur,
