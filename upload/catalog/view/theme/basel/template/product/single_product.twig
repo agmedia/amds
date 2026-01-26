@@ -14,6 +14,14 @@
     {% if  product.cat =='1' %}
   <!-- <span class="badge sale_badge"><i>-30%</i></span>-->
     {% endif %}
+
+    {% if product.isbn == '1'
+        and product.lowest_price_30d_pct
+        and not product.price_ponuda %}
+        <span class="badge sale_badge">
+        <i>{{ product.lowest_price_30d_pct }}%</i>
+    </span>
+    {% endif %}
     {% if product.price_ponuda %}
 
         {% if product.isbn == '1' and product.lowest_price_30d_pct %}
