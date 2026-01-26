@@ -129,6 +129,17 @@ class ControllerExtensionModuleDigitalElephantFilterGetProduct extends Controlle
 		
         $results = $this->model_extension_module_digitalElephantFilter->getProducts($data_filter);
 
+        // Priprema modela za batch upit
+        $models = [];
+
+        foreach ($results as $r) {
+            if (!empty($r['model'])) {
+                $models[] = $r['model'];
+            }
+        }
+
+        $temp_prices = $this->model_catalog_product->getTempThirdPricesByModels($models);
+
         $products = array();
 
         foreach ($results as $result) {
