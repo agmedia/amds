@@ -125,21 +125,27 @@ class LOC_Order
      */
     public function store()
     {
-        DB::beginTransaction();
+        $this->db = new Database(DB_DATABASE);
 
         try {
-            $order = Order::where('order_id', $this->oc_order['order_id'])
-                ->lockForUpdate()
-                ->first();
+            // START TRANSACTION
+            $this->db->query("START TRANSACTION");
 
-            if (!$order) {
-                DB::rollBack();
+            // 1) Zaključaj red u order tablici
+            $qid = (int) $this->oc_order['order_id'];
+
+            $orderRow = $this->db->query(
+                "SELECT * FROM `" . DB_PREFIX . "order` WHERE order_id = {$qid} FOR UPDATE"
+            );
+
+            if (empty($orderRow->row)) {
+                $this->db->query("ROLLBACK");
                 $this->log('Store ERROR: order not found');
                 return false;
             }
 
-            // 1) Ako već imamo luceed_uid, ne radimo createOrder opet
-            $luceedUid = $order->luceed_uid;
+            // 2) Ako već imamo luceed_uid, ne radi createOrder ponovno
+            $luceedUid = $orderRow->row['luceed_uid'] ?? null;
 
             if (!$luceedUid) {
                 $this->create();
@@ -151,24 +157,34 @@ class LOC_Order
                 $this->log('Store order response', $this->response);
 
                 if (!isset($this->response->result[0])) {
-                    DB::rollBack();
+                    $this->db->query("ROLLBACK");
                     return false;
                 }
 
                 $luceedUid = $this->response->result[0];
-                $order->luceed_uid = $luceedUid;
-                $order->save();
+
+                $this->db->query(
+                    "UPDATE `" . DB_PREFIX . "order`
+                 SET luceed_uid = '" . $this->db->escape($luceedUid) . "'
+                 WHERE order_id = {$qid}"
+                );
             }
 
-            // 2) Raspis samo ako nije već napravljen
-            if (!$order->luceed_raspis_uid) {
+            // 3) Raspis samo ako nije već
+            if (empty($orderRow->row['luceed_raspis_uid'])) {
+
                 $this->log('Calling orderWrit for luceed_uid: ' . $luceedUid);
 
                 $raspis = json_decode($this->service->orderWrit($luceedUid));
 
                 if (isset($raspis->result[0])) {
-                    $order->luceed_raspis_uid = $raspis->result[0];
-                    $order->save();
+                    $raspisUid = $raspis->result[0];
+
+                    $this->db->query(
+                        "UPDATE `" . DB_PREFIX . "order`
+                     SET luceed_raspis_uid = '" . $this->db->escape($raspisUid) . "'
+                     WHERE order_id = {$qid}"
+                    );
 
                     $this->log('Raspis OK', $raspis);
                 } else {
@@ -176,15 +192,17 @@ class LOC_Order
                 }
             }
 
-            DB::commit();
+            // COMMIT
+            $this->db->query("COMMIT");
             return true;
 
         } catch (\Throwable $e) {
-            DB::rollBack();
+            $this->db->query("ROLLBACK");
             $this->log('Store ERROR: ' . $e->getMessage());
             throw $e;
         }
     }
+
 
 
 
