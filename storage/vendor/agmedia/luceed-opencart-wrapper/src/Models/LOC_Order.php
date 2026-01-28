@@ -19,6 +19,7 @@ use Agmedia\Models\Product\Product;
 use Agmedia\Models\Product\ProductCategory;
 use Agmedia\Models\Product\ProductOption;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Class LOC_Order
@@ -124,49 +125,68 @@ class LOC_Order
      */
     public function store()
     {
-        // Create luceed order data.
-        $this->create();
+        DB::beginTransaction();
 
-        // Send order to luceed service.
-        $this->response = json_decode(
-            $this->service->createOrder(['nalozi_prodaje' => [$this->order]])
-        );
+        try {
+            $order = Order::where('order_id', $this->oc_order['order_id'])
+                ->lockForUpdate()
+                ->first();
 
-        $this->log('Store order response: $this->response - LOC_Order #98.', $this->response);
+            if (!$order) {
+                DB::rollBack();
+                $this->log('Store ERROR: order not found');
+                return false;
+            }
 
-        // If response ok.
-        // Update order uid.
-        if (isset($this->response->result[0])) {
-            $created = Order::where('order_id', $this->oc_order['order_id'])->update([
-                'luceed_uid' => $this->response->result[0]
-            ]);
+            // 1) Ako već imamo luceed_uid, ne radimo createOrder opet
+            $luceedUid = $order->luceed_uid;
 
-            $existing_order = Order::where('order_id', $this->oc_order['order_id'])->first();
+            if (!$luceedUid) {
+                $this->create();
 
-            if ( ! $this->call_raspis && ! $existing_order->luceed_raspis_uid) {
-                $raspis = json_decode(
-                    $this->service->orderWrit($this->response->result[0])
+                $this->response = json_decode(
+                    $this->service->createOrder(['nalozi_prodaje' => [$this->order]])
                 );
 
+                $this->log('Store order response', $this->response);
+
+                if (!isset($this->response->result[0])) {
+                    DB::rollBack();
+                    return false;
+                }
+
+                $luceedUid = $this->response->result[0];
+                $order->luceed_uid = $luceedUid;
+                $order->save();
+            }
+
+            // 2) Raspis samo ako nije već napravljen
+            if (!$order->luceed_raspis_uid) {
+                $this->log('Calling orderWrit for luceed_uid: ' . $luceedUid);
+
+                $raspis = json_decode($this->service->orderWrit($luceedUid));
+
                 if (isset($raspis->result[0])) {
-                    $this->call_raspis = false;
+                    $order->luceed_raspis_uid = $raspis->result[0];
+                    $order->save();
 
-                    Order::where('order_id', $this->oc_order['order_id'])->update([
-                        'luceed_raspis_uid' => $raspis->result[0]
-                    ]);
-
-                    $this->log('Raspis response: $raspis - LOC_Order', $raspis);
-
+                    $this->log('Raspis OK', $raspis);
                 } else {
-                    $this->log('GREŠKA ::::::::: Raspis response: $raspis - LOC_Order', $raspis);
+                    $this->log('Raspis ERROR', $raspis);
                 }
             }
 
-            return $created;
-        }
+            DB::commit();
+            return true;
 
-        return false;
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            $this->log('Store ERROR: ' . $e->getMessage());
+            throw $e;
+        }
     }
+
+
 
 
     /**
