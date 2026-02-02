@@ -56,7 +56,7 @@ class LuceedEndPoints
             'manufacturer_list' => 'robnemarke/lista',
             'warehouse_list'    => 'skladista/lista',
             //'product_list'      => 'artikli/naziv//',
-            'product_list'      => 'artikli/sifradio/1328',
+            'product_list'      => 'artikli/sifradio/1327',
             'product_short_list'=> 'artikli/lista/',
             'product'           => 'artikli/sifra/',
             'product_actions'   => 'akcije/lista',
