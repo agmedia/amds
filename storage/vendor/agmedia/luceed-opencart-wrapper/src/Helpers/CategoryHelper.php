@@ -24,12 +24,8 @@ class CategoryHelper
     public static function getCategory(string $name, $parent_id)
     {
         $db = new Database(DB_DATABASE);
-        if($parent_id){
-            return $db->query("SELECT * FROM oc_category c LEFT JOIN oc_category_description cd ON c.category_id = cd.category_id WHERE c.parent_id = " . $parent_id . " AND cd.name = '" . $name . "'");
-        }
-        return false;
 
-
+        return $db->query("SELECT * FROM oc_category c LEFT JOIN oc_category_description cd ON c.category_id = cd.category_id WHERE c.parent_id = " . $parent_id . " AND cd.name = '" . $name . "'");
     }
 
 
