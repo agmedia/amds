@@ -108,6 +108,12 @@
                 <p class="meta_description"><strong>Najniža cijena u zadnjih 30 dana: {{ price_ponuda }}   - {{ ljetni.discount }} %</strong></p>
                 {% endif %}
 
+                {% if  special %}
+                    <p class="meta_description"><strong>Najniža cijena u zadnjih 30 dana: {{ price }}</strong></p>
+                {% endif %}
+
+
+
                 {% if lowest_price_30d %}
                 <p class="meta_description">{{ lowest_price_30d }}</p>
                 {% endif %}
