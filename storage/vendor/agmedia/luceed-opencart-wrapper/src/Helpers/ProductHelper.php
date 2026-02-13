@@ -234,6 +234,10 @@ class ProductHelper
          * Pod Kategorija
          */
         if (CategoryHelper::hasValue($podgrupa_uid)) {
+            if ( ! isset($glavna_kategorija->row['category_id'])) {
+                $glavna_kategorija->row['category_id'] = $spol_kategorija->row['category_id'];
+            }
+
             $pod_kategorija = CategoryHelper::getCategory($podgrupa_uid->vrijednost, $glavna_kategorija->row['category_id']);
 
             if ( ! $pod_kategorija->num_rows) {
@@ -251,7 +255,7 @@ class ProductHelper
          */
         if (CategoryHelper::hasValue($pod_podgrupa_uid)) {
             if ( ! isset($pod_kategorija->row['category_id'])) {
-                $pod_kategorija->row['category_id'] = $glavna_kategorija->row['category_id'];
+                $pod_kategorija->row['category_id'] = isset($glavna_kategorija->row['category_id']) ? $glavna_kategorija->row['category_id'] : $spol_kategorija->row['category_id'];
             }
 
             $pod_pod_kategorija = CategoryHelper::getCategory($pod_podgrupa_uid->vrijednost, $pod_kategorija->row['category_id']);
@@ -289,7 +293,7 @@ class ProductHelper
          */
         if (CategoryHelper::hasValue($pod_pod_podgrupa_uid)) {
             if ( ! isset($pod_pod_kategorija->row['category_id'])) {
-                $pod_pod_kategorija->row['category_id'] = $pod_kategorija->row['category_id'];
+                $pod_pod_kategorija->row['category_id'] = isset($pod_kategorija->row['category_id']) ? $pod_kategorija->row['category_id'] : (isset($glavna_kategorija->row['category_id']) ? $glavna_kategorija->row['category_id'] : $spol_kategorija->row['category_id']);
             }
 
             $pod_pod_pod_kategorija = CategoryHelper::getCategory($pod_pod_podgrupa_uid->vrijednost, $pod_pod_kategorija->row['category_id']);
