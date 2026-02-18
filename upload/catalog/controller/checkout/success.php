@@ -6,6 +6,9 @@ use Agmedia\LuceedOpencartWrapper\Models\LOC_Order;
 class ControllerCheckoutSuccess extends Controller {
     public function index() {
         $this->load->language('checkout/success');
+        $order_id = 0;
+        $oc_order = [];
+        $data['klaviyo_order'] = [];
 
         if (isset($this->session->data['order_id'])) {
             $order_id = $this->session->data['order_id'];
@@ -45,7 +48,8 @@ class ControllerCheckoutSuccess extends Controller {
             $data['klaviyo_order'] = [
                 'OrderID'   => $order_id,
                 'value'     => (float)$order_info['total'],
-                'Currency'  => $order_info['currency_code']
+                'Currency'  => $order_info['currency_code'],
+                'Email'     => $order_info['email'] ?? ''
             ];
 
             \Agmedia\Helpers\Log::store($data, 'luceed_success');
@@ -77,6 +81,25 @@ class ControllerCheckoutSuccess extends Controller {
             /*******************************************************************************
              *                              END Copyright : AGmedia                         *
              *******************************************************************************/
+        }
+
+        if (empty($data['klaviyo_order']) && !empty($this->request->get['order_id']) && ctype_digit((string)$this->request->get['order_id'])) {
+            $order_id = (int)$this->request->get['order_id'];
+
+            $this->load->model('checkout/order');
+            $order_info = $this->model_checkout_order->getOrder($order_id);
+
+            if ($order_info) {
+                $oc_order = $order_info;
+                $data['order_id'] = $order_id;
+                $data['paymethod'] = $order_info['payment_code'];
+                $data['klaviyo_order'] = [
+                    'OrderID'   => $order_id,
+                    'value'     => (float)$order_info['total'],
+                    'Currency'  => $order_info['currency_code'],
+                    'Email'     => $order_info['email'] ?? ''
+                ];
+            }
         }
 
         $this->document->setTitle($this->language->get('heading_title'));
@@ -122,30 +145,23 @@ class ControllerCheckoutSuccess extends Controller {
         // Totals
         $data['totals'] = array();
 
-        $totals = $this->model_account_order->getOrderTotals($order_id);
+        if ($order_id && !empty($oc_order)) {
+            $totals = $this->model_account_order->getOrderTotals($order_id);
 
-        foreach ($totals as $total) {
+            foreach ($totals as $total) {
+                if ($total['title'] == 'Ukupno') {
+                    $ukupno = $this->currency->format($total['value'], $oc_order['currency_code'], $oc_order['currency_value']);
+                    $ukupnohub = number_format((float)$total['value'], 2, '.', '');
+                    $ukupnohub = $ukupnohub * 100;
+                }
 
+                $text = $this->currency->format($total['value'], $oc_order['currency_code'], $oc_order['currency_value']);
 
-            if ($total['title']=='Ukupno'){
-
-                $ukupno = $this->currency->format($total['value'], $oc_order['currency_code'], $oc_order['currency_value']);
-                $ukupnohub = number_format((float)$total['value'], 2, '.', '');
-                $ukupnohub = $ukupnohub * 100;
+                $data['totals'][] = array(
+                    'title' => $total['title'],
+                    'text'  => $text,
+                );
             }
-
-            if($oc_order['currency_code']=='HRK'){
-                $text =  $this->currency->format($total['value'], $oc_order['currency_code'], $oc_order['currency_value']);
-            }
-            else{
-                $text =  $this->currency->format($total['value'], $oc_order['currency_code'], $oc_order['currency_value']);
-            }
-
-
-            $data['totals'][] = array(
-                'title' => $total['title'],
-                'text'  => $text,
-            );
         }
 
 

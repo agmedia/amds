@@ -1,16 +1,24 @@
 {{ header }}
 
+{% if klaviyo_order is defined and klaviyo_order.OrderID %}
 <script>
   window._learnq = window._learnq || [];
 
+  {% if klaviyo_order.Email %}
+  window._learnq.push(['identify', {
+    '$email': '{{ klaviyo_order.Email }}'
+  }]);
+  {% endif %}
+
   window._learnq.push(['track', 'Placed Order', {
     OrderID: '{{ klaviyo_order.OrderID }}',
-    value: {{ klaviyo_order.value }},
-    Currency: '{{ klaviyo_order.Currency }}'
+    value: {{ klaviyo_order.value|default(0) }},
+    Currency: '{{ klaviyo_order.Currency|default("EUR") }}'
   }]);
 
-  console.log('Klaviyo: Placed Order with value sent');
+  console.log('Klaviyo: Placed Order sent');
 </script>
+{% endif %}
 
 
 <div class="container">
