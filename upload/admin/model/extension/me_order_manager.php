@@ -164,6 +164,7 @@ class ModelExtensionMeordermanager extends Model {
     }
 
     public function getOrders($data = array()) {
+        $year_start = date('Y-01-01 00:00:00');
 
         $sql = "SELECT o.order_id, CONCAT(o.firstname, ' ', o.lastname) AS customer,cgd.name AS customer_group, (SELECT os.name FROM " . DB_PREFIX . "order_status os WHERE os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') AS order_status, o.shipping_code, o.total, o.currency_code, o.currency_value, o.date_added, o.date_modified FROM `" . DB_PREFIX . "order` o LEFT JOIN " . DB_PREFIX . "customer_group_description cgd ON (o.customer_group_id = cgd.customer_group_id)";
 
@@ -192,6 +193,8 @@ class ModelExtensionMeordermanager extends Model {
         } else {
             $sql .= " WHERE o.order_status_id > '0'";
         }
+
+        $sql .= " AND o.date_added >= '" . $this->db->escape($year_start) . "'";
 
         if (!empty($data['filter_order_id'])) {
             $sql .= " AND o.order_id = '" . (int)$data['filter_order_id'] . "'";
@@ -360,6 +363,7 @@ class ModelExtensionMeordermanager extends Model {
     }
 
     public function getTotalOrders($data = array()) {
+        $year_start = date('Y-01-01 00:00:00');
         $sql = "SELECT COUNT(*) AS total FROM `" . DB_PREFIX . "order` o";
 
         if (isset($data['filter_product']) && $data['filter_product'] !== '') {
@@ -387,6 +391,8 @@ class ModelExtensionMeordermanager extends Model {
         } else {
             $sql .= " WHERE o.order_status_id > '0'";
         }
+
+        $sql .= " AND o.date_added >= '" . $this->db->escape($year_start) . "'";
 
         if (!empty($data['filter_order_id'])) {
             $sql .= " AND o.order_id = '" . (int)$data['filter_order_id'] . "'";
@@ -470,6 +476,7 @@ class ModelExtensionMeordermanager extends Model {
     }
 
     public function getTotalSumOrders($data = array()) {
+        $year_start = date('Y-01-01 00:00:00');
         $sql = "SELECT SUM(o.total) AS total FROM `" . DB_PREFIX . "order` o";
 
         if (isset($data['filter_product']) && $data['filter_product'] !== '') {
@@ -497,6 +504,8 @@ class ModelExtensionMeordermanager extends Model {
         } else {
             $sql .= " WHERE o.order_status_id > '0'";
         }
+
+        $sql .= " AND o.date_added >= '" . $this->db->escape($year_start) . "'";
 
         if (!empty($data['filter_order_id'])) {
             $sql .= " AND o.order_id = '" . (int)$data['filter_order_id'] . "'";
