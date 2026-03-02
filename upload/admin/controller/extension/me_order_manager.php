@@ -169,6 +169,22 @@ class ControllerExtensionMeordermanager extends Controller {
 			$limit = $this->config->get('config_limit_admin');
 		}
 
+		$page = (int)$page;
+		if ($page < 1) {
+			$page = 1;
+		}
+
+		$limit = (int)$limit;
+		if ($limit < 1) {
+			$limit = (int)$this->config->get('config_limit_admin');
+		}
+		if ($limit < 1) {
+			$limit = 20;
+		}
+		if ($limit > 200) {
+			$limit = 200;
+		}
+
 		$url = '';
 
 		if (isset($this->request->get['filter_order_id'])) {
@@ -327,7 +343,12 @@ class ControllerExtensionMeordermanager extends Controller {
 		$results = $this->model_extension_me_order_manager->getOrders($filter_data);
 		
 		foreach ($results as $result) {
-			$order_info = $this->model_extension_me_order_manager->getOrder($result['order_id']);
+			try {
+			$order_info = $this->model_extension_me_order_manager->getOrder((int)$result['order_id']);
+
+			if (empty($order_info) || !is_array($order_info)) {
+				continue;
+			}
 			
 			//Payment Address
 			$payment_address = $order_info['payment_firstname'].' '.$order_info['payment_lastname'] . "," . (!empty($order_info['payment_company']) ? $order_info['payment_company'] . "," : ''). $order_info['payment_address_1'] . "," . (!empty($order_info['payment_address_2']) ? $order_info['payment_address_2'] . "," : '') . $order_info['payment_city'].' '.$order_info['payment_postcode'] . "," . $order_info['payment_zone'] . "," . $order_info['payment_country'];
@@ -374,7 +395,11 @@ class ControllerExtensionMeordermanager extends Controller {
 						}
 					}
 					
-					$product_option_value_info = $this->model_catalog_product->getProductOptionValue($order_product['product_id'], $option['product_option_value_id']);
+					if (empty($option['product_option_value_id'])) {
+						continue;
+					}
+
+					$product_option_value_info = $this->model_catalog_product->getProductOptionValue((int)$order_product['product_id'], (int)$option['product_option_value_id']);
 
 					if ($product_option_value_info) {
 						if ($product_option_value_info['weight_prefix'] == '+') {
@@ -492,6 +517,14 @@ class ControllerExtensionMeordermanager extends Controller {
 				'view'          => $this->url->link('sale/order/info', 'user_token=' . $this->session->data['user_token'] . '&order_id=' . $result['order_id'] . $url, true),
 				'edit'          => $this->url->link('sale/order/edit', 'user_token=' . $this->session->data['user_token'] . '&order_id=' . $result['order_id'] . $url, true)
 			);
+			} catch (\Throwable $e) {
+				error_log(
+					'ME Order Manager index error. order_id=' . (isset($result['order_id']) ? (int)$result['order_id'] : 0) .
+					' message=' . $e->getMessage() .
+					' file=' . $e->getFile() . ':' . $e->getLine()
+				);
+				continue;
+			}
 		}
 
 		$data['user_token'] = $this->session->data['user_token'];
