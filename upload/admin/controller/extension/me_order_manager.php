@@ -306,9 +306,15 @@ class ControllerExtensionMeordermanager extends Controller {
         $data['invoice'] = $this->url->link('sale/order/invoice', 'user_token=' . $this->session->data['user_token'], true);
         $data['shipping'] = $this->url->link('sale/order/shipping', 'user_token=' . $this->session->data['user_token'], true);
         $data['add'] = $this->url->link('sale/order/add', 'user_token=' . $this->session->data['user_token'] . $url, true);
-        $data['delete'] = str_replace('&amp;', '&', $this->url->link('extension/me_order_manager/delete', 'user_token=' . $this->session->data['user_token'] . $url, true));
+		$data['delete'] = str_replace('&amp;', '&', $this->url->link('extension/me_order_manager/delete', 'user_token=' . $this->session->data['user_token'] . $url, true));
 
-        $data['orders'] = array();
+		$data['orders'] = array();
+		$order_manager_setting = (array)$this->config->get('module_me_order_manager_setting');
+		$order_manager_columns = (array)$this->config->get('module_me_order_manager_setting_column');
+		$use_product_popup = !empty($order_manager_setting['displayproducts']);
+		$need_order_weight = !empty($order_manager_columns['order_weight']['status']);
+		$load_full_products = !$use_product_popup;
+		$load_order_products = $load_full_products || $need_order_weight;
 
         $filter_data = array(
             'filter_order_id'        => $filter_order_id,
@@ -363,81 +369,85 @@ class ControllerExtensionMeordermanager extends Controller {
                     $affiliate = '';
                 }
 
-                //Products
-                $totalproducts = $this->model_extension_me_order_manager->getTotalOrderProducts($result['order_id']);
-                $products = array();
-                $order_weight = '';
-                $weight = 0;
-                $order_products = $this->model_sale_order->getOrderProducts($result['order_id']);
+			// Products (lightweight mode when popup loading is enabled)
+			$totalproducts = $this->model_extension_me_order_manager->getTotalOrderProducts($result['order_id']);
+			$products = array();
+			$order_weight = '';
+			$weight = 0;
 
-                foreach ($order_products as $order_product) {
-                    $option_data = array();
+			if ($load_order_products) {
+				$order_products = $this->model_sale_order->getOrderProducts($result['order_id']);
 
-                    $options = $this->model_sale_order->getOrderOptions($result['order_id'], $order_product['order_product_id']);
-                    $option_weight = 0;
-                    foreach ($options as $option) {
-                        if ($option['type'] != 'file') {
-                            $option_data[] = array(
-                                'name'  => $option['name'],
-                                'value' => $option['value'],
-                                'type'  => $option['type']
-                            );
-                        } else {
-                            $upload_info = $this->model_tool_upload->getUploadByCode($option['value']);
+				foreach ($order_products as $order_product) {
+					$option_data = array();
+					$option_weight = 0;
+					$options = $this->model_sale_order->getOrderOptions($result['order_id'], $order_product['order_product_id']);
 
-                            if ($upload_info) {
-                                $option_data[] = array(
-                                    'name'  => $option['name'],
-                                    'value' => $upload_info['name'],
-                                    'type'  => $option['type'],
-                                    'href'  => $this->url->link('tool/upload/download', 'user_token=' . $this->session->data['user_token'] . '&code=' . $upload_info['code'], true)
-                                );
-                            }
-                        }
+					foreach ($options as $option) {
+						if ($load_full_products) {
+							if ($option['type'] != 'file') {
+								$option_data[] = array(
+									'name'  => $option['name'],
+									'value' => $option['value'],
+									'type'  => $option['type']
+								);
+							} else {
+								$upload_info = $this->model_tool_upload->getUploadByCode($option['value']);
 
-                        if (empty($option['product_option_value_id'])) {
-                            continue;
-                        }
+								if ($upload_info) {
+									$option_data[] = array(
+										'name'  => $option['name'],
+										'value' => $upload_info['name'],
+										'type'  => $option['type'],
+										'href'  => $this->url->link('tool/upload/download', 'user_token=' . $this->session->data['user_token'] . '&code=' . $upload_info['code'], true)
+									);
+								}
+							}
+						}
 
-                        $product_option_value_info = $this->model_catalog_product->getProductOptionValue((int)$order_product['product_id'], (int)$option['product_option_value_id']);
+						if (empty($option['product_option_value_id'])) {
+							continue;
+						}
 
-                        if ($product_option_value_info) {
-                            if ($product_option_value_info['weight_prefix'] == '+') {
-                                $option_weight += $product_option_value_info['weight'];
-                            } elseif ($product_option_value_info['weight_prefix'] == '-') {
-                                $option_weight -= $product_option_value_info['weight'];
-                            }
-                        }
-                    }
+						$product_option_value_info = $this->model_catalog_product->getProductOptionValue((int)$order_product['product_id'], (int)$option['product_option_value_id']);
 
-                    $product_info = $this->model_catalog_product->getProduct($order_product['product_id']);
-                    if ($product_info) {
-                        if ($product_info['image']) {
-                            $image = $this->model_tool_image->resize($product_info['image'], 50, 50);
-                        } else {
-                            $image = $this->model_tool_image->resize('placeholder.png', 50, 50);
-                        }
+						if ($product_option_value_info) {
+							if ($product_option_value_info['weight_prefix'] == '+') {
+								$option_weight += $product_option_value_info['weight'];
+							} elseif ($product_option_value_info['weight_prefix'] == '-') {
+								$option_weight -= $product_option_value_info['weight'];
+							}
+						}
+					}
 
-                        $weight += $this->weight->convert(($product_info['weight'] + (float)$option_weight) * $order_product['quantity'], $product_info['weight_class_id'], $this->config->get('config_weight_class_id'));
-                    }else {
-                        $image = $this->model_tool_image->resize('placeholder.png', 50, 50);
-                    }
+					$product_info = $this->model_catalog_product->getProduct($order_product['product_id']);
+					if ($product_info) {
+						$weight += $this->weight->convert(($product_info['weight'] + (float)$option_weight) * $order_product['quantity'], $product_info['weight_class_id'], $this->config->get('config_weight_class_id'));
+						$image = ($product_info['image']) ? $this->model_tool_image->resize($product_info['image'], 50, 50) : $this->model_tool_image->resize('placeholder.png', 50, 50);
+					} else {
+						$image = $this->model_tool_image->resize('placeholder.png', 50, 50);
+					}
 
-                    $products[] = array(
-                        'order_product_id' => $order_product['order_product_id'],
-                        'product_id'       => $order_product['product_id'],
-                        'name'    	 	   => $order_product['name'],
-                        'image'    	 	   => $image,
-                        'model'    		   => $order_product['model'],
-                        'option'   		   => $option_data,
-                        'quantity'		   => $order_product['quantity'],
-                        'price'    		   => $this->currency->format($order_product['price'] + ($this->config->get('config_tax') ? $order_product['tax'] : 0), $order_info['currency_code'], $order_info['currency_value']),
-                        'total'    		   => $this->currency->format($order_product['total'] + ($this->config->get('config_tax') ? ($order_product['tax'] * $order_product['quantity']) : 0), $order_info['currency_code'], $order_info['currency_value']),
-                        'href'     		   => $this->url->link('catalog/product/edit', 'user_token=' . $this->session->data['user_token'] . '&product_id=' . $order_product['product_id'], true)
-                    );
-                }
+					if ($load_full_products) {
+						$products[] = array(
+							'order_product_id' => $order_product['order_product_id'],
+							'product_id'       => $order_product['product_id'],
+							'name'             => $order_product['name'],
+							'image'            => $image,
+							'model'            => $order_product['model'],
+							'option'           => $option_data,
+							'quantity'         => $order_product['quantity'],
+							'price'            => $this->currency->format($order_product['price'] + ($this->config->get('config_tax') ? $order_product['tax'] : 0), $order_info['currency_code'], $order_info['currency_value']),
+							'total'            => $this->currency->format($order_product['total'] + ($this->config->get('config_tax') ? ($order_product['tax'] * $order_product['quantity']) : 0), $order_info['currency_code'], $order_info['currency_value']),
+							'href'             => $this->url->link('catalog/product/edit', 'user_token=' . $this->session->data['user_token'] . '&product_id=' . $order_product['product_id'], true)
+						);
+					}
+				}
+			}
 
-                $order_weight = $this->weight->format($weight, $this->config->get('config_weight_class_id'), $this->language->get('decimal_point'), $this->language->get('thousand_point'));
+			if ($need_order_weight) {
+				$order_weight = $this->weight->format($weight, $this->config->get('config_weight_class_id'), $this->language->get('decimal_point'), $this->language->get('thousand_point'));
+			}
 
                 //Coupon,Voucher,reward
                 $ordertotals = $this->model_sale_order->getOrderTotals($result['order_id']);
