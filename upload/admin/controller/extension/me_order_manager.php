@@ -192,9 +192,9 @@ class ControllerExtensionMeordermanager extends Controller {
         if ($limit < 1) {
             $limit = 20;
         }
-        if ($limit > 200) {
-            $limit = 200;
-        }
+		if ($limit > 50) {
+			$limit = 50;
+		}
 
         $url = '';
 
@@ -360,8 +360,19 @@ class ControllerExtensionMeordermanager extends Controller {
 		$results = $this->model_extension_me_order_manager->getOrders($filter_data);
 		file_put_contents(DIR_STORAGE . 'logs/me_fatal.log', date('c') . " | got results: " . count((array)$results) . "\n", FILE_APPEND);
 
-        foreach ($results as $result) {
-            try {
+		$processed_orders = 0;
+		foreach ($results as $result) {
+			$processed_orders++;
+			if (($processed_orders % 10) === 0) {
+				file_put_contents(DIR_STORAGE . 'logs/me_fatal.log', date('c') . " | processing order #" . $processed_orders . "\n", FILE_APPEND);
+			}
+
+			if ($processed_orders > 50) {
+				file_put_contents(DIR_STORAGE . 'logs/me_fatal.log', date('c') . " | break at 50 orders\n", FILE_APPEND);
+				break;
+			}
+
+			try {
                 $order_info = $this->model_extension_me_order_manager->getOrder((int)$result['order_id']);
 
                 if (empty($order_info) || !is_array($order_info)) {
