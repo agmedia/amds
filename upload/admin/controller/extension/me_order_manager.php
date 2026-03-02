@@ -7,9 +7,20 @@ include DIR_SYSTEM.'library/me_order_manager/PHPExcel.php';
 class ControllerExtensionMeordermanager extends Controller {
     private $error = array();
 
-    public function index(){
-        $this->load->model('sale/order');
-        $this->load->model('extension/me_order_manager');
+	public function index(){
+		file_put_contents(DIR_STORAGE . 'logs/me_fatal.log', date('c') . " | index enter\n", FILE_APPEND);
+
+		register_shutdown_function(function () {
+			$e = error_get_last();
+			file_put_contents(
+				DIR_STORAGE . 'logs/me_fatal.log',
+				date('c') . " | shutdown | " . json_encode($e) . "\n",
+				FILE_APPEND
+			);
+		});
+
+		$this->load->model('sale/order');
+		$this->load->model('extension/me_order_manager');
         $this->load->model('catalog/product');
         $this->load->model('tool/image');
         $this->load->model('tool/upload');
@@ -346,7 +357,8 @@ class ControllerExtensionMeordermanager extends Controller {
         $order_total = $this->model_extension_me_order_manager->getTotalOrders($filter_data);
         $sum_order_total = $this->model_extension_me_order_manager->getTotalSumOrders($filter_data);
 
-        $results = $this->model_extension_me_order_manager->getOrders($filter_data);
+		$results = $this->model_extension_me_order_manager->getOrders($filter_data);
+		file_put_contents(DIR_STORAGE . 'logs/me_fatal.log', date('c') . " | got results: " . count((array)$results) . "\n", FILE_APPEND);
 
         foreach ($results as $result) {
             try {
