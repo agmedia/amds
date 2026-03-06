@@ -18,9 +18,9 @@
     {% if product.isbn == '1'
         and product.lowest_price_30d_pct
         and not product.price_ponuda %}
-        <span class="badge sale_badge">
+      <!--  <span class="badge sale_badge">
         <i>{{ product.lowest_price_30d_pct }}%</i>
-    </span>
+    </span> -->
     {% endif %}
     {% if product.price_ponuda %}
 
