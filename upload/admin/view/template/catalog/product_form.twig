@@ -3,8 +3,10 @@
   <div class="page-header">
     <div class="container-fluid">
       <div class="pull-right">
+          {% if product_id %}
           <button type="button" id="luceed-update-btn" data-toggle="tooltip" title="Force update from Luceed" class="btn btn-default" style="margin-right: 10px;"><i class="fa fa-upload"></i> Luceed Update Product</button>
           <button type="button" id="luceed-update-image-btn" data-toggle="tooltip" title="Force update from Luceed" class="btn btn-default" style="margin-right: 10px;"><i class="fa fa-upload"></i> Luceed Update Image</button>
+          {% endif %}
         <button type="submit" form="form-product" data-toggle="tooltip" title="{{ button_save }}" class="btn btn-primary"><i class="fa fa-save"></i></button>
         <a href="{{ cancel }}" data-toggle="tooltip" title="{{ button_cancel }}" class="btn btn-default"><i class="fa fa-reply"></i></a></div>
       <h1>{{ heading_title }}</h1>
@@ -1135,15 +1137,19 @@
 
       $(() => {
           $('#luceed-update-image-btn').on('click', (e) => {
-              setSpinner('#luceed-update-btn');
+              setSpinner('#luceed-update-image-btn');
 
               $.ajax({
-                  url: 'index.php?route=catalog/product/luceed&user_token={{ user_token }}&sifra={{ model }}',
+                  url: 'index.php?route=catalog/product/luceed&user_token={{ user_token }}&product_id={{ product_id }}&sifra={{ model }}',
                   dataType: 'json',
                   success: function(json) {
-                      setSpinner('#luceed-update-btn', false);
+                      setSpinner('#luceed-update-image-btn', false);
 
-                      //location.reload();
+                      if (json.status == 200) {
+                          location.reload();
+                      } else {
+                          alert(json.message || 'Luceed update slike nije uspio.');
+                      }
                   }
               });
           });
@@ -1152,12 +1158,16 @@
               setSpinner('#luceed-update-btn');
 
               $.ajax({
-                  url: 'index.php?route=catalog/product/updateSingleProduct&user_token={{ user_token }}&sifra={{ model }}',
+                  url: 'index.php?route=catalog/product/updateSingleProduct&user_token={{ user_token }}&product_id={{ product_id }}&sifra={{ model }}',
                   dataType: 'json',
                   success: function(json) {
                       setSpinner('#luceed-update-btn', false);
-                      console.log(json);
-                      //location.reload();
+
+                      if (json.status == 200) {
+                          location.reload();
+                      } else {
+                          alert(json.message || 'Luceed update nije uspio.');
+                      }
                   }
               });
           });

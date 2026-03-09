@@ -1,6 +1,7 @@
 <?php
 class ControllerCatalogProduct extends Controller {
 	private $error = array();
+	private $product_columns = null;
 
 	public function index() {
 		$this->load->language('catalog/product');
@@ -580,6 +581,7 @@ class ControllerCatalogProduct extends Controller {
 		}
 
 		$data['user_token'] = $this->session->data['user_token'];
+		$data['product_id'] = isset($this->request->get['product_id']) ? (int)$this->request->get['product_id'] : 0;
 
 		$this->load->model('localisation/language');
 
@@ -1350,26 +1352,253 @@ class ControllerCatalogProduct extends Controller {
     {
         $this->load->model('catalog/product');
 
-        $feed = \Agmedia\Luceed\Facade\LuceedProduct::getById($this->request->get['sifra']);
-        $product = new \Agmedia\LuceedOpencartWrapper\Models\LOC_Product($feed);
-
-        if ($product->getProducts()->count()) {
-            $product_array = collect($product->getProducts()->first())->toArray();
-
-            \Agmedia\Helpers\Log::write($product_array, 'prod');
-
-            $cats_arr = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::getCategoriesFromAttributes($product_array);
-
-            \Agmedia\Helpers\Log::write($cats_arr, 'prod');
-
-            $this->response->addHeader('Content-Type: application/json');
-            return $this->response->setOutput(json_encode(['status' => 200, 'result' => 1]));
+        if (!$this->user->hasPermission('modify', 'catalog/product')) {
+            return $this->jsonResponse([
+                'status' => 300,
+                'message' => 'Nemate ovlasti za Luceed update proizvoda.'
+            ]);
         }
 
-        \Agmedia\Helpers\Log::write($this->request->get['sifra'], 'prod');
-        \Agmedia\Helpers\Log::write($feed, 'prod');
+        $product_id = isset($this->request->get['product_id']) ? (int)$this->request->get['product_id'] : 0;
+        $model = '';
 
+        if ($product_id) {
+            $product_info = $this->model_catalog_product->getProduct($product_id);
+            $model = isset($product_info['model']) ? $product_info['model'] : '';
+        }
+
+        if (!$model && !empty($this->request->get['sifra'])) {
+            $model = $this->request->get['sifra'];
+        }
+
+        if (!$model) {
+            return $this->jsonResponse([
+                'status' => 300,
+                'message' => 'Model proizvoda nije pronađen.'
+            ]);
+        }
+
+        try {
+            return $this->jsonResponse($this->syncSingleProductFromLuceed($model, $product_id));
+        } catch (\Throwable $exception) {
+            \Agmedia\Helpers\Log::store([
+                'product_id' => $product_id,
+                'model' => $model,
+                'message' => $exception->getMessage()
+            ], 'luceed_single_product_error');
+
+            return $this->jsonResponse([
+                'status' => 300,
+                'message' => $exception->getMessage()
+            ]);
+        }
+    }
+
+
+    /**
+     * @param string $model
+     * @param int    $product_id
+     *
+     * @return array
+     */
+    private function syncSingleProductFromLuceed($model, $product_id = 0) {
+        $luceed_items = collect($this->fetchLuceedProductsByModel($model));
+
+        if (!$luceed_items->count()) {
+            return [
+                'status' => 300,
+                'message' => 'Luceed nije vratio podatke za model ' . $model . '.'
+            ];
+        }
+
+        $luceed_product = $luceed_items
+            ->where('artikl', '==', $model)
+            ->where('osnovni__artikl', '==', null)
+            ->first();
+
+        if (!$luceed_product) {
+            $luceed_product = $luceed_items->where('artikl', '==', $model)->first();
+        }
+
+        if (!$luceed_product) {
+            return [
+                'status' => 300,
+                'message' => 'Glavni artikl nije pronađen u Luceed odgovoru za model ' . $model . '.'
+            ];
+        }
+
+        if (!$product_id) {
+            $product = \Agmedia\Models\Product\Product::query()->select('product_id')->where('model', $model)->first();
+            $product_id = $product ? (int)$product->product_id : 0;
+        }
+
+        if (!$product_id) {
+            return [
+                'status' => 300,
+                'message' => 'Lokalni proizvod za model ' . $model . ' nije pronađen.'
+            ];
+        }
+
+        $luceed_product->opcije = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::sortOptions(
+            $luceed_items->where('osnovni__artikl', '==', $model)->values()->all(),
+            5
+        );
+
+        $product_payload = new \Agmedia\LuceedOpencartWrapper\Models\LOC_Product();
+        $payload = $product_payload->make($luceed_product);
+        $payload = array_merge($payload, $this->resolveLuceedProductDependencies($product_id));
+        $payload = $this->applyImmediateQuantityState($payload, $luceed_product->opcije);
+
+        $this->model_catalog_product->editProduct($product_id, $payload);
+        $this->markProductAsSynced($product_id, $luceed_product);
+
+        return [
+            'status' => 200,
+            'message' => 'Luceed update je završen za model ' . $model . '.'
+        ];
+    }
+
+
+    /**
+     * @param string $model
+     *
+     * @return array
+     */
+    private function fetchLuceedProductsByModel($model) {
+        if (agconf('env') === 'local') {
+            $products = json_decode(\Agmedia\Luceed\Facade\LuceedProduct::all());
+
+            if (!isset($products->result[0]->artikli) || !is_array($products->result[0]->artikli)) {
+                return [];
+            }
+
+            return collect($products->result[0]->artikli)
+                ->filter(function ($item) use ($model) {
+                    return $item->artikl === $model || (isset($item->osnovni__artikl) && $item->osnovni__artikl === $model);
+                })
+                ->values()
+                ->all();
+        }
+
+        $service = new \Agmedia\Luceed\Connection\LuceedService();
+        $response = $service->get('artikli/sifradio/' . rawurlencode($model));
+
+        if (!$response) {
+            return [];
+        }
+
+        $decoded = json_decode($response);
+
+        if (!isset($decoded->result[0]->artikli) || !is_array($decoded->result[0]->artikli)) {
+            return [];
+        }
+
+        return $decoded->result[0]->artikli;
+    }
+
+
+    /**
+     * @param int $product_id
+     *
+     * @return array
+     */
+    private function resolveLuceedProductDependencies($product_id) {
+        return [
+            'product_discount' => $this->model_catalog_product->getProductDiscounts($product_id),
+            'product_special' => $this->model_catalog_product->getProductSpecials($product_id),
+            'product_download' => $this->model_catalog_product->getProductDownloads($product_id),
+            'product_filter' => $this->model_catalog_product->getProductFilters($product_id),
+            'product_related' => $this->model_catalog_product->getProductRelated($product_id),
+            'product_reward' => $this->model_catalog_product->getProductRewards($product_id),
+        ];
+    }
+
+
+    /**
+     * @param array $payload
+     * @param array $options
+     *
+     * @return array
+     */
+    private function applyImmediateQuantityState(array $payload, array $options) {
+        if ($options) {
+            $quantity = 0;
+
+            foreach ($options as $option) {
+                $quantity += (int)$option['raspolozivo_kol'];
+            }
+
+            $payload['quantity'] = $quantity;
+            $payload['stock_status_id'] = $quantity ? agconf('import.default_stock_full') : agconf('import.default_stock_empty');
+            $payload['status'] = $quantity ? $payload['status'] : 0;
+        }
+
+        return $payload;
+    }
+
+
+    /**
+     * @param int      $product_id
+     * @param \stdClass $luceed_product
+     *
+     * @return void
+     */
+    private function markProductAsSynced($product_id, \stdClass $luceed_product) {
+        $updates = [];
+
+        if ($this->hasProductColumn('luceed_uid')) {
+            $updates[] = "luceed_uid = '" . $this->db->escape($luceed_product->artikl_uid) . "'";
+        }
+
+        if ($this->hasProductColumn('updated')) {
+            $updates[] = "updated = 1";
+        }
+
+        if ($this->hasProductColumn('imported')) {
+            $updates[] = "imported = 1";
+        }
+
+        if ($this->hasProductColumn('hash')) {
+            $hash = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::hashLuceedData(
+                \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::collectLuceedData($luceed_product)
+            );
+
+            $updates[] = "hash = '" . $this->db->escape($hash) . "'";
+        }
+
+        if ($updates) {
+            $this->db->query("UPDATE " . DB_PREFIX . "product SET " . implode(', ', $updates) . " WHERE product_id = '" . (int)$product_id . "'");
+        }
+    }
+
+
+    /**
+     * @param string $column
+     *
+     * @return bool
+     */
+    private function hasProductColumn($column) {
+        if ($this->product_columns === null) {
+            $this->product_columns = [];
+
+            $query = $this->db->query("SHOW COLUMNS FROM " . DB_PREFIX . "product");
+
+            foreach ($query->rows as $row) {
+                $this->product_columns[] = $row['Field'];
+            }
+        }
+
+        return in_array($column, $this->product_columns, true);
+    }
+
+
+    /**
+     * @param array $payload
+     *
+     * @return void
+     */
+    private function jsonResponse(array $payload) {
         $this->response->addHeader('Content-Type: application/json');
-        return $this->response->setOutput(json_encode(['status' => 300, 'result' => 0]));
+        $this->response->setOutput(json_encode($payload));
     }
 }

@@ -6,6 +6,7 @@ use Agmedia\Luceed\Facade\LuceedManufacturer;
 use Agmedia\Luceed\Facade\LuceedOrder;
 use Agmedia\Luceed\Facade\LuceedPayments;
 use Agmedia\Luceed\Facade\LuceedProduct;
+use Agmedia\Luceed\Connection\LuceedService;
 use Agmedia\Luceed\Facade\LuceedWarehouse;
 use Agmedia\Luceed\Models\LuceedProductForRevision;
 use Agmedia\Luceed\Models\LuceedProductForRevisionData;
@@ -33,6 +34,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
 {
 
     private $error = array();
+    private $product_columns = null;
 
 
     public function install()
@@ -89,11 +91,15 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
         $data['breadcrumbs'][] = array(
             'text' => $this->language->get('heading_title'),
-            'href' => $this->url->link('extension/module/shipping_collector', 'user_token=' . $this->session->data['user_token'], true)
+            'href' => $this->url->link('extension/module/luceed_sync', 'user_token=' . $this->session->data['user_token'], true)
         );
 
         if (isset($this->error['warning'])) {
             $data['error_warning'] = $this->error['warning'];
+        } elseif (isset($this->session->data['error_warning'])) {
+            $data['error_warning'] = $this->session->data['error_warning'];
+
+            unset($this->session->data['error_warning']);
         } else {
             $data['error_warning'] = '';
         }
@@ -107,6 +113,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
         }
 
         $data['generate_excel_link'] = $this->url->link('extension/module/luceed_sync/generateExcel', 'user_token=' . $this->session->data['user_token'], true);
+        $data['sync_csv_action'] = $this->url->link('extension/module/luceed_sync/syncSelectedProducts', 'user_token=' . $this->session->data['user_token'], true);
 
         $data['user_token'] = $this->session->data['user_token'];
 
@@ -115,6 +122,66 @@ class ControllerExtensionModuleLuceedSync extends Controller
         $data['footer']      = $this->load->controller('common/footer');
 
         $this->response->setOutput($this->load->view('extension/module/luceed_sync_dash', $data));
+    }
+
+
+    /**
+     * Upload CSV with product models and sync only those products from Luceed.
+     *
+     * @return void
+     */
+    public function syncSelectedProducts()
+    {
+        $this->load->language('extension/module/luceed_sync');
+
+        if (!$this->validateModifyPermission()) {
+            $this->session->data['error_warning'] = $this->error['warning'];
+
+            return $this->redirectToModule();
+        }
+
+        if ($this->request->server['REQUEST_METHOD'] !== 'POST') {
+            $this->session->data['error_warning'] = $this->language->get('error_csv_file');
+
+            return $this->redirectToModule();
+        }
+
+        if (empty($this->request->files['csv_file']['tmp_name']) || !is_file($this->request->files['csv_file']['tmp_name'])) {
+            $this->session->data['error_warning'] = $this->language->get('error_csv_file');
+
+            return $this->redirectToModule();
+        }
+
+        try {
+            $models = $this->extractModelsFromCsv($this->request->files['csv_file']['tmp_name']);
+
+            if (!$models) {
+                throw new \RuntimeException($this->language->get('error_csv_empty'));
+            }
+
+            $result = $this->syncProductsByModel($models);
+
+            if ($result['updated']) {
+                $this->session->data['success'] = $this->buildCsvSyncMessage($result);
+            } else {
+                $this->session->data['error_warning'] = $this->buildCsvSyncMessage($result, true);
+            }
+        } catch (\Throwable $exception) {
+            Log::store(
+                [
+                    'message' => $exception->getMessage(),
+                    'trace' => $exception->getTraceAsString()
+                ],
+                'luceed_csv_sync_error'
+            );
+
+            $this->session->data['error_warning'] = sprintf(
+                $this->language->get('error_csv_sync'),
+                $exception->getMessage()
+            );
+        }
+
+        return $this->redirectToModule();
     }
 
 
@@ -750,15 +817,383 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
 
     /**
+     * @param array $models
+     *
+     * @return array
+     */
+    private function syncProductsByModel(array $models): array
+    {
+        $this->load->model('catalog/product');
+
+        $_loc = new LOC_Product();
+
+        $updated = 0;
+        $missing_local = [];
+        $missing_luceed = [];
+        $errors = [];
+
+        foreach ($models as $model) {
+            $oc_product = Product::query()->select('product_id', 'model')->where('model', $model)->first();
+
+            if (!$oc_product) {
+                $missing_local[] = $model;
+                continue;
+            }
+
+            $luceed_items = collect($this->fetchLuceedProductsByModel($model));
+
+            $luceed_product = $luceed_items
+                ->where('artikl', '==', $model)
+                ->where('osnovni__artikl', '==', null)
+                ->first();
+
+            if (!$luceed_product) {
+                $luceed_product = $luceed_items->where('artikl', '==', $model)->first();
+            }
+
+            if (!$luceed_product) {
+                $missing_luceed[] = $model;
+                continue;
+            }
+
+            $luceed_product->opcije = ProductHelper::sortOptions(
+                $luceed_items->where('osnovni__artikl', '==', $model)->values()->all(),
+                5
+            );
+
+            try {
+                $payload = $_loc->make($luceed_product);
+                $payload = array_merge($payload, $this->resolveOldProductData(['product_id' => $oc_product->product_id]));
+                $payload = $this->applyImmediateQuantityState($payload, $luceed_product->opcije);
+
+                $this->model_catalog_product->editProduct((int)$oc_product->product_id, $payload);
+                $this->markProductAsSynced((int)$oc_product->product_id, $luceed_product);
+
+                $updated++;
+            } catch (\Throwable $exception) {
+                $errors[$model] = $exception->getMessage();
+
+                Log::store(
+                    [
+                        'model' => $model,
+                        'message' => $exception->getMessage(),
+                    ],
+                    'luceed_csv_sync_product_error'
+                );
+            }
+        }
+
+        return [
+            'requested' => count($models),
+            'updated' => $updated,
+            'missing_local' => $missing_local,
+            'missing_luceed' => $missing_luceed,
+            'errors' => $errors,
+        ];
+    }
+
+
+    /**
+     * Fetch a single Luceed product payload with all its options.
+     *
+     * @param string $model
+     *
+     * @return array
+     */
+    private function fetchLuceedProductsByModel(string $model): array
+    {
+        if (agconf('env') === 'local') {
+            $products = json_decode(LuceedProduct::all());
+
+            if (!isset($products->result[0]->artikli) || !is_array($products->result[0]->artikli)) {
+                return [];
+            }
+
+            return collect($products->result[0]->artikli)
+                ->filter(function ($item) use ($model) {
+                    return $item->artikl === $model || (isset($item->osnovni__artikl) && $item->osnovni__artikl === $model);
+                })
+                ->values()
+                ->all();
+        }
+
+        $service = new LuceedService();
+        $response = $service->get('artikli/sifradio/' . rawurlencode($model));
+
+        if (!$response) {
+            return [];
+        }
+
+        $decoded = json_decode($response);
+
+        if (!isset($decoded->result[0]->artikli) || !is_array($decoded->result[0]->artikli)) {
+            return [];
+        }
+
+        return $decoded->result[0]->artikli;
+    }
+
+
+    /**
+     * Aggregate the product stock immediately from Luceed options.
+     *
+     * @param array $payload
+     * @param array $options
+     *
+     * @return array
+     */
+    private function applyImmediateQuantityState(array $payload, array $options): array
+    {
+        if ($options) {
+            $quantity = 0;
+
+            foreach ($options as $option) {
+                $quantity += (int)$option['raspolozivo_kol'];
+            }
+
+            $payload['quantity'] = $quantity;
+            $payload['stock_status_id'] = $quantity ? agconf('import.default_stock_full') : agconf('import.default_stock_empty');
+            $payload['status'] = $quantity ? $payload['status'] : 0;
+        }
+
+        return $payload;
+    }
+
+
+    /**
+     * @param int      $product_id
+     * @param \stdClass $luceed_product
+     *
+     * @return void
+     */
+    private function markProductAsSynced(int $product_id, \stdClass $luceed_product): void
+    {
+        $updates = [];
+
+        if ($this->hasProductColumn('luceed_uid')) {
+            $updates[] = "luceed_uid = '" . $this->db->escape($luceed_product->artikl_uid) . "'";
+        }
+
+        if ($this->hasProductColumn('updated')) {
+            $updates[] = "updated = 1";
+        }
+
+        if ($this->hasProductColumn('imported')) {
+            $updates[] = "imported = 1";
+        }
+
+        if ($this->hasProductColumn('hash')) {
+            $hash = ProductHelper::hashLuceedData(ProductHelper::collectLuceedData($luceed_product));
+            $updates[] = "hash = '" . $this->db->escape($hash) . "'";
+        }
+
+        if ($updates) {
+            $this->db->query("UPDATE " . DB_PREFIX . "product SET " . implode(', ', $updates) . " WHERE product_id = '" . (int)$product_id . "'");
+        }
+    }
+
+
+    /**
+     * @param string $column
+     *
+     * @return bool
+     */
+    private function hasProductColumn(string $column): bool
+    {
+        if ($this->product_columns === null) {
+            $this->product_columns = [];
+
+            $query = $this->db->query("SHOW COLUMNS FROM " . DB_PREFIX . "product");
+
+            foreach ($query->rows as $row) {
+                $this->product_columns[] = $row['Field'];
+            }
+        }
+
+        return in_array($column, $this->product_columns, true);
+    }
+
+
+    /**
+     * @param string $file
+     *
+     * @return array
+     */
+    private function extractModelsFromCsv(string $file): array
+    {
+        $handle = fopen($file, 'rb');
+
+        if (!$handle) {
+            throw new \RuntimeException($this->language->get('error_csv_file'));
+        }
+
+        $delimiter = $this->detectCsvDelimiter($file);
+        $models = [];
+        $model_index = null;
+        $line = 0;
+
+        while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
+            $line++;
+            $row = array_map([$this, 'normalizeCsvCell'], $row);
+
+            if (!$row || count(array_filter($row, function ($value) {
+                return $value !== '';
+            })) === 0) {
+                continue;
+            }
+
+            if ($line === 1) {
+                $model_index = $this->resolveModelColumnIndex($row);
+
+                if ($model_index !== null) {
+                    continue;
+                }
+
+                if (in_array(strtolower($row[0]), ['model', 'artikl', 'sifra', 'sku'], true)) {
+                    continue;
+                }
+            }
+
+            $value = $model_index !== null && isset($row[$model_index]) ? $row[$model_index] : '';
+
+            if ($value === '') {
+                foreach ($row as $cell) {
+                    if ($cell !== '') {
+                        $value = $cell;
+                        break;
+                    }
+                }
+            }
+
+            if ($value !== '') {
+                $models[] = $value;
+            }
+        }
+
+        fclose($handle);
+
+        return array_values(array_unique($models));
+    }
+
+
+    /**
+     * @param array $row
+     *
+     * @return int|null
+     */
+    private function resolveModelColumnIndex(array $row)
+    {
+        foreach ($row as $index => $value) {
+            if (in_array(strtolower($value), ['model', 'artikl', 'sifra', 'sku'], true)) {
+                return $index;
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
+     * @param string $value
+     *
+     * @return string
+     */
+    private function normalizeCsvCell(string $value): string
+    {
+        return trim(str_replace("\xEF\xBB\xBF", '', $value));
+    }
+
+
+    /**
+     * @param string $file
+     *
+     * @return string
+     */
+    private function detectCsvDelimiter(string $file): string
+    {
+        $handle = fopen($file, 'rb');
+        $line = $handle ? (string)fgets($handle) : '';
+
+        if ($handle) {
+            fclose($handle);
+        }
+
+        $delimiters = [
+            ';' => substr_count($line, ';'),
+            ',' => substr_count($line, ','),
+            "\t" => substr_count($line, "\t"),
+        ];
+
+        arsort($delimiters);
+
+        return (string)key($delimiters);
+    }
+
+
+    /**
+     * @param array $result
+     * @param bool  $warning
+     *
+     * @return string
+     */
+    private function buildCsvSyncMessage(array $result, bool $warning = false): string
+    {
+        $message = sprintf(
+            $this->language->get($warning ? 'text_warning_products_csv_sync' : 'text_success_products_csv_sync'),
+            $result['updated'],
+            $result['requested']
+        );
+
+        if ($result['missing_luceed']) {
+            $message .= ' ' . sprintf($this->language->get('text_products_csv_missing_luceed'), implode(', ', $result['missing_luceed']));
+        }
+
+        if ($result['missing_local']) {
+            $message .= ' ' . sprintf($this->language->get('text_products_csv_missing_local'), implode(', ', $result['missing_local']));
+        }
+
+        if ($result['errors']) {
+            $message .= ' ' . sprintf($this->language->get('text_products_csv_errors'), implode(', ', array_keys($result['errors'])));
+        }
+
+        return $message;
+    }
+
+
+    /**
+     * @return void
+     */
+    private function redirectToModule()
+    {
+        $this->response->redirect(
+            $this->url->link('extension/module/luceed_sync', 'user_token=' . $this->session->data['user_token'], true)
+        );
+    }
+
+
+    /**
      * @return bool
      */
     protected function validateRole()
     {
-        if ( ! $this->user->hasPermission('modify', 'extension/module/luceed_sync_dash')) {
+        if ( ! $this->user->hasPermission('modify', 'extension/module/luceed_sync')) {
             $this->error['warning'] = $this->language->get('error_permission');
         }
 
         return ! $this->error;
+    }
+
+
+    /**
+     * @return bool
+     */
+    private function validateModifyPermission(): bool
+    {
+        if (!$this->user->hasPermission('modify', 'extension/module/luceed_sync')) {
+            $this->error['warning'] = $this->language->get('error_permission');
+        }
+
+        return !$this->error;
     }
 
 

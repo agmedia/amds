@@ -29,9 +29,15 @@ $_['text_success_payments']          = 'Uspjeh..! Nova lista načina plaćanja j
 $_['text_warning_payments']          = 'Upozorenje..! Greška kod osvježavanja liste načina plaćanja!';
 $_['text_success_orders']            = 'Uspjeh..! Statusi narudžbi su obnovljeni!';
 $_['text_warning_orders']            = 'Upozorenje..! Nema novih statusa za obnoviti..!';
+$_['text_success_products_csv_sync']  = 'Sinkronizirano %s od %s artikala iz CSV-a.';
+$_['text_warning_products_csv_sync']  = 'Nije sinkroniziran nijedan artikl iz CSV-a (%s od %s).';
+$_['text_products_csv_missing_luceed'] = 'Luceed ne vraća: %s.';
+$_['text_products_csv_missing_local']  = 'Lokalno ne postoji: %s.';
+$_['text_products_csv_errors']         = 'Greška pri obradi: %s.';
 $_['text_products_import_panel']     = 'Proizvodi';
 $_['text_categories_import_panel']   = 'Kategorije';
 $_['text_manufacturer_import_panel'] = 'Proizvođači';
+$_['text_products_csv_panel']         = 'Selektivni CSV Sync';
 
 $_['text_success_product']          = 'Uspjeh..! %s novih proizvoda dodano!';
 $_['text_warning_product']          = 'Upozorenje..! Nema novih proizvoda za dodati!';
@@ -47,6 +53,7 @@ $_['btn_products_update_q']       = 'Update Količina';
 $_['btn_categories_import']       = 'Import Novih Kategorija';
 $_['btn_categories_active']       = 'Provjera Minimalnog Stanja';
 $_['btn_manufacturer_import']     = 'Import Novih Proizvođača';
+$_['btn_products_csv_sync']        = 'Pokreni CSV Sync';
 $_['btn_importing']               = 'Importing... <i class="fa fa-spinner fa-spin"></i>';
 $_['btn_updating']                = 'Updating... <i class="fa fa-spinner fa-spin"></i>';
 $_['btn_checking']                = 'Provjera... <i class="fa fa-spinner fa-spin"></i>';
@@ -55,6 +62,7 @@ $_['btn_checking']                = 'Provjera... <i class="fa fa-spinner fa-spin
 $_['help_products_import']     = 'Import se radi samo novih proizvoda. Proizvodi već importani neće se dirati.';
 $_['help_products_active']     = 'Provjerava se stanje svih artikala s obzirom na vrijednost Min_Kol_Web parametra u Luceed atributima.';
 $_['help_products_actions']    = 'Postojeće akcije se brišu. Radi se novi import svih važećih akcija iz Luceed-a.';
+$_['help_products_csv_sync']    = 'Upload CSV-a s modelima iz products tablice. Podržan je header `model`, `artikl`, `sifra` ili `sku`, kao i obična prva kolona bez headera. Za svaki model radi se direktan Luceed poziv i odmah se osvježavaju opcije i količine.';
 $_['help_products_update_pq']  = 'Update cijena i količina se vrši na svim proizvodima.';
 $_['help_products_update_p']   = 'Update cijena se vrši na svim proizvodima.';
 $_['help_products_update_q']   = 'Update količina se vrši na svim proizvodima.';
@@ -63,5 +71,10 @@ $_['help_categories_active']   = 'Provjerava se stanje svih kategorija s obzirom
 $_['help_manufacturer_import'] = 'Import se radi samo novih proizvođača.<br>Proizvođači već importani neće se dirati.';
 
 // Error
-$_['error_permission'] = 'Upozorenje..! Nemate ovlasti za promjenu Luceed Sync. Menađer modula.';
+$_['entry_products_csv_file'] = 'CSV datoteka';
 
+// Error
+$_['error_permission'] = 'Upozorenje..! Nemate ovlasti za promjenu Luceed Sync. Menađer modula.';
+$_['error_csv_file']   = 'Odaberite valjanu CSV datoteku za sync.';
+$_['error_csv_empty']  = 'CSV ne sadrži nijedan model za obradu.';
+$_['error_csv_sync']   = 'Greška pri CSV syncu: %s';
