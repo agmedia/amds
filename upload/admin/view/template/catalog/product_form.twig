@@ -588,6 +588,8 @@
                               <thead>
                                 <tr>
                                   <td class="text-left">{{ entry_option_value }}</td>
+                                  <td class="text-left">{{ entry_option_sku }}</td>
+                                  <td class="text-left">{{ entry_option_sifra }}</td>
                                   <td class="text-right">{{ entry_quantity }}</td>
                                   <td class="text-left">{{ entry_subtract }}</td>
                                   <td class="text-right">{{ entry_price }}</td>
@@ -625,6 +627,8 @@
 
 
                                       </select> <input type="hidden" name="product_option[{{ option_row }}][product_option_value][{{ option_value_row }}][product_option_value_id]" value="{{ product_option_value.product_option_value_id }}"/></td>
+                                    <td class="text-left"><input type="text" name="product_option[{{ option_row }}][product_option_value][{{ option_value_row }}][sku]" value="{{ product_option_value.sku }}" placeholder="{{ entry_option_sku }}" class="form-control"/></td>
+                                    <td class="text-left"><input type="text" name="product_option[{{ option_row }}][product_option_value][{{ option_value_row }}][sifra]" value="{{ product_option_value.sifra }}" placeholder="{{ entry_option_sifra }}" class="form-control"/></td>
                                     <td class="text-right"><input type="text" name="product_option[{{ option_row }}][product_option_value][{{ option_value_row }}][quantity]" value="{{ product_option_value.quantity }}" placeholder="{{ entry_quantity }}" class="form-control"/></td>
                                     <td class="text-left"><select name="product_option[{{ option_row }}][product_option_value][{{ option_value_row }}][subtract]" class="form-control">
 
@@ -751,7 +755,7 @@
 
                               <tfoot>
                                 <tr>
-                                  <td colspan="6"></td>
+                                  <td colspan="8"></td>
                                   <td class="text-left"><button type="button" onclick="addOptionValue('{{ option_row }}');" data-toggle="tooltip" title="{{ button_option_value_add }}" class="btn btn-primary"><i class="fa fa-plus-circle"></i></button></td>
                                 </tr>
                               </tfoot>
@@ -1536,6 +1540,8 @@
 	  html += '  <td class="text-left"><select name="product_option[' + option_row + '][product_option_value][' + option_value_row + '][option_value_id]" class="form-control">';
 	  html += $('#option-values' + option_row).html();
 	  html += '  </select><input type="hidden" name="product_option[' + option_row + '][product_option_value][' + option_value_row + '][product_option_value_id]" value="" /></td>';
+	  html += '  <td class="text-left"><input type="text" name="product_option[' + option_row + '][product_option_value][' + option_value_row + '][sku]" value="" placeholder="{{ entry_option_sku }}" class="form-control" /></td>';
+	  html += '  <td class="text-left"><input type="text" name="product_option[' + option_row + '][product_option_value][' + option_value_row + '][sifra]" value="" placeholder="{{ entry_option_sifra }}" class="form-control" /></td>';
 	  html += '  <td class="text-right"><input type="text" name="product_option[' + option_row + '][product_option_value][' + option_value_row + '][quantity]" value="" placeholder="{{ entry_quantity }}" class="form-control" /></td>';
 	  html += '  <td class="text-left"><select name="product_option[' + option_row + '][product_option_value][' + option_value_row + '][subtract]" class="form-control">';
 	  html += '    <option value="1">{{ text_yes }}</option>';

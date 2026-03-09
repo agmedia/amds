@@ -965,6 +965,8 @@ class ControllerCatalogProduct extends Controller {
 						'price_prefix'            => $product_option_value['price_prefix'],
 						'points'                  => $product_option_value['points'],
 						'points_prefix'           => $product_option_value['points_prefix'],
+						'sku'                     => isset($product_option_value['sku']) ? $product_option_value['sku'] : '',
+						'sifra'                   => isset($product_option_value['sifra']) ? $product_option_value['sifra'] : '',
 						'weight'                  => $product_option_value['weight'],
 						'weight_prefix'           => $product_option_value['weight_prefix']
 					);
@@ -1439,9 +1441,8 @@ class ControllerCatalogProduct extends Controller {
             ];
         }
 
-        $luceed_product->opcije = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::sortOptions(
-            $luceed_items->where('osnovni__artikl', '==', $model)->values()->all(),
-            5
+        $luceed_product->opcije = $this->mapLuceedOptions(
+            $luceed_items->where('osnovni__artikl', '==', $model)->values()->all()
         );
 
         $product_payload = new \Agmedia\LuceedOpencartWrapper\Models\LOC_Product();
@@ -1494,6 +1495,35 @@ class ControllerCatalogProduct extends Controller {
         }
 
         return $decoded->result[0]->artikli;
+    }
+
+
+    /**
+     * @param array $items
+     *
+     * @return array
+     */
+    private function mapLuceedOptions(array $items) {
+        $options = [];
+
+        foreach ($items as $item) {
+            if (!isset($item->artikl_uid) || !isset($item->artikl)) {
+                continue;
+            }
+
+            $options[] = [
+                'uid' => $item->artikl_uid,
+                'artikl' => $item->artikl,
+                'barcode' => isset($item->barcode) ? $item->barcode : '',
+                'mpc' => isset($item->mpc) ? $item->mpc : 0,
+                'velicina_uid' => isset($item->velicina_uid) ? $item->velicina_uid : '',
+                'velicina' => isset($item->velicina) ? $item->velicina : '',
+                'velicina_naziv' => isset($item->velicina_naziv) ? $item->velicina_naziv : $item->artikl,
+                'raspolozivo_kol' => (int)(isset($item->raspolozivo_kol) ? $item->raspolozivo_kol : (isset($item->stanje_kol) ? $item->stanje_kol : 0))
+            ];
+        }
+
+        return $options;
     }
 
 
