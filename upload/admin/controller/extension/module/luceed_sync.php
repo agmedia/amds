@@ -869,6 +869,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
                     $updated++;
                 } else {
+                    $payload = $this->appendNovoCategory($payload);
                     $product_id = (int)$this->model_catalog_product->addProduct($payload);
 
                     if (!$product_id) {
@@ -972,6 +973,28 @@ class ControllerExtensionModuleLuceedSync extends Controller
         }
 
         return $options;
+    }
+
+
+    /**
+     * Ensure newly imported products are assigned to the Novo category.
+     *
+     * @param array $payload
+     *
+     * @return array
+     */
+    private function appendNovoCategory(array $payload): array
+    {
+        $novo_category_id = (int) (agconf('import.novo_category') ?: 111);
+
+        if (!isset($payload['product_category']) || !is_array($payload['product_category'])) {
+            $payload['product_category'] = [];
+        }
+
+        $payload['product_category'][] = $novo_category_id;
+        $payload['product_category'] = array_values(array_unique(array_map('intval', $payload['product_category'])));
+
+        return $payload;
     }
 
 
