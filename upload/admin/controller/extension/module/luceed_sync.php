@@ -161,7 +161,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
             $result = $this->syncProductsByModel($models);
 
-            if ($result['updated']) {
+            if ($result['updated'] || $result['imported']) {
                 $this->session->data['success'] = $this->buildCsvSyncMessage($result);
             } else {
                 $this->session->data['error_warning'] = $this->buildCsvSyncMessage($result, true);
@@ -828,17 +828,13 @@ class ControllerExtensionModuleLuceedSync extends Controller
         $_loc = new LOC_Product();
 
         $updated = 0;
+        $imported = 0;
         $missing_local = [];
         $missing_luceed = [];
         $errors = [];
 
         foreach ($models as $model) {
             $oc_product = Product::query()->select('product_id', 'model')->where('model', $model)->first();
-
-            if (!$oc_product) {
-                $missing_local[] = $model;
-                continue;
-            }
 
             $luceed_items = collect($this->fetchLuceedProductsByModel($model));
 
@@ -862,19 +858,34 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
             try {
                 $payload = $_loc->make($luceed_product);
-                $payload = array_merge($payload, $this->resolveOldProductData(['product_id' => $oc_product->product_id]));
                 $payload = $this->applyImmediateQuantityState($payload, $luceed_product->opcije);
+                $payload['sku'] = $model;
 
-                $this->model_catalog_product->editProduct((int)$oc_product->product_id, $payload);
-                $this->markProductAsSynced((int)$oc_product->product_id, $luceed_product);
+                if ($oc_product) {
+                    $payload = array_merge($payload, $this->resolveOldProductData(['product_id' => $oc_product->product_id]));
 
-                $updated++;
+                    $this->model_catalog_product->editProduct((int)$oc_product->product_id, $payload);
+                    $this->markProductAsSynced((int)$oc_product->product_id, $luceed_product);
+
+                    $updated++;
+                } else {
+                    $product_id = (int)$this->model_catalog_product->addProduct($payload);
+
+                    if (!$product_id) {
+                        throw new \RuntimeException('Import nije vratio product_id za model ' . $model . '.');
+                    }
+
+                    $this->markProductAsSynced($product_id, $luceed_product);
+
+                    $imported++;
+                }
             } catch (\Throwable $exception) {
                 $errors[$model] = $exception->getMessage();
 
                 Log::store(
                     [
                         'model' => $model,
+                        'exists_local' => $oc_product ? 1 : 0,
                         'message' => $exception->getMessage(),
                     ],
                     'luceed_csv_sync_product_error'
@@ -885,6 +896,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
         return [
             'requested' => count($models),
             'updated' => $updated,
+            'imported' => $imported,
             'missing_local' => $missing_local,
             'missing_luceed' => $missing_luceed,
             'errors' => $errors,
@@ -1167,11 +1179,21 @@ class ControllerExtensionModuleLuceedSync extends Controller
      */
     private function buildCsvSyncMessage(array $result, bool $warning = false): string
     {
+        $processed = (int)$result['updated'] + (int)$result['imported'];
+
         $message = sprintf(
             $this->language->get($warning ? 'text_warning_products_csv_sync' : 'text_success_products_csv_sync'),
-            $result['updated'],
+            $processed,
             $result['requested']
         );
+
+        if (!empty($result['updated'])) {
+            $message .= ' ' . sprintf($this->language->get('text_products_csv_updated'), $result['updated']);
+        }
+
+        if (!empty($result['imported'])) {
+            $message .= ' ' . sprintf($this->language->get('text_products_csv_imported'), $result['imported']);
+        }
 
         if ($result['missing_luceed']) {
             $message .= ' ' . sprintf($this->language->get('text_products_csv_missing_luceed'), implode(', ', $result['missing_luceed']));
