@@ -1511,19 +1511,54 @@ class ControllerCatalogProduct extends Controller {
                 continue;
             }
 
+            $option_name = $this->resolveLuceedOptionName($item);
+
             $options[] = [
                 'uid' => $item->artikl_uid,
                 'artikl' => $item->artikl,
                 'barcode' => isset($item->barcode) ? $item->barcode : '',
                 'mpc' => isset($item->mpc) ? $item->mpc : 0,
                 'velicina_uid' => isset($item->velicina_uid) ? $item->velicina_uid : '',
-                'velicina' => isset($item->velicina) ? $item->velicina : '',
-                'velicina_naziv' => isset($item->velicina_naziv) ? $item->velicina_naziv : $item->artikl,
+                'velicina' => $option_name,
+                'velicina_naziv' => $option_name,
                 'raspolozivo_kol' => (int)(isset($item->raspolozivo_kol) ? $item->raspolozivo_kol : (isset($item->stanje_kol) ? $item->stanje_kol : 0))
             ];
         }
 
         return $options;
+    }
+
+
+    /**
+     * Resolve the OpenCart option label from the Luceed variant code.
+     * Example: 134747-S => S
+     *
+     * @param object $item
+     *
+     * @return string
+     */
+    private function resolveLuceedOptionName($item) {
+        if (isset($item->artikl) && is_string($item->artikl)) {
+            $position = strrpos($item->artikl, '-');
+
+            if ($position !== false) {
+                $suffix = trim(substr($item->artikl, $position + 1));
+
+                if ($suffix !== '') {
+                    return $suffix;
+                }
+            }
+        }
+
+        if (isset($item->velicina) && trim((string)$item->velicina) !== '') {
+            return trim((string)$item->velicina);
+        }
+
+        if (isset($item->velicina_naziv) && trim((string)$item->velicina_naziv) !== '') {
+            return trim((string)$item->velicina_naziv);
+        }
+
+        return isset($item->artikl) ? trim((string)$item->artikl) : '';
     }
 
 
