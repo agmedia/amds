@@ -834,7 +834,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
         $errors = [];
 
         foreach ($models as $model) {
-            $oc_product = Product::query()->select('product_id', 'model')->where('model', $model)->first();
+            $oc_product = Product::query()->select('product_id', 'model', 'date_added')->where('model', $model)->first();
 
             $luceed_items = collect($this->fetchLuceedProductsByModel($model));
 
@@ -863,6 +863,10 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
                 if ($oc_product) {
                     $payload = array_merge($payload, $this->resolveOldProductData(['product_id' => $oc_product->product_id]));
+
+                    if ($this->shouldAssignNovoCategory($oc_product)) {
+                        $payload = $this->appendNovoCategory($payload);
+                    }
 
                     $this->model_catalog_product->editProduct((int)$oc_product->product_id, $payload);
                     $this->markProductAsSynced((int)$oc_product->product_id, $luceed_product);
@@ -1031,6 +1035,37 @@ class ControllerExtensionModuleLuceedSync extends Controller
         $payload['product_category'] = array_values(array_unique(array_map('intval', $payload['product_category'])));
 
         return $payload;
+    }
+
+
+    /**
+     * Assign the Novo category only to products added within the last 30 days.
+     *
+     * @param mixed $product
+     *
+     * @return bool
+     */
+    private function shouldAssignNovoCategory($product): bool
+    {
+        $date_added = '';
+
+        if (is_array($product) && !empty($product['date_added'])) {
+            $date_added = (string)$product['date_added'];
+        } elseif (is_object($product) && !empty($product->date_added)) {
+            $date_added = (string)$product->date_added;
+        }
+
+        if ($date_added === '') {
+            return false;
+        }
+
+        $added_at = Carbon::make($date_added);
+
+        if (!$added_at) {
+            return false;
+        }
+
+        return $added_at->greaterThanOrEqualTo(Carbon::now()->subDays(30)->startOfDay());
     }
 
 
