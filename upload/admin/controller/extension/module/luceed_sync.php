@@ -68,6 +68,10 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
         $this->document->setTitle($this->language->get('heading_title'));
 
+        if ($this->request->server['REQUEST_METHOD'] === 'POST' && isset($this->request->files['csv_file'])) {
+            $this->processCsvSyncUpload();
+        }
+
         $data['revision_products'] = LuceedProductForRevision::with('product')->get();
         $data['rev_ids']           = $data['revision_products']->pluck('sku')->take(200)->flatten();
         $last_rev                  = LuceedProductForRevisionData::orderBy('last_revision_date', 'desc')->first();
@@ -113,7 +117,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
         }
 
         $data['generate_excel_link'] = $this->url->link('extension/module/luceed_sync/generateExcel', 'user_token=' . $this->session->data['user_token'], true);
-        $data['sync_csv_action'] = $this->url->link('extension/module/luceed_sync/syncSelectedProducts', 'user_token=' . $this->session->data['user_token'], true);
+        $data['sync_csv_action'] = $this->url->link('extension/module/luceed_sync', 'user_token=' . $this->session->data['user_token'], true);
 
         $data['user_token'] = $this->session->data['user_token'];
 
@@ -133,53 +137,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
     public function syncSelectedProducts()
     {
         $this->load->language('extension/module/luceed_sync');
-
-        if (!$this->validateModifyPermission()) {
-            $this->session->data['error_warning'] = $this->error['warning'];
-
-            return $this->redirectToModule();
-        }
-
-        if ($this->request->server['REQUEST_METHOD'] !== 'POST') {
-            $this->session->data['error_warning'] = $this->language->get('error_csv_file');
-
-            return $this->redirectToModule();
-        }
-
-        if (empty($this->request->files['csv_file']['tmp_name']) || !is_file($this->request->files['csv_file']['tmp_name'])) {
-            $this->session->data['error_warning'] = $this->language->get('error_csv_file');
-
-            return $this->redirectToModule();
-        }
-
-        try {
-            $models = $this->extractModelsFromCsv($this->request->files['csv_file']['tmp_name']);
-
-            if (!$models) {
-                throw new \RuntimeException($this->language->get('error_csv_empty'));
-            }
-
-            $result = $this->syncProductsByModel($models);
-
-            if ($result['updated'] || $result['imported']) {
-                $this->session->data['success'] = $this->buildCsvSyncMessage($result);
-            } else {
-                $this->session->data['error_warning'] = $this->buildCsvSyncMessage($result, true);
-            }
-        } catch (\Throwable $exception) {
-            Log::store(
-                [
-                    'message' => $exception->getMessage(),
-                    'trace' => $exception->getTraceAsString()
-                ],
-                'luceed_csv_sync_error'
-            );
-
-            $this->session->data['error_warning'] = sprintf(
-                $this->language->get('error_csv_sync'),
-                $exception->getMessage()
-            );
-        }
+        $this->processCsvSyncUpload();
 
         return $this->redirectToModule();
     }
@@ -1302,6 +1260,65 @@ class ControllerExtensionModuleLuceedSync extends Controller
         }
 
         return $message;
+    }
+
+
+    /**
+     * Process the uploaded CSV and populate flash messages for the module page.
+     *
+     * @return void
+     */
+    private function processCsvSyncUpload(): void
+    {
+        $this->session->data['success'] = '';
+        unset($this->session->data['error_warning']);
+
+        if (!$this->validateModifyPermission()) {
+            $this->session->data['error_warning'] = $this->error['warning'];
+
+            return;
+        }
+
+        if ($this->request->server['REQUEST_METHOD'] !== 'POST') {
+            $this->session->data['error_warning'] = $this->language->get('error_csv_file');
+
+            return;
+        }
+
+        if (empty($this->request->files['csv_file']['tmp_name']) || !is_file($this->request->files['csv_file']['tmp_name'])) {
+            $this->session->data['error_warning'] = $this->language->get('error_csv_file');
+
+            return;
+        }
+
+        try {
+            $models = $this->extractModelsFromCsv($this->request->files['csv_file']['tmp_name']);
+
+            if (!$models) {
+                throw new \RuntimeException($this->language->get('error_csv_empty'));
+            }
+
+            $result = $this->syncProductsByModel($models);
+
+            if ($result['updated'] || $result['imported']) {
+                $this->session->data['success'] = $this->buildCsvSyncMessage($result);
+            } else {
+                $this->session->data['error_warning'] = $this->buildCsvSyncMessage($result, true);
+            }
+        } catch (\Throwable $exception) {
+            Log::store(
+                [
+                    'message' => $exception->getMessage(),
+                    'trace' => $exception->getTraceAsString()
+                ],
+                'luceed_csv_sync_error'
+            );
+
+            $this->session->data['error_warning'] = sprintf(
+                $this->language->get('error_csv_sync'),
+                $exception->getMessage()
+            );
+        }
     }
 
 
