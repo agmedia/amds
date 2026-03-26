@@ -32,6 +32,8 @@ use Carbon\Carbon;
 
 class ControllerExtensionModuleLuceedSync extends Controller
 {
+    private const CSV_SYNC_SESSION_KEY = 'luceed_csv_sync_state';
+    private const CSV_SYNC_BATCH_SIZE = 5;
 
     private $error = array();
     private $product_columns = null;
@@ -118,6 +120,8 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
         $data['generate_excel_link'] = $this->url->link('extension/module/luceed_sync/generateExcel', 'user_token=' . $this->session->data['user_token'], true);
         $data['sync_csv_action'] = $this->url->link('extension/module/luceed_sync', 'user_token=' . $this->session->data['user_token'], true);
+        $data['sync_csv_start_action'] = $this->url->link('extension/module/luceed_sync/startCsvSync', 'user_token=' . $this->session->data['user_token'], true);
+        $data['sync_csv_batch_action'] = $this->url->link('extension/module/luceed_sync/processCsvSyncBatch', 'user_token=' . $this->session->data['user_token'], true);
 
         $data['user_token'] = $this->session->data['user_token'];
 
@@ -140,6 +144,161 @@ class ControllerExtensionModuleLuceedSync extends Controller
         $this->processCsvSyncUpload();
 
         return $this->redirectToModule();
+    }
+
+
+    /**
+     * Start CSV sync in batches and return initial state as JSON.
+     *
+     * @return void
+     */
+    public function startCsvSync()
+    {
+        $this->load->language('extension/module/luceed_sync');
+        $this->prepareLongRunningRequest();
+
+        $this->session->data['success'] = '';
+        unset($this->session->data['error_warning']);
+
+        if (!$this->validateModifyPermission()) {
+            $this->output(['status' => 300, 'message' => $this->error['warning']]);
+
+            return;
+        }
+
+        if ($this->request->server['REQUEST_METHOD'] !== 'POST') {
+            $this->output(['status' => 300, 'message' => $this->language->get('error_csv_file')]);
+
+            return;
+        }
+
+        if (empty($this->request->files['csv_file']['tmp_name']) || !is_file($this->request->files['csv_file']['tmp_name'])) {
+            $this->output(['status' => 300, 'message' => $this->language->get('error_csv_file')]);
+
+            return;
+        }
+
+        try {
+            $items = $this->extractModelsFromCsv($this->request->files['csv_file']['tmp_name']);
+
+            if (!$items) {
+                throw new \RuntimeException($this->language->get('error_csv_empty'));
+            }
+
+            $this->clearCsvSyncState();
+
+            $file = $this->createCsvSyncItemsFile($items);
+
+            $this->session->data[self::CSV_SYNC_SESSION_KEY] = [
+                'file' => $file,
+                'offset' => 0,
+                'total' => count($items),
+                'chunk_size' => self::CSV_SYNC_BATCH_SIZE,
+                'result' => $this->createEmptyCsvSyncResult(count($items)),
+            ];
+
+            $this->output([
+                'status' => 200,
+                'message' => sprintf($this->language->get('text_products_csv_sync_started'), self::CSV_SYNC_BATCH_SIZE, count($items)),
+                'processed' => 0,
+                'total' => count($items),
+                'done' => false,
+            ]);
+        } catch (\Throwable $exception) {
+            $this->clearCsvSyncState();
+
+            Log::store(
+                [
+                    'message' => $exception->getMessage(),
+                    'trace' => $exception->getTraceAsString()
+                ],
+                'luceed_csv_sync_error'
+            );
+
+            $this->output([
+                'status' => 300,
+                'message' => sprintf($this->language->get('error_csv_sync'), $exception->getMessage())
+            ]);
+        }
+    }
+
+
+    /**
+     * Process the next CSV sync batch and return progress as JSON.
+     *
+     * @return void
+     */
+    public function processCsvSyncBatch()
+    {
+        $this->load->language('extension/module/luceed_sync');
+        $this->prepareLongRunningRequest();
+
+        if (!$this->validateModifyPermission()) {
+            $this->output(['status' => 300, 'message' => $this->error['warning']]);
+
+            return;
+        }
+
+        try {
+            $state = $this->getCsvSyncState();
+            $items = $this->loadCsvSyncItems($state['file']);
+            $chunk = array_slice($items, (int)$state['offset'], (int)$state['chunk_size']);
+
+            if (!$chunk) {
+                $this->finalizeCsvSyncState($state['result']);
+
+                $this->output([
+                    'status' => 200,
+                    'message' => $this->buildCsvSyncMessage($state['result'], !($state['result']['updated'] || $state['result']['imported'])),
+                    'processed' => (int)$state['offset'],
+                    'total' => (int)$state['total'],
+                    'done' => true,
+                ]);
+
+                return;
+            }
+
+            $chunk_result = $this->syncProductsByModel($chunk);
+            $state['result'] = $this->mergeCsvSyncResults($state['result'], $chunk_result);
+            $state['offset'] += count($chunk);
+
+            $done = (int)$state['offset'] >= (int)$state['total'];
+
+            if ($done) {
+                $this->finalizeCsvSyncState($state['result']);
+            } else {
+                $this->session->data[self::CSV_SYNC_SESSION_KEY] = $state;
+            }
+
+            $this->output([
+                'status' => 200,
+                'message' => $done
+                    ? $this->buildCsvSyncMessage($state['result'], !($state['result']['updated'] || $state['result']['imported']))
+                    : $this->buildCsvSyncProgressMessage($state['offset'], $state['total'], $state['result']),
+                'processed' => (int)$state['offset'],
+                'total' => (int)$state['total'],
+                'done' => $done,
+            ]);
+        } catch (\Throwable $exception) {
+            $this->clearCsvSyncState();
+            $this->session->data['error_warning'] = sprintf(
+                $this->language->get('error_csv_sync'),
+                $exception->getMessage()
+            );
+
+            Log::store(
+                [
+                    'message' => $exception->getMessage(),
+                    'trace' => $exception->getTraceAsString()
+                ],
+                'luceed_csv_sync_error'
+            );
+
+            $this->output([
+                'status' => 300,
+                'message' => sprintf($this->language->get('error_csv_sync'), $exception->getMessage())
+            ]);
+        }
     }
 
 
@@ -1305,12 +1464,175 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
 
     /**
+     * @param int   $processed
+     * @param int   $total
+     * @param array $result
+     *
+     * @return string
+     */
+    private function buildCsvSyncProgressMessage(int $processed, int $total, array $result): string
+    {
+        return sprintf(
+            $this->language->get('text_products_csv_progress'),
+            $processed,
+            $total,
+            (int)$result['updated'],
+            (int)$result['imported']
+        );
+    }
+
+
+    /**
+     * @param int $requested
+     *
+     * @return array
+     */
+    private function createEmptyCsvSyncResult(int $requested): array
+    {
+        return [
+            'requested' => $requested,
+            'updated' => 0,
+            'imported' => 0,
+            'missing_local' => [],
+            'missing_luceed' => [],
+            'errors' => [],
+        ];
+    }
+
+
+    /**
+     * @param array $total
+     * @param array $chunk
+     *
+     * @return array
+     */
+    private function mergeCsvSyncResults(array $total, array $chunk): array
+    {
+        $total['updated'] += (int)$chunk['updated'];
+        $total['imported'] += (int)$chunk['imported'];
+        $total['missing_local'] = array_values(array_unique(array_merge($total['missing_local'], $chunk['missing_local'])));
+        $total['missing_luceed'] = array_values(array_unique(array_merge($total['missing_luceed'], $chunk['missing_luceed'])));
+        $total['errors'] = array_merge($total['errors'], $chunk['errors']);
+
+        return $total;
+    }
+
+
+    /**
+     * @return void
+     */
+    private function prepareLongRunningRequest(): void
+    {
+        if (function_exists('ignore_user_abort')) {
+            ignore_user_abort(true);
+        }
+
+        if (function_exists('set_time_limit')) {
+            @set_time_limit(0);
+        }
+    }
+
+
+    /**
+     * @param array $items
+     *
+     * @return string
+     */
+    private function createCsvSyncItemsFile(array $items): string
+    {
+        $directory = rtrim(DIR_STORAGE, '/\\') . '/cache/';
+
+        if (!is_dir($directory) && !mkdir($directory, 0777, true) && !is_dir($directory)) {
+            throw new \RuntimeException($this->language->get('error_csv_sync_state'));
+        }
+
+        $file = $directory . 'luceed_csv_sync_' . md5(uniqid('', true)) . '.json';
+        $written = file_put_contents($file, json_encode(array_values($items)));
+
+        if ($written === false) {
+            throw new \RuntimeException($this->language->get('error_csv_sync_state'));
+        }
+
+        return $file;
+    }
+
+
+    /**
+     * @param string $file
+     *
+     * @return array
+     */
+    private function loadCsvSyncItems(string $file): array
+    {
+        if (!is_file($file)) {
+            throw new \RuntimeException($this->language->get('error_csv_sync_state'));
+        }
+
+        $decoded = json_decode((string)file_get_contents($file), true);
+
+        if (!is_array($decoded)) {
+            throw new \RuntimeException($this->language->get('error_csv_sync_state'));
+        }
+
+        return $decoded;
+    }
+
+
+    /**
+     * @return array
+     */
+    private function getCsvSyncState(): array
+    {
+        if (empty($this->session->data[self::CSV_SYNC_SESSION_KEY]) || !is_array($this->session->data[self::CSV_SYNC_SESSION_KEY])) {
+            throw new \RuntimeException($this->language->get('error_csv_sync_state'));
+        }
+
+        return $this->session->data[self::CSV_SYNC_SESSION_KEY];
+    }
+
+
+    /**
+     * @param array $result
+     *
+     * @return void
+     */
+    private function finalizeCsvSyncState(array $result): void
+    {
+        if ($result['updated'] || $result['imported']) {
+            $this->session->data['success'] = $this->buildCsvSyncMessage($result);
+        } else {
+            $this->session->data['error_warning'] = $this->buildCsvSyncMessage($result, true);
+        }
+
+        $this->clearCsvSyncState();
+    }
+
+
+    /**
+     * @return void
+     */
+    private function clearCsvSyncState(): void
+    {
+        if (!empty($this->session->data[self::CSV_SYNC_SESSION_KEY]['file'])) {
+            $file = $this->session->data[self::CSV_SYNC_SESSION_KEY]['file'];
+
+            if (is_string($file) && is_file($file)) {
+                @unlink($file);
+            }
+        }
+
+        unset($this->session->data[self::CSV_SYNC_SESSION_KEY]);
+    }
+
+
+    /**
      * Process the uploaded CSV and populate flash messages for the module page.
      *
      * @return void
      */
     private function processCsvSyncUpload(): void
     {
+        $this->prepareLongRunningRequest();
         $this->session->data['success'] = '';
         unset($this->session->data['error_warning']);
 
@@ -1333,13 +1655,13 @@ class ControllerExtensionModuleLuceedSync extends Controller
         }
 
         try {
-            $models = $this->extractModelsFromCsv($this->request->files['csv_file']['tmp_name']);
+            $items = $this->extractModelsFromCsv($this->request->files['csv_file']['tmp_name']);
 
-            if (!$models) {
+            if (!$items) {
                 throw new \RuntimeException($this->language->get('error_csv_empty'));
             }
 
-            $result = $this->syncProductsByModel($models);
+            $result = $this->syncProductsByModel($items);
 
             if ($result['updated'] || $result['imported']) {
                 $this->session->data['success'] = $this->buildCsvSyncMessage($result);
