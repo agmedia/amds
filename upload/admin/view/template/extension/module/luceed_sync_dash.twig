@@ -427,7 +427,7 @@
             showCsvSyncProgress('{{ text_products_csv_sync_uploading }}');
 
             $.ajax({
-                url: '{{ sync_csv_start_action }}',
+                url: 'index.php?route=extension/module/luceed_sync/startCsvSync&user_token={{ user_token }}',
                 type: 'POST',
                 data: formData,
                 dataType: 'json',
@@ -452,7 +452,7 @@
 
         function processCsvSyncBatch(originalHtml) {
             $.ajax({
-                url: '{{ sync_csv_batch_action }}',
+                url: 'index.php?route=extension/module/luceed_sync/processCsvSyncBatch&user_token={{ user_token }}',
                 type: 'POST',
                 dataType: 'json',
                 success: function(json) {
