@@ -1723,11 +1723,11 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
 
     /**
-     * @param array $order
+     * @param array|null $order
      *
      * @throws Exception
      */
-    private function sendMail(array $order = null)
+    private function sendMail(?array $order = null)
     {
         if ($order && isset($order['order_id']) && isset($order['mail'])) {
             $email             = $this->loadEmails($order['mail']);
@@ -1864,6 +1864,10 @@ class ControllerExtensionModuleLuceedSync extends Controller
      */
     private function output($data)
     {
+        while (ob_get_level() > 0) {
+            @ob_end_clean();
+        }
+
         $this->response->addHeader('Content-Type: application/json');
         $this->response->setOutput(collect($data)->toJson());
     }
