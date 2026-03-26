@@ -64,7 +64,7 @@ $_['btn_checking']                = 'Provjera... <i class="fa fa-spinner fa-spin
 $_['help_products_import']     = 'Import se radi samo novih proizvoda. Proizvodi već importani neće se dirati.';
 $_['help_products_active']     = 'Provjerava se stanje svih artikala s obzirom na vrijednost Min_Kol_Web parametra u Luceed atributima.';
 $_['help_products_actions']    = 'Postojeće akcije se brišu. Radi se novi import svih važećih akcija iz Luceed-a.';
-$_['help_products_csv_sync']    = 'Upload CSV-a s modelima iz products tablice. Podržan je header `model`, `artikl`, `sifra` ili `sku`, kao i obična prva kolona bez headera. Za svaki model radi se direktan Luceed poziv i odmah se osvježavaju opcije i količine.';
+$_['help_products_csv_sync']    = 'Upload CSV-a s modelima iz products tablice. Podržan je header `model`, `artikl`, `sifra` ili `sku`, kao i obična prva kolona bez headera. Ako CSV ima drugu kolonu, samo redovi s vrijednosti `A26` dobivaju kategoriju Novo. Za svaki model radi se direktan Luceed poziv i odmah se osvježavaju opcije i količine.';
 $_['help_products_update_pq']  = 'Update cijena i količina se vrši na svim proizvodima.';
 $_['help_products_update_p']   = 'Update cijena se vrši na svim proizvodima.';
 $_['help_products_update_q']   = 'Update količina se vrši na svim proizvodima.';

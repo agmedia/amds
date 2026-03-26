@@ -779,7 +779,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
      *
      * @return array
      */
-    private function syncProductsByModel(array $models): array
+    private function syncProductsByModel(array $items): array
     {
         $this->load->model('catalog/product');
 
@@ -791,7 +791,8 @@ class ControllerExtensionModuleLuceedSync extends Controller
         $missing_luceed = [];
         $errors = [];
 
-        foreach ($models as $model) {
+        foreach ($items as $item) {
+            $model = $item['model'];
             $oc_product = Product::query()->select('product_id', 'model', 'date_added')->where('model', $model)->first();
 
             $luceed_items = collect($this->fetchLuceedProductsByModel($model));
@@ -822,7 +823,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
                 if ($oc_product) {
                     $payload = array_merge($payload, $this->resolveOldProductData(['product_id' => $oc_product->product_id]));
 
-                    if ($this->shouldAssignNovoCategory($oc_product)) {
+                    if ($this->shouldAssignNovoCategoryFromCsvRow($item, $oc_product)) {
                         $payload = $this->appendNovoCategory($payload);
                     }
 
@@ -831,7 +832,10 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
                     $updated++;
                 } else {
-                    $payload = $this->appendNovoCategory($payload);
+                    if ($this->shouldAssignNovoCategoryFromCsvRow($item)) {
+                        $payload = $this->appendNovoCategory($payload);
+                    }
+
                     $product_id = (int)$this->model_catalog_product->addProduct($payload);
 
                     if (!$product_id) {
@@ -857,7 +861,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
         }
 
         return [
-            'requested' => count($models),
+            'requested' => count($items),
             'updated' => $updated,
             'imported' => $imported,
             'missing_local' => $missing_local,
@@ -1028,6 +1032,30 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
 
     /**
+     * Decide Novo assignment for CSV sync rows.
+     * If CSV has a second column, only rows with value A26 should get Novo.
+     * Otherwise keep the existing behavior.
+     *
+     * @param array $row
+     * @param mixed $product
+     *
+     * @return bool
+     */
+    private function shouldAssignNovoCategoryFromCsvRow(array $row, $product = null): bool
+    {
+        if (!empty($row['has_secondary_column'])) {
+            return isset($row['novo_marker']) && strtoupper(trim((string)$row['novo_marker'])) === 'A26';
+        }
+
+        if ($product) {
+            return $this->shouldAssignNovoCategory($product);
+        }
+
+        return true;
+    }
+
+
+    /**
      * Aggregate the product stock immediately from Luceed options.
      *
      * @param array $payload
@@ -1121,9 +1149,10 @@ class ControllerExtensionModuleLuceedSync extends Controller
         }
 
         $delimiter = $this->detectCsvDelimiter($file);
-        $models = [];
+        $items = [];
         $model_index = null;
         $line = 0;
+        $has_secondary_column = false;
 
         while (($row = fgetcsv($handle, 0, $delimiter)) !== false) {
             $line++;
@@ -1133,6 +1162,10 @@ class ControllerExtensionModuleLuceedSync extends Controller
                 return $value !== '';
             })) === 0) {
                 continue;
+            }
+
+            if (count($row) > 1) {
+                $has_secondary_column = true;
             }
 
             if ($line === 1) {
@@ -1159,13 +1192,21 @@ class ControllerExtensionModuleLuceedSync extends Controller
             }
 
             if ($value !== '') {
-                $models[] = $value;
+                $items[$value] = [
+                    'model' => $value,
+                    'novo_marker' => isset($row[1]) ? $row[1] : '',
+                ];
             }
         }
 
         fclose($handle);
 
-        return array_values(array_unique($models));
+        foreach ($items as &$item) {
+            $item['has_secondary_column'] = $has_secondary_column;
+        }
+        unset($item);
+
+        return array_values($items);
     }
 
 
