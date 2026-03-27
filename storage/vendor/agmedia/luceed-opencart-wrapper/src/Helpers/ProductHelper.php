@@ -724,25 +724,25 @@ class ProductHelper
         }
 
         return [
-            'artikl_uid' => $product->artikl_uid,
-            'artikl' => $product->artikl,
-            'naziv' => $product->naziv,
-            'barcode' => $product->barcode,
-            'jm' => $product->jm,
-            'opis' => static::setDescription($product->opis),
-            'vpc' => $product->vpc,
-            'mpc' => $product->mpc,
-            'enabled' => $product->enabled,
-            'specifikacija' => static::setDescription($product->specifikacija),
-            'stopa_pdv' => $product->stopa_pdv,
-            'nadgrupa_artikla' => $product->nadgrupa_artikla,
-            'nadgrupa_artikla_naziv' => $product->nadgrupa_artikla_naziv,
-            'grupa_artikla' => $product->grupa_artikla_uid,
-            'grupa_artikla_naziv' => $product->grupa_artikla_naziv,
-            'robna_marka' => $product->robna_marka,
-            'robna_marka_naziv' => $product->robna_marka_naziv,
-            'jamstvo_naziv' => $product->jamstvo_naziv,
-            'stanje_kol' => $product->stanje_kol,
+            'artikl_uid' => $product->artikl_uid ?? '',
+            'artikl' => $product->artikl ?? '',
+            'naziv' => $product->naziv ?? '',
+            'barcode' => $product->barcode ?? '',
+            'jm' => $product->jm ?? '',
+            'opis' => static::setDescription($product->opis ?? null),
+            'vpc' => $product->vpc ?? 0,
+            'mpc' => $product->mpc ?? 0,
+            'enabled' => $product->enabled ?? 'N',
+            'specifikacija' => static::setDescription($product->specifikacija ?? null),
+            'stopa_pdv' => $product->stopa_pdv ?? 0,
+            'nadgrupa_artikla' => $product->nadgrupa_artikla ?? '',
+            'nadgrupa_artikla_naziv' => $product->nadgrupa_artikla_naziv ?? '',
+            'grupa_artikla' => $product->grupa_artikla_uid ?? '',
+            'grupa_artikla_naziv' => $product->grupa_artikla_naziv ?? '',
+            'robna_marka' => $product->robna_marka ?? null,
+            'robna_marka_naziv' => $product->robna_marka_naziv ?? '',
+            'jamstvo_naziv' => $product->jamstvo_naziv ?? '',
+            'stanje_kol' => $product->stanje_kol ?? 0,
             'atributi' => $atributi,
             'dokumenti' => $dokumenti,
         ];
@@ -948,7 +948,7 @@ class ProductHelper
      *
      * @return string
      */
-    private static function setDescription(string $text = null): string
+    private static function setDescription(?string $text = null): string
     {
         if ($text) {
             $text = str_replace("\n", '<br>', $text);
