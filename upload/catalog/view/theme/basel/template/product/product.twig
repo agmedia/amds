@@ -182,7 +182,7 @@
                                 {% for option_value in option.product_option_value %}
 
                                         <label class="btn btn-outline btn-option ">
-                                    <input type="radio" name="option[{{ option.product_option_id }}]" value="{{ option_value.product_option_value_id }}" data-uid="{{ option_value.sifra }}" />
+                                    <input type="radio" name="option[{{ option.product_option_id }}]" value="{{ option_value.product_option_value_id }}" data-uid="{{ option_value.sifra }}" data-sifra="{{ option_value.sifra }}" data-sku="{{ option_value.sku }}" />
                                     {% if option_value.image %}
                                     <img src="{{ option_value.image }}" alt="{{ option_value.name }}{% if option_value.price %}({{ option_value.price_prefix }}{{ option_value.price }}){% endif %}" data-toggle="tooltip" data-title="{{ option_value.name }}{% if option_value.price %} ({{ option_value.price_prefix }}{{ option_value.price }}){% endif %}" />
                                     {% endif %}
@@ -2412,17 +2412,23 @@
 
 <script>
     $(document).on('change', '.product-info input[type=\'radio\']:checked', function (e) {
-        console.log(e.currentTarget.getAttribute('data-uid'))
+        const selectedSifra = e.currentTarget.getAttribute('data-sifra') || e.currentTarget.getAttribute('data-uid') || '';
+        const selectedSku = e.currentTarget.getAttribute('data-sku') || '';
+
+        console.log(selectedSifra)
         console.log({{ model }})
 
         $.ajax({
             type: 'get',
-            url: 'index.php?route=product/product/availability&sifra=' + e.currentTarget.getAttribute('data-uid'),
+            url: 'index.php?route=product/product/availability&' + $.param({
+                sifra: selectedSifra,
+                sku: selectedSku
+            }),
             success: (json) => {
                 if (!json.error) {
                     console.log(json.error);
                 }
-                var selectedoption = e.currentTarget.getAttribute('data-uid');
+                var selectedoption = selectedSifra;
                 selectedoption = selectedoption.split("-").pop();
                 let html = '';
                 html += '<div class="cd-store-title" data-product_title="1">{{ heading_title }}</div> <span class="code">{{ model }}</span><div class="cd-store-header special"><div class="cd-store-attr-title"><strong>Veličina: </strong>' + selectedoption  + ' </div></div> <div class="panel-group">';

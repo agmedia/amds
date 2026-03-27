@@ -230,6 +230,28 @@ class Luceed
 
 
     /**
+     * @param string       $product_uid
+     * @param string|array $warehouse_uid
+     *
+     * @return false|mixed
+     */
+    public function getIndividualStock(string $product_uid, $warehouse_uid = null)
+    {
+        if (is_array($warehouse_uid)) {
+            $warehouse_uid = '[' . implode(',', $warehouse_uid) . ']';
+        }
+
+        $query = rawurlencode($product_uid);
+
+        if ($warehouse_uid) {
+            $query .= '/' . $warehouse_uid;
+        }
+
+        return $this->service->get($this->end_points['ind_stock_get'], $query);
+    }
+
+
+    /**
      * @param string|array $warehouse_uid
      *
      * @return false|mixed

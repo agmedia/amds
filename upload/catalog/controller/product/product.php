@@ -809,8 +809,11 @@ class ControllerProductProduct extends Controller {
         $this->load->language('product/product');
         $this->load->model('catalog/product');
 
+        $sifra = isset($this->request->get['sifra']) ? (string) $this->request->get['sifra'] : '';
+        $sku = isset($this->request->get['sku']) ? (string) $this->request->get['sku'] : '';
+
         $loc = new \Agmedia\LuceedOpencartWrapper\Models\LOC_Warehouse();
-        $skladista = $loc->getAvailabilityForProduct($this->request->get['sifra']);
+        $skladista = $loc->getAvailabilityForProduct($sifra, $sku);
 
         $this->response->addHeader('Content-Type: application/json');
         $this->response->setOutput($skladista->toJson());

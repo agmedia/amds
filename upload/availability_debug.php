@@ -119,13 +119,22 @@ if (PHP_SAPI !== 'cli' && defined('WSPAY_CRON_KEY')) {
 }
 
 $sifra = '';
+$sku = '';
 
 if (PHP_SAPI === 'cli' && isset($argv[1])) {
     $sifra = trim((string) $argv[1]);
 }
 
+if (PHP_SAPI === 'cli' && isset($argv[2])) {
+    $sku = trim((string) $argv[2]);
+}
+
 if ($sifra === '') {
     $sifra = trim((string) ($_GET['sifra'] ?? ''));
+}
+
+if ($sku === '') {
+    $sku = trim((string) ($_GET['sku'] ?? ''));
 }
 
 if ($sifra === '') {
@@ -222,25 +231,93 @@ foreach ($locations as $location) {
 $units = array_values(array_unique($units));
 $unitsQuery = '[' . implode(',', $units) . ']';
 
-$rawStock = \Agmedia\Luceed\Facade\LuceedProduct::stock($unitsQuery, urlencode($sifra));
-$decodedStock = json_decode((string) $rawStock, true);
+function availabilityDebugExtractAvailables($rawStock): array
+{
+    $decodedStock = json_decode((string) $rawStock, true);
 
-if (! is_array($decodedStock)) {
+    if (! is_array($decodedStock)) {
+        return [];
+    }
+
+    $availables = [];
+
+    foreach (($decodedStock['result'] ?? []) as $resultRow) {
+        foreach (($resultRow['stanje'] ?? []) as $availableRow) {
+            $availables[] = $availableRow;
+        }
+    }
+
+    return $availables;
+}
+
+function availabilityDebugCountPositiveAvailables(array $availables): int
+{
+    $uids = [];
+
+    foreach ($availables as $available) {
+        $qty = availabilityDebugQty($available['raspolozivo_kol'] ?? 0);
+        $uid = trim((string) ($available['skladiste_uid'] ?? ''));
+
+        if ($qty <= 0 || $uid === '') {
+            continue;
+        }
+
+        $uids[$uid] = true;
+    }
+
+    return count($uids);
+}
+
+$lookupCandidates = [];
+
+if ($sku !== '') {
+    $lookupCandidates[] = [
+        'method'     => 'stock_by_sku',
+        'identifier' => $sku,
+        'availables' => availabilityDebugExtractAvailables(
+            \Agmedia\Luceed\Facade\LuceedProduct::stock($unitsQuery, urlencode($sku))
+        ),
+    ];
+
+    $lookupCandidates[] = [
+        'method'     => 'individual_stock_by_sku',
+        'identifier' => $sku,
+        'availables' => availabilityDebugExtractAvailables(
+            \Agmedia\Luceed\Facade\LuceedProduct::individualStock($sku, $unitsQuery)
+        ),
+    ];
+}
+
+$lookupCandidates[] = [
+    'method'     => 'stock_by_sifra',
+    'identifier' => $sifra,
+    'availables' => availabilityDebugExtractAvailables(
+        \Agmedia\Luceed\Facade\LuceedProduct::stock($unitsQuery, urlencode($sifra))
+    ),
+];
+
+$selectedLookup = null;
+$selectedPositiveCount = -1;
+
+foreach ($lookupCandidates as $candidate) {
+    $positiveCount = availabilityDebugCountPositiveAvailables($candidate['availables']);
+
+    if ($positiveCount > $selectedPositiveCount) {
+        $selectedLookup = $candidate;
+        $selectedPositiveCount = $positiveCount;
+    }
+}
+
+if (! $selectedLookup) {
     availabilityDebugRespond([
-        'error'        => 'Luceed response is not valid JSON.',
-        'sifra'        => $sifra,
-        'units_query'  => $unitsQuery,
-        'response_raw' => substr((string) $rawStock, 0, 1500),
+        'error'       => 'Luceed response is not valid JSON.',
+        'sifra'       => $sifra,
+        'sku'         => $sku,
+        'units_query' => $unitsQuery,
     ], 500);
 }
 
-$availables = [];
-
-foreach (($decodedStock['result'] ?? []) as $resultRow) {
-    foreach (($resultRow['stanje'] ?? []) as $availableRow) {
-        $availables[] = $availableRow;
-    }
-}
+$availables = $selectedLookup['availables'];
 
 $aggregatedAvailables = [];
 
@@ -365,6 +442,18 @@ foreach ($aggregatedAvailables as $available) {
 
 availabilityDebugRespond([
     'sifra' => $sifra,
+    'sku'   => $sku,
+    'lookup' => [
+        'selected_method' => $selectedLookup['method'],
+        'selected_identifier' => $selectedLookup['identifier'],
+        'candidates' => array_map(function (array $candidate): array {
+            return [
+                'method' => $candidate['method'],
+                'identifier' => $candidate['identifier'],
+                'positive_locations' => availabilityDebugCountPositiveAvailables($candidate['availables']),
+            ];
+        }, $lookupCandidates),
+    ],
     'summary' => [
         'queried_units'                 => count($units),
         'luceed_positive_locations'     => count($luceedPositive),

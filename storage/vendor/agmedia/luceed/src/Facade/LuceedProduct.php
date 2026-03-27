@@ -95,6 +95,20 @@ class LuceedProduct extends Facade
 
 
     /**
+     * @param string       $product_uid
+     * @param string|array $units
+     *
+     * @return mixed
+     */
+    public static function individualStock(string $product_uid, $units = null)
+    {
+        $luceed = new Luceed();
+
+        return $luceed->getIndividualStock($product_uid, $units);
+    }
+
+
+    /**
      * @param null|string|array $units
      *
      * @return mixed

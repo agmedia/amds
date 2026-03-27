@@ -229,7 +229,7 @@ class LOC_Warehouse
     }
 
 
-    public function getAvailabilityForProduct(string $product): Collection
+    public function getAvailabilityForProduct(string $product = '', string $product_uid = ''): Collection
     {
         $response = collect();
         $locations = Location::all();
@@ -241,9 +241,7 @@ class LOC_Warehouse
         $warehouses = $this->getList()->keyBy('skladiste_uid');
         $used_keys = [];
 
-        $availables = collect($this->setAvailables(
-            LuceedProduct::stock($this->getUnitsQuery($units), urlencode($product))
-        ));
+        $availables = $this->getAvailabilityStocks($units, $product, $product_uid);
 
         if ($availables->isEmpty()) {
             return collect([
@@ -278,6 +276,69 @@ class LOC_Warehouse
         }
 
         return $response;
+    }
+
+
+    /**
+     * Prefer the richer Luceed response when both `sku` (artikl_uid) and `sifra`
+     * are available for the selected option.
+     *
+     * @param Collection $units
+     * @param string     $product
+     * @param string     $product_uid
+     *
+     * @return Collection
+     */
+    private function getAvailabilityStocks(Collection $units, string $product = '', string $product_uid = ''): Collection
+    {
+        $product = trim($product);
+        $product_uid = trim($product_uid);
+        $units_query = $this->getUnitsQuery($units);
+        $queries = [];
+
+        if ($product_uid !== '') {
+            $queries[] = collect($this->setAvailables(
+                LuceedProduct::stock($units_query, urlencode($product_uid))
+            ));
+
+            $queries[] = collect($this->setAvailables(
+                LuceedProduct::individualStock($product_uid, $units_query)
+            ));
+        }
+
+        if ($product !== '') {
+            $queries[] = collect($this->setAvailables(
+                LuceedProduct::stock($units_query, urlencode($product))
+            ));
+        }
+
+        $best = collect();
+        $best_count = -1;
+
+        foreach ($queries as $query) {
+            $count = $this->countPositiveAvailables($query);
+
+            if ($count > $best_count) {
+                $best = $query;
+                $best_count = $count;
+            }
+        }
+
+        return $best;
+    }
+
+
+    /**
+     * @param Collection $availables
+     *
+     * @return int
+     */
+    private function countPositiveAvailables(Collection $availables): int
+    {
+        return $availables->filter(function ($available) {
+            return ! empty($available->skladiste_uid)
+                && (float) $available->raspolozivo_kol > 0;
+        })->pluck('skladiste_uid')->unique()->count();
     }
 
 
