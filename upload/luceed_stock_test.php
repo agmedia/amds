@@ -85,11 +85,19 @@ function luceedStockTestCountRows(?array $decoded): int
     return $count;
 }
 
-function luceedStockTestCall(string $method, string $requestPath, callable $callback, bool $includeRaw = false): array
+function luceedStockTestCall(
+    string $method,
+    string $requestPath,
+    callable $callback,
+    bool $includeRaw = false,
+    array $warehousesByUid = [],
+    array $focusUids = []
+): array
 {
     $raw = $callback();
     $decoded = luceedStockTestDecode($raw);
     $positiveRows = luceedStockTestPositiveRows($decoded);
+    $focusRows = luceedStockTestFocusRows($decoded, $warehousesByUid, $focusUids);
 
     return [
         'method' => $method,
@@ -98,9 +106,57 @@ function luceedStockTestCall(string $method, string $requestPath, callable $call
         'stanje_rows' => luceedStockTestCountRows($decoded),
         'positive_locations' => count($positiveRows),
         'positive_rows' => $positiveRows,
+        'focus_rows' => $focusRows,
         'decoded_response' => $includeRaw ? $decoded : null,
         'response_raw' => $decoded ? null : substr((string) $raw, 0, 4000),
     ];
+}
+
+function luceedStockTestWarehouseStoreCode(array $warehouse): string
+{
+    $pj = trim((string) ($warehouse['pj'] ?? ''));
+
+    if ($pj !== '') {
+        return $pj;
+    }
+
+    return trim((string) ($warehouse['skladiste'] ?? ''));
+}
+
+function luceedStockTestFocusRows(
+    ?array $decoded,
+    array $warehousesByUid,
+    array $focusUids
+): array {
+    if (! $decoded || empty($focusUids)) {
+        return [];
+    }
+
+    $rows = [];
+
+    foreach (($decoded['result'] ?? []) as $resultRow) {
+        foreach (($resultRow['stanje'] ?? []) as $stockRow) {
+            $uid = trim((string) ($stockRow['skladiste_uid'] ?? ''));
+
+            if ($uid === '' || ! isset($focusUids[$uid])) {
+                continue;
+            }
+
+            $warehouse = $warehousesByUid[$uid] ?? [];
+
+            $rows[] = [
+                'uid' => $uid,
+                'qty' => luceedStockTestQty($stockRow['raspolozivo_kol'] ?? 0),
+                'artikl_uid' => $stockRow['artikl_uid'] ?? '',
+                'warehouse_code' => $warehouse['skladiste'] ?? '',
+                'store_code' => luceedStockTestWarehouseStoreCode($warehouse),
+                'warehouse_name' => $warehouse['naziv'] ?? '',
+                'store_name' => $warehouse['pj_naziv'] ?? '',
+            ];
+        }
+    }
+
+    return $rows;
 }
 
 if (PHP_SAPI !== 'cli' && defined('WSPAY_CRON_KEY')) {
@@ -116,6 +172,7 @@ if (PHP_SAPI !== 'cli' && defined('WSPAY_CRON_KEY')) {
 $sifra = '';
 $sku = '';
 $includeRaw = false;
+$focusStore = '';
 
 if (PHP_SAPI === 'cli' && isset($argv[1])) {
     $sifra = trim((string) $argv[1]);
@@ -139,6 +196,14 @@ if (PHP_SAPI === 'cli' && isset($argv[3])) {
 
 if (isset($_GET['raw'])) {
     $includeRaw = in_array(strtolower((string) $_GET['raw']), ['1', 'true', 'yes', 'raw'], true);
+}
+
+if (PHP_SAPI === 'cli' && isset($argv[4])) {
+    $focusStore = strtoupper(trim((string) $argv[4]));
+}
+
+if ($focusStore === '') {
+    $focusStore = strtoupper(trim((string) ($_GET['focus_store'] ?? '')));
 }
 
 if ($sifra === '') {
@@ -165,8 +230,9 @@ if ($db->connect_error) {
 
 $locationTable = DB_PREFIX . 'location';
 $units = [];
+$locationsByStore = [];
 $result = $db->query(
-    "SELECT skladiste FROM `" . $db->real_escape_string($locationTable) . "` WHERE skladiste != '' ORDER BY location_id"
+    "SELECT skladiste, skladiste_uid, name, vidljivost FROM `" . $db->real_escape_string($locationTable) . "` WHERE skladiste != '' ORDER BY location_id"
 );
 
 if (! $result) {
@@ -178,11 +244,65 @@ if (! $result) {
 
 while ($row = $result->fetch_assoc()) {
     $units[] = $row['skladiste'];
+    $locationsByStore[$row['skladiste']][] = $row;
 }
 
 $units = array_values(array_unique($units));
 $unitsQuery = '[' . implode(',', $units) . ']';
 $calls = [];
+$warehousesByUid = [];
+$focusCandidates = [];
+
+$warehouseJson = function_exists('agconf') ? agconf('import.warehouse.json') : null;
+
+if ($warehouseJson && is_file($warehouseJson)) {
+    $warehouseRows = json_decode(file_get_contents($warehouseJson), true) ?: [];
+
+    foreach ($warehouseRows as $warehouseRow) {
+        if (! empty($warehouseRow['skladiste_uid'])) {
+            $warehousesByUid[$warehouseRow['skladiste_uid']] = $warehouseRow;
+        }
+
+        if (
+            $focusStore !== ''
+            && (
+                strtoupper(trim((string) ($warehouseRow['pj'] ?? ''))) === $focusStore
+                || strtoupper(trim((string) ($warehouseRow['skladiste'] ?? ''))) === $focusStore
+            )
+        ) {
+            $focusCandidates[] = [
+                'uid' => $warehouseRow['skladiste_uid'] ?? '',
+                'warehouse_code' => $warehouseRow['skladiste'] ?? '',
+                'store_code' => luceedStockTestWarehouseStoreCode($warehouseRow),
+                'warehouse_name' => $warehouseRow['naziv'] ?? '',
+                'store_name' => $warehouseRow['pj_naziv'] ?? '',
+                'source' => 'warehouse_json',
+            ];
+        }
+    }
+}
+
+if ($focusStore !== '' && isset($locationsByStore[$focusStore])) {
+    foreach ($locationsByStore[$focusStore] as $locationRow) {
+        $focusCandidates[] = [
+            'uid' => $locationRow['skladiste_uid'] ?? '',
+            'warehouse_code' => $locationRow['skladiste'] ?? '',
+            'store_code' => $locationRow['skladiste'] ?? '',
+            'warehouse_name' => $locationRow['name'] ?? '',
+            'store_name' => $locationRow['name'] ?? '',
+            'source' => 'oc_location',
+            'visible' => (int) ($locationRow['vidljivost'] ?? 0),
+        ];
+    }
+}
+
+$focusUids = [];
+
+foreach ($focusCandidates as $candidate) {
+    if (! empty($candidate['uid'])) {
+        $focusUids[$candidate['uid']] = true;
+    }
+}
 
 $calls[] = luceedStockTestCall(
     'stock_by_sifra',
@@ -190,7 +310,9 @@ $calls[] = luceedStockTestCall(
     function () use ($unitsQuery, $sifra) {
         return \Agmedia\Luceed\Facade\LuceedProduct::stock($unitsQuery, urlencode($sifra));
     },
-    $includeRaw
+    $includeRaw,
+    $warehousesByUid,
+    $focusUids
 );
 
 if ($sku !== '') {
@@ -200,7 +322,9 @@ if ($sku !== '') {
         function () use ($unitsQuery, $sku) {
             return \Agmedia\Luceed\Facade\LuceedProduct::stock($unitsQuery, urlencode($sku));
         },
-        $includeRaw
+        $includeRaw,
+        $warehousesByUid,
+        $focusUids
     );
 
     $calls[] = luceedStockTestCall(
@@ -209,7 +333,9 @@ if ($sku !== '') {
         function () use ($unitsQuery, $sku) {
             return \Agmedia\Luceed\Facade\LuceedProduct::individualStock($sku, $unitsQuery);
         },
-        $includeRaw
+        $includeRaw,
+        $warehousesByUid,
+        $focusUids
     );
 }
 
@@ -217,6 +343,8 @@ luceedStockTestRespond([
     'sifra' => $sifra,
     'sku' => $sku,
     'include_raw' => $includeRaw,
+    'focus_store' => $focusStore,
+    'focus_candidates' => array_values($focusCandidates),
     'units_query' => $unitsQuery,
     'calls' => $calls,
 ]);
