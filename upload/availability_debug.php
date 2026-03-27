@@ -290,6 +290,21 @@ foreach ($aggregatedAvailables as $available) {
         ]);
     }
 
+    if ($locationByUid && ! availabilityDebugIsVisibleLocation($locationByUid)) {
+        $hiddenOrBrokenMappings[] = array_merge(
+            availabilityDebugNormalizeLocation($locationByUid, 'hidden_or_broken', [
+                'qty' => $qty,
+            ]),
+            [
+                'luceed_uid'        => $uid,
+                'luceed_store_code' => $storeCode,
+                'warehouse'         => $warehouse['naziv'] ?? '',
+            ]
+        );
+
+        continue;
+    }
+
     $resolved = null;
     $resolvedKey = $uid;
 

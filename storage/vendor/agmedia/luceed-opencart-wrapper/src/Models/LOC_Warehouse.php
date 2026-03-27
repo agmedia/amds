@@ -297,11 +297,16 @@ class LOC_Warehouse
     ): ?array {
         $location = $locations_by_uid->get($warehouse_uid);
 
-        if ($this->isVisibleLocation($location)) {
-            return [
-                'key'  => 'location:' . $location['location_id'],
-                'data' => $this->mapLocationData($location)
-            ];
+        if ($location) {
+            if ($this->isVisibleLocation($location)) {
+                return [
+                    'key'  => 'location:' . $location['location_id'],
+                    'data' => $this->mapLocationData($location)
+                ];
+            }
+
+            // If the location exists locally but is hidden, keep it hidden.
+            return null;
         }
 
         $warehouse = $warehouses->get($warehouse_uid);
