@@ -506,8 +506,16 @@ class LOC_Warehouse
     {
         $json = json_decode($items);
 
-        if (isset($json->result[0]->stanje)) {
-            return $json->result[0]->stanje;
+        if (isset($json->result) && is_array($json->result)) {
+            $response = [];
+
+            foreach ($json->result as $result) {
+                if (isset($result->stanje) && is_array($result->stanje)) {
+                    $response = array_merge($response, $result->stanje);
+                }
+            }
+
+            return $response;
         }
 
         return [];

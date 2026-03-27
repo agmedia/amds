@@ -234,7 +234,13 @@ if (! is_array($decodedStock)) {
     ], 500);
 }
 
-$availables = $decodedStock['result'][0]['stanje'] ?? [];
+$availables = [];
+
+foreach (($decodedStock['result'] ?? []) as $resultRow) {
+    foreach (($resultRow['stanje'] ?? []) as $availableRow) {
+        $availables[] = $availableRow;
+    }
+}
 
 $aggregatedAvailables = [];
 
