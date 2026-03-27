@@ -720,6 +720,10 @@ class LOC_Order
      */
     public static function calculateDiscount($regular_price, $action_price)
     {
+        if ((float) $regular_price <= 0.0) {
+            return 0.0;
+        }
+
         $value = (($regular_price - $action_price) / $regular_price) * 100;
 
         return floor($value);

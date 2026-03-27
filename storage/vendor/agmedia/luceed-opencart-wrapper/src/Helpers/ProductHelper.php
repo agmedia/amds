@@ -818,6 +818,10 @@ class ProductHelper
      */
     public static function calculateDiscountBetweenPrices(float $list_price, float $seling_price)
     {
+        if ($list_price <= 0.0) {
+            return 0;
+        }
+
         return (($list_price - $seling_price) / $list_price) * 100;
     }
 
@@ -916,6 +920,10 @@ class ProductHelper
     private static function getDiscount(int $product_id)
     {
         $product = Product::query()->where('product_id', $product_id)->first();
+
+        if ( ! $product) {
+            return 0;
+        }
 
         return static::calculateDiscountBetweenPrices($product->price_ponuda, $product->price);
     }
