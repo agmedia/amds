@@ -231,11 +231,15 @@ class LOC_Warehouse
 
     public function getAvailabilityForProduct(string $product): Collection
     {
-        $count = 0;
         $response = collect();
-        $has_items = collect();
         $locations = Location::all();
-        $units = $locations->pluck('skladiste')->flatten();
+        $units = $locations->pluck('skladiste')->filter()->unique()->values();
+        $locations_by_uid = $locations->keyBy('skladiste_uid');
+        $locations_by_store = $locations->filter(function ($location) {
+            return ! empty($location['skladiste']);
+        })->groupBy('skladiste');
+        $warehouses = $this->getList()->keyBy('skladiste_uid');
+        $used_keys = [];
 
         $availables = collect($this->setAvailables(
             LuceedProduct::stock($this->getUnitsQuery($units), urlencode($product))
@@ -248,35 +252,29 @@ class LOC_Warehouse
         }
 
         foreach ($availables as $available) {
-            if ($available->raspolozivo_kol) {
-                $has_items->push([
-                    'uid' => $available->skladiste_uid,
-                    'qty' => $available->raspolozivo_kol
-                ]);
+            $qty = (float) $available->raspolozivo_kol;
 
-                $count += $available->raspolozivo_kol;
+            if ($qty <= 0 || empty($available->skladiste_uid)) {
+                continue;
             }
-        }
 
-        $houses = $locations->whereIn('skladiste_uid', $has_items->pluck('uid')->flatten())->where('vidljivost', 1);
+            $resolved = $this->resolveAvailabilityLocation(
+                $available->skladiste_uid,
+                $locations_by_uid,
+                $locations_by_store,
+                $warehouses
+            );
 
-        // AVAILABILITY VIEW
-        if ( ! empty($houses)) {
-            foreach ($houses as $house) {
-                $has = $availables->where('skladiste_uid', $house['skladiste_uid'])->first();
-
-                if ($has) {
-                    $response->push([
-                        'name'      => $house['name'],
-                        'uid'       => $house['skladiste_uid'],
-                        'geocode'   => $house['geocode'],
-                        'address'   => $house['address'],
-                        'telephone' => $house['telephone'],
-                        'email'     => $house['fax'],
-                        'open'      => $house['open'],
-                    ]);
-                }
+            if ( ! $resolved) {
+                continue;
             }
+
+            if (isset($used_keys[$resolved['key']])) {
+                continue;
+            }
+
+            $used_keys[$resolved['key']] = true;
+            $response->push($resolved['data']);
         }
 
         return $response;
@@ -284,9 +282,162 @@ class LOC_Warehouse
 
 
     /**
+     * @param string     $warehouse_uid
+     * @param Collection $locations_by_uid
+     * @param Collection $locations_by_store
+     * @param Collection $warehouses
+     *
+     * @return array|null
+     */
+    private function resolveAvailabilityLocation(
+        string $warehouse_uid,
+        Collection $locations_by_uid,
+        Collection $locations_by_store,
+        Collection $warehouses
+    ): ?array {
+        $location = $locations_by_uid->get($warehouse_uid);
+
+        if ($this->isVisibleLocation($location)) {
+            return [
+                'key'  => 'location:' . $location['location_id'],
+                'data' => $this->mapLocationData($location)
+            ];
+        }
+
+        $warehouse = $warehouses->get($warehouse_uid);
+        $store_code = $this->getWarehouseStoreCode($warehouse);
+
+        if ($store_code && $locations_by_store->has($store_code)) {
+            foreach ($locations_by_store->get($store_code) as $store_location) {
+                if ($this->isVisibleLocation($store_location)) {
+                    return [
+                        'key'  => 'location:' . $store_location['location_id'],
+                        'data' => $this->mapLocationData($store_location)
+                    ];
+                }
+            }
+        }
+
+        if ($warehouse && $this->isDisplayWarehouse($warehouse)) {
+            return [
+                'key'  => 'warehouse:' . $warehouse_uid,
+                'data' => $this->mapWarehouseData($warehouse)
+            ];
+        }
+
+        return null;
+    }
+
+
+    /**
+     * @param array|\ArrayAccess|null $location
+     *
+     * @return bool
+     */
+    private function isVisibleLocation($location): bool
+    {
+        return $location
+            && (int) $location['vidljivost'] === 1
+            && ! empty($location['skladiste'])
+            && ! empty($location['skladiste_uid']);
+    }
+
+
+    /**
+     * @param array $location
+     *
+     * @return array
+     */
+    private function mapLocationData($location): array
+    {
+        return [
+            'name'      => $location['name'],
+            'uid'       => $location['skladiste_uid'],
+            'geocode'   => $location['geocode'],
+            'address'   => $location['address'],
+            'telephone' => $location['telephone'],
+            'email'     => $location['fax'],
+            'open'      => $location['open'],
+        ];
+    }
+
+
+    /**
+     * @param array $warehouse
+     *
+     * @return array
+     */
+    private function mapWarehouseData(array $warehouse): array
+    {
+        return [
+            'name'      => $warehouse['pj_naziv'] ?: $warehouse['naziv'],
+            'uid'       => $warehouse['skladiste_uid'],
+            'geocode'   => '',
+            'address'   => $this->getWarehouseAddress($warehouse),
+            'telephone' => $warehouse['telefon'] ?: '',
+            'email'     => $warehouse['e_mail'] ?: '',
+            'open'      => '',
+        ];
+    }
+
+
+    /**
+     * @param array|null $warehouse
+     *
+     * @return string
+     */
+    private function getWarehouseStoreCode(?array $warehouse = null): string
+    {
+        if ( ! $warehouse) {
+            return '';
+        }
+
+        if ( ! empty($warehouse['pj'])) {
+            return trim($warehouse['pj']);
+        }
+
+        if ( ! empty($warehouse['skladiste'])) {
+            return trim($warehouse['skladiste']);
+        }
+
+        return '';
+    }
+
+
+    /**
+     * @param array $warehouse
+     *
+     * @return bool
+     */
+    private function isDisplayWarehouse(array $warehouse): bool
+    {
+        return (bool) preg_match('/^(D|K|P)[0-9A-Z]+$/', $this->getWarehouseStoreCode($warehouse));
+    }
+
+
+    /**
+     * @param array $warehouse
+     *
+     * @return string
+     */
+    private function getWarehouseAddress(array $warehouse): string
+    {
+        $parts = [];
+
+        foreach (['adresa', 'postanski_broj', 'mjesto'] as $field) {
+            if ( ! empty($warehouse[$field])) {
+                $parts[] = trim($warehouse[$field]);
+            }
+        }
+
+        return implode(', ', array_unique($parts));
+    }
+
+
+    /**
      * @return int
      */
-    public function import(Collection $list = null)
+    public function import(?Collection $list = null)
     {
         $imported = 0;
 
