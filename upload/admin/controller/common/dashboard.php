@@ -18,6 +18,8 @@ class ControllerCommonDashboard extends Controller {
         $data['link_blog'] = $this->url->link('extension/blog/blog', 'user_token=' . $this->session->data['user_token'], true);
 
         $data['link_sync_manager'] = $this->url->link('extension/module/luceed_sync', 'user_token=' . $this->session->data['user_token'], true);
+        $data['link_export_orders'] = $this->url->link('sale/order', 'user_token=' . $this->session->data['user_token'], true);
+        $data['button_export_orders'] = 'Export narudžbi';
 
 
 

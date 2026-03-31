@@ -83,6 +83,129 @@ class ControllerSaleOrder extends Controller {
 
 		$this->response->redirect($this->url->link('sale/order', 'user_token=' . $this->session->data['user_token'] . $url, true));
 	}
+
+	public function export() {
+		$this->load->language('sale/order');
+		$this->load->model('sale/order');
+
+		if (isset($this->request->get['filter_order_id'])) {
+			$filter_order_id = $this->request->get['filter_order_id'];
+		} else {
+			$filter_order_id = '';
+		}
+
+		if (isset($this->request->get['filter_customer'])) {
+			$filter_customer = $this->request->get['filter_customer'];
+		} else {
+			$filter_customer = '';
+		}
+
+		if (isset($this->request->get['filter_order_status'])) {
+			$filter_order_status = $this->request->get['filter_order_status'];
+		} else {
+			$filter_order_status = '';
+		}
+
+		if (isset($this->request->get['filter_order_status_id'])) {
+			$filter_order_status_id = $this->request->get['filter_order_status_id'];
+		} else {
+			$filter_order_status_id = '';
+		}
+
+		if (isset($this->request->get['filter_total'])) {
+			$filter_total = $this->request->get['filter_total'];
+		} else {
+			$filter_total = '';
+		}
+
+		if (isset($this->request->get['filter_date_added'])) {
+			$filter_date_added = $this->request->get['filter_date_added'];
+		} else {
+			$filter_date_added = '';
+		}
+
+		if (isset($this->request->get['filter_date_modified'])) {
+			$filter_date_modified = $this->request->get['filter_date_modified'];
+		} else {
+			$filter_date_modified = '';
+		}
+
+		if (isset($this->request->get['sort'])) {
+			$sort = $this->request->get['sort'];
+		} else {
+			$sort = 'o.order_id';
+		}
+
+		if (isset($this->request->get['order'])) {
+			$order = $this->request->get['order'];
+		} else {
+			$order = 'DESC';
+		}
+
+		$filter_data = array(
+			'filter_order_id'        => $filter_order_id,
+			'filter_customer'        => $filter_customer,
+			'filter_order_status'    => $filter_order_status,
+			'filter_order_status_id' => $filter_order_status_id,
+			'filter_total'           => $filter_total,
+			'filter_date_added'      => $filter_date_added,
+			'filter_date_modified'   => $filter_date_modified,
+			'sort'                   => $sort,
+			'order'                  => $order
+		);
+
+		$results = $this->model_sale_order->getOrders($filter_data);
+
+		require_once DIR_SYSTEM . 'library/me_order_manager/PHPExcel.php';
+
+		$objPHPExcel = new PHPExcel();
+		$objPHPExcel->setActiveSheetIndex(0);
+
+		$sheet = $objPHPExcel->getActiveSheet();
+		$sheet->setTitle('Orders');
+		$sheet->freezePane('A2');
+
+		$sheet->setCellValue('A1', $this->language->get('column_order_id'));
+		$sheet->setCellValue('B1', $this->language->get('column_customer'));
+		$sheet->setCellValue('C1', $this->language->get('column_status'));
+		$sheet->setCellValue('D1', $this->language->get('column_total'));
+		$sheet->setCellValue('E1', $this->language->get('column_date_added'));
+		$sheet->setCellValue('F1', $this->language->get('column_date_modified'));
+		$sheet->setCellValue('G1', 'Luceed UID');
+		$sheet->getStyle('A1:G1')->getFont()->setBold(true);
+
+		$row = 2;
+
+		foreach ($results as $result) {
+			$sheet->setCellValueExplicit('A' . $row, (string)$result['order_id'], PHPExcel_Cell_DataType::TYPE_STRING);
+			$sheet->setCellValue('B' . $row, $result['customer']);
+			$sheet->setCellValue('C' . $row, $result['order_status'] ? $result['order_status'] : $this->language->get('text_missing'));
+			$sheet->setCellValue('D' . $row, $this->currency->format($result['total'], $result['currency_code'], $result['currency_value']));
+			$sheet->setCellValue('E' . $row, date($this->language->get('date_format_short'), strtotime($result['date_added'])));
+			$sheet->setCellValue('F' . $row, date($this->language->get('date_format_short'), strtotime($result['date_modified'])));
+			$sheet->setCellValueExplicit('G' . $row, (string)$result['luceed_uid'], PHPExcel_Cell_DataType::TYPE_STRING);
+			$row++;
+		}
+
+		foreach (range('A', 'G') as $column) {
+			$sheet->getColumnDimension($column)->setAutoSize(true);
+		}
+
+		$writer = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+		$filename = 'orders-export-' . date('Y-m-d_H-i-s') . '.xls';
+
+		if (ob_get_length()) {
+			ob_end_clean();
+		}
+
+		header('Content-Type: application/vnd.ms-excel');
+		header('Content-Disposition: attachment; filename="' . $filename . '"');
+		header('Cache-Control: max-age=0');
+
+		$writer->save('php://output');
+
+		exit();
+	}
 			
 	protected function getList() {
 		if (isset($this->request->get['filter_order_id'])) {
@@ -203,6 +326,9 @@ class ControllerSaleOrder extends Controller {
 		$data['shipping'] = $this->url->link('sale/order/shipping', 'user_token=' . $this->session->data['user_token'], true);
 		$data['add'] = $this->url->link('sale/order/add', 'user_token=' . $this->session->data['user_token'] . $url, true);
 		$data['delete'] = str_replace('&amp;', '&', $this->url->link('sale/order/delete', 'user_token=' . $this->session->data['user_token'] . $url, true));
+		$data['export_orders'] = $this->url->link('sale/order/export', 'user_token=' . $this->session->data['user_token'] . $url, true);
+		$data['button_export_orders'] = 'Export narudžbi u Excel';
+		$data['column_luceed_uid'] = 'Luceed UID';
 
 		$data['orders'] = array();
 
