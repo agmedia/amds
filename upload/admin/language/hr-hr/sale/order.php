@@ -212,6 +212,8 @@ $_['entry_reward']               = 'Nagrada';
 $_['entry_order_id']             = 'Broj narudžbe';
 $_['entry_total']                = 'Ukupno';
 $_['entry_date_added']           = 'Datum dodavanja';
+$_['entry_date_added_from']      = 'Datum dodavanja od';
+$_['entry_date_added_to']        = 'Datum dodavanja do';
 $_['entry_date_modified']        = 'Datum izmjene';
 
 // Help
@@ -273,3 +275,4 @@ $_['error_permission']           = 'Upozorenje: Nemate ovlasti za izmjenu narud�
 // $_['error_curl']               = 'Upozorenje: CURL greška %s(%s)!'; // postojalo u verziji OC 2.0.3.1
 $_['error_action']               = 'Upozorenje: Ne mogu završiti ovu akciju!';
 $_['error_filetype']			 = 'Neispravna vrsta/tip datoteke/file-a!';
+$_['error_export_date_range']     = 'Za export je potrebno odabrati datum dodavanja od i do.';

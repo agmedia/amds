@@ -120,6 +120,8 @@ $_['entry_reward']               = 'Reward';
 $_['entry_order_id']             = 'Order ID';
 $_['entry_total']                = 'Total';
 $_['entry_date_added']           = 'Date Added';
+$_['entry_date_added_from']       = 'Date Added From';
+$_['entry_date_added_to']         = 'Date Added To';
 $_['entry_date_modified']        = 'Date Modified';
 
 // Help
@@ -130,3 +132,4 @@ $_['error_warning']              = 'Warning: Please check the form carefully for
 $_['error_permission']           = 'Warning: You do not have permission to modify orders!';
 $_['error_action']               = 'Warning: Could not complete this action!';
 $_['error_filetype']             = 'Invalid file type!';
+$_['error_export_date_range']     = 'Date added from and to are required for export.';

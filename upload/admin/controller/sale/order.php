@@ -65,6 +65,10 @@ class ControllerSaleOrder extends Controller {
 			$url .= '&filter_date_added=' . $this->request->get['filter_date_added'];
 		}
 
+		if (isset($this->request->get['filter_date_added_to'])) {
+			$url .= '&filter_date_added_to=' . $this->request->get['filter_date_added_to'];
+		}
+
 		if (isset($this->request->get['filter_date_modified'])) {
 			$url .= '&filter_date_modified=' . $this->request->get['filter_date_modified'];
 		}
@@ -124,10 +128,10 @@ class ControllerSaleOrder extends Controller {
 			$filter_date_added = '';
 		}
 
-		if (isset($this->request->get['filter_date_modified'])) {
-			$filter_date_modified = $this->request->get['filter_date_modified'];
+		if (isset($this->request->get['filter_date_added_to'])) {
+			$filter_date_added_to = $this->request->get['filter_date_added_to'];
 		} else {
-			$filter_date_modified = '';
+			$filter_date_added_to = '';
 		}
 
 		if (isset($this->request->get['sort'])) {
@@ -142,6 +146,54 @@ class ControllerSaleOrder extends Controller {
 			$order = 'DESC';
 		}
 
+		if (!$filter_date_added || !$filter_date_added_to) {
+			$this->session->data['error_warning'] = $this->language->get('error_export_date_range');
+
+			$url = '';
+
+			if ($filter_order_id !== '') {
+				$url .= '&filter_order_id=' . $filter_order_id;
+			}
+
+			if ($filter_customer !== '') {
+				$url .= '&filter_customer=' . urlencode(html_entity_decode($filter_customer, ENT_QUOTES, 'UTF-8'));
+			}
+
+			if ($filter_order_status !== '') {
+				$url .= '&filter_order_status=' . $filter_order_status;
+			}
+
+			if ($filter_order_status_id !== '') {
+				$url .= '&filter_order_status_id=' . $filter_order_status_id;
+			}
+
+			if ($filter_total !== '') {
+				$url .= '&filter_total=' . $filter_total;
+			}
+
+			if ($filter_date_added !== '') {
+				$url .= '&filter_date_added=' . $filter_date_added;
+			}
+
+			if ($filter_date_added_to !== '') {
+				$url .= '&filter_date_added_to=' . $filter_date_added_to;
+			}
+
+			if (isset($this->request->get['sort'])) {
+				$url .= '&sort=' . $this->request->get['sort'];
+			}
+
+			if (isset($this->request->get['order'])) {
+				$url .= '&order=' . $this->request->get['order'];
+			}
+
+			if (isset($this->request->get['page'])) {
+				$url .= '&page=' . $this->request->get['page'];
+			}
+
+			$this->response->redirect($this->url->link('sale/order', 'user_token=' . $this->session->data['user_token'] . $url, true));
+		}
+
 		$filter_data = array(
 			'filter_order_id'        => $filter_order_id,
 			'filter_customer'        => $filter_customer,
@@ -149,7 +201,7 @@ class ControllerSaleOrder extends Controller {
 			'filter_order_status_id' => $filter_order_status_id,
 			'filter_total'           => $filter_total,
 			'filter_date_added'      => $filter_date_added,
-			'filter_date_modified'   => $filter_date_modified,
+			'filter_date_added_to'   => $filter_date_added_to,
 			'sort'                   => $sort,
 			'order'                  => $order
 		);
@@ -244,6 +296,12 @@ class ControllerSaleOrder extends Controller {
 			$filter_date_added = '';
 		}
 
+		if (isset($this->request->get['filter_date_added_to'])) {
+			$filter_date_added_to = $this->request->get['filter_date_added_to'];
+		} else {
+			$filter_date_added_to = '';
+		}
+
 		if (isset($this->request->get['filter_date_modified'])) {
 			$filter_date_modified = $this->request->get['filter_date_modified'];
 		} else {
@@ -294,6 +352,10 @@ class ControllerSaleOrder extends Controller {
 			$url .= '&filter_date_added=' . $this->request->get['filter_date_added'];
 		}
 
+		if (isset($this->request->get['filter_date_added_to'])) {
+			$url .= '&filter_date_added_to=' . $this->request->get['filter_date_added_to'];
+		}
+
 		if (isset($this->request->get['filter_date_modified'])) {
 			$url .= '&filter_date_modified=' . $this->request->get['filter_date_modified'];
 		}
@@ -339,7 +401,7 @@ class ControllerSaleOrder extends Controller {
 			'filter_order_status_id' => $filter_order_status_id,
 			'filter_total'           => $filter_total,
 			'filter_date_added'      => $filter_date_added,
-			'filter_date_modified'   => $filter_date_modified,
+			'filter_date_added_to'   => $filter_date_added_to,
 			'sort'                   => $sort,
 			'order'                  => $order,
 			'start'                  => ($page - 1) * $this->config->get('config_limit_admin'),
@@ -367,7 +429,11 @@ class ControllerSaleOrder extends Controller {
 
 		$data['user_token'] = $this->session->data['user_token'];
 
-		if (isset($this->error['warning'])) {
+		if (isset($this->session->data['error_warning'])) {
+			$data['error_warning'] = $this->session->data['error_warning'];
+
+			unset($this->session->data['error_warning']);
+		} elseif (isset($this->error['warning'])) {
 			$data['error_warning'] = $this->error['warning'];
 		} else {
 			$data['error_warning'] = '';
@@ -411,6 +477,10 @@ class ControllerSaleOrder extends Controller {
 
 		if (isset($this->request->get['filter_date_added'])) {
 			$url .= '&filter_date_added=' . $this->request->get['filter_date_added'];
+		}
+
+		if (isset($this->request->get['filter_date_added_to'])) {
+			$url .= '&filter_date_added_to=' . $this->request->get['filter_date_added_to'];
 		}
 
 		if (isset($this->request->get['filter_date_modified'])) {
@@ -460,6 +530,10 @@ class ControllerSaleOrder extends Controller {
 			$url .= '&filter_date_added=' . $this->request->get['filter_date_added'];
 		}
 
+		if (isset($this->request->get['filter_date_added_to'])) {
+			$url .= '&filter_date_added_to=' . $this->request->get['filter_date_added_to'];
+		}
+
 		if (isset($this->request->get['filter_date_modified'])) {
 			$url .= '&filter_date_modified=' . $this->request->get['filter_date_modified'];
 		}
@@ -488,6 +562,7 @@ class ControllerSaleOrder extends Controller {
 		$data['filter_order_status_id'] = $filter_order_status_id;
 		$data['filter_total'] = $filter_total;
 		$data['filter_date_added'] = $filter_date_added;
+		$data['filter_date_added_to'] = $filter_date_added_to;
 		$data['filter_date_modified'] = $filter_date_modified;
 
 		$data['sort'] = $sort;
@@ -555,6 +630,10 @@ class ControllerSaleOrder extends Controller {
 
 		if (isset($this->request->get['filter_date_added'])) {
 			$url .= '&filter_date_added=' . $this->request->get['filter_date_added'];
+		}
+
+		if (isset($this->request->get['filter_date_added_to'])) {
+			$url .= '&filter_date_added_to=' . $this->request->get['filter_date_added_to'];
 		}
 
 		if (isset($this->request->get['filter_date_modified'])) {
@@ -878,6 +957,10 @@ class ControllerSaleOrder extends Controller {
 
 			if (isset($this->request->get['filter_date_added'])) {
 				$url .= '&filter_date_added=' . $this->request->get['filter_date_added'];
+			}
+
+			if (isset($this->request->get['filter_date_added_to'])) {
+				$url .= '&filter_date_added_to=' . $this->request->get['filter_date_added_to'];
 			}
 
 			if (isset($this->request->get['filter_date_modified'])) {
