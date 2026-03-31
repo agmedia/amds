@@ -24,7 +24,7 @@
 	$data['basel_share_btn'] = $this->config->get('basel_share_btn');
 	$data['basel_rel_prod_grid'] = $this->config->get('basel_rel_prod_grid');
 	$data['items_mobile_fw'] = $this->config->get('items_mobile_fw');
-	if (strtotime($product_info['date_available']) > strtotime('-' . $this->config->get('newlabel_status') . ' day')) $data['is_new'] = true;
+	$data['is_new'] = $this->model_catalog_product->isNovoProduct((int)$product_info['product_id']);
 	$data['basel_text_offer_ends'] = $this->language->get('basel_text_offer_ends');
 	$price_snippet = preg_replace("/[^0-9,.]/","", $data['price']);
 	$data['price_snippet'] = str_replace( ',', '.', $price_snippet);

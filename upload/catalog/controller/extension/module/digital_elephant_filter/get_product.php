@@ -233,11 +233,7 @@ class ControllerExtensionModuleDigitalElephantFilterGetProduct extends Controlle
 				$sale_badge = false;
 			}
 		
-			if (strtotime($result['date_available']) > strtotime('-' . $this->config->get('newlabel_status') . ' day')) {
-				$is_new = true;
-			} else {
-				$is_new = false;
-			}
+			$is_new = $this->model_catalog_product->isNovoProduct((int)$result['product_id']);
 			
 			if ((float)$result['special']) {
 				$date_end = $this->model_extension_basel_basel->getSpecialEndDate($result['product_id']);

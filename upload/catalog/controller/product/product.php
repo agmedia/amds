@@ -320,6 +320,7 @@ class ControllerProductProduct extends Controller {
             $is_badge = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::isBadge($data['product_id']);
 
             $data['is_badge'] = $is_badge;
+            $data['is_new'] = $this->model_catalog_product->isNovoProduct((int)$data['product_id']);
 
 			$this->load->model('tool/image');
 
@@ -552,6 +553,7 @@ class ControllerProductProduct extends Controller {
 					'name'        => $result['name'],
 					'description' => utf8_substr(trim(strip_tags(html_entity_decode($result['description'], ENT_QUOTES, 'UTF-8'))), 0, $this->config->get('theme_' . $this->config->get('config_theme') . '_product_description_length')) . '..',
 					'price'       => $price,
+                    'new_label'   => $this->model_catalog_product->isNovoProduct((int)$result['product_id']),
 					'special'     => $special,
                     'priceeur'       => $priceeur,
                     'specialeur'     => $specialeur,

@@ -29,6 +29,8 @@ $_['text_success_payments']          = 'Uspjeh..! Nova lista načina plaćanja j
 $_['text_warning_payments']          = 'Upozorenje..! Greška kod osvježavanja liste načina plaćanja!';
 $_['text_success_orders']            = 'Uspjeh..! Statusi narudžbi su obnovljeni!';
 $_['text_warning_orders']            = 'Upozorenje..! Nema novih statusa za obnoviti..!';
+$_['text_success_novo_products']      = 'A26 artikli su obrađeni. U kategoriju Novo dodano: %s od %s pronađenih artikala.';
+$_['text_warning_novo_products']      = 'Nijedan artikl s oznakom A26 nije pronađen za dodavanje u kategoriju Novo.';
 $_['text_success_products_csv_sync']  = 'Sinkronizirano %s od %s artikala iz CSV-a.';
 $_['text_warning_products_csv_sync']  = 'Nije sinkroniziran nijedan artikl iz CSV-a (%s od %s).';
 $_['text_products_csv_sync_started']    = 'CSV je učitan. Pokrećem sinkronizaciju u batchovima po %s artikala. Ukupno za obradu: %s.';
@@ -59,6 +61,7 @@ $_['btn_products_update_q']       = 'Update Količina';
 $_['btn_categories_import']       = 'Import Novih Kategorija';
 $_['btn_categories_active']       = 'Provjera Minimalnog Stanja';
 $_['btn_manufacturer_import']     = 'Import Novih Proizvođača';
+$_['btn_novo_products_sync']       = 'A26 -> Novo';
 $_['btn_products_csv_sync']        = 'Pokreni CSV Sync';
 $_['btn_web_coupon_export']          = 'Export Web Kupona';
 $_['btn_importing']               = 'Importing... <i class="fa fa-spinner fa-spin"></i>';
@@ -76,6 +79,7 @@ $_['help_products_update_q']   = 'Update količina se vrši na svim proizvodima.
 $_['help_categories_import']   = 'Import se radi samo novih kategorija.<br>Kategorije već importane neće se dirati.';
 $_['help_categories_active']   = 'Provjerava se stanje svih kategorija s obzirom na vrijednost Min_Kol_Web parametra u proizvodu u Luceed atributima.';
 $_['help_manufacturer_import'] = 'Import se radi samo novih proizvođača.<br>Proizvođači već importani neće se dirati.';
+$_['help_novo_products_sync']    = 'Pregleda sve artikle i svaki proizvod koji u nazivu ili modelu sadrži A26 dodaje u kategoriju Novo (ID 153), bez micanja iz postojećih kategorija.';
 $_['help_web_coupon_export']    = 'Export narudžbi po odabranom rasponu datuma u Excel-kompatibilan CSV. Obrada ide u batchovima po 1000 narudžbi da veći export ne puca.';
 
 // Error

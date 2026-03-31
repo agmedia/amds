@@ -1,5 +1,7 @@
 <?php
 class ModelCatalogProduct extends Model {
+    private $novo_products = null;
+
 	public function updateViewed($product_id) {
 		$this->db->query("UPDATE " . DB_PREFIX . "product SET viewed = (viewed + 1) WHERE product_id = '" . (int)$product_id . "'");
 	}
@@ -482,6 +484,26 @@ class ModelCatalogProduct extends Model {
 
 		return $query->rows;
 	}
+
+    public function isNovoProduct($product_id) {
+        $this->loadNovoProducts();
+
+        return isset($this->novo_products[(int)$product_id]);
+    }
+
+    private function loadNovoProducts() {
+        if ($this->novo_products !== null) {
+            return;
+        }
+
+        $this->novo_products = array();
+
+        $query = $this->db->query("SELECT product_id FROM " . DB_PREFIX . "product_to_category WHERE category_id = '153'");
+
+        foreach ($query->rows as $row) {
+            $this->novo_products[(int)$row['product_id']] = true;
+        }
+    }
 
 	public function getTotalProducts($data = array()) {
 		$sql = "SELECT COUNT(DISTINCT p.product_id) AS total";

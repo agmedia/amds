@@ -19,7 +19,10 @@
 
                  <ul class="cd-images" id="gallery">
                      {% if thumb %}
-                     <li class="cd-image">
+                     <li class="cd-image main-image" style="position: relative;">
+                         {% if is_new %}
+                             <span class="badge new_badge"><i>{{ basel_text_new }}</i></span>
+                         {% endif %}
                          <a href="{{ popup }}" class="link product-gallery cloud-zoom "  rel="position:'inside', showTitle: false" >
                              <picture>
                                  <source srcset="{{ thumb }}" media="(max-width: 760px)">

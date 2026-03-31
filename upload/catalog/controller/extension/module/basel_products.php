@@ -170,11 +170,7 @@ class ControllerExtensionModuleBaselProducts extends Controller {
 						$image2 = false;
 					}
 
-					if (strtotime($result['date_available']) > strtotime('-' . $this->config->get('newlabel_status') . ' day')) {
-						$is_new = true;
-					} else {
-						$is_new = false;
-					}
+					$is_new = $this->model_catalog_product->isNovoProduct((int)$result['product_id']);
 					if ($this->config->get('config_tax')) {
 					$tax = $this->currency->format((float)$result['special'] ? $result['special'] : $result['price'], $this->session->data['currency']);
 					} else {

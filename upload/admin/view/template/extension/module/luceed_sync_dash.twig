@@ -155,6 +155,9 @@
                     <div class="col-sm-12 col-md-7">
                         <div class="panel panel-default">
                             <div class="panel-heading darker-bg">
+                                <div class="pull-right">
+                                    <a href="javascript:void(0)" id="update-novo-products" data-toggle="tooltip" title="{{ help_novo_products_sync }}" class="btn btn-info btn-sm">{{ btn_novo_products_sync }}</a>
+                                </div>
                                 <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_products_import_panel }}</h3>
                             </div>
                             <div class="panel-body form-horizontal">
@@ -435,6 +438,7 @@
             $('#update-prices-quantities')  .on('click', e => { callApi(e, 'updatePricesAndQuantities'); });
             $('#update-prices')             .on('click', e => { callApi(e, 'updatePrices'); });
             $('#update-quantities')         .on('click', e => { callApi(e, 'updateQuantities'); });
+            $('#update-novo-products')      .on('click', e => { callApi(e, 'updateNovoProducts'); });
             //
             $('#update-order-statuses')     .on('click', e => { callApi(e, 'updateOrderStatuses'); });
             $('#duration-order-statuses')   .on('click', e => { callApi(e, 'checkOrderStatusDuration'); });
