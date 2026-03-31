@@ -125,8 +125,12 @@ class ControllerExtensionModuleLuceedSync extends Controller
         $data['sync_csv_start_action'] = $this->url->link('extension/module/luceed_sync/startCsvSync', 'user_token=' . $this->session->data['user_token'], true);
         $data['sync_csv_batch_action'] = $this->url->link('extension/module/luceed_sync/processCsvSyncBatch', 'user_token=' . $this->session->data['user_token'], true);
         $default_web_coupon_range = $this->getDefaultWebCouponExportRange();
-        $data['web_coupon_date_start'] = $default_web_coupon_range['start'];
-        $data['web_coupon_date_end'] = $default_web_coupon_range['end'];
+        $data['web_coupon_date_start'] = isset($this->request->get['web_coupon_date_start'])
+            ? (string)$this->request->get['web_coupon_date_start']
+            : $default_web_coupon_range['start'];
+        $data['web_coupon_date_end'] = isset($this->request->get['web_coupon_date_end'])
+            ? (string)$this->request->get['web_coupon_date_end']
+            : $default_web_coupon_range['end'];
 
         $data['user_token'] = $this->session->data['user_token'];
 

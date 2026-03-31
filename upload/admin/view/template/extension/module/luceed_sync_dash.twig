@@ -123,7 +123,9 @@
                                 <h3 class="panel-title"><i class="fa fa-ticket"></i> {{ text_web_coupon_export_panel }}</h3>
                             </div>
                             <div class="panel-body">
-                                <form action="{{ web_coupon_export_link }}" method="get" class="form-horizontal">
+                                <form action="index.php" method="get" class="form-horizontal">
+                                    <input type="hidden" name="route" value="extension/module/luceed_sync/exportWebCoupons" />
+                                    <input type="hidden" name="user_token" value="{{ user_token }}" />
                                     <div class="form-group">
                                         <label class="col-sm-12 control-label text-left" style="text-align: left;">{{ help_web_coupon_export }}</label>
                                     </div>
