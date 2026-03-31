@@ -43,6 +43,7 @@ $_['text_products_import_panel']     = 'Proizvodi';
 $_['text_categories_import_panel']   = 'Kategorije';
 $_['text_manufacturer_import_panel'] = 'Proizvođači';
 $_['text_products_csv_panel']         = 'Selektivni CSV Sync';
+$_['text_web_coupon_export_panel']     = 'Web kuponi export';
 
 $_['text_success_product']          = 'Uspjeh..! %s novih proizvoda dodano!';
 $_['text_warning_product']          = 'Upozorenje..! Nema novih proizvoda za dodati!';
@@ -59,6 +60,7 @@ $_['btn_categories_import']       = 'Import Novih Kategorija';
 $_['btn_categories_active']       = 'Provjera Minimalnog Stanja';
 $_['btn_manufacturer_import']     = 'Import Novih Proizvođača';
 $_['btn_products_csv_sync']        = 'Pokreni CSV Sync';
+$_['btn_web_coupon_export']          = 'Export Web Kupona';
 $_['btn_importing']               = 'Importing... <i class="fa fa-spinner fa-spin"></i>';
 $_['btn_updating']                = 'Updating... <i class="fa fa-spinner fa-spin"></i>';
 $_['btn_checking']                = 'Provjera... <i class="fa fa-spinner fa-spin"></i>';
@@ -74,9 +76,12 @@ $_['help_products_update_q']   = 'Update količina se vrši na svim proizvodima.
 $_['help_categories_import']   = 'Import se radi samo novih kategorija.<br>Kategorije već importane neće se dirati.';
 $_['help_categories_active']   = 'Provjerava se stanje svih kategorija s obzirom na vrijednost Min_Kol_Web parametra u proizvodu u Luceed atributima.';
 $_['help_manufacturer_import'] = 'Import se radi samo novih proizvođača.<br>Proizvođači već importani neće se dirati.';
+$_['help_web_coupon_export']    = 'Export narudžbi po odabranom rasponu datuma u Excel-kompatibilan CSV. Obrada ide u batchovima po 1000 narudžbi da veći export ne puca.';
 
 // Error
 $_['entry_products_csv_file'] = 'CSV datoteka';
+$_['entry_web_coupon_date_start'] = 'Datum od';
+$_['entry_web_coupon_date_end']   = 'Datum do';
 
 // Error
 $_['error_permission'] = 'Upozorenje..! Nemate ovlasti za promjenu Luceed Sync. Menađer modula.';
@@ -85,3 +90,6 @@ $_['error_csv_empty']  = 'CSV ne sadrži nijedan model za obradu.';
 $_['error_csv_sync']   = 'Greška pri CSV syncu: %s';
 $_['error_csv_sync_state'] = 'CSV sync stanje nije dostupno ili je isteklo. Ponovno uploadajte CSV.';
 $_['error_csv_sync_generic'] = 'Greška pri CSV syncu.';
+$_['error_web_coupon_export'] = 'Greška pri exportu web kupona: %s';
+$_['error_web_coupon_export_dates'] = 'Odaberite valjan raspon datuma za export web kupona.';
+$_['error_web_coupon_export_file'] = 'Nije moguće pripremiti datoteku za export web kupona.';

@@ -34,6 +34,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
 {
     private const CSV_SYNC_SESSION_KEY = 'luceed_csv_sync_state';
     private const CSV_SYNC_BATCH_SIZE = 5;
+    private const WEB_COUPON_EXPORT_BATCH_SIZE = 1000;
 
     private $error = array();
     private $product_columns = null;
@@ -66,7 +67,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
     public function index()
     {
-        $this->load->language('extension/module/luceed_sync');
+        $data = $this->load->language('extension/module/luceed_sync');
 
         $this->document->setTitle($this->language->get('heading_title'));
 
@@ -119,9 +120,13 @@ class ControllerExtensionModuleLuceedSync extends Controller
         }
 
         $data['generate_excel_link'] = $this->url->link('extension/module/luceed_sync/generateExcel', 'user_token=' . $this->session->data['user_token'], true);
+        $data['web_coupon_export_link'] = $this->url->link('extension/module/luceed_sync/exportWebCoupons', 'user_token=' . $this->session->data['user_token'], true);
         $data['sync_csv_action'] = $this->url->link('extension/module/luceed_sync', 'user_token=' . $this->session->data['user_token'], true);
         $data['sync_csv_start_action'] = $this->url->link('extension/module/luceed_sync/startCsvSync', 'user_token=' . $this->session->data['user_token'], true);
         $data['sync_csv_batch_action'] = $this->url->link('extension/module/luceed_sync/processCsvSyncBatch', 'user_token=' . $this->session->data['user_token'], true);
+        $default_web_coupon_range = $this->getDefaultWebCouponExportRange();
+        $data['web_coupon_date_start'] = $default_web_coupon_range['start'];
+        $data['web_coupon_date_end'] = $default_web_coupon_range['end'];
 
         $data['user_token'] = $this->session->data['user_token'];
 
@@ -930,6 +935,341 @@ class ControllerExtensionModuleLuceedSync extends Controller
         $excel = new \Agmedia\LuceedOpencartWrapper\Helpers\Excel('simple', $products);
 
         return $excel->make()->response('stream');
+    }
+
+
+    /**
+     * Export orders for the selected date range into an Excel-compatible CSV file.
+     *
+     * @return void
+     */
+    public function exportWebCoupons()
+    {
+        $this->load->language('extension/module/luceed_sync');
+        $this->prepareLongRunningRequest();
+
+        $file = null;
+
+        try {
+            [$start_date, $end_date, $start_datetime, $end_datetime] = $this->resolveWebCouponExportRange();
+            $file = $this->buildWebCouponExportFile($start_datetime, $end_datetime);
+            $filename = sprintf('web_kuponi_%s_%s.csv', $start_date, $end_date);
+
+            while (ob_get_level() > 0) {
+                @ob_end_clean();
+            }
+
+            header('Content-Type: text/csv; charset=UTF-8');
+            header('Content-Disposition: attachment;filename="' . basename($filename) . '"');
+            header('Cache-Control: max-age=0');
+            header('Cache-Control: max-age=1');
+            header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
+            header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+            header('Cache-Control: cache, must-revalidate');
+            header('Pragma: public');
+
+            readfile($file);
+            @unlink($file);
+        } catch (\Throwable $exception) {
+            if ($file && is_file($file)) {
+                @unlink($file);
+            }
+
+            Log::store(
+                [
+                    'message' => $exception->getMessage(),
+                    'trace' => $exception->getTraceAsString()
+                ],
+                'luceed_web_coupon_export_error'
+            );
+
+            $this->session->data['error_warning'] = sprintf(
+                $this->language->get('error_web_coupon_export'),
+                $exception->getMessage()
+            );
+
+            $this->redirectToModule();
+        }
+    }
+
+
+    /**
+     * @return array
+     */
+    private function getDefaultWebCouponExportRange(): array
+    {
+        $reference = Carbon::now()->subMonthNoOverflow();
+
+        return [
+            'start' => $reference->copy()->startOfMonth()->format('Y-m-d'),
+            'end' => $reference->copy()->endOfMonth()->format('Y-m-d'),
+        ];
+    }
+
+
+    /**
+     * @return array
+     */
+    private function resolveWebCouponExportRange(): array
+    {
+        $defaults = $this->getDefaultWebCouponExportRange();
+        $start_input = isset($this->request->get['web_coupon_date_start']) ? (string)$this->request->get['web_coupon_date_start'] : $defaults['start'];
+        $end_input = isset($this->request->get['web_coupon_date_end']) ? (string)$this->request->get['web_coupon_date_end'] : $defaults['end'];
+
+        $start = $this->parseWebCouponExportDate($start_input)->startOfDay();
+        $end = $this->parseWebCouponExportDate($end_input)->endOfDay();
+
+        if ($start->gt($end)) {
+            throw new \RuntimeException($this->language->get('error_web_coupon_export_dates'));
+        }
+
+        return [
+            $start->format('Y-m-d'),
+            $end->format('Y-m-d'),
+            $start->format('Y-m-d H:i:s'),
+            $end->format('Y-m-d H:i:s'),
+        ];
+    }
+
+
+    /**
+     * @param string $value
+     *
+     * @return Carbon
+     */
+    private function parseWebCouponExportDate(string $value): Carbon
+    {
+        try {
+            $date = Carbon::createFromFormat('!Y-m-d', trim($value));
+        } catch (\Throwable $exception) {
+            $date = false;
+        }
+
+        if (!$date || $date->format('Y-m-d') !== trim($value)) {
+            throw new \RuntimeException($this->language->get('error_web_coupon_export_dates'));
+        }
+
+        return $date;
+    }
+
+
+    /**
+     * @param string $start_datetime
+     * @param string $end_datetime
+     *
+     * @return string
+     */
+    private function buildWebCouponExportFile(string $start_datetime, string $end_datetime): string
+    {
+        $directory = rtrim(DIR_STORAGE, '/\\') . '/cache/';
+
+        if (!is_dir($directory) && !mkdir($directory, 0777, true) && !is_dir($directory)) {
+            throw new \RuntimeException($this->language->get('error_web_coupon_export_file'));
+        }
+
+        $file = $directory . 'web_coupon_export_' . md5(uniqid('', true)) . '.csv';
+        $handle = fopen($file, 'wb');
+
+        if ($handle === false) {
+            throw new \RuntimeException($this->language->get('error_web_coupon_export_file'));
+        }
+
+        try {
+            fwrite($handle, "\xEF\xBB\xBF");
+            $this->writeWebCouponExportCsvRow($handle, $this->getWebCouponExportHeaders());
+
+            $last_order_id = null;
+
+            do {
+                $rows = $this->getWebCouponExportBatch($start_datetime, $end_datetime, $last_order_id, self::WEB_COUPON_EXPORT_BATCH_SIZE);
+
+                foreach ($rows as $row) {
+                    $this->writeWebCouponExportCsvRow($handle, $this->formatWebCouponExportRow($row));
+                    $last_order_id = (int)$row['id'];
+                }
+            } while (count($rows) === self::WEB_COUPON_EXPORT_BATCH_SIZE);
+        } catch (\Throwable $exception) {
+            fclose($handle);
+            @unlink($file);
+
+            throw $exception;
+        }
+
+        fclose($handle);
+
+        return $file;
+    }
+
+
+    /**
+     * @return array
+     */
+    private function getWebCouponExportHeaders(): array
+    {
+        return [
+            'id',
+            'invoice_no',
+            'invoice_prefix',
+            'date_added',
+            'firstname',
+            'lastname',
+            'email',
+            'telephone',
+            'payment_method',
+            'shipping_method',
+            'sub_total',
+            'shipping',
+            'coupon_discount',
+            'order_total',
+            'coupon_name',
+            'coupon_code',
+        ];
+    }
+
+
+    /**
+     * @param resource $handle
+     * @param array    $row
+     *
+     * @return void
+     */
+    private function writeWebCouponExportCsvRow($handle, array $row): void
+    {
+        if (fputcsv($handle, $row, ';') === false) {
+            throw new \RuntimeException($this->language->get('error_web_coupon_export_file'));
+        }
+    }
+
+
+    /**
+     * @param string   $start_datetime
+     * @param string   $end_datetime
+     * @param int|null $last_order_id
+     * @param int      $limit
+     *
+     * @return array
+     */
+    private function getWebCouponExportBatch(string $start_datetime, string $end_datetime, ?int $last_order_id, int $limit): array
+    {
+        $sql = "SELECT
+                    o.order_id AS id,
+                    o.invoice_no,
+                    o.invoice_prefix,
+                    o.date_added,
+                    o.payment_firstname AS firstname,
+                    o.payment_lastname AS lastname,
+                    o.email,
+                    o.telephone,
+                    o.payment_method,
+                    o.shipping_method,
+                    CAST(MAX(ot_sub_total.value) AS DECIMAL(15,4)) AS sub_total,
+                    CAST(MAX(ot_shipping.value) AS DECIMAL(15,4)) AS shipping,
+                    CAST(MAX(ot_coupon.value) AS DECIMAL(15,4)) AS coupon_discount,
+                    CAST(MAX(ot_total.value) AS DECIMAL(15,4)) AS order_total,
+                    MAX(ot_coupon.title) AS coupon_name,
+                    MAX(ot_coupon.title) AS coupon_code
+                FROM (
+                    SELECT
+                        order_id,
+                        invoice_no,
+                        invoice_prefix,
+                        date_added,
+                        payment_firstname,
+                        payment_lastname,
+                        email,
+                        telephone,
+                        payment_method,
+                        shipping_method
+                    FROM " . DB_PREFIX . "order
+                    WHERE date_added >= '" . $this->db->escape($start_datetime) . "'
+                      AND date_added <= '" . $this->db->escape($end_datetime) . "'";
+
+        if ($last_order_id !== null) {
+            $sql .= " AND order_id < " . (int)$last_order_id;
+        }
+
+        $sql .= " ORDER BY order_id DESC LIMIT " . (int)$limit . "
+                ) o
+                LEFT JOIN " . DB_PREFIX . "order_total ot_sub_total
+                    ON (ot_sub_total.order_id = o.order_id AND ot_sub_total.code = 'sub_total')
+                LEFT JOIN " . DB_PREFIX . "order_total ot_shipping
+                    ON (ot_shipping.order_id = o.order_id AND ot_shipping.code = 'shipping')
+                LEFT JOIN " . DB_PREFIX . "order_total ot_coupon
+                    ON (ot_coupon.order_id = o.order_id AND ot_coupon.code = 'coupon')
+                LEFT JOIN " . DB_PREFIX . "order_total ot_total
+                    ON (ot_total.order_id = o.order_id AND ot_total.code = 'total')
+                GROUP BY
+                    o.order_id,
+                    o.invoice_no,
+                    o.invoice_prefix,
+                    o.date_added,
+                    o.payment_firstname,
+                    o.payment_lastname,
+                    o.email,
+                    o.telephone,
+                    o.payment_method,
+                    o.shipping_method
+                ORDER BY o.order_id DESC";
+
+        return $this->db->query($sql)->rows;
+    }
+
+
+    /**
+     * @param array $row
+     *
+     * @return array
+     */
+    private function formatWebCouponExportRow(array $row): array
+    {
+        return [
+            (int)$row['id'],
+            $this->normalizeWebCouponExportValue($row['invoice_no']),
+            $this->normalizeWebCouponExportValue($row['invoice_prefix']),
+            $this->normalizeWebCouponExportValue($row['date_added']),
+            $this->normalizeWebCouponExportValue($row['firstname']),
+            $this->normalizeWebCouponExportValue($row['lastname']),
+            $this->normalizeWebCouponExportValue($row['email']),
+            $this->normalizeWebCouponExportValue($row['telephone']),
+            $this->normalizeWebCouponExportValue($row['payment_method']),
+            $this->normalizeWebCouponExportValue($row['shipping_method']),
+            $this->normalizeWebCouponExportAmount($row['sub_total']),
+            $this->normalizeWebCouponExportAmount($row['shipping']),
+            $this->normalizeWebCouponExportAmount($row['coupon_discount']),
+            $this->normalizeWebCouponExportAmount($row['order_total']),
+            $this->normalizeWebCouponExportValue($row['coupon_name']),
+            $this->normalizeWebCouponExportValue($row['coupon_code']),
+        ];
+    }
+
+
+    /**
+     * @param mixed $value
+     *
+     * @return string
+     */
+    private function normalizeWebCouponExportValue($value): string
+    {
+        if ($value === null || $value === '') {
+            return '';
+        }
+
+        return trim(str_replace(["\r", "\n"], ' ', html_entity_decode((string)$value, ENT_QUOTES, 'UTF-8')));
+    }
+
+
+    /**
+     * @param mixed $value
+     *
+     * @return string
+     */
+    private function normalizeWebCouponExportAmount($value): string
+    {
+        if ($value === null || $value === '') {
+            return '';
+        }
+
+        return number_format((float)$value, 4, ',', '');
     }
 
 
