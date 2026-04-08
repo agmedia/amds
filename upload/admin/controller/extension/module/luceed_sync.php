@@ -1513,8 +1513,8 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
 
     /**
-     * Resolve the OpenCart option label from Luceed size fields first,
-     * then fall back to parsing the variant code when size data is missing.
+     * Resolve the OpenCart option label by preferring a concrete V-size
+     * from the article code, then falling back to Luceed size fields.
      *
      * @param object $item
      *
@@ -1522,6 +1522,12 @@ class ControllerExtensionModuleLuceedSync extends Controller
      */
     private function resolveLuceedOptionName($item): string
     {
+        $specific_option_name = $this->extractSpecificLuceedOptionNameFromArtikl($item);
+
+        if ($specific_option_name !== '') {
+            return $specific_option_name;
+        }
+
         if (isset($item->velicina_naziv) && trim((string)$item->velicina_naziv) !== '') {
             return trim((string)$item->velicina_naziv);
         }
@@ -1543,6 +1549,30 @@ class ControllerExtensionModuleLuceedSync extends Controller
         }
 
         return isset($item->artikl) ? trim((string)$item->artikl) : '';
+    }
+
+
+    /**
+     * Prefer a concrete V-size from the Luceed article code when present.
+     * Examples:
+     * - 132709-V46 => V46
+     * - 132741-S/V46 => V46
+     *
+     * @param object $item
+     *
+     * @return string
+     */
+    private function extractSpecificLuceedOptionNameFromArtikl($item): string
+    {
+        if (!isset($item->artikl) || !is_string($item->artikl)) {
+            return '';
+        }
+
+        if (preg_match('/(?:^|[\\/-])(V\\d{2,3})(?:$|[\\/-])/', trim($item->artikl), $matches)) {
+            return $matches[1];
+        }
+
+        return '';
     }
 
 
