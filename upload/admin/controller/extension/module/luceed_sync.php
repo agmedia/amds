@@ -1513,8 +1513,8 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
 
     /**
-     * Resolve the OpenCart option label from the Luceed variant code.
-     * Example: 134747-S => S
+     * Resolve the OpenCart option label from Luceed size fields first,
+     * then fall back to parsing the variant code when size data is missing.
      *
      * @param object $item
      *
@@ -1522,6 +1522,14 @@ class ControllerExtensionModuleLuceedSync extends Controller
      */
     private function resolveLuceedOptionName($item): string
     {
+        if (isset($item->velicina_naziv) && trim((string)$item->velicina_naziv) !== '') {
+            return trim((string)$item->velicina_naziv);
+        }
+
+        if (isset($item->velicina) && trim((string)$item->velicina) !== '') {
+            return trim((string)$item->velicina);
+        }
+
         if (isset($item->artikl) && is_string($item->artikl)) {
             $position = strrpos($item->artikl, '-');
 
@@ -1532,14 +1540,6 @@ class ControllerExtensionModuleLuceedSync extends Controller
                     return $suffix;
                 }
             }
-        }
-
-        if (isset($item->velicina) && trim((string)$item->velicina) !== '') {
-            return trim((string)$item->velicina);
-        }
-
-        if (isset($item->velicina_naziv) && trim((string)$item->velicina_naziv) !== '') {
-            return trim((string)$item->velicina_naziv);
         }
 
         return isset($item->artikl) ? trim((string)$item->artikl) : '';
