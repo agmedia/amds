@@ -40,6 +40,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
     private $error = array();
     private $product_columns = null;
+    private $syncLocks = array();
 
 
     public function install()
@@ -620,26 +621,28 @@ class ControllerExtensionModuleLuceedSync extends Controller
      */
     public function importProducts()
     {
-        $_loc  = new LOC_Product(LuceedProduct::all());
-        $count = 0;
+        return $this->runGuardedSync(__FUNCTION__, function () {
+            $_loc  = new LOC_Product(LuceedProduct::all());
+            $count = 0;
 
-        $new_products = $_loc->checkDiff()->getProductsToAdd();
-        
-        if ($new_products->count()) {
-            $this->load->model('catalog/product');
+            $new_products = $_loc->checkDiff()->getProductsToAdd();
 
-            foreach ($new_products->all() as $product) {
-                $this->model_catalog_product->addProduct(
-                    $_loc->make($product)
-                );
+            if ($new_products->count()) {
+                $this->load->model('catalog/product');
 
-                $count++;
+                foreach ($new_products->all() as $product) {
+                    $this->model_catalog_product->addProduct(
+                        $_loc->make($product)
+                    );
+
+                    $count++;
+                }
             }
-        }
 
-        $this->setNovoProducts();
+            $this->setNovoProducts();
 
-        return $this->response($count, 'products');
+            return $this->response($count, 'products');
+        });
     }
 
 
@@ -791,15 +794,17 @@ class ControllerExtensionModuleLuceedSync extends Controller
      */
     public function importActions()
     {
-        $_loc = new LOC_Action(LuceedProduct::getActions());
+        return $this->runGuardedSync(__FUNCTION__, function () {
+            $_loc = new LOC_Action(LuceedProduct::getActions());
 
-        $imported = $_loc->collectActive()
-                         ->sortActions()
-                         ->import();
+            $imported = $_loc->collectActive()
+                             ->sortActions()
+                             ->import();
 
-        $_loc->updateSpecialsFromTemp();
+            $_loc->updateSpecialsFromTemp();
 
-        return $this->response($imported, 'products_actions');
+            return $this->response($imported, 'products_actions');
+        });
     }
 
 
@@ -871,19 +876,21 @@ class ControllerExtensionModuleLuceedSync extends Controller
      */
     public function updatePricesAndQuantities()
     {
-        $start = microtime(true);
-        
-        $_loc = new LOC_Product(LuceedProduct::shortList());
-        
-        $end = microtime(true);
-        $time = number_format(($end - $start), 2, ',', '.');
-        Log::store('Download time ::: ' . $time . ' sec.', 'testing_update_time');
+        return $this->runGuardedSync(__FUNCTION__, function () {
+            $start = microtime(true);
 
-        $updated = $_loc->sortForUpdate()->update();
+            $_loc = new LOC_Product(LuceedProduct::shortList());
 
-        //Helper::overwritePricesAndSpecialsFromTempTable();
+            $end = microtime(true);
+            $time = number_format(($end - $start), 2, ',', '.');
+            Log::store('Download time ::: ' . $time . ' sec.', 'testing_update_time');
 
-        return $this->response($updated, 'update');
+            $updated = $_loc->sortForUpdate()->update();
+
+            //Helper::overwritePricesAndSpecialsFromTempTable();
+
+            return $this->response($updated, 'update');
+        });
     }
 
 
@@ -929,22 +936,24 @@ class ControllerExtensionModuleLuceedSync extends Controller
      */
     public function updateOrderStatuses()
     {
-        $loc = new LOC_Order();
+        return $this->runGuardedSync(__FUNCTION__, function () {
+            $loc = new LOC_Order();
 
-        $loc->setOrders(
-            LuceedOrder::get(
-                $loc->collectStatuses(),
-                Carbon::now()->subMonth()->format('d.m.Y') //agconf('import.orders.from_date')
-            )
-        );
+            $loc->setOrders(
+                LuceedOrder::get(
+                    $loc->collectStatuses(),
+                    Carbon::now()->subMonth()->format('d.m.Y') //agconf('import.orders.from_date')
+                )
+            );
 
-        $updated = $loc->sort()->updateStatuses();
+            $updated = $loc->sort()->updateStatuses();
 
-        foreach ($loc->collection as $order) {
-            $this->sendMail($order);
-        }
+            foreach ($loc->collection as $order) {
+                $this->sendMail($order);
+            }
 
-        return $this->response($updated, 'orders');
+            return $this->response($updated, 'orders');
+        });
     }
 
 
@@ -1980,6 +1989,87 @@ class ControllerExtensionModuleLuceedSync extends Controller
         if (function_exists('set_time_limit')) {
             @set_time_limit(0);
         }
+    }
+
+
+    /**
+     * @param string   $lockName
+     * @param callable $callback
+     *
+     * @return mixed
+     */
+    private function runGuardedSync(string $lockName, callable $callback)
+    {
+        $this->prepareLongRunningRequest();
+
+        if (!$this->acquireSyncLock($lockName)) {
+            Log::store('Skipped duplicate sync call for ' . $lockName, 'luceed_sync_lock');
+
+            return $this->output([
+                'status' => 300,
+                'message' => 'Sync already running.'
+            ]);
+        }
+
+        try {
+            return $callback();
+        } finally {
+            $this->releaseSyncLock($lockName);
+        }
+    }
+
+
+    /**
+     * @param string $lockName
+     *
+     * @return bool
+     */
+    private function acquireSyncLock(string $lockName): bool
+    {
+        $directory = rtrim(DIR_STORAGE, '/\\') . '/locks/';
+
+        if (!is_dir($directory) && !mkdir($directory, 0777, true) && !is_dir($directory)) {
+            return false;
+        }
+
+        $file = $directory . 'luceed_' . preg_replace('/[^a-zA-Z0-9_\-]/', '_', $lockName) . '.lock';
+        $handle = fopen($file, 'c');
+
+        if ($handle === false) {
+            return false;
+        }
+
+        if (!flock($handle, LOCK_EX | LOCK_NB)) {
+            fclose($handle);
+
+            return false;
+        }
+
+        ftruncate($handle, 0);
+        fwrite($handle, (string)getmypid());
+        fflush($handle);
+
+        $this->syncLocks[$lockName] = $handle;
+
+        return true;
+    }
+
+
+    /**
+     * @param string $lockName
+     *
+     * @return void
+     */
+    private function releaseSyncLock(string $lockName): void
+    {
+        if (!isset($this->syncLocks[$lockName]) || !is_resource($this->syncLocks[$lockName])) {
+            return;
+        }
+
+        flock($this->syncLocks[$lockName], LOCK_UN);
+        fclose($this->syncLocks[$lockName]);
+
+        unset($this->syncLocks[$lockName]);
     }
 
 
