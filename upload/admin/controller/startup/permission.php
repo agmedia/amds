@@ -2,13 +2,13 @@
 class ControllerStartupPermission extends Controller {
 	public function index() {
 		if (isset($this->request->get['route'])) {
+			if ($this->isLuceedSyncRoute($this->request->get['route']) && $this->hasValidLuceedCronKey()) {
+				return;
+			}
+
 			$route = '';
 
 			$part = explode('/', $this->request->get['route']);
-            
-            if (isset($part[3]) && in_array($part[3], ['importProducts', 'importActions', 'updatePricesAndQuantities', 'updateOrderStatuses'])) {
-                return;
-            }
 
 			if (isset($part[0])) {
 				$route .= $part[0];
@@ -54,5 +54,37 @@ class ControllerStartupPermission extends Controller {
 				return new Action('error/permission');
 			}
 		}
+	}
+
+	private function isLuceedSyncRoute($route) {
+		return in_array($route, array(
+			'extension/module/luceed_sync/importProducts',
+			'extension/module/luceed_sync/importActions',
+			'extension/module/luceed_sync/updatePricesAndQuantities',
+			'extension/module/luceed_sync/updateOrderStatuses'
+		), true);
+	}
+
+	private function hasValidLuceedCronKey() {
+		if (PHP_SAPI === 'cli') {
+			return true;
+		}
+
+		$expected = $this->getLuceedCronKey();
+		$provided = isset($this->request->get['key']) ? (string)$this->request->get['key'] : '';
+
+		return ($expected !== '' && $provided !== '' && hash_equals($expected, $provided));
+	}
+
+	private function getLuceedCronKey() {
+		if (defined('OC_ENV') && isset(OC_ENV['security']['luceed_sync_cron_key'])) {
+			return trim((string)OC_ENV['security']['luceed_sync_cron_key']);
+		}
+
+		if (defined('WSPAY_CRON_KEY')) {
+			return trim((string)WSPAY_CRON_KEY);
+		}
+
+		return '';
 	}
 }

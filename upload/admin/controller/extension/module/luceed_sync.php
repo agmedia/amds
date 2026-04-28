@@ -2002,6 +2002,12 @@ class ControllerExtensionModuleLuceedSync extends Controller
     {
         $this->prepareLongRunningRequest();
 
+        if (!$this->isAuthorizedSyncRequest()) {
+            Log::store('Rejected unauthorized sync call for ' . $lockName, 'luceed_sync_lock');
+
+            return $this->forbiddenSyncResponse();
+        }
+
         if (!$this->acquireSyncLock($lockName)) {
             Log::store('Skipped duplicate sync call for ' . $lockName, 'luceed_sync_lock');
 
@@ -2016,6 +2022,84 @@ class ControllerExtensionModuleLuceedSync extends Controller
         } finally {
             $this->releaseSyncLock($lockName);
         }
+    }
+
+
+    /**
+     * @return bool
+     */
+    private function isAuthorizedSyncRequest(): bool
+    {
+        $user = $this->registry->get('user');
+
+        if (PHP_SAPI === 'cli') {
+            return true;
+        }
+
+        if ($this->hasValidLuceedCronKey()) {
+            return true;
+        }
+
+        if (!$user || !$user->isLogged()) {
+            return false;
+        }
+
+        if (!isset($this->request->get['user_token']) || !isset($this->session->data['user_token'])) {
+            return false;
+        }
+
+        return hash_equals((string)$this->session->data['user_token'], (string)$this->request->get['user_token']);
+    }
+
+
+    /**
+     * @return bool
+     */
+    private function hasValidLuceedCronKey(): bool
+    {
+        $expected = $this->getLuceedCronKey();
+        $provided = isset($this->request->get['key']) ? (string)$this->request->get['key'] : '';
+
+        return ($expected !== '' && $provided !== '' && hash_equals($expected, $provided));
+    }
+
+
+    /**
+     * @return string
+     */
+    private function getLuceedCronKey(): string
+    {
+        if (defined('OC_ENV') && isset(OC_ENV['security']['luceed_sync_cron_key'])) {
+            return trim((string)OC_ENV['security']['luceed_sync_cron_key']);
+        }
+
+        if (defined('WSPAY_CRON_KEY')) {
+            return trim((string)WSPAY_CRON_KEY);
+        }
+
+        return '';
+    }
+
+
+    /**
+     * @return mixed
+     */
+    private function forbiddenSyncResponse()
+    {
+        while (ob_get_level() > 0) {
+            @ob_end_clean();
+        }
+
+        $protocol = isset($this->request->server['SERVER_PROTOCOL']) ? $this->request->server['SERVER_PROTOCOL'] : 'HTTP/1.1';
+
+        $this->response->addHeader($protocol . ' 403 Forbidden');
+        $this->response->addHeader('Content-Type: application/json');
+        $this->response->setOutput(collect([
+            'status' => 403,
+            'message' => 'Forbidden'
+        ])->toJson());
+
+        return $this->response;
     }
 
 
