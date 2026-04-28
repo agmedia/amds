@@ -51,9 +51,9 @@ class ControllerExtensionModuleBirthdayReminder extends Controller
             $order_id = $this->session->data['order_id'];
             if ($order_id && !$this->customer->getId()) {
                 $this->load->model('checkout/order');
-                $data = $this->model_checkout_order->getOrder($order_id);
-                if ($data) {
-                    $this->moduleModel->registerGuestBirthday($data);
+                $order_data = $this->model_checkout_order->getOrder($order_id);
+                if ($order_data) {
+                    $this->moduleModel->registerGuestBirthday($order_data);
                 } 
             }
         } 

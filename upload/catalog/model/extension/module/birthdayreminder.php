@@ -69,33 +69,43 @@ class ModelExtensionModuleBirthdayReminder extends Model {
 	return $birthdays;
   }
 
-  public function registerGuestBirthday($data) {
-	
-	$this->load->model('setting/setting'); 
-	$setting = $this->model_setting_setting->getSetting('BirthdayReminder');
-	if(!empty($setting['BirthdayReminder']['Enabled']) && $setting['BirthdayReminder']['Enabled'] == 'yes') {
-		if(!empty($setting['BirthdayReminder']['custom_field'])) {          
-		  if(is_object($data['custom_field'])) {
-			$birthday = $data['custom_field']->$setting['BirthdayReminder']['custom_field'];
-		  } else {
-		  
-			$birthday = $data['custom_field'][$setting['BirthdayReminder']['custom_field']];
-		  }
-		  
-		  $d_quickcheckout = $this->model_setting_setting->getSetting('d_quickcheckout');
-		 
-		  if (!empty($d_quickcheckout['d_quickcheckout_status'])) {
-			$birthday = explode('/', $birthday);
-			$year = $birthday[2];
-			$month = $birthday[0];
-			$day = $birthday[1];
-			$d_qc_date = "$year-$month-$day";
-			$birthday = $d_qc_date;
-		  }
-		  $this->addGuestBirthday($birthday, $data['email']);
+	  public function registerGuestBirthday($data) {
+		
+		$this->load->model('setting/setting'); 
+		$setting = $this->model_setting_setting->getSetting('BirthdayReminder');
+		if(!empty($setting['BirthdayReminder']['Enabled']) && $setting['BirthdayReminder']['Enabled'] == 'yes') {
+			if(!empty($setting['BirthdayReminder']['custom_field']) && !empty($data['email'])) {
+			  $custom_field_key = $setting['BirthdayReminder']['custom_field'];
+			  $custom_field = isset($data['custom_field']) ? $data['custom_field'] : array();
+			  $birthday = '';
+
+			  if (is_object($custom_field) && isset($custom_field->{$custom_field_key})) {
+				$birthday = $custom_field->{$custom_field_key};
+			  } elseif (is_array($custom_field) && isset($custom_field[$custom_field_key])) {
+				$birthday = $custom_field[$custom_field_key];
+			  }
+
+			  if (!$birthday) {
+				return;
+			  }
+
+			  $d_quickcheckout = $this->model_setting_setting->getSetting('d_quickcheckout');
+			 
+			  if (!empty($d_quickcheckout['d_quickcheckout_status']) && strpos($birthday, '/') !== false) {
+				$birthday_parts = explode('/', $birthday);
+
+				if (count($birthday_parts) === 3) {
+					$year = $birthday_parts[2];
+					$month = $birthday_parts[0];
+					$day = $birthday_parts[1];
+					$birthday = "$year-$month-$day";
+				}
+			  }
+
+			  $this->addGuestBirthday($birthday, $data['email']);
+			}
 		}
-	}
-  }
+	  }
 
   private function addGuestBirthday($birthday_date, $email) {   
 	$this->db->query("INSERT INTO `" . DB_PREFIX . "customer_birthday` 

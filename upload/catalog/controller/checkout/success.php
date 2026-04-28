@@ -9,6 +9,8 @@ class ControllerCheckoutSuccess extends Controller {
         $order_id = 0;
         $oc_order = [];
         $data['klaviyo_order'] = [];
+        $ukupno = '';
+        $ukupnohub = 0;
 
         if (isset($this->session->data['order_id'])) {
             $order_id = $this->session->data['order_id'];
@@ -39,44 +41,45 @@ class ControllerCheckoutSuccess extends Controller {
 
             $oc_order = $this->model_checkout_order->getOrder($order_id);
 
-            $data['paymethod'] = $oc_order['payment_code'];
-            $data['order_id'] = $order_id;
+            if ($oc_order) {
+                $data['paymethod'] = $oc_order['payment_code'] ?? '';
+                $data['order_id'] = $order_id;
 
-            $order_id = $data['order_id'];
-            $order_info = $this->model_checkout_order->getOrder($order_id);
+                $data['klaviyo_order'] = [
+                    'OrderID'   => $order_id,
+                    'value'     => (float)$oc_order['total'],
+                    'Currency'  => $oc_order['currency_code'] ?? '',
+                    'Email'     => $oc_order['email'] ?? ''
+                ];
 
-            $data['klaviyo_order'] = [
-                'OrderID'   => $order_id,
-                'value'     => (float)$order_info['total'],
-                'Currency'  => $order_info['currency_code'],
-                'Email'     => $order_info['email'] ?? ''
-            ];
+                \Agmedia\Helpers\Log::store($data, 'luceed_success');
 
-            \Agmedia\Helpers\Log::store($data, 'luceed_success');
+                if (empty($oc_order['luceed_uid'])) {
+                    $order    = new LOC_Order($oc_order);
+                    $customer = new LOC_Customer($order->getCustomerData());
 
-            if (empty($oc_order['luceed_uid'])) {
-                $order    = new LOC_Order($oc_order);
-                $customer = new LOC_Customer($order->getCustomerData());
+                    \Agmedia\Helpers\Log::store($oc_order, 'luceed_success');
 
-                \Agmedia\Helpers\Log::store($oc_order, 'luceed_success');
+                    $has_qty = $order->collectProductsFromWarehouses();
 
-                $has_qty = $order->collectProductsFromWarehouses();
+                    \Agmedia\Helpers\Log::store($has_qty ? 'Ima qty' : 'Nema qty', 'luceed_success');
 
-                \Agmedia\Helpers\Log::store($has_qty ? 'Ima qty' : 'Nema qty', 'luceed_success');
+                    if ($has_qty) {
+                        if (!$customer->exist()) {
+                            $customer->store();
+                        }
 
-                if ($has_qty) {
-                    if ( ! $customer->exist()) {
-                        $customer->store();
-                    }
+                        $sent = $order->setCustomerUid($customer->getUid())->store();
 
-                    $sent = $order->setCustomerUid($customer->getUid())->store();
+                        \Agmedia\Helpers\Log::store($sent ? 'Success sent' : 'Error sent', 'luceed_success');
 
-                    \Agmedia\Helpers\Log::store($sent ? 'Success sent' : 'Error sent', 'luceed_success');
-
-                    if ( ! $sent) {
-                        $order->recordError();
+                        if (!$sent) {
+                            $order->recordError();
+                        }
                     }
                 }
+            } else {
+                \Agmedia\Helpers\Log::store('Order not found on success page: ' . (int)$order_id, 'luceed_success');
             }
             /*******************************************************************************
              *                              END Copyright : AGmedia                         *
@@ -144,18 +147,27 @@ class ControllerCheckoutSuccess extends Controller {
         $this->load->model('account/order');
         // Totals
         $data['totals'] = array();
+        $order_currency_code = '';
+        $order_currency_value = 0;
 
         if ($order_id && !empty($oc_order)) {
+            $order_currency_code = !empty($oc_order['currency_code']) ? $oc_order['currency_code'] : ((string)$this->config->get('config_currency') ?: 'EUR');
+            $order_currency_value = !empty($oc_order['currency_value']) ? $oc_order['currency_value'] : $this->currency->getValue($order_currency_code);
+
+            if (!$order_currency_value) {
+                $order_currency_value = 1;
+            }
+
             $totals = $this->model_account_order->getOrderTotals($order_id);
 
             foreach ($totals as $total) {
                 if ($total['title'] == 'Ukupno') {
-                    $ukupno = $this->currency->format($total['value'], $oc_order['currency_code'], $oc_order['currency_value']);
+                    $ukupno = $this->currency->format($total['value'], $order_currency_code, $order_currency_value);
                     $ukupnohub = number_format((float)$total['value'], 2, '.', '');
                     $ukupnohub = $ukupnohub * 100;
                 }
 
-                $text = $this->currency->format($total['value'], $oc_order['currency_code'], $oc_order['currency_value']);
+                $text = $this->currency->format($total['value'], $order_currency_code, $order_currency_value);
 
                 $data['totals'][] = array(
                     'title' => $total['title'],

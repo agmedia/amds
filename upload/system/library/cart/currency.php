@@ -5,6 +5,7 @@ class Currency {
 
 	public function __construct($registry) {
 		$this->db = $registry->get('db');
+		$this->config = $registry->get('config');
 		$this->language = $registry->get('language');
 
 		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "currency");
@@ -22,11 +23,23 @@ class Currency {
 	}
 
 	public function format($number, $currency, $value = '', $format = true) {
+		$currency = $this->resolveCurrencyCode($currency);
+
+		if ($currency === '') {
+			$amount = (float)$number;
+
+			if (!$format) {
+				return $amount;
+			}
+
+			return number_format($amount, 2, $this->language->get('decimal_point'), $this->language->get('thousand_point'));
+		}
+
 		$symbol_left = $this->currencies[$currency]['symbol_left'];
 		$symbol_right = $this->currencies[$currency]['symbol_right'];
 		$decimal_place = $this->currencies[$currency]['decimal_place'];
 
-		if (!$value) {
+		if ($value === '' || $value === null || $value === false) {
 			$value = $this->currencies[$currency]['value'];
 		}
 
@@ -111,5 +124,25 @@ class Currency {
 
 	public function has($currency) {
 		return isset($this->currencies[$currency]);
+	}
+
+	private function resolveCurrencyCode($currency) {
+		if (is_string($currency) && isset($this->currencies[$currency])) {
+			return $currency;
+		}
+
+		$default_currency = (string)$this->config->get('config_currency');
+
+		if ($default_currency !== '' && isset($this->currencies[$default_currency])) {
+			return $default_currency;
+		}
+
+		if (isset($this->currencies['EUR'])) {
+			return 'EUR';
+		}
+
+		$codes = array_keys($this->currencies);
+
+		return $codes ? (string)reset($codes) : '';
 	}
 }

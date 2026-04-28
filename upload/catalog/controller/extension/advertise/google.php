@@ -63,8 +63,12 @@ class ControllerExtensionAdvertiseGoogle extends Controller {
 
         $order_info = $this->model_checkout_order->getOrder($this->session->data['order_id']);
 
+        if (!$order_info) {
+            return;
+        }
+
         $tracker = $this->setting->get('advertise_google_conversion_tracker');
-        $currency = $order_info['currency_code'];
+        $currency = !empty($order_info['currency_code']) ? $order_info['currency_code'] : (string)$this->config->get('config_currency');
         
         $total = $this->googleshopping->convertAndFormat($order_info['total'], $currency);
 

@@ -127,23 +127,25 @@ class ControllerExtensionPaymentWSPay extends Controller
                 1,
                 '', true
             );
-            $this->response->redirect($this->url->link('checkout/success'));
+            $this->session->data['order_id'] = (int)$cartId;
+
+            $this->response->redirect($this->url->link('checkout/success', 'order_id=' . (int)$cartId, true));
         } else {
             // ako je nešto sumnjivo, pošalji korisnika na checkout uz poruku
             $this->session->data['error'] = 'Plaćanje nije potvrđeno. Ako je iznos terećen, kontaktirajte podršku.';
-            $this->response->redirect($this->url->link('checkout/checkout'));
+            $this->response->redirect($this->url->link('checkout/checkout', '', true));
         }
     }
 
     public function error() {
         // neuspješno plaćanje po browser povratu
         $this->session->data['error'] = 'Transakcija je odbijena.';
-        $this->response->redirect($this->url->link('checkout/checkout'));
+        $this->response->redirect($this->url->link('checkout/checkout', '', true));
     }
 
     public function cancel() {
         $this->session->data['error'] = 'Plaćanje je otkazano.';
-        $this->response->redirect($this->url->link('checkout/checkout'));
+        $this->response->redirect($this->url->link('checkout/checkout', '', true));
     }
 
     /** ========== 3) SERVER-TO-SERVER NOTIFY (glavni izvor istine) ========== */

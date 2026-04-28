@@ -25,10 +25,10 @@ class ControllerExtensionPaymentBankTransfer extends Controller {
             $comment = str_replace('%order_id%', $this->session->data['order_id'], $comment);
 
 
-			$this->model_checkout_order->addOrderHistory($this->session->data['order_id'], $this->config->get('payment_bank_transfer_order_status_id'), $comment, true);
-		
-			$json['redirect'] = $this->url->link('checkout/success');
-		}
+				$this->model_checkout_order->addOrderHistory($this->session->data['order_id'], $this->config->get('payment_bank_transfer_order_status_id'), $comment, true);
+			
+				$json['redirect'] = $this->url->link('checkout/success', 'order_id=' . (int)$this->session->data['order_id'], true);
+			}
 		
 		$this->response->addHeader('Content-Type: application/json');
 		$this->response->setOutput(json_encode($json));		
