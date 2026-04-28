@@ -414,7 +414,7 @@ class LOC_Action
      */
     private function deleteProductTempDB(): void
     {
-        $this->db->query("TRUNCATE TABLE `" . DB_PREFIX . "product_temp`");
+        $this->db->query("DELETE FROM `" . DB_PREFIX . "product_temp`");
     }
 
     /**

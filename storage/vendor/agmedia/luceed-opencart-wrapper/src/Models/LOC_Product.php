@@ -257,8 +257,8 @@ class LOC_Product
 
         $start = microtime(true);
 
-        // Truncate the product_temp table.
-        $db->query("TRUNCATE TABLE `" . DB_PREFIX . "product_temp`");
+        // DELETE avoids TRUNCATE's metadata lock while still clearing the temp table.
+        $db->query("DELETE FROM `" . DB_PREFIX . "product_temp`");
 
         $this->updateOptions($type);
 
@@ -306,7 +306,7 @@ class LOC_Product
             $db->query("UPDATE " . DB_PREFIX . "product_option_value p SET p.quantity = 0");
             $updated = $db->query("UPDATE " . DB_PREFIX . "product_option_value p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.sku = pt.uid SET p.quantity = pt.quantity");
 
-            $db->query("TRUNCATE TABLE `" . DB_PREFIX . "product_temp`");
+            $db->query("DELETE FROM `" . DB_PREFIX . "product_temp`");
         }
 
         return $updated ? true : false;

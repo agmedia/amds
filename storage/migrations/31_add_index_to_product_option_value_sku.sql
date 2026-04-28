@@ -1,0 +1,2 @@
+ALTER TABLE `oc_product_option_value`
+ADD INDEX `idx_product_option_value_sku` (`sku`);
