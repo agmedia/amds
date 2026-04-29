@@ -492,34 +492,42 @@ class ControllerProductProduct extends Controller {
 
 			$data['attribute_groups'] = $this->model_catalog_product->getProductAttributes($this->request->get['product_id']);
 
-			$data['products'] = array();
+				$data['products'] = array();
 
-			$results = $this->model_catalog_product->getProductRelated($this->request->get['product_id'], $product_info['price']);
+				$results = $this->model_catalog_product->getProductRelated($this->request->get['product_id'], $product_info['price']);
+				$has_temp_third_data = $this->db->query("SHOW TABLES LIKE 'temp_third_data'")->num_rows > 0;
 
-			foreach ($results as $result) {
-				if ($result['image']) {
-					$image = $this->model_tool_image->resize($result['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_related_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_related_height'));
+				foreach ($results as $result) {
+					if ($result['image']) {
+						$image = $this->model_tool_image->resize($result['image'], $this->config->get('theme_' . $this->config->get('config_theme') . '_image_related_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_related_height'));
 				} else {
 					$image = $this->model_tool_image->resize('placeholder.png', $this->config->get('theme_' . $this->config->get('config_theme') . '_image_related_width'), $this->config->get('theme_' . $this->config->get('config_theme') . '_image_related_height'));
 				}
 
-				if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
-					$price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+					if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
+						$price = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
 
-                    if($this->session->data['currency']=='HRK'){
-                        $priceeur = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), 'EUR');
-                    }
-                    else{
+						if ($result['price_ponuda'] > 0) {
+							$price_ponuda = $this->currency->format($this->tax->calculate($result['price_ponuda'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+						} else {
+							$price_ponuda = '';
+						}
+
+	                    if($this->session->data['currency']=='HRK'){
+	                        $priceeur = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), 'EUR');
+	                    }
+	                    else{
                         $priceeur = $this->currency->format($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax')), 'HRK');
 
                     }
-				} else {
-					$price = false;
-                    $priceeur  ='';
-				}
+					} else {
+						$price = false;
+	                    $priceeur  ='';
+						$price_ponuda = '';
+					}
 
-				if (!is_null($result['special']) && (float)$result['special'] >= 0) {
-					$special = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
+					if (!is_null($result['special']) && (float)$result['special'] >= 0) {
+						$special = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
 
                     if($this->session->data['currency']=='HRK'){
                         $specialeur = $this->currency->format($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')),  'EUR');
@@ -529,42 +537,81 @@ class ControllerProductProduct extends Controller {
 
                     }
 					$tax_price = (float)$result['special'];
-				} else {
-					$special = false;
-                    $specialeur  ='';
-					$tax_price = (float)$result['price'];
-				}
-	
-				if ($this->config->get('config_tax')) {
-					$tax = $this->currency->format($tax_price, $this->session->data['currency']);
-				} else {
-					$tax = false;
+					} else {
+						$special = false;
+	                    $specialeur  ='';
+						$tax_price = (float)$result['price'];
+					}
+
+					if ((float)$result['special'] && ($this->config->get('salebadge_status'))) {
+						if ($this->config->get('salebadge_status') == '2') {
+							$sale_badge = '-' . number_format(((($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax'))) - ($this->tax->calculate($result['special'], $result['tax_class_id'], $this->config->get('config_tax')))) / (($this->tax->calculate($result['price'], $result['tax_class_id'], $this->config->get('config_tax'))) / 100)), 0, ',', '.') . '%';
+						} else {
+							$sale_badge = $this->language->get('basel_text_sale');
+						}
+					} else {
+						$sale_badge = false;
+					}
+
+					if ($this->config->get('config_tax')) {
+						$tax = $this->currency->format($tax_price, $this->session->data['currency']);
+					} else {
+						$tax = false;
 				}
 
-				if ($this->config->get('config_review_status')) {
-					$rating = (int)$result['rating'];
-				} else {
-					$rating = false;
-				}
+					if ($this->config->get('config_review_status')) {
+						$rating = (int)$result['rating'];
+					} else {
+						$rating = false;
+					}
 
-				$data['products'][] = array(
-					'product_id'  => $result['product_id'],
-					'thumb'       => $image,
-					'name'        => $result['name'],
-					'description' => utf8_substr(trim(strip_tags(html_entity_decode($result['description'], ENT_QUOTES, 'UTF-8'))), 0, $this->config->get('theme_' . $this->config->get('config_theme') . '_product_description_length')) . '..',
-					'price'       => $price,
-                    'new_label'   => $this->model_catalog_product->isNovoProduct((int)$result['product_id']),
-					'special'     => $special,
-                    'priceeur'       => $priceeur,
-                    'specialeur'     => $specialeur,
-                    'imported'     => $result['imported'],
-					'tax'         => $tax,
-                    'sale_badge' => $sale_badge,
-                    'sale_end_date' => $date_end['date_end'] ?? '',
-					'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,
-					'rating'      => $rating,
-					'href'        => $this->url->link('product/product', 'product_id=' . $result['product_id'])
-				);
+					$is_ljetni = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::isLjetni($result['product_id']);
+					$is_badge = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::isBadge($result['product_id']);
+
+					$lowest_price_30d = '';
+					$lowest_price_30d_value = 0.0;
+					$lowest_price_30d_pct = 0;
+
+					if ($has_temp_third_data && !empty($result['model'])) {
+						$model = $this->db->escape($result['model']);
+						$q = $this->db->query("SELECT price FROM temp_third_data WHERE model = '" . $model . "' LIMIT 1");
+
+						if ($q->num_rows && isset($q->row['price'])) {
+							$lowest_price_30d_value = (float)$q->row['price'];
+							$lowest_price_30d = $this->currency->format($lowest_price_30d_value, $this->session->data['currency']);
+						}
+					}
+
+					if ($lowest_price_30d_value > 0 && $tax_price > 0) {
+						$pct = (($tax_price - $lowest_price_30d_value) / $lowest_price_30d_value) * 100;
+						$lowest_price_30d_pct = (int) floor($pct);
+					}
+
+					$data['products'][] = array(
+						'product_id'  => $result['product_id'],
+						'quantity'    => $result['quantity'],
+						'thumb'       => $image,
+						'name'        => $result['name'],
+						'description' => utf8_substr(trim(strip_tags(html_entity_decode($result['description'], ENT_QUOTES, 'UTF-8'))), 0, $this->config->get('theme_' . $this->config->get('config_theme') . '_product_description_length')) . '..',
+						'price'       => $price,
+	                    'new_label'   => $this->model_catalog_product->isNovoProduct((int)$result['product_id']),
+						'special'     => $special,
+						'price_ponuda' => $price_ponuda,
+						'lowest_price_30d' => $lowest_price_30d,
+						'lowest_price_30d_pct' => $lowest_price_30d_pct,
+	                    'priceeur'       => $priceeur,
+	                    'specialeur'     => $specialeur,
+	                    'isbn'         => $result['isbn'],
+	                    'ljetni'       => $is_ljetni,
+	                    'badge'        => $is_badge,
+	                    'imported'     => $result['imported'],
+						'tax'         => $tax,
+	                    'sale_badge' => $sale_badge,
+	                    'sale_end_date' => '',
+						'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,
+						'rating'      => $rating,
+						'href'        => $this->url->link('product/product', 'product_id=' . $result['product_id'])
+					);
 			}
 
 			$data['tags'] = array();

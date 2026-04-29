@@ -1,3 +1,5 @@
+{% set has_ljetni = product.ljetni is defined and product.ljetni.cat_id is defined %}
+{% set show_nc_30_price = product.price_ponuda and (product.special or (has_ljetni and product.ljetni.cat_id in [429, 474])) %}
 <div class="item single-product">
 <div class="image" {% if columns == 'list' %}style="width:{{ img_width }}px"{% endif %}>
     <a href="{{ product.href }}">
@@ -22,14 +24,8 @@
         <i>{{ product.lowest_price_30d_pct }}%</i>
     </span> -->
     {% endif %}
-    {% if product.price_ponuda %}
-
-        {% if product.isbn == '1' and product.lowest_price_30d_pct %}
-      <!-- ovo      <span class="badge sale_badge"><i>{{ product.lowest_price_30d_pct }}%</i></span> -->
-        {% else %}
-          <!--  <span class="badge sale_badge"><i>{{ product.ljetni.discount }}%</i></span> -->
-        {% endif %}
-
+    {% if product.price_ponuda and not product.special and has_ljetni and product.ljetni.discount %}
+        <span class="badge sale_badge"><i>{{ product.ljetni.discount }}%</i></span>
     {% endif %}
 
 {% if product.new_label and product.cat !='1' %}
@@ -94,17 +90,17 @@
     <span class="price-old"><s>{{ product.price }} </s></span><span class="price-new">{{ product.special }} </span>
     {% else %}
     <span>{{ product.price }} </span>
-        {% if product.price_ponuda and product.ljetni.cat_id != 429%}
+        {% if product.price_ponuda and not show_nc_30_price %}
             <span class="price-old">{{ product.price_ponuda }} </span>
-        {% endif %}
-        {% if product.price_ponuda and product.ljetni.cat_id == 429%}
-            <span class="price-old" style="text-decoration: unset;">NC 30 dana: {{ product.price_ponuda }} </span>
         {% endif %}
     {% endif %}
     {% if product.tax %}
     <span class="price-tax">{{ text_tax }} {{ product.tax }}</span>
     {% endif %}
 </div><!-- .price -->
+{% if show_nc_30_price %}
+    <p style="margin-bottom:5px"><small>NC 30 dana: {{ product.price_ponuda }}</small></p>
+{% endif %}
 {% endif %}
 <p class="description">{% if product.description %}{{ product.description }}{% endif %}</p>
 
