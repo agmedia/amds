@@ -21,6 +21,12 @@ $_['text_comment']       = 'Komentari uz zahtjev za povrat';
 $_['text_history']       = 'Povijest povrata';
 $_['text_empty']         = 'Do sad niste napravili niti jedan povrat!';
 $_['text_agree']         = 'Pročitao sam i slažem se s <a href="%s" class="agree"><b>%s</b></a>';
+$_['mail_return_admin_subject']    = '%s - novi zahtjev za povrat #%s';
+$_['mail_return_customer_subject'] = '%s - zaprimili smo zahtjev za povrat #%s';
+$_['mail_return_admin_intro']      = 'Zaprimljen je novi zahtjev za povrat putem digitalnog obrasca.';
+$_['mail_return_customer_intro']   = 'Zaprimili smo Vaš zahtjev za povrat. U nastavku je kopija podataka koje ste poslali.';
+$_['mail_return_customer_footer']  = 'Kontaktirat ćemo Vas nakon obrade zahtjeva.';
+$_['mail_return_label_return_id']  = 'Broj zahtjeva';
 
 // Column
 $_['column_return_id']   = 'Povrata artikala broj';

@@ -20,6 +20,12 @@ $_['text_comment']       = 'Return Comments';
 $_['text_history']       = 'Return History';
 $_['text_empty']         = 'You have not made any previous returns!';
 $_['text_agree']         = 'I have read and agree to the <a href="%s" class="agree"><b>%s</b></a>';
+$_['mail_return_admin_subject']    = '%s - new return request #%s';
+$_['mail_return_customer_subject'] = '%s - we received your return request #%s';
+$_['mail_return_admin_intro']      = 'A new return request has been submitted through the digital return form.';
+$_['mail_return_customer_intro']   = 'We received your return request. A copy of the submitted details is below.';
+$_['mail_return_customer_footer']  = 'We will contact you after the request has been reviewed.';
+$_['mail_return_label_return_id']  = 'Return request ID';
 
 // Column
 $_['column_return_id']   = 'Return ID';

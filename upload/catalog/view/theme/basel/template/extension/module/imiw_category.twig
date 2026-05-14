@@ -1,0 +1,76 @@
+<div class="widget" style="margin-bottom:43px">
+	<ul class="plain-menu cat">
+		{% for category in categories %}
+			{% if category.category_id == category_id %}
+				<li class="open active">
+					<a href="{{ category.href }}">{{ category.name }}</a>
+
+					{% if category.children %}
+						<div class="sign"><i class="icon-arrow-right"></i></div>
+						<ul>
+							{% for child in category.children %}
+								{% if child.grandchildren %}
+									<li class="{% if child.category_id == child_id %}open active{% endif %}">
+										<a href="{{ child.href }}">{{ child.name }}</a>
+										<span class="toggle-icon"><span></span></span>
+										<ul>
+											{% for grandchild in child.grandchildren %}
+												{% if grandchild.grand_grandchildren %}
+													<li class="{% if grandchild.category_id == grandchild_id %}open active{% endif %}">
+														<a href="{{ grandchild.href }}">{{ grandchild.name }}</a>
+														<span class="toggle-icon"><span></span></span>
+														<ul>
+															{% for grand_grandchild in grandchild.grand_grandchildren %}
+																{% if grand_grandchild.grand_5_grandchildren %}
+																	<li class="{% if grand_grandchild.category_id == grand_grandchild_id %}open active{% endif %}">
+																		<a href="{{ grand_grandchild.href }}">{{ grand_grandchild.name }}</a>
+																		<span class="toggle-icon"><span></span></span>
+																		<ul>
+																			{% for grand_5_grandchild in grand_grandchild.grand_5_grandchildren %}
+																				<li class="{% if grand_5_grandchild.category_id == grand_5_grandchild_id %}active{% endif %}">
+																					<a href="{{ grand_5_grandchild.href }}">{{ grand_5_grandchild.name }}</a>
+																				</li>
+																			{% endfor %}
+																		</ul>
+																	</li>
+																{% else %}
+																	<li class="{% if grand_grandchild.category_id == grand_grandchild_id %}active{% endif %}">
+																		<a href="{{ grand_grandchild.href }}">{{ grand_grandchild.name }}</a>
+																	</li>
+																{% endif %}
+															{% endfor %}
+														</ul>
+													</li>
+												{% else %}
+													<li class="{% if grandchild.category_id == grandchild_id %}active{% endif %}">
+														<a href="{{ grandchild.href }}">{{ grandchild.name }}</a>
+													</li>
+												{% endif %}
+											{% endfor %}
+										</ul>
+									</li>
+								{% else %}
+									<li class="{% if child.category_id == child_id %}active{% endif %}">
+										<a href="{{ child.href }}">{{ child.name }}</a>
+									</li>
+								{% endif %}
+							{% endfor %}
+						</ul>
+					{% endif %}
+				</li>
+			{% endif %}
+		{% endfor %}
+	</ul>
+</div>
+
+<script>
+	$('.plain-menu.cat li').bind().click(function(e) {
+		$(this).toggleClass("open").find('>ul').stop(true, true).slideToggle(350)
+			.end().siblings().find('>ul').slideUp().parent().removeClass("open");
+		e.stopPropagation();
+	});
+
+	$('.plain-menu.cat li a').click(function(e) {
+		e.stopPropagation();
+	});
+</script>

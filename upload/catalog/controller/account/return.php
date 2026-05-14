@@ -221,7 +221,9 @@ class ControllerAccountReturn extends Controller {
 		$this->load->model('account/return');
 
 		if (($this->request->server['REQUEST_METHOD'] == 'POST') && $this->validate()) {
-			$this->model_account_return->addReturn($this->request->post);
+			$return_id = $this->model_account_return->addReturn($this->request->post);
+
+			$this->sendReturnEmails($return_id, $this->request->post);
 
 			$this->response->redirect($this->url->link('account/return/success', '', true));
 		}
@@ -508,6 +510,95 @@ class ControllerAccountReturn extends Controller {
 		}
 
 		return !$this->error;
+	}
+
+	protected function sendReturnEmails($return_id, $data) {
+		try {
+			$store_name = html_entity_decode($this->config->get('config_name'), ENT_QUOTES, 'UTF-8');
+			$store_email = $this->config->get('config_email');
+			$customer_email = isset($data['email']) ? $data['email'] : '';
+
+			$this->load->model('localisation/return_reason');
+
+			$return_reason = '';
+
+			foreach ($this->model_localisation_return_reason->getReturnReasons() as $reason) {
+				if ((int)$reason['return_reason_id'] === (int)$data['return_reason_id']) {
+					$return_reason = $reason['name'];
+					break;
+				}
+			}
+
+			$message_details = $this->buildReturnEmailDetails($return_id, $data, $return_reason);
+
+			$admin_message  = html_entity_decode($this->language->get('mail_return_admin_intro'), ENT_QUOTES, 'UTF-8') . "\n\n";
+			$admin_message .= $message_details;
+
+			$admin_mail = $this->createReturnMail();
+			$admin_mail->setTo('webshop@amds.hr');
+			$admin_mail->setFrom($store_email);
+			$admin_mail->setSender($store_name);
+			$admin_mail->setReplyTo($customer_email);
+			$admin_mail->setSubject(sprintf($this->language->get('mail_return_admin_subject'), $store_name, $return_id));
+			$admin_mail->setText($admin_message);
+			$admin_mail->send();
+
+			if ($customer_email && filter_var($customer_email, FILTER_VALIDATE_EMAIL)) {
+				$customer_message  = html_entity_decode($this->language->get('mail_return_customer_intro'), ENT_QUOTES, 'UTF-8') . "\n\n";
+				$customer_message .= $message_details;
+				$customer_message .= "\n" . html_entity_decode($this->language->get('mail_return_customer_footer'), ENT_QUOTES, 'UTF-8') . "\n";
+
+				$customer_mail = $this->createReturnMail();
+				$customer_mail->setTo($customer_email);
+				$customer_mail->setFrom($store_email);
+				$customer_mail->setSender($store_name);
+				$customer_mail->setSubject(sprintf($this->language->get('mail_return_customer_subject'), $store_name, $return_id));
+				$customer_mail->setText($customer_message);
+				$customer_mail->send();
+			}
+		} catch (Exception $e) {
+			$this->log->write('Return form mail error: ' . $e->getMessage());
+		}
+	}
+
+	protected function createReturnMail() {
+		$mail = new Mail($this->config->get('config_mail_engine'));
+		$mail->parameter = $this->config->get('config_mail_parameter');
+		$mail->smtp_hostname = $this->config->get('config_mail_smtp_hostname');
+		$mail->smtp_username = $this->config->get('config_mail_smtp_username');
+		$mail->smtp_password = html_entity_decode($this->config->get('config_mail_smtp_password'), ENT_QUOTES, 'UTF-8');
+		$mail->smtp_port = $this->config->get('config_mail_smtp_port');
+		$mail->smtp_timeout = $this->config->get('config_mail_smtp_timeout');
+
+		return $mail;
+	}
+
+	protected function buildReturnEmailDetails($return_id, $data, $return_reason) {
+		$opened = !empty($data['opened']) ? $this->language->get('text_yes') : $this->language->get('text_no');
+
+		$fields = array(
+			$this->language->get('mail_return_label_return_id') => $return_id,
+			$this->language->get('entry_order_id') => isset($data['order_id']) ? $data['order_id'] : '',
+			$this->language->get('entry_date_ordered') => isset($data['date_ordered']) ? $data['date_ordered'] : '',
+			$this->language->get('entry_firstname') => isset($data['firstname']) ? $data['firstname'] : '',
+			$this->language->get('entry_lastname') => isset($data['lastname']) ? $data['lastname'] : '',
+			$this->language->get('entry_email') => isset($data['email']) ? $data['email'] : '',
+			$this->language->get('entry_telephone') => isset($data['telephone']) ? $data['telephone'] : '',
+			$this->language->get('entry_product') => isset($data['product']) ? $data['product'] : '',
+			$this->language->get('entry_model') => isset($data['model']) ? $data['model'] : '',
+			$this->language->get('entry_quantity') => isset($data['quantity']) ? $data['quantity'] : '',
+			$this->language->get('entry_reason') => $return_reason,
+			$this->language->get('entry_opened') => $opened,
+			$this->language->get('entry_fault_detail') => isset($data['comment']) ? $data['comment'] : ''
+		);
+
+		$message = '';
+
+		foreach ($fields as $label => $value) {
+			$message .= $label . ': ' . html_entity_decode(strip_tags((string)$value), ENT_QUOTES, 'UTF-8') . "\n";
+		}
+
+		return $message;
 	}
 
 	public function success() {
