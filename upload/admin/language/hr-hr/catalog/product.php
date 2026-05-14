@@ -28,6 +28,7 @@ $_['column_action']          = 'Akcija';
 // Entry
 $_['entry_name']             = 'Naziv artikla';
 $_['entry_description']      = 'Opis';
+$_['entry_napomena']         = 'Napomena';
 $_['entry_short_description']      = 'Kratki opis';
 $_['entry_spec_description']      = 'Specifikacije';
 $_['entry_meta_title'] 	     = 'Meta Tag (oznaka) - naziv';

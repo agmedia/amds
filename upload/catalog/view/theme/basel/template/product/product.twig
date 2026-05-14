@@ -276,6 +276,11 @@
                         <div class="cd-desc cms-content">
                             {{ description }}
                         </div>
+                        {% if napomena_status %}
+                            <div class="cd-desc-note cms-content">
+                                {{ napomena }}
+                            </div>
+                        {% endif %}
 
                     </div> <!-- #product ends -->
 
