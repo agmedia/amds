@@ -7,319 +7,316 @@
 
 
     <div id="content" class="product-main no-min-height {{ class }}">
-    {{ content_top }}
-    
-    <div class="product-info product-page">
+        {{ content_top }}
 
-        <div class="cd-row">
-     
-             <div class="cd-col1">
-                 {% if thumb or images %}
+        <div class="product-info product-page">
 
+            <div class="cd-row">
 
-                 <ul class="cd-images" id="gallery">
-                     {% if thumb %}
-                     <li class="cd-image main-image" style="position: relative;">
-                         {% if is_new %}
-                             <span class="badge new_badge"><i>{{ basel_text_new }}</i></span>
-                         {% endif %}
-                         <a href="{{ popup }}" class="link product-gallery cloud-zoom "  rel="position:'inside', showTitle: false" >
-                             <picture>
-                                 <source srcset="{{ thumb }}" media="(max-width: 760px)">
-                                 <img src="{{ thumb }}" alt="{{ heading_title }}" data-product_main_image="1" width="610" height="915">
-                             </picture>
-                         </a>
-                     </li>
-                     {% endif %}
-                         {% if images %}
-                             {% for image in images %}
-                             <li class="cd-image {% if loop.first %} {% else %}extra{% endif %}">
-                                 <a href="{{ image.popup }}" class="product-gallery cloud-zoom link" title=""  rel="position:'inside', showTitle: false">
-                                     <picture>
-                                         <source srcset="{{ image.thumb }}" media="(max-width: 760px)">
-                                         <img src="{{ image.thumb }}" alt="{{ heading_title }}"  >
-                                     </picture>
-                                 </a>
-                             </li>
-                             {% endfor %}
-                         {% endif %}
-
-                     {% endif %}
-                 </ul>
-             </div>
-            <div class="cd-col2 ">
-            <div class="inner">
+                <div class="cd-col1">
+                    {% if thumb or images %}
 
 
-                <ul class="breadcrumb" style="display: block;margin-bottom:20px">
-                    {% for breadcrumb in breadcrumbs %}
-                        <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
-                    {% endfor %}
-                </ul>
+                    <ul class="cd-images" id="gallery">
+                        {% if thumb %}
+                            <li class="cd-image main-image" style="position: relative;">
+                                {% if is_new %}
+                                    <span class="badge new_badge"><i>{{ basel_text_new }}</i></span>
+                                {% endif %}
+                                <a href="{{ popup }}" class="link product-gallery cloud-zoom "  rel="position:'inside', showTitle: false" >
+                                    <picture>
+                                        <source srcset="{{ thumb }}" media="(max-width: 760px)">
+                                        <img src="{{ thumb }}" alt="{{ heading_title }}" data-product_main_image="1" width="610" height="915">
+                                    </picture>
+                                </a>
+                            </li>
+                        {% endif %}
+                        {% if images %}
+                            {% for image in images %}
+                                <li class="cd-image {% if loop.first %} {% else %}extra{% endif %}">
+                                    <a href="{{ image.popup }}" class="product-gallery cloud-zoom link" title=""  rel="position:'inside', showTitle: false">
+                                        <picture>
+                                            <source srcset="{{ image.thumb }}" media="(max-width: 760px)">
+                                            <img src="{{ image.thumb }}" alt="{{ heading_title }}"  >
+                                        </picture>
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        {% endif %}
 
-                <div class="cd-header">
-                    <div class="cd-info">
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="cd-col2 ">
+                    <div class="inner">
 
-                    <div class="product-h1">
-                    <h1 id="page-title">{{ heading_title }}</h1>
-                    </div>
 
-                        <p class="info skuo margin-b0"> {{ model }}</p>
-                    </div>
+                        <ul class="breadcrumb" style="display: block;margin-bottom:20px">
+                            {% for breadcrumb in breadcrumbs %}
+                                <li><a href="{{ breadcrumb.href }}">{{ breadcrumb.text }}</a></li>
+                            {% endfor %}
+                        </ul>
 
-                          {% if review_status and (review_qty > 0) %}
-            <div class="rating">
+                        <div class="cd-header">
+                            <div class="cd-info">
+
+                                <div class="product-h1">
+                                    <h1 id="page-title">{{ heading_title }}</h1>
+                                </div>
+
+                                <p class="info skuo margin-b0"> {{ model }}</p>
+                            </div>
+
+                            {% if review_status and (review_qty > 0) %}
+                                <div class="rating">
             <span class="rating_stars rating r{{ rating }}">
             <i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i><i class="fa fa-star-o"></i>
             </span>
-            </div>
-            <span class="review_link">(<a class="hover_uline to_tabs" onclick="$('a[href=\'#tab-review\']').trigger('click'); return false;">{{ reviews }}</a>)</span>
-            {% endif %}
-
-                    <div class="cd-price price">
-
-                        {% if price %}
-                            {% if  special %}
-
-                            <div class="old cd-old-price line-through" data-product_basic_price="4406_0">{{ price }} </div>
-
-                            <div class="current cd-current-price cd-discount-price" data-product_price="4406_0">{{ special }}  </div>
-                            {% else %}
-                                <div class="current cd-current-price " data-product_basic_price="4406_0">{{ price }} </div>
-
-
-                        {% endif %}
-
-
-
-
-                            {% if discounts %}
-                            <p class="discount">
-                            {% for discount in discounts %}
-                            <span>{{ discount.quantity }}{{ text_discount }}<i class="price">{{ discount.price }}</i></span>
-                            {% endfor %}
-                            </p>
+                                </div>
+                                <span class="review_link">(<a class="hover_uline to_tabs" onclick="$('a[href=\'#tab-review\']').trigger('click'); return false;">{{ reviews }}</a>)</span>
                             {% endif %}
 
-                          {% endif %} <!-- if price ends -->
-                    </div>
+                            <div class="cd-price price">
+
+                                {% if price %}
+                                    {% if  special %}
+
+                                        <div class="old cd-old-price line-through" data-product_basic_price="4406_0">{{ price }} </div>
+
+                                        <div class="current cd-current-price cd-discount-price" data-product_price="4406_0">{{ special }}  </div>
+                                    {% else %}
+                                        <div class="current cd-current-price " data-product_basic_price="4406_0">{{ price }} </div>
 
 
-
-                </div>
-                {% set show_nc_30_price = price_ponuda and ljetni.cat_id in [429, 474] %}
-                {% if show_nc_30_price %}
-                <p class="meta_description"><strong>Najniža cijena u zadnjih 30 dana: {{ price_ponuda }}   - {{ ljetni.discount }} %</strong></p>
-                {% endif %}
-
-                {% if  special %}
-              <!-- ovo      <p class="meta_description"><strong>Najniža cijena u zadnjih 30 dana: {{ price }}</strong></p> -->
-                {% endif %}
-
-
-
-                {% if lowest_price_30d %}
-                <p class="meta_description">{{ lowest_price_30d }}</p>
-                {% endif %}
-
-                {% if  price_ponuda and not show_nc_30_price %}
-                    <p class="meta_description"><strong>Stara cijena: {{ price_ponuda }}  </strong></p>
-                {% endif %}
-
-                {% if is_badge =='1' %}
-               <!-- <p><span class="badge new_badge outlet"><i>-20% uz kod BLACK20</i></span></p> -->
-                {% endif %}
-
-
-                {% if price and special and sale_badge %}
-              <!-- ovo  <p> <span class="badge new_badge outlet"><i>{{ sale_badge }}</i></span> </p> ovo  -->
-                {% endif %}
-
-                {% if is_posebna_ponuda =='1' %}
-                  <!--  <p><span class="badge new_badge outlet"><i>-30% popusta na obračunu plaćanja</i></span></p> -->
-
-                {% endif %}
-                {% if isbn == '1' and lowest_price_30d_pct %}
-                    <p><span class="badge new_badge outlet"><i>{{ sale_badge }} </i></span></p> <!-- lowest_price_30d_pct }}% -->
-                {% endif %}
-
-              {% if meta_description_status and meta_description %}
-              <p class="meta_description">{{ meta_description }}</p>
-              {% endif %}
-
-
-              <div id="product">
-
-                    {% if options %}
-                    <div class="options">
-                        {% for option in options %}
-
-                            {% if option.type == 'select' %}
-                            <div class="form-group{% if option.required %} required{% endif %} table-row">
-                              <div class="table-cell name">
-                              <label class="control-label" for="input-option{{ option.product_option_id }}">{{ option.name }}</label>
-                              </div>
-                              <div class="table-cell">
-                              <select name="option[{{ option.product_option_id }}]" id="input-option{{ option.product_option_id }}" class="form-control">
-                                <option value="">{{ text_select }}</option>
-                                {% for option_value in option.product_option_value %}
-                                <option value="{{ option_value.product_option_value_id }}">{{ option_value.name }}
-                                {% if option_value.price %}
-                                ({{ option_value.price_prefix }}{{ option_value.price }})
-                                {% endif %}
-                                </option>
-                                {% endfor %}
-                              </select>
-                              </div>
-                            </div>
-                            {% endif %}
-
-                            {% if option.type == 'radio' %}
-                            <div class="form-group{% if option.required %} required {% endif %}   mb-0 ">
-                              <div class=" radio-cell name variation-title">
-                              <label class="control-label vt-title"> {% if option.name == 'Veličina' %} Odaberite veličinu {% else  %} {{ option.name }}{% endif %}</label>
-                                  <a data-toggle="modal" data-target="#sizeModal" class="btn-size-guide fancybox">Vodič za veličine </a>
-                              </div>
-                              <div class=" radio-cell">
-                              <div id="input-option{{ option.product_option_id }}">
-                                  <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                                {% for option_value in option.product_option_value %}
-
-                                        <label class="btn btn-outline btn-option ">
-                                    <input type="radio" name="option[{{ option.product_option_id }}]" value="{{ option_value.product_option_value_id }}" data-uid="{{ option_value.sifra }}" data-sifra="{{ option_value.sifra }}" data-sku="{{ option_value.sku }}" />
-                                    {% if option_value.image %}
-                                    <img src="{{ option_value.image }}" alt="{{ option_value.name }}{% if option_value.price %}({{ option_value.price_prefix }}{{ option_value.price }}){% endif %}" data-toggle="tooltip" data-title="{{ option_value.name }}{% if option_value.price %} ({{ option_value.price_prefix }}{{ option_value.price }}){% endif %}" />
                                     {% endif %}
-                                    <span class="name">
-                                    {{ option_value.name }}
-                                    {% if option_value.price %}
-                                    ({{ option_value.price_prefix }}{{ option_value.price }})
+
+
+
+
+                                    {% if discounts %}
+                                        <p class="discount">
+                                            {% for discount in discounts %}
+                                                <span>{{ discount.quantity }}{{ text_discount }}<i class="price">{{ discount.price }}</i></span>
+                                            {% endfor %}
+                                        </p>
                                     {% endif %}
-                                    </span>
-                                  </label>
 
-                                {% endfor %}
-                                  </div>
-                              </div>
-                              </div>
+                                {% endif %} <!-- if price ends -->
                             </div>
-                            {% endif %}
 
-                            {% if option.type == 'checkbox' %}
-                        <div class="form-group{% if option.required %} required{% endif %} ">
-                          <div class=" checkbox-cell name">
-                          <label class="control-label">ODABERITE VELIČINU</label>
-                          </div>
-                          <div class=" checkbox-cell">
-                          <div id="input-option{{ option.product_option_id }}">
-                              <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                            {% for option_value in option.product_option_value %}
 
-                                    <label class="btn btn-outline btn-option active">
-                                <input type="radio" name="option[{{ option.product_option_id }}][]" value="{{ option_value.product_option_value_id }}" />
-                                {% if option_value.image %}
-                                <img src="{{ option_value.image }}" alt="{{ option_value.name }}{% if option_value.price %}({{ option_value.price_prefix }}{{ option_value.price }}){% endif %}" data-toggle="tooltip" data-title="{{ option_value.name }}{% if option_value.price %} ({{ option_value.price_prefix }}{{ option_value.price }}){% endif %}" />
-                                {% endif %}
-                                <span class="name">
-                                {{ option_value.name }}
-                                {% if option_value.price %}
-                                ({{ option_value.price_prefix }}{{ option_value.price }})
-                                {% endif %}
-                                </span>
-                              </label>
 
-                            {% endfor %}
-                              </div>
-                          </div>
-                          </div>
                         </div>
+                        {% set show_nc_30_price = price_ponuda %}
+                        {% if show_nc_30_price %}
+                            <p class="meta_description"><strong>NC 30 dana: {{ price_ponuda }}</strong></p>
                         {% endif %}
 
-                        {% endfor %} <!-- foreach option -->
-                    </div>
+                        {% if  special %}
+                            <p class="meta_description"><strong>Najniža cijena u zadnjih 30 dana: {{ price }}</strong></p>
+                        {% endif %}
+
+
+
+                        {% if lowest_price_30d %}
+                            <p class="meta_description">{{ lowest_price_30d }}</p>
+                        {% endif %}
+
+
+                        {% if is_badge =='1' %}
+                            <!-- <p><span class="badge new_badge outlet"><i>-20% uz kod BLACK20</i></span></p> -->
+                        {% endif %}
+
+
+                        {% if price and special and sale_badge %}
+                            <!-- ovo  <p> <span class="badge new_badge outlet"><i>{{ sale_badge }}</i></span> </p> ovo  -->
+                        {% endif %}
+
+                        {% if is_posebna_ponuda =='1' %}
+                            <!--  <p><span class="badge new_badge outlet"><i>-30% popusta na obračunu plaćanja</i></span></p> -->
+
+                        {% endif %}
+                        {% if isbn == '1' and lowest_price_30d_pct %}
+                            <p><span class="badge new_badge outlet"><i>{{ sale_badge }} </i></span></p> <!-- lowest_price_30d_pct }}% -->
+                        {% endif %}
+
+                        {% if meta_description_status and meta_description %}
+                            <p class="meta_description">{{ meta_description }}</p>
+                        {% endif %}
+
+
+                        <div id="product">
+
+                            {% if options %}
+                                <div class="options">
+                                    {% for option in options %}
+
+                                        {% if option.type == 'select' %}
+                                            <div class="form-group{% if option.required %} required{% endif %} table-row">
+                                                <div class="table-cell name">
+                                                    <label class="control-label" for="input-option{{ option.product_option_id }}">{{ option.name }}</label>
+                                                </div>
+                                                <div class="table-cell">
+                                                    <select name="option[{{ option.product_option_id }}]" id="input-option{{ option.product_option_id }}" class="form-control">
+                                                        <option value="">{{ text_select }}</option>
+                                                        {% for option_value in option.product_option_value %}
+                                                            <option value="{{ option_value.product_option_value_id }}">{{ option_value.name }}
+                                                                {% if option_value.price %}
+                                                                    ({{ option_value.price_prefix }}{{ option_value.price }})
+                                                                {% endif %}
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        {% if option.type == 'radio' %}
+                                            <div class="form-group{% if option.required %} required {% endif %}   mb-0 ">
+                                                <div class=" radio-cell name variation-title">
+                                                    <label class="control-label vt-title"> {% if option.name == 'Veličina' %} Odaberite veličinu {% else  %} {{ option.name }}{% endif %}</label>
+                                                    <a data-toggle="modal" data-target="#sizeModal" class="btn-size-guide fancybox">Vodič za veličine </a>
+                                                </div>
+                                                <div class=" radio-cell">
+                                                    <div id="input-option{{ option.product_option_id }}">
+                                                        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                            {% for option_value in option.product_option_value %}
+
+                                                                <label class="btn btn-outline btn-option ">
+                                                                    <input type="radio" name="option[{{ option.product_option_id }}]" value="{{ option_value.product_option_value_id }}" data-uid="{{ option_value.sifra }}" data-sifra="{{ option_value.sifra }}" data-sku="{{ option_value.sku }}" />
+                                                                    {% if option_value.image %}
+                                                                        <img src="{{ option_value.image }}" alt="{{ option_value.name }}{% if option_value.price %}({{ option_value.price_prefix }}{{ option_value.price }}){% endif %}" data-toggle="tooltip" data-title="{{ option_value.name }}{% if option_value.price %} ({{ option_value.price_prefix }}{{ option_value.price }}){% endif %}" />
+                                                                    {% endif %}
+                                                                    <span class="name">
+                                    {{ option_value.name }}
+                                                                        {% if option_value.price %}
+                                                                            ({{ option_value.price_prefix }}{{ option_value.price }})
+                                                                        {% endif %}
+                                    </span>
+                                                                </label>
+
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                        {% if option.type == 'checkbox' %}
+                                            <div class="form-group{% if option.required %} required{% endif %} ">
+                                                <div class=" checkbox-cell name">
+                                                    <label class="control-label">ODABERITE VELIČINU</label>
+                                                </div>
+                                                <div class=" checkbox-cell">
+                                                    <div id="input-option{{ option.product_option_id }}">
+                                                        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                                                            {% for option_value in option.product_option_value %}
+
+                                                                <label class="btn btn-outline btn-option active">
+                                                                    <input type="radio" name="option[{{ option.product_option_id }}][]" value="{{ option_value.product_option_value_id }}" />
+                                                                    {% if option_value.image %}
+                                                                        <img src="{{ option_value.image }}" alt="{{ option_value.name }}{% if option_value.price %}({{ option_value.price_prefix }}{{ option_value.price }}){% endif %}" data-toggle="tooltip" data-title="{{ option_value.name }}{% if option_value.price %} ({{ option_value.price_prefix }}{{ option_value.price }}){% endif %}" />
+                                                                    {% endif %}
+                                                                    <span class="name">
+                                {{ option_value.name }}
+                                                                        {% if option_value.price %}
+                                                                            ({{ option_value.price_prefix }}{{ option_value.price }})
+                                                                        {% endif %}
+                                </span>
+                                                                </label>
+
+                                                            {% endfor %}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+
+                                    {% endfor %} <!-- foreach option -->
+                                </div>
+                            {% endif %}
+
+
+                            <div class="add-to-cart-section">
+                                <div class="add-to-cart-container">
+                                    <div  class="cd-add-section active" >
+                                        <div class="cd-qty quantity buttons_added">
+                                            <!--   <input type="number" step="1" min="{{ minimum }}" name="quantity" value="{{ minimum }}" id="input-quantity" class="form-control  put-qty" />-->
+
+                                            <input type="button" value="-" class="minus"><input type="text" step="1" min="1" max="" id="input-quantity" name="quantity" value="{{ minimum }}" title="Qty" class="input-text qty text put-qty" size="4" pattern="" inputmode=""><input type="button" value="+" class="plus">
+                                        </div>
+                                        <input type="hidden" name="product_id" value="{{ product_id }}" />
+
+                                        {% if ((qty < 1) and (stock_badge_status)) %}
+                                            <button type="button"  data-loading-text="{{ text_loading }}" class="btn btn-primary cd-btn-add"><span>{{ basel_text_out_of_stock }}</span></button>
+                                        {% else %}
+                                            <button type="button" id="button-cart" data-loading-text="{{ text_loading }}" class="btn btn-primary cd-btn-add"><span>{{ button_cart }}</span></button>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <div class="add-to-wishlist cd-add-to-wishlist cd-wishlist" >
+                                    <a onclick="wishlist.add('{{ product_id }}');" class="btn-add-to-wishlist"><i class="icon-heart"></i> </a>
+                                </div>
+                            </div>
+                            {% if minimum > 1 %}
+                                <div class="alert alert-sm alert-info"><i class="fa fa-info-circle"></i> {{ text_minimum }}</div>
+                            {% endif %}
+
+                        </div>
+
+                        <!-- <div class="cd-shipping-info"><p><strong>Besplatna dostava</strong> za narudžbe iznad  49,99 € (dostava 4,65 €)</p>
+                         </div> -->
+
+
+                        <a data-toggle="modal" data-target="#dostupnostModal" class="cd-btn-stores fancybox">
+                            <span>Provjeri dostupnost u trgovinama</span>
+                        </a>
+
+                        <div class="cd-desc cms-content">
+                            {{ description }}
+                        </div>
+
+                    </div> <!-- #product ends -->
+
+
+
+                    <p class="info is_compare"><a onclick="compare.add('{{ product_id }}');"><i class="icon-refresh"></i> {{ button_compare }}</a></p>
+                    {% if question_status %}
+                        <p class="info is_ask"><a class="to_tabs" onclick="$('a[href=\'#tab-questions\']').trigger('click'); return false;"><i class="icon-question"></i> {{ basel_button_ask }}</a></p>
                     {% endif %}
 
+                    <div class="clearfix"></div>
 
-                      <div class="add-to-cart-section">
-                          <div class="add-to-cart-container">
-                              <div  class="cd-add-section active" >
-                                <div class="cd-qty quantity buttons_added">
-                                     <!--   <input type="number" step="1" min="{{ minimum }}" name="quantity" value="{{ minimum }}" id="input-quantity" class="form-control  put-qty" />-->
+                    <div class="info-holder">
 
-                                    <input type="button" value="-" class="minus"><input type="text" step="1" min="1" max="" id="input-quantity" name="quantity" value="{{ minimum }}" title="Qty" class="input-text qty text put-qty" size="4" pattern="" inputmode=""><input type="button" value="+" class="plus">
-                                </div>
-                          <input type="hidden" name="product_id" value="{{ product_id }}" />
-
-                                  {% if ((qty < 1) and (stock_badge_status)) %}
-                                    <button type="button"  data-loading-text="{{ text_loading }}" class="btn btn-primary cd-btn-add"><span>{{ basel_text_out_of_stock }}</span></button>
-                                  {% else %}
-                                      <button type="button" id="button-cart" data-loading-text="{{ text_loading }}" class="btn btn-primary cd-btn-add"><span>{{ button_cart }}</span></button>
-                                  {% endif %}
-                              </div>
-                            </div>
-
-                          <div class="add-to-wishlist cd-add-to-wishlist cd-wishlist" >
-                          <a onclick="wishlist.add('{{ product_id }}');" class="btn-add-to-wishlist"><i class="icon-heart"></i> </a>
-                          </div>
-                      </div>
-                        {% if minimum > 1 %}
-                        <div class="alert alert-sm alert-info"><i class="fa fa-info-circle"></i> {{ text_minimum }}</div>
+                        {% if price and tax %}
+                            <p class="info p-tax"><b>{{ text_tax }}</b> <span class="live-price-tax">{{ tax }}</span></p>
                         {% endif %}
 
-                      </div>
-
-               <!-- <div class="cd-shipping-info"><p><strong>Besplatna dostava</strong> za narudžbe iznad  49,99 € (dostava 4,65 €)</p>
-                </div> -->
-
-
-                <a data-toggle="modal" data-target="#dostupnostModal" class="cd-btn-stores fancybox">
-                    <span>Provjeri dostupnost u trgovinama</span>
-                </a>
-
-                <div class="cd-desc cms-content">
-                    {{ description }}
-                </div>
-
-                  </div> <!-- #product ends -->
+                        {% if price and points %}
+                            <p class="info"><b>{{ text_points }}</b> {{ points }}</p>
+                        {% endif %}
 
 
 
-            <p class="info is_compare"><a onclick="compare.add('{{ product_id }}');"><i class="icon-refresh"></i> {{ button_compare }}</a></p>
-            {% if question_status %}
-            <p class="info is_ask"><a class="to_tabs" onclick="$('a[href=\'#tab-questions\']').trigger('click'); return false;"><i class="icon-question"></i> {{ basel_button_ask }}</a></p>
-            {% endif %}
-
-            <div class="clearfix"></div>
-
-            <div class="info-holder">
-
-              {% if price and tax %}
-              <p class="info p-tax"><b>{{ text_tax }}</b> <span class="live-price-tax">{{ tax }}</span></p>
-              {% endif %}
-
-              {% if price and points %}
-              <p class="info"><b>{{ text_points }}</b> {{ points }}</p>
-              {% endif %}
+                        {% if manufacturer %}
+                            <p class="info"><b>{{ text_manufacturer }}</b> <a class="hover_uline" href="{{ manufacturers }}">{{ manufacturer }}</a></p>
+                        {% endif %}
 
 
 
-              {% if manufacturer %}
-              <p class="info"><b>{{ text_manufacturer }}</b> <a class="hover_uline" href="{{ manufacturers }}">{{ manufacturer }}</a></p>
-              {% endif %}
+                        {% if reward %}
+                            <p class="info"><b>{{ text_reward }}</b> {{ reward }}</p>
+                        {% endif %}
 
+                    </div> <!-- .info-holder ends -->
 
-
-              {% if reward %}
-              <p class="info"><b>{{ text_reward }}</b> {{ reward }}</p>
-              {% endif %}
-
-             </div> <!-- .info-holder ends -->
-
-             </div> <!-- .inner ends -->
-             </div> <!-- .table-cell.right ends -->
+                </div> <!-- .inner ends -->
+            </div> <!-- .table-cell.right ends -->
 
         </div>
-    
+
     </div> <!-- .product-info ends -->
 
 </div>
@@ -337,21 +334,21 @@
 
 {% if products %}
 
-<div class="container " >
-    <div class="widget widget-related">
+    <div class="container " >
+        <div class="widget widget-related">
 
-        <div class="widget-title">
-            <p class="main-title"><span>{{ text_related }}</span></p>
-            <p class="widget-title-separator"><i class="icon-line-cross"></i></p>
-        </div>
+            <div class="widget-title">
+                <p class="main-title"><span>{{ text_related }}</span></p>
+                <p class="widget-title-separator"><i class="icon-line-cross"></i></p>
+            </div>
 
-        <div class="grid grid-holder related carousel grid{{ basel_rel_prod_grid }}">
-            {% for product in products %}
-                {% include 'basel/template/product/single_product.twig' %}
-            {% endfor %}
+            <div class="grid grid-holder related carousel grid{{ basel_rel_prod_grid }}">
+                {% for product in products %}
+                    {% include 'basel/template/product/single_product.twig' %}
+                {% endfor %}
+            </div>
         </div>
     </div>
-</div>
 
 {% endif %}
 
@@ -365,21 +362,21 @@
 {% if spol == 'Ž' %}
 
 
-<!-- Modal -->
-<div class="modal fade" id="sizeModal" tabindex="-1" role="dialog" aria-labelledby="sizeModalLabel">
-    <div class="modal-dialog" role="document"  id="velicinet">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title" id="myModalLabel">Vodič za veličine </h4>
-            </div>
-            <div class="modal-body">
-                <h3 class="modalh">Žene</h3>
-                <p>*Sve veličine navedene su u centimetrima</p>
-                <div class="table-responsive">
+    <!-- Modal -->
+    <div class="modal fade" id="sizeModal" tabindex="-1" role="dialog" aria-labelledby="sizeModalLabel">
+        <div class="modal-dialog" role="document"  id="velicinet">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close close-modal" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Vodič za veličine </h4>
+                </div>
+                <div class="modal-body">
+                    <h3 class="modalh">Žene</h3>
+                    <p>*Sve veličine navedene su u centimetrima</p>
+                    <div class="table-responsive">
 
 
-                    <table class="table table-hover" >
+                        <table class="table table-hover" >
 
                             <tbody>
                             <tr>
@@ -916,509 +913,509 @@
 
                         </table>
 
-                    </table>
+                        </table>
 
-                </div>
-
-                <h3 class="modalh" style="margin-top:30px">Ženski traper</h3>
-                <p>*Navedene mjere služe isključivo  kao pomoć u odabiru  veličine trapera.</p>
-                <div class="table-responsive">
-                    <table class="table table-hover" >
-
-                        <tbody>
-                        <tr>
-                            <td>
-                                <p><strong>Međunarodna veličina&nbsp;</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>XS</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>S</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>S</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>S</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>M</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>M</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>M</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>L</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>L</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>XL</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>XL</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>XXL</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>XXL</strong></p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><strong>Traper veličina / inch</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>25</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>26</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>27</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>28</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>29</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>30</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>31</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>32</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>33</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>34</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>36</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>38</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>40</strong></p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><strong>EU</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>32</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>34</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>34</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>36</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>36</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>38</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>38</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>40</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>40</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>42</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>42</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>44</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>44</strong></p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><strong>UK</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>4</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>6</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>6</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>8</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>8</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>10</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>10</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>12</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>12</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>14</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>14</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>16</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>16</strong></p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><strong>FR</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>34</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>36</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>36</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>38</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>38</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>40</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>40</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>42</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>42</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>44</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>44</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>46</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>46</strong></p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><strong>IT</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>38</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>40</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>40</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>42</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>42</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>44</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>44</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>46</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>46</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>48</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>48</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>50</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p><strong>50</strong></p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><strong>Opseg struka</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>62-64</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>65-67</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>68-70</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>71-73</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>74-76</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>77-79</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>80-82</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>83-85</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>86-89</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>90-93</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>94-98</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>99-103</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>104-108</p>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <p><strong>Opseg bokova</strong></p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>87-89</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>90-92</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>93-95</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>95-98</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>99-101</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>102-104</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>105-107</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>108-110</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>111-114</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>115-118</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>119-123</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>124-128</p>
-                            </td>
-                            <td>&nbsp;</td>
-                            <td>
-                                <p>129-133</p>
-                            </td>
-                        </tr>
-                        </tbody>
-
-                    </table>
-                </div>
-
-                <div class="row" style="margin-top:30px">
-                    <div class="col-md-9 col-xs-12">
-                        <h3 class="modalh">Prikaz mjerenja</h3>
-                        <p class="extra1"><strong>1. Prsa</strong></p>
-
-                        <p>Izmjerite na najširem dijelu prsa, ispod pazuha (metar položiti horizontalno).</p>
-
-                        <p class="extra1"><strong>2. Struk</strong></p>
-
-                        <p>Izmjerite na najužem dijelu struka (iznad pupka i ispod prsnog koša).</p>
-
-                        <p class="extra1"><strong>3. Bokovi</strong></p>
-
-                        <p>Izmjerite na najširem dijelu bokova (na vrhu nogu).</p>
-                    </div>
-                    <div class="col-md-3 hidden-xs">
-                        <img src="image/zenemjera.jpg" alt="">
                     </div>
 
+                    <h3 class="modalh" style="margin-top:30px">Ženski traper</h3>
+                    <p>*Navedene mjere služe isključivo  kao pomoć u odabiru  veličine trapera.</p>
+                    <div class="table-responsive">
+                        <table class="table table-hover" >
+
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <p><strong>Međunarodna veličina&nbsp;</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>XS</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>S</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>S</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>S</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>M</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>M</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>M</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>L</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>L</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>XL</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>XL</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>XXL</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>XXL</strong></p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p><strong>Traper veličina / inch</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>25</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>26</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>27</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>28</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>29</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>30</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>31</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>32</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>33</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>34</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>36</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>38</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>40</strong></p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p><strong>EU</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>32</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>34</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>34</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>36</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>36</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>38</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>38</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>40</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>40</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>42</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>42</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>44</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>44</strong></p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p><strong>UK</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>4</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>6</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>6</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>8</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>8</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>10</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>10</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>12</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>12</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>14</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>14</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>16</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>16</strong></p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p><strong>FR</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>34</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>36</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>36</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>38</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>38</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>40</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>40</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>42</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>42</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>44</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>44</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>46</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>46</strong></p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p><strong>IT</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>38</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>40</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>40</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>42</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>42</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>44</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>44</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>46</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>46</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>48</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>48</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>50</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p><strong>50</strong></p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p><strong>Opseg struka</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>62-64</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>65-67</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>68-70</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>71-73</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>74-76</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>77-79</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>80-82</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>83-85</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>86-89</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>90-93</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>94-98</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>99-103</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>104-108</p>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p><strong>Opseg bokova</strong></p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>87-89</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>90-92</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>93-95</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>95-98</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>99-101</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>102-104</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>105-107</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>108-110</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>111-114</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>115-118</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>119-123</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>124-128</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>129-133</p>
+                                </td>
+                            </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+
+                    <div class="row" style="margin-top:30px">
+                        <div class="col-md-9 col-xs-12">
+                            <h3 class="modalh">Prikaz mjerenja</h3>
+                            <p class="extra1"><strong>1. Prsa</strong></p>
+
+                            <p>Izmjerite na najširem dijelu prsa, ispod pazuha (metar položiti horizontalno).</p>
+
+                            <p class="extra1"><strong>2. Struk</strong></p>
+
+                            <p>Izmjerite na najužem dijelu struka (iznad pupka i ispod prsnog koša).</p>
+
+                            <p class="extra1"><strong>3. Bokovi</strong></p>
+
+                            <p>Izmjerite na najširem dijelu bokova (na vrhu nogu).</p>
+                        </div>
+                        <div class="col-md-3 hidden-xs">
+                            <img src="image/zenemjera.jpg" alt="">
+                        </div>
+
+
+                    </div>
+
+
+
 
                 </div>
-
-
-
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal">Zatvori</button>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">Zatvori</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 {% endif %}
 
 
@@ -1439,422 +1436,422 @@
                     <p>*Sve veličine navedene su u centimetrima</p>
                     <div class="table-responsive">
                         <table class="table table-hover" >
-                                <tbody>
-                                <tr>
-                                    <td>
-                                        <p>Konfencijski broj / SUPPLIER SIZE&nbsp;</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>44</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>46</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>48</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>50</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>52</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>54</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>56</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>58</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>60</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>62</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p>EU</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>44</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>46</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>48</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>50</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>52</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>54</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>56</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>58</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>60</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>62</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p>US</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>XS</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>S</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>M</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>L</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>XL</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>XXL</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>3XL</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>4XL</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>5XL</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>6XL</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p>UK</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>XS</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>S</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>M</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>L</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>XL</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>XXL</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>3XL</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>4XL</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>5XL</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>6XL</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p>FR</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>44</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>46</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>48</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>50</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>52</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>54</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>56</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>58</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>60</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>62</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p>IT</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>44</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>46</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>48</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>50</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>52</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>54</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>56</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>58</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>60</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>62</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p>Opseg grudi</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>86-89</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>90-93</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>94-97</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>98-101</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>101-104</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>105-110</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>111-116</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>117-122</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>123-128</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>129-134</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p>Opseg struka</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>77-80</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>81-84</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>85-88</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>89-92</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>93-96</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>97-102</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>103-108</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>109-114</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>115-120</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>121-126</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p>Opseg bokova</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>91-94</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>95-98</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>99-102</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>103-106</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>107-110</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>111-114</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>115-118</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>119-122</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>123-126</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>127-130</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                </tr>
-                                </tbody>
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <p>Konfencijski broj / SUPPLIER SIZE&nbsp;</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>44</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>46</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>48</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>50</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>52</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>54</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>56</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>58</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>60</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>62</p>
+                                </td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>EU</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>44</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>46</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>48</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>50</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>52</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>54</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>56</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>58</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>60</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>62</p>
+                                </td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>US</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>XS</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>S</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>M</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>L</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>XL</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>XXL</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>3XL</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>4XL</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>5XL</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>6XL</p>
+                                </td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>UK</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>XS</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>S</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>M</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>L</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>XL</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>XXL</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>3XL</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>4XL</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>5XL</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>6XL</p>
+                                </td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>FR</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>44</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>46</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>48</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>50</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>52</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>54</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>56</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>58</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>60</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>62</p>
+                                </td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>IT</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>44</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>46</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>48</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>50</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>52</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>54</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>56</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>58</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>60</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>62</p>
+                                </td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Opseg grudi</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>86-89</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>90-93</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>94-97</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>98-101</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>101-104</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>105-110</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>111-116</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>117-122</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>123-128</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>129-134</p>
+                                </td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Opseg struka</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>77-80</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>81-84</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>85-88</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>89-92</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>93-96</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>97-102</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>103-108</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>109-114</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>115-120</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>121-126</p>
+                                </td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Opseg bokova</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>91-94</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>95-98</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>99-102</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>103-106</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>107-110</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>111-114</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>115-118</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>119-122</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>123-126</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>127-130</p>
+                                </td>
+                                <td>&nbsp;</td>
+                            </tr>
+                            </tbody>
 
                         </table></div>
 
@@ -1865,440 +1862,440 @@
                     <div class="table-responsive">
                         <table class="table table-hover" >
 
-                                <tbody>
-                                <tr>
-                                    <td>
-                                        <p>Međunarodna veličina&nbsp;</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>S/M</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>M</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>M</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>L</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>L</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>L/XL</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>XL</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>XL</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>XXL</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>3XL</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>3XL</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>3XL</p>
-                                    </td>
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <p>Međunarodna veličina&nbsp;</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>S/M</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>M</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>M</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>L</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>L</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>L/XL</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>XL</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>XL</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>XXL</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>3XL</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>3XL</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>3XL</p>
+                                </td>
 
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p>Traper veličina / inch</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>30</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>31</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>32</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>33</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>34</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>35</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>36</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>38</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>40</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>42</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>44</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>46</p>
-                                    </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Traper veličina / inch</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>30</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>31</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>32</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>33</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>34</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>35</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>36</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>38</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>40</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>42</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>44</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>46</p>
+                                </td>
 
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p>EU</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>46</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>48</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>48</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>50</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>50</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>50/52</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>52</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>54</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>56</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>58</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>60</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>60</p>
-                                    </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>EU</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>46</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>48</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>48</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>50</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>50</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>50/52</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>52</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>54</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>56</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>58</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>60</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>60</p>
+                                </td>
 
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p>UK</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>36</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>38</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>38</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>40</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>40</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>40/42</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>42</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>44</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>46</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>48</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>50</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>50</p>
-                                    </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>UK</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>36</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>38</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>38</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>40</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>40</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>40/42</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>42</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>44</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>46</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>48</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>50</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>50</p>
+                                </td>
 
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p>FR</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>46</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>48</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>48</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>50</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>50</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>50/52</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>52</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>54</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>56</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>58</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>60</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>60</p>
-                                    </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>FR</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>46</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>48</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>48</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>50</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>50</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>50/52</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>52</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>54</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>56</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>58</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>60</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>60</p>
+                                </td>
 
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p>IT</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>46</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>48</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>48</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>50</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>50</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>50/52</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>52</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>54</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>56</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>58</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>60</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>60</p>
-                                    </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>IT</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>46</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>48</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>48</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>50</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>50</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>50/52</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>52</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>54</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>56</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>58</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>60</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>60</p>
+                                </td>
 
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p>Opseg struka</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>80-82</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>83-85</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>86-88</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>89-91</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>92-95</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>96-99</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>100-103</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>104-107</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>108-111</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>112-115</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>116-119</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>120-123</p>
-                                    </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Opseg struka</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>80-82</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>83-85</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>86-88</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>89-91</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>92-95</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>96-99</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>100-103</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>104-107</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>108-111</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>112-115</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>116-119</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>120-123</p>
+                                </td>
 
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <p>Opseg bokova</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>92-94</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>95-97</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>98-100</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>101-103</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>104-107</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>108-111</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>112-115</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>116-119</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>120-123</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>124-127</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>128-131</p>
-                                    </td>
-                                    <td>&nbsp;</td>
-                                    <td>
-                                        <p>131-134</p>
-                                    </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <p>Opseg bokova</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>92-94</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>95-97</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>98-100</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>101-103</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>104-107</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>108-111</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>112-115</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>116-119</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>120-123</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>124-127</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>128-131</p>
+                                </td>
+                                <td>&nbsp;</td>
+                                <td>
+                                    <p>131-134</p>
+                                </td>
 
-                                </tr>
-                                </tbody>
+                            </tr>
+                            </tbody>
 
                         </table>
                     </div>
@@ -2393,11 +2390,11 @@
 
 
 
-                </div>
             </div>
-
         </div>
+
     </div>
+</div>
 </div>
 
 
@@ -2410,7 +2407,7 @@
 <script src="catalog/view/theme/basel/js/lightgallery/js/lg-zoom.min.js"></script>
 <script src="catalog/view/theme/basel/js/cloudzoom/cloud-zoom.1.0.2.min.js"></script>
 {% if basel_price_update %}
-<script src="index.php?route=extension/basel/live_options/js&product_id={{ product_id }}"></script>
+    <script src="index.php?route=extension/basel/live_options/js&product_id={{ product_id }}"></script>
 {% endif %}
 
 
@@ -2470,73 +2467,73 @@
 
 
 {% if products %}
-<script><!--
-$('.grid-holder.related').slick({
-prevArrow: "<a class=\"arrow-left icon-arrow-left\"></a>",
-nextArrow: "<a class=\"arrow-right icon-arrow-right\"></a>",
-dots:true,
-{% if direction == 'rtl' %}
-rtl: true,
-{% endif %}
-respondTo:'min',
-{% if basel_rel_prod_grid == '5' %}
-slidesToShow:5,slidesToScroll:5,responsive:[{breakpoint:1100,settings:{slidesToShow:4,slidesToScroll:4}},{breakpoint:960,settings:{slidesToShow:3,slidesToScroll:3}},{breakpoint:600,settings:{slidesToShow:2,slidesToScroll:2}},
-{% elseif basel_rel_prod_grid == '4' %}
-slidesToShow:4,slidesToScroll:4,responsive:[{breakpoint:960,settings:{slidesToShow:3,slidesToScroll:3}},{breakpoint:600,settings:{slidesToShow:2,slidesToScroll:2}},
-{% elseif basel_rel_prod_grid == '3' %}
-slidesToShow:3,slidesToScroll:3,responsive:[{breakpoint:600,settings:{slidesToShow:2,slidesToScroll:2}},
-{% elseif basel_rel_prod_grid == '2' %}
-slidesToShow:2,slidesToScroll:2,responsive:[
-{% endif %}
-{% if items_mobile_fw %}
-{breakpoint:320,settings:{slidesToShow:1,slidesToScroll:1}}
-{% endif %}
-]
-});
-$('.product-style2 .single-product .icon').attr('data-placement', 'top');
-$('[data-toggle=\'tooltip\']').tooltip({container: 'body'});
-//--></script>
+    <script><!--
+        $('.grid-holder.related').slick({
+            prevArrow: "<a class=\"arrow-left icon-arrow-left\"></a>",
+            nextArrow: "<a class=\"arrow-right icon-arrow-right\"></a>",
+            dots:true,
+            {% if direction == 'rtl' %}
+            rtl: true,
+            {% endif %}
+            respondTo:'min',
+            {% if basel_rel_prod_grid == '5' %}
+            slidesToShow:5,slidesToScroll:5,responsive:[{breakpoint:1100,settings:{slidesToShow:4,slidesToScroll:4}},{breakpoint:960,settings:{slidesToShow:3,slidesToScroll:3}},{breakpoint:600,settings:{slidesToShow:2,slidesToScroll:2}},
+                {% elseif basel_rel_prod_grid == '4' %}
+                slidesToShow:4,slidesToScroll:4,responsive:[{breakpoint:960,settings:{slidesToShow:3,slidesToScroll:3}},{breakpoint:600,settings:{slidesToShow:2,slidesToScroll:2}},
+            {% elseif basel_rel_prod_grid == '3' %}
+            slidesToShow:3,slidesToScroll:3,responsive:[{breakpoint:600,settings:{slidesToShow:2,slidesToScroll:2}},
+            {% elseif basel_rel_prod_grid == '2' %}
+            slidesToShow:2,slidesToScroll:2,responsive:[
+            {% endif %}
+            {% if items_mobile_fw %}
+            {breakpoint:320,settings:{slidesToShow:1,slidesToScroll:1}}
+            {% endif %}
+        ]
+        });
+        $('.product-style2 .single-product .icon').attr('data-placement', 'top');
+        $('[data-toggle=\'tooltip\']').tooltip({container: 'body'});
+        //--></script>
 {% endif %}
 
 {% if sale_end_date and product_page_countdown %}
- <script>
-  $(function() {
-	$('#special_countdown').countdown('{{ sale_end_date }}').on('update.countdown', function(event) {
-  var $this = $(this).html(event.strftime(''
-    + '<div class=\"special_countdown\"></span><p><span class=\"icon-clock\"></span> {{ basel_text_offer_ends }}</p><div>'
-    + '%D<i>{{ basel_text_days }}</i></div><div>'
-    + '%H <i>{{ basel_text_hours }}</i></div><div>'
-    + '%M <i>{{ basel_text_mins }}</i></div><div>'
-    + '%S <i>{{ basel_text_secs }}</i></div></div>'));
-});
-  });
-</script>
+    <script>
+        $(function() {
+            $('#special_countdown').countdown('{{ sale_end_date }}').on('update.countdown', function(event) {
+                var $this = $(this).html(event.strftime(''
+                    + '<div class=\"special_countdown\"></span><p><span class=\"icon-clock\"></span> {{ basel_text_offer_ends }}</p><div>'
+                    + '%D<i>{{ basel_text_days }}</i></div><div>'
+                    + '%H <i>{{ basel_text_hours }}</i></div><div>'
+                    + '%M <i>{{ basel_text_mins }}</i></div><div>'
+                    + '%S <i>{{ basel_text_secs }}</i></div></div>'));
+            });
+        });
+    </script>
 {% endif %}
 
 
 <script><!--
-$('select[name=\'recurring_id\'], input[name="quantity"]').change(function(){
-	$.ajax({
-		url: 'index.php?route=product/product/getRecurringDescription',
-		type: 'post',
-		data: $('input[name=\'product_id\'], input[name=\'quantity\'], select[name=\'recurring_id\']'),
-		dataType: 'json',
-		beforeSend: function() {
-			$('#recurring-description').html('');
-		},
-		success: function(json) {
-			$('.alert-dismissible, .text-danger').remove();
+    $('select[name=\'recurring_id\'], input[name="quantity"]').change(function(){
+        $.ajax({
+            url: 'index.php?route=product/product/getRecurringDescription',
+            type: 'post',
+            data: $('input[name=\'product_id\'], input[name=\'quantity\'], select[name=\'recurring_id\']'),
+            dataType: 'json',
+            beforeSend: function() {
+                $('#recurring-description').html('');
+            },
+            success: function(json) {
+                $('.alert-dismissible, .text-danger').remove();
 
-			if (json['success']) {
-				$('#recurring-description').html(json['success']);
-			}
-		},
-        error: function(xhr, ajaxOptions, thrownError) {
-            alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
-        }
-	});
-});
-//--></script>
+                if (json['success']) {
+                    $('#recurring-description').html(json['success']);
+                }
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+            }
+        });
+    });
+    //--></script>
 
 
 <script>
@@ -2565,272 +2562,272 @@ $('select[name=\'recurring_id\'], input[name="quantity"]').change(function(){
 </script>
 
 <script><!--
-$('#button-cart').on('click', function() {
-	$.ajax({
-		url: 'index.php?route=extension/basel/basel_features/add_to_cart',
-		type: 'post',
-		data: $('#product input[type=\'text\'], #product input[type=\'hidden\'], #product input[type=\'number\'], #product input[type=\'radio\']:checked, #product input[type=\'checkbox\']:checked, #product select, #product textarea'),
-		dataType: 'json',
-		beforeSend: function(json) {
-			$('body').append('<span class="basel-spinner ajax-call"></span>');
-		},
+    $('#button-cart').on('click', function() {
+        $.ajax({
+            url: 'index.php?route=extension/basel/basel_features/add_to_cart',
+            type: 'post',
+            data: $('#product input[type=\'text\'], #product input[type=\'hidden\'], #product input[type=\'number\'], #product input[type=\'radio\']:checked, #product input[type=\'checkbox\']:checked, #product select, #product textarea'),
+            dataType: 'json',
+            beforeSend: function(json) {
+                $('body').append('<span class="basel-spinner ajax-call"></span>');
+            },
 
-		success: function(json) {
-			$('.alert, .text-danger').remove();
-			$('.table-cell').removeClass('has-error');
+            success: function(json) {
+                $('.alert, .text-danger').remove();
+                $('.table-cell').removeClass('has-error');
 
-            // Klaviyo: Added to Cart (safe queue)
-            window._learnq = window._learnq || [];
+                // Klaviyo: Added to Cart (safe queue)
+                window._learnq = window._learnq || [];
 
-            if (json.klaviyo) {
-                window._learnq.push(['track', 'Added to Cart', {
-                    ProductID: json.klaviyo.ProductID,
-                    ProductName: json.klaviyo.ProductName,
-                    ProductURL: json.klaviyo.ProductURL,
-                    ImageURL: json.klaviyo.ImageURL,
-                    Price: json.klaviyo.Price,
-                    Quantity: json.klaviyo.Quantity,
-                    Currency: json.klaviyo.Currency
-                }]);
+                if (json.klaviyo) {
+                    window._learnq.push(['track', 'Added to Cart', {
+                        ProductID: json.klaviyo.ProductID,
+                        ProductName: json.klaviyo.ProductName,
+                        ProductURL: json.klaviyo.ProductURL,
+                        ImageURL: json.klaviyo.ImageURL,
+                        Price: json.klaviyo.Price,
+                        Quantity: json.klaviyo.Quantity,
+                        Currency: json.klaviyo.Currency
+                    }]);
+                }
+
+
+                if (json.error) {
+                    $('.basel-spinner.ajax-call').remove();
+                    if (json.error.option) {
+                        for (i in json.error.option) {
+                            var element = $('#input-option' + i.replace('_', '-'));
+
+                            if (element.parent().hasClass('input-group')) {
+                                element.parent().after('<div class="text-danger">' + json.error.option[i] + '</div>');
+                            } else {
+                                element.after('<div class="text-danger">' + json.error.option[i] + '</div>');
+                            }
+                        }
+                    }
+
+                    if (json.error.recurring) {
+                        $('select[name=\'recurring_id\']').after('<div class="text-danger">' + json['error']['recurring'] + '</div>');
+                    }
+
+                    // Highlight any found errors
+                    $('.text-danger').parent().addClass('has-error');
+                }
+
+                if (json.success_redirect) {
+
+                    location = json.success_redirect;
+
+                } else if (json.success) {
+
+                    $('.table-cell').removeClass('has-error');
+                    $('.alert, .popup-note, .basel-spinner.ajax-call, .text-danger').remove();
+
+                    html = '<div class="popup-note">';
+                    html += '<div class="inner">';
+                    html += '<a class="popup-note-close" onclick="$(this).parent().parent().remove()">&times;</a>';
+                    html += '<div class="table">';
+                    html += '<div class="table-cell v-top img"><img src="' + json.image + '" /></div>';
+                    html += '<div class="table-cell v-top">' + json.success + '</div>';
+                    html += '</div>';
+                    html += '</div>';
+                    html += '</div>';
+                    $('body').append(html);
+                    setTimeout(function() {$('.popup-note').hide();}, 8100);
+                    // Need to set timeout otherwise it wont update the total
+                    setTimeout(function () {
+                        $('.cart-total-items').html( json.total_items );
+                        $('.cart-total-amount').html( json.total_amount );
+                    }, 100);
+
+                    $('#cart-content').load('index.php?route=common/cart/info #cart-content > *');
+                }
+            },
+            error: function(xhr, ajaxOptions, thrownError) {
+                alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
             }
+        });
+    });
+    //--></script>
 
 
-            if (json.error) {
-				$('.basel-spinner.ajax-call').remove();
-				if (json.error.option) {
-					for (i in json.error.option) {
-						var element = $('#input-option' + i.replace('_', '-'));
 
-						if (element.parent().hasClass('input-group')) {
-							element.parent().after('<div class="text-danger">' + json.error.option[i] + '</div>');
-						} else {
-							element.after('<div class="text-danger">' + json.error.option[i] + '</div>');
-						}
-					}
-				}
+<script><!--
+    $('.date').datetimepicker({
+        pickTime: false
+    });
 
-				if (json.error.recurring) {
-					$('select[name=\'recurring_id\']').after('<div class="text-danger">' + json['error']['recurring'] + '</div>');
-				}
+    $('.datetime').datetimepicker({
+        pickDate: true,
+        pickTime: true
+    });
 
-				// Highlight any found errors
-				$('.text-danger').parent().addClass('has-error');
-			}
+    $('.time').datetimepicker({
+        pickDate: false
+    });
 
-				if (json.success_redirect) {
-					
-					location = json.success_redirect;
-				
-				} else if (json.success) {
-					
-					$('.table-cell').removeClass('has-error');
-					$('.alert, .popup-note, .basel-spinner.ajax-call, .text-danger').remove();
-				 
-					html = '<div class="popup-note">';
-					html += '<div class="inner">';
-					html += '<a class="popup-note-close" onclick="$(this).parent().parent().remove()">&times;</a>';
-					html += '<div class="table">';
-					html += '<div class="table-cell v-top img"><img src="' + json.image + '" /></div>';
-					html += '<div class="table-cell v-top">' + json.success + '</div>';
-					html += '</div>';
-					html += '</div>';
-					html += '</div>';
-					$('body').append(html);
-					setTimeout(function() {$('.popup-note').hide();}, 8100);
-					// Need to set timeout otherwise it wont update the total
-					setTimeout(function () {
-					$('.cart-total-items').html( json.total_items );
-					$('.cart-total-amount').html( json.total_amount );
-					}, 100);
+    $('button[id^=\'button-upload\']').on('click', function() {
+        var node = this;
 
-					$('#cart-content').load('index.php?route=common/cart/info #cart-content > *');
-			}
-		},
-        error: function(xhr, ajaxOptions, thrownError) {
-            alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+        $('#form-upload').remove();
+
+        $('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
+
+        $('#form-upload input[name=\'file\']').trigger('click');
+
+        if (typeof timer != 'undefined') {
+            clearInterval(timer);
         }
-	});
-});
-//--></script>
 
+        timer = setInterval(function() {
+            if ($('#form-upload input[name=\'file\']').val() != '') {
+                clearInterval(timer);
 
+                $.ajax({
+                    url: 'index.php?route=tool/upload',
+                    type: 'post',
+                    dataType: 'json',
+                    data: new FormData($('#form-upload')[0]),
+                    cache: false,
+                    contentType: false,
+                    processData: false,
+                    beforeSend: function() {
+                        $(node).button('loading');
+                    },
+                    complete: function() {
+                        $(node).button('reset');
+                    },
+                    success: function(json) {
+                        $('.text-danger').remove();
 
+                        if (json['error']) {
+                            $(node).parent().find('input').after('<div class="text-danger">' + json['error'] + '</div>');
+                        }
+
+                        if (json['success']) {
+                            alert(json['success']);
+
+                            $(node).parent().find('input').val(json['code']);
+                        }
+                    },
+                    error: function(xhr, ajaxOptions, thrownError) {
+                        alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
+                    }
+                });
+            }
+        }, 500);
+    });
+    //--></script>
 <script><!--
-$('.date').datetimepicker({
-	pickTime: false
-});
+    $('#review').delegate('.pagination a', 'click', function(e) {
+        e.preventDefault();
+        $("html,body").animate({scrollTop:(($("#review").offset().top)-50)},500);
+        $('#review').fadeOut(50);
 
-$('.datetime').datetimepicker({
-	pickDate: true,
-	pickTime: true
-});
+        $('#review').load(this.href);
 
-$('.time').datetimepicker({
-	pickDate: false
-});
+        $('#review').fadeIn(500);
 
-$('button[id^=\'button-upload\']').on('click', function() {
-	var node = this;
-
-	$('#form-upload').remove();
-
-	$('body').prepend('<form enctype="multipart/form-data" id="form-upload" style="display: none;"><input type="file" name="file" /></form>');
-
-	$('#form-upload input[name=\'file\']').trigger('click');
-
-	if (typeof timer != 'undefined') {
-    	clearInterval(timer);
-	}
-
-	timer = setInterval(function() {
-		if ($('#form-upload input[name=\'file\']').val() != '') {
-			clearInterval(timer);
-
-			$.ajax({
-				url: 'index.php?route=tool/upload',
-				type: 'post',
-				dataType: 'json',
-				data: new FormData($('#form-upload')[0]),
-				cache: false,
-				contentType: false,
-				processData: false,
-				beforeSend: function() {
-					$(node).button('loading');
-				},
-				complete: function() {
-					$(node).button('reset');
-				},
-				success: function(json) {
-					$('.text-danger').remove();
-
-					if (json['error']) {
-						$(node).parent().find('input').after('<div class="text-danger">' + json['error'] + '</div>');
-					}
-
-					if (json['success']) {
-						alert(json['success']);
-
-						$(node).parent().find('input').val(json['code']);
-					}
-				},
-				error: function(xhr, ajaxOptions, thrownError) {
-					alert(thrownError + "\r\n" + xhr.statusText + "\r\n" + xhr.responseText);
-				}
-			});
-		}
-	}, 500);
-});
-//--></script>
-<script><!--
-$('#review').delegate('.pagination a', 'click', function(e) {
-  e.preventDefault();
-	$("html,body").animate({scrollTop:(($("#review").offset().top)-50)},500);
-    $('#review').fadeOut(50);
-
-    $('#review').load(this.href);
-
-    $('#review').fadeIn(500);
-	
-});
+    });
 
 
-$('#button-review').on('click', function() {
-	$.ajax({
-		url: 'index.php?route=product/product/write&product_id={{ product_id }}',
-		type: 'post',
-		dataType: 'json',
-		data: $("#form-review").serialize(),
-		beforeSend: function() {
-			$('#button-review').button('loading');
-		},
-		complete: function() {
-			$('#button-review').button('reset');
-		},
-		success: function(json) {
-			$('.alert-success, .alert-danger').remove();
+    $('#button-review').on('click', function() {
+        $.ajax({
+            url: 'index.php?route=product/product/write&product_id={{ product_id }}',
+            type: 'post',
+            dataType: 'json',
+            data: $("#form-review").serialize(),
+            beforeSend: function() {
+                $('#button-review').button('loading');
+            },
+            complete: function() {
+                $('#button-review').button('reset');
+            },
+            success: function(json) {
+                $('.alert-success, .alert-danger').remove();
 
-			if (json.error) {
-				$('#review-notification').after('<div class="alert alert-sm alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json.error + '</div>');
-			}
+                if (json.error) {
+                    $('#review-notification').after('<div class="alert alert-sm alert-danger"><i class="fa fa-exclamation-circle"></i> ' + json.error + '</div>');
+                }
 
-			if (json.success) {
-				$('#review-notification').after('<div class="alert alert-sm alert-success"><i class="fa fa-check-circle"></i> ' + json.success + '</div>');
+                if (json.success) {
+                    $('#review-notification').after('<div class="alert alert-sm alert-success"><i class="fa fa-check-circle"></i> ' + json.success + '</div>');
 
-				$('input[name=\'name\']').val('');
-				$('textarea[name=\'text\']').val('');
-				$('input[name=\'rating\']:checked').prop('checked', false);
-			}
-		}
-	});
-});
+                    $('input[name=\'name\']').val('');
+                    $('textarea[name=\'text\']').val('');
+                    $('input[name=\'rating\']:checked').prop('checked', false);
+                }
+            }
+        });
+    });
 
-$(document).ready(function() {
-{% if product_layout == "full-width" %}
+    $(document).ready(function() {
+        {% if product_layout == "full-width" %}
 // Sticky information
-$('.table-cell.right .inner').theiaStickySidebar({containerSelector:'.product-info'});
-{% endif %}
+        $('.table-cell.right .inner').theiaStickySidebar({containerSelector:'.product-info'});
+        {% endif %}
 
 // Reviews/Question scroll link
-$(".to_tabs").click(function() {
-    $('html, body').animate({
-        scrollTop: ($(".main_tabs").offset().top - 100)
-    }, 1000);
-});
+        $(".to_tabs").click(function() {
+            $('html, body').animate({
+                scrollTop: ($(".main_tabs").offset().top - 100)
+            }, 1000);
+        });
 
 // Sharing buttons
-{% if basel_share_btn %}
-var share_url = encodeURIComponent(window.location.href);
-var page_title = '{{ heading_title }}';
-{% if thumb %}
-var thumb = '{{ thumb }}';
-{% endif %}
-$('.fb_share').attr("href", 'https://www.facebook.com/sharer/sharer.php?u=' + share_url + '');
-$('.twitter_share').attr("href", 'https://twitter.com/intent/tweet?source=' + share_url + '&text=' + page_title + ': ' + share_url + '');
-$('.google_share').attr("href", 'https://plus.google.com/share?url=' + share_url + '');
-$('.pinterest_share').attr("href", 'http://pinterest.com/pin/create/button/?url=' + share_url + '&media=' + thumb + '&description=' + page_title + '');
-$('.vk_share').attr("href", 'http://vkontakte.ru/share.php?url=' + share_url + '');
-{% endif %}
-});
-//--></script>
+        {% if basel_share_btn %}
+        var share_url = encodeURIComponent(window.location.href);
+        var page_title = '{{ heading_title }}';
+        {% if thumb %}
+        var thumb = '{{ thumb }}';
+        {% endif %}
+        $('.fb_share').attr("href", 'https://www.facebook.com/sharer/sharer.php?u=' + share_url + '');
+        $('.twitter_share').attr("href", 'https://twitter.com/intent/tweet?source=' + share_url + '&text=' + page_title + ': ' + share_url + '');
+        $('.google_share').attr("href", 'https://plus.google.com/share?url=' + share_url + '');
+        $('.pinterest_share').attr("href", 'http://pinterest.com/pin/create/button/?url=' + share_url + '&media=' + thumb + '&description=' + page_title + '');
+        $('.vk_share').attr("href", 'http://vkontakte.ru/share.php?url=' + share_url + '');
+        {% endif %}
+    });
+    //--></script>
 
 
 <script>
-$(document).ready(function() {
+    $(document).ready(function() {
 
-$('.cloud-zoom-wrap').click(function (e) {
-	e.preventDefault();
-    $('img', this).trigger('click');
-});
+        $('.cloud-zoom-wrap').click(function (e) {
+            e.preventDefault();
+            $('img', this).trigger('click');
+        });
 
 
-$('.image-additional').slick({
-prevArrow: "<a class=\"icon-arrow-left\"></a>",
-nextArrow: "<a class=\"icon-arrow-right\"></a>",
-appendArrows: '.image-additional .slick-list',
-arrows:true,
-{% if direction == 'rtl' %}
-rtl: true,
-{% endif %}
-infinite:false,
-{% if product_layout == "images-left" %}
-slidesToShow: {{ (img_h/img_a_h)|round(0, 'floor') }},
-vertical:true,
-verticalSwiping:true,
-{% else %}
-slidesToShow: {{ (img_w/img_a_w)|round }},
-{% endif %}
-responsive: [
-{
-breakpoint: 992,
-settings: {
-vertical:false,
-verticalSwiping:false
-}
-}]
-});	
+        $('.image-additional').slick({
+            prevArrow: "<a class=\"icon-arrow-left\"></a>",
+            nextArrow: "<a class=\"icon-arrow-right\"></a>",
+            appendArrows: '.image-additional .slick-list',
+            arrows:true,
+            {% if direction == 'rtl' %}
+            rtl: true,
+            {% endif %}
+            infinite:false,
+            {% if product_layout == "images-left" %}
+            slidesToShow: {{ (img_h/img_a_h)|round(0, 'floor') }},
+            vertical:true,
+            verticalSwiping:true,
+            {% else %}
+            slidesToShow: {{ (img_w/img_a_w)|round }},
+            {% endif %}
+            responsive: [
+                {
+                    breakpoint: 992,
+                    settings: {
+                        vertical:false,
+                        verticalSwiping:false
+                    }
+                }]
+        });
 
-});
-//--></script>
+    });
+    //--></script>
 
 <script>
 
@@ -2847,44 +2844,44 @@ verticalSwiping:false
 
 
 
-//--></script>
+    //--></script>
 <script type="application/ld+json">
-{
-"@context": "http://schema.org",
-"@type": "Product",
-"image": [
-{% if thumb %}
+    {
+    "@context": "http://schema.org",
+    "@type": "Product",
+    "image": [
+    {% if thumb %}
 "{{ thumb }}"
 {% endif %}
-],
-"description": "{{ meta_description }}",
-{% if review_qty %}
+    ],
+    "description": "{{ meta_description }}",
+    {% if review_qty %}
 "aggregateRating": {
 "@type": "AggregateRating",
 "ratingValue": "{{ rating }}",
 "reviewCount": "{{ review_qty }}"},
 {% endif %}
-"name": "{{ heading_title }}",
+    "name": "{{ heading_title }}",
 "sku": "{{ model }}",
-{% if manufacturer %}
+    {% if manufacturer %}
 "brand": "{{ manufacturer }}",
 {% endif %}
-"offers": {
-"@type": "Offer",
-{% if qty > 0 %}
+    "offers": {
+    "@type": "Offer",
+    {% if qty > 0 %}
 "availability": "http://schema.org/InStock",
 {% else %}
 "availability": "http://schema.org/OutOfStock",
 {% endif %}
 {% if price %}
-{% if special %}
+    {% if special %}
 "price": "{{ special_snippet }}",
 {% else %}
 "price": "{{ price_snippet }}",
 {% endif %}
 "priceCurrency": "{{ currency_code }}"
 {% endif %}
-}
-}
+    }
+    }
 </script>
 {{ footer }}
