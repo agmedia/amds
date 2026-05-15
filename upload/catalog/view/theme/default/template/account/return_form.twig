@@ -55,47 +55,64 @@
               {% endif %} </div>
           </div>
           <div class="form-group required">
-            <label class="col-sm-2 control-label" for="input-order-id">{{ entry_order_id }}</label>
+            <label class="col-sm-2 control-label" for="input-invoice-number">{{ entry_invoice_number }}</label>
             <div class="col-sm-10">
-              <input type="text" name="order_id" value="{{ order_id }}" placeholder="{{ entry_order_id }}" id="input-order-id" class="form-control" />
+              <input type="text" name="invoice_number" value="{{ invoice_number }}" placeholder="{{ entry_invoice_number }}" id="input-invoice-number" class="form-control" />
               {% if error_order_id %}
               <div class="text-danger">{{ error_order_id }}</div>
               {% endif %} </div>
           </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label" for="input-date-ordered">{{ entry_date_ordered }}</label>
+          <div class="form-group required">
+            <label class="col-sm-2 control-label" for="input-invoice-date">{{ entry_invoice_date }}</label>
             <div class="col-sm-3">
               <div class="input-group date">
-                <input type="text" name="date_ordered" value="{{ date_ordered }}" placeholder="{{ entry_date_ordered }}" data-date-format="YYYY-MM-DD" id="input-date-ordered" class="form-control" />
+                <input type="text" name="invoice_date" value="{{ invoice_date }}" placeholder="{{ entry_invoice_date }}" data-date-format="YYYY-MM-DD" id="input-invoice-date" class="form-control" />
                 <span class="input-group-btn">
                 <button type="button" class="btn btn-default"><i class="fa fa-calendar"></i></button>
                 </span></div>
+              {% if error_date_ordered %}
+              <div class="text-danger">{{ error_date_ordered }}</div>
+              {% endif %}
             </div>
           </div>
         </fieldset>
         <fieldset>
           <legend>{{ text_product }}</legend>
+          <input type="hidden" name="product_id" value="{{ product_id }}" />
           <div class="form-group required">
-            <label class="col-sm-2 control-label" for="input-product">{{ entry_product }}</label>
+            <label class="col-sm-2 control-label">{{ text_return_products_title }}</label>
             <div class="col-sm-10">
-              <input type="text" name="product" value="{{ product }}" placeholder="{{ entry_product }}" id="input-product" class="form-control" />
-              <input type="hidden" name="product_id" value="{{ product_id }}" />
-              {% if error_product %}
-              <div class="text-danger">{{ error_product }}</div>
-              {% endif %} </div>
-          </div>
-          <div class="form-group required">
-            <label class="col-sm-2 control-label" for="input-model">{{ entry_model }}</label>
-            <div class="col-sm-10">
-              <input type="text" name="model" value="{{ model }}" placeholder="{{ entry_model }}" id="input-model" class="form-control" />
-              {% if error_model %}
-              <div class="text-danger">{{ error_model }}</div>
-              {% endif %} </div>
-          </div>
-          <div class="form-group">
-            <label class="col-sm-2 control-label" for="input-quantity">{{ entry_quantity }}</label>
-            <div class="col-sm-10">
-              <input type="text" name="quantity" value="{{ quantity }}" placeholder="{{ entry_quantity }}" id="input-quantity" class="form-control" />
+              <div class="table-responsive">
+                <table id="return-product" class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <td>{{ entry_product_code }}</td>
+                      <td>{{ entry_quantity }}</td>
+                      <td>{{ entry_price }}</td>
+                      <td></td>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for return_product in return_products %}
+                    <tr>
+                      <td><input type="text" name="return_products[{{ loop.index0 }}][code]" value="{{ return_product.code }}" placeholder="{{ entry_product_code }}" class="form-control" /></td>
+                      <td><input type="text" name="return_products[{{ loop.index0 }}][quantity]" value="{{ return_product.quantity }}" placeholder="{{ entry_quantity }}" class="form-control" /></td>
+                      <td><input type="text" name="return_products[{{ loop.index0 }}][price]" value="{{ return_product.price }}" placeholder="{{ entry_price }}" class="form-control" /></td>
+                      <td class="text-center"><button type="button" class="btn btn-default button-remove-return-product" title="{{ button_remove }}"><i class="fa fa-minus-circle"></i></button></td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                  <tfoot>
+                    <tr>
+                      <td colspan="3"></td>
+                      <td class="text-center"><button type="button" id="button-return-product" class="btn btn-default" title="{{ button_add_product }}"><i class="fa fa-plus-circle"></i></button></td>
+                    </tr>
+                  </tfoot>
+                </table>
+              </div>
+              {% if error_return_products %}
+              <div class="text-danger">{{ error_return_products }}</div>
+              {% endif %}
             </div>
           </div>
           <div class="form-group required">
@@ -120,20 +137,12 @@
               {% endif %} </div>
           </div>
           <div class="form-group required">
-            <label class="col-sm-2 control-label">{{ entry_opened }}</label>
+            <label class="col-sm-2 control-label" for="input-refund-iban">{{ entry_refund_iban }}</label>
             <div class="col-sm-10">
-              <label class="radio-inline"> {% if opened %}
-                <input type="radio" name="opened" value="1" checked="checked" />
-                {% else %}
-                <input type="radio" name="opened" value="1" />
-                {% endif %}
-                {{ text_yes }}</label>
-              <label class="radio-inline"> {% if not opened %}
-                <input type="radio" name="opened" value="0" checked="checked" />
-                {% else %}
-                <input type="radio" name="opened" value="0" />
-                {% endif %}
-                {{ text_no }}</label>
+              <input type="text" name="refund_iban" value="{{ refund_iban }}" placeholder="{{ entry_refund_iban }}" id="input-refund-iban" class="form-control" />
+              {% if error_refund_iban %}
+              <div class="text-danger">{{ error_refund_iban }}</div>
+              {% endif %}
             </div>
           </div>
           <div class="form-group">
@@ -172,6 +181,29 @@
 $('.date').datetimepicker({
 	language: '{{ datepicker }}',
 	pickTime: false
+});
+
+var returnProductRow = {{ return_products|length }};
+
+$('#button-return-product').on('click', function() {
+	html  = '<tr>';
+	html += '  <td><input type="text" name="return_products[' + returnProductRow + '][code]" value="" placeholder="{{ entry_product_code|e('js') }}" class="form-control" /></td>';
+	html += '  <td><input type="text" name="return_products[' + returnProductRow + '][quantity]" value="" placeholder="{{ entry_quantity|e('js') }}" class="form-control" /></td>';
+	html += '  <td><input type="text" name="return_products[' + returnProductRow + '][price]" value="" placeholder="{{ entry_price|e('js') }}" class="form-control" /></td>';
+	html += '  <td class="text-center"><button type="button" class="btn btn-default button-remove-return-product" title="{{ button_remove|e('js') }}"><i class="fa fa-minus-circle"></i></button></td>';
+	html += '</tr>';
+
+	$('#return-product tbody').append(html);
+
+	returnProductRow++;
+});
+
+$('#return-product').on('click', '.button-remove-return-product', function() {
+	if ($('#return-product tbody tr').length > 1) {
+		$(this).closest('tr').remove();
+	} else {
+		$(this).closest('tr').find('input').val('');
+	}
 });
 //--></script> 
 {{ footer }} 

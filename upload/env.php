@@ -2,6 +2,9 @@
 // AGmedia Custom
 define('OC_ENV', [
     'env'                    => 'local',
+    'security'               => [
+        'luceed_sync_cron_key' => getenv('LUCEED_SYNC_CRON_KEY') ?: '',
+    ],
     //
     'free_shipping_amount'   => 500,
     'default_shipping_price' => 39,
