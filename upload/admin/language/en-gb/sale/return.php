@@ -13,6 +13,7 @@ $_['text_order']           = 'Order Information';
 $_['text_product']         = 'Product Information &amp; Reason for Return';
 $_['text_history']         = 'History';
 $_['text_history_add']     = 'Add History';
+$_['text_return_items']    = 'Return Items';
 
 // Column
 $_['column_return_id']     = 'Return ID';
@@ -26,6 +27,9 @@ $_['column_date_modified'] = 'Date Modified';
 $_['column_comment']       = 'Comment';
 $_['column_notify']        = 'Customer Notified';
 $_['column_action']        = 'Action';
+$_['column_product_code']  = 'Product Code';
+$_['column_quantity']      = 'Quantity';
+$_['column_price']         = 'Price';
 
 // Entry
 $_['entry_customer']       = 'Customer';
@@ -47,6 +51,12 @@ $_['entry_notify']         = 'Notify Customer';
 $_['entry_return_id']      = 'Return ID';
 $_['entry_date_added']     = 'Date Added';
 $_['entry_date_modified']  = 'Date Modified';
+$_['entry_invoice_number'] = 'Invoice/Order Number';
+$_['entry_invoice_date']   = 'Invoice Date';
+$_['entry_refund_iban']    = 'Refund IBAN';
+
+// Button
+$_['button_export']        = 'Export Selected to Excel';
 
 // Help
 $_['help_product']         = '(Autocomplete)';
@@ -61,3 +71,4 @@ $_['error_email']          = 'E-Mail Address does not appear to be valid!';
 $_['error_telephone']      = 'Telephone must be between 3 and 32 characters!';
 $_['error_product']        = 'Product Name must be greater than 3 and less than 255 characters!';
 $_['error_model']          = 'Product Model must be greater than 3 and less than 64 characters!';
+$_['error_export_selected'] = 'Select at least one return to export to Excel!';

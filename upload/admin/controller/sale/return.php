@@ -206,6 +206,126 @@ class ControllerSaleReturn extends Controller {
 		$this->getList();
 	}
 
+	public function export() {
+		$this->load->language('sale/return');
+		$this->load->model('sale/return');
+
+		$url = $this->getReturnListUrl();
+
+		if (empty($this->request->post['selected']) || !is_array($this->request->post['selected'])) {
+			$this->session->data['error'] = $this->language->get('error_export_selected');
+
+			$this->response->redirect($this->url->link('sale/return', 'user_token=' . $this->session->data['user_token'] . $url, true));
+		}
+
+		$returns = $this->model_sale_return->getReturnsByIds($this->request->post['selected']);
+
+		if (!$returns) {
+			$this->session->data['error'] = $this->language->get('error_export_selected');
+
+			$this->response->redirect($this->url->link('sale/return', 'user_token=' . $this->session->data['user_token'] . $url, true));
+		}
+
+		$previous_error_reporting = error_reporting();
+		error_reporting($previous_error_reporting & ~E_DEPRECATED & ~E_USER_DEPRECATED);
+
+		if (!class_exists('\PhpOffice\PhpSpreadsheet\Spreadsheet') && defined('DIR_STORAGE') && is_file(DIR_STORAGE . 'vendor/autoload.php')) {
+			require_once DIR_STORAGE . 'vendor/autoload.php';
+		}
+
+		$spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+		$sheet = $spreadsheet->getActiveSheet();
+		$sheet->setTitle('Povrati');
+		$sheet->freezePane('A2');
+
+		$headers = array(
+			$this->language->get('column_return_id'),
+			$this->language->get('column_order_id'),
+			$this->language->get('entry_date_ordered'),
+			$this->language->get('column_customer'),
+			$this->language->get('entry_email'),
+			$this->language->get('entry_telephone'),
+			$this->language->get('entry_refund_iban'),
+			$this->language->get('column_status'),
+			$this->language->get('entry_return_reason'),
+			$this->language->get('column_product'),
+			$this->language->get('column_product_code'),
+			$this->language->get('column_quantity'),
+			$this->language->get('column_price'),
+			$this->language->get('column_comment'),
+			$this->language->get('column_date_added'),
+			$this->language->get('column_date_modified')
+		);
+
+		foreach ($headers as $index => $header) {
+			$sheet->setCellValueByColumnAndRow($index + 1, 1, $header);
+		}
+
+		$sheet->getStyle('A1:P1')->getFont()->setBold(true);
+
+		$row = 2;
+
+		foreach ($returns as $return_info) {
+			$return_items = $this->getReturnItems($return_info);
+
+			if (!$return_items) {
+				$return_items = array(array(
+					'code' => '',
+					'quantity' => '',
+					'price' => ''
+				));
+			}
+
+			foreach ($return_items as $return_item) {
+				$values = array(
+					$return_info['return_id'],
+					!empty($return_info['invoice_number']) ? $return_info['invoice_number'] : $return_info['order_id'],
+					$this->formatReturnExportDate(!empty($return_info['invoice_date']) ? $return_info['invoice_date'] : $return_info['date_ordered']),
+					$return_info['customer'],
+					$return_info['email'],
+					$return_info['telephone'],
+					isset($return_info['refund_iban']) ? $return_info['refund_iban'] : '',
+					$return_info['return_status'],
+					isset($return_info['return_reason']) ? $return_info['return_reason'] : '',
+					$return_info['product'],
+					$return_item['code'],
+					$return_item['quantity'],
+					$return_item['price'],
+					$return_info['comment'],
+					$this->formatReturnExportDate($return_info['date_added']),
+					$this->formatReturnExportDate($return_info['date_modified'])
+				);
+
+				foreach ($values as $index => $value) {
+					$sheet->setCellValueExplicitByColumnAndRow($index + 1, $row, html_entity_decode(strip_tags((string)$value), ENT_QUOTES, 'UTF-8'), \PhpOffice\PhpSpreadsheet\Cell\DataType::TYPE_STRING);
+				}
+
+				$row++;
+			}
+		}
+
+		foreach (range('A', 'P') as $column) {
+			$sheet->getColumnDimension($column)->setAutoSize(true);
+		}
+
+		$writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+		$filename = 'povrati-export-' . date('Y-m-d_H-i-s') . '.xlsx';
+
+		if (ob_get_length()) {
+			ob_end_clean();
+		}
+
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		header('Content-Disposition: attachment; filename="' . $filename . '"');
+		header('Cache-Control: max-age=0');
+
+		$writer->save('php://output');
+
+		error_reporting($previous_error_reporting);
+
+		exit();
+	}
+
 	protected function getList() {
 		if (isset($this->request->get['filter_return_id'])) {
 			$filter_return_id = $this->request->get['filter_return_id'];
@@ -333,6 +453,7 @@ class ControllerSaleReturn extends Controller {
 
 		$data['add'] = $this->url->link('sale/return/add', 'user_token=' . $this->session->data['user_token'] . $url, true);
 		$data['delete'] = $this->url->link('sale/return/delete', 'user_token=' . $this->session->data['user_token'] . $url, true);
+		$data['export'] = $this->url->link('sale/return/export', 'user_token=' . $this->session->data['user_token'] . $url, true);
 
 		$data['returns'] = array();
 
@@ -356,12 +477,15 @@ class ControllerSaleReturn extends Controller {
 		$results = $this->model_sale_return->getReturns($filter_data);
 
 		foreach ($results as $result) {
+			$return_items = $this->getReturnItems($result, !empty($result['return_items']));
+
 			$data['returns'][] = array(
 				'return_id'     => $result['return_id'],
 				'order_id'      => $result['order_id'],
 				'customer'      => $result['customer'],
 				'product'       => $result['product'],
 				'model'         => $result['model'],
+				'return_items'  => $return_items,
 				'return_status' => $result['return_status'],
 				'date_added'    => date($this->language->get('date_format_short'), strtotime($result['date_added'])),
 				'date_modified' => date($this->language->get('date_format_short'), strtotime($result['date_modified'])),
@@ -668,6 +792,22 @@ class ControllerSaleReturn extends Controller {
 			$data['date_ordered'] = '';
 		}
 
+		if (isset($this->request->post['invoice_number'])) {
+			$data['invoice_number'] = $this->request->post['invoice_number'];
+		} elseif (!empty($return_info) && isset($return_info['invoice_number'])) {
+			$data['invoice_number'] = $return_info['invoice_number'];
+		} else {
+			$data['invoice_number'] = '';
+		}
+
+		if (isset($this->request->post['invoice_date'])) {
+			$data['invoice_date'] = $this->request->post['invoice_date'];
+		} elseif (!empty($return_info) && isset($return_info['invoice_date'])) {
+			$data['invoice_date'] = ($return_info['invoice_date'] != '0000-00-00' ? $return_info['invoice_date'] : '');
+		} else {
+			$data['invoice_date'] = '';
+		}
+
 		if (isset($this->request->post['customer'])) {
 			$data['customer'] = $this->request->post['customer'];
 		} elseif (!empty($return_info)) {
@@ -716,6 +856,14 @@ class ControllerSaleReturn extends Controller {
 			$data['telephone'] = '';
 		}
 
+		if (isset($this->request->post['refund_iban'])) {
+			$data['refund_iban'] = $this->request->post['refund_iban'];
+		} elseif (!empty($return_info) && isset($return_info['refund_iban'])) {
+			$data['refund_iban'] = $return_info['refund_iban'];
+		} else {
+			$data['refund_iban'] = '';
+		}
+
 		if (isset($this->request->post['product'])) {
 			$data['product'] = $this->request->post['product'];
 		} elseif (!empty($return_info)) {
@@ -746,6 +894,12 @@ class ControllerSaleReturn extends Controller {
 			$data['quantity'] = $return_info['quantity'];
 		} else {
 			$data['quantity'] = '';
+		}
+
+		if (!empty($return_info)) {
+			$data['return_items'] = $this->getReturnItems($return_info);
+		} else {
+			$data['return_items'] = array();
 		}
 
 		if (isset($this->request->post['opened'])) {
@@ -805,6 +959,86 @@ class ControllerSaleReturn extends Controller {
 		$data['footer'] = $this->load->controller('common/footer');
 
 		$this->response->setOutput($this->load->view('sale/return_form', $data));
+	}
+
+	protected function getReturnListUrl() {
+		$url = '';
+
+		$keys = array(
+			'filter_return_id',
+			'filter_order_id',
+			'filter_customer',
+			'filter_product',
+			'filter_model',
+			'filter_return_status_id',
+			'filter_date_added',
+			'filter_date_modified',
+			'sort',
+			'order',
+			'page'
+		);
+
+		foreach ($keys as $key) {
+			if (isset($this->request->get[$key])) {
+				$value = $this->request->get[$key];
+
+				if (in_array($key, array('filter_customer', 'filter_product', 'filter_model'), true)) {
+					$value = urlencode(html_entity_decode($value, ENT_QUOTES, 'UTF-8'));
+				}
+
+				$url .= '&' . $key . '=' . $value;
+			}
+		}
+
+		return $url;
+	}
+
+	protected function getReturnItems($return_info, $include_fallback = true) {
+		$return_items = array();
+
+		if (!empty($return_info['return_items'])) {
+			$items = json_decode($return_info['return_items'], true);
+
+			if (is_array($items)) {
+				foreach ($items as $item) {
+					if (!is_array($item)) {
+						continue;
+					}
+
+					$code = isset($item['code']) ? trim($item['code']) : '';
+					$quantity = isset($item['quantity']) ? trim($item['quantity']) : '';
+					$price = isset($item['price']) ? trim($item['price']) : '';
+
+					if ($code === '' && $quantity === '' && $price === '') {
+						continue;
+					}
+
+					$return_items[] = array(
+						'code' => $code,
+						'quantity' => $quantity,
+						'price' => $price
+					);
+				}
+			}
+		}
+
+		if ($include_fallback && !$return_items && (!empty($return_info['model']) || !empty($return_info['quantity']))) {
+			$return_items[] = array(
+				'code' => isset($return_info['model']) ? $return_info['model'] : '',
+				'quantity' => isset($return_info['quantity']) ? $return_info['quantity'] : '',
+				'price' => ''
+			);
+		}
+
+		return $return_items;
+	}
+
+	protected function formatReturnExportDate($date) {
+		if (!$date || $date == '0000-00-00' || $date == '0000-00-00 00:00:00') {
+			return '';
+		}
+
+		return date('Y-m-d H:i:s', strtotime($date));
 	}
 
 	protected function validateForm() {

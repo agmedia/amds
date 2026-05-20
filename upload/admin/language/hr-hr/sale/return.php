@@ -13,6 +13,7 @@ $_['text_unopened']       = 'Neotvoren';
 $_['text_order']          = 'Informacije o narudžbi';
 $_['text_product']        = 'Informacije o artiklu i razlog za povrat artikala';
 $_['text_history']        = 'Dodaj u povijest povrata artikala';
+$_['text_return_items']   = 'Artikli za povrat';
 
 // Column
 $_['column_return_id']     = 'Povrat artikla broj';
@@ -26,6 +27,9 @@ $_['column_date_modified'] = 'Datum izmjene';
 $_['column_comment']       = 'Komentar';
 $_['column_notify']        = 'Kupac obaviješten';
 $_['column_action']        = 'Akcija';
+$_['column_product_code']  = 'Šifra artikla';
+$_['column_quantity']      = 'Količina';
+$_['column_price']         = 'Cijena';
 
 // Entry
 $_['entry_customer']      = 'Kupac';
@@ -47,6 +51,12 @@ $_['entry_notify']        = 'Kupac obaviješten';
 $_['entry_return_id']     = 'Broj povrata artikala';
 $_['entry_date_added']    = 'Datum dodavanja';
 $_['entry_date_modified'] = 'Datum izmjene';
+$_['entry_invoice_number'] = 'Broj računa/narudžbe';
+$_['entry_invoice_date']   = 'Datum računa';
+$_['entry_refund_iban']    = 'IBAN za povrat sredstava';
+
+// Button
+$_['button_export']       = 'Izvezi označeno u Excel';
 
 // Help
 $_['help_product']        = '(Autopopuna)';
@@ -61,3 +71,4 @@ $_['error_email']         = 'Čini se da je E-mail adresa neispravna!';
 $_['error_telephone']     = 'Telefon mora sadržavati između 3 i 32 znaka!';
 $_['error_product']       = 'Naziv artikla mora sadržavati između 3 i 255 znakova!';
 $_['error_model']         = 'Model artikla mora sadržavati između 3 i 64 znaka!';
+$_['error_export_selected'] = 'Odaberite barem jedan povrat za export u Excel!';

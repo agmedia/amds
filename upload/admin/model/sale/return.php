@@ -21,6 +21,18 @@ class ModelSaleReturn extends Model {
 		return $query->row;
 	}
 
+	public function getReturnsByIds($return_ids) {
+		$return_ids = array_unique(array_filter(array_map('intval', (array)$return_ids)));
+
+		if (!$return_ids) {
+			return array();
+		}
+
+		$query = $this->db->query("SELECT r.*, CONCAT(r.firstname, ' ', r.lastname) AS customer, (SELECT rr.name FROM " . DB_PREFIX . "return_reason rr WHERE rr.return_reason_id = r.return_reason_id AND rr.language_id = '" . (int)$this->config->get('config_language_id') . "') AS return_reason, (SELECT rs.name FROM " . DB_PREFIX . "return_status rs WHERE rs.return_status_id = r.return_status_id AND rs.language_id = '" . (int)$this->config->get('config_language_id') . "') AS return_status FROM `" . DB_PREFIX . "return` r WHERE r.return_id IN (" . implode(',', $return_ids) . ") ORDER BY r.return_id DESC");
+
+		return $query->rows;
+	}
+
 	public function getReturns($data = array()) {
 		$sql = "SELECT *, CONCAT(r.firstname, ' ', r.lastname) AS customer, (SELECT rs.name FROM " . DB_PREFIX . "return_status rs WHERE rs.return_status_id = r.return_status_id AND rs.language_id = '" . (int)$this->config->get('config_language_id') . "') AS return_status FROM `" . DB_PREFIX . "return` r";
 

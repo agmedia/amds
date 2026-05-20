@@ -5,7 +5,8 @@
       <div class="pull-right">
         <button type="button" data-toggle="tooltip" title="{{ button_filter }}" onclick="$('#filter-return').toggleClass('hidden-sm hidden-xs');" class="btn btn-default hidden-md hidden-lg"><i class="fa fa-filter"></i></button>
         <a href="{{ add }}" data-toggle="tooltip" title="{{ button_add }}" class="btn btn-primary"><i class="fa fa-plus"></i></a>
-        <button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger" onclick="confirm('{{ text_confirm }}') ? $('#form-return').submit() : false;"><i class="fa fa-trash-o"></i></button>
+        <button type="button" data-toggle="tooltip" title="{{ button_export }}" class="btn btn-success" onclick="if ($('input[name*=\'selected\']:checked').length) { $('#form-return').attr('action', $('#form-return').data('export')).submit(); $('#form-return').attr('action', $('#form-return').data('delete')); } else { alert('{{ error_export_selected }}'); }"><i class="fa fa-file-excel-o"></i></button>
+        <button type="button" data-toggle="tooltip" title="{{ button_delete }}" class="btn btn-danger" onclick="$('#form-return').attr('action', $('#form-return').data('delete')); confirm('{{ text_confirm }}') ? $('#form-return').submit() : false;"><i class="fa fa-trash-o"></i></button>
       </div>
       <h1>{{ heading_title }}</h1>
       <ul class="breadcrumb">
@@ -141,7 +142,7 @@
             <h3 class="panel-title"><i class="fa fa-list"></i> {{ text_list }}</h3>
           </div>
           <div class="panel-body">
-            <form action="{{ delete }}" method="post" enctype="multipart/form-data" id="form-return">
+            <form action="{{ delete }}" data-delete="{{ delete }}" data-export="{{ export }}" method="post" enctype="multipart/form-data" id="form-return">
               <div class="table-responsive">
                 <table class="table table-bordered table-hover">
                   <thead>
@@ -171,7 +172,15 @@
                     <td class="text-right">{{ return.return_id }}</td>
                     <td class="text-right">{{ return.order_id }}</td>
                     <td class="text-left">{{ return.customer }}</td>
-                    <td class="text-left">{{ return.product }}</td>
+                    <td class="text-left">
+                      {% if return.return_items %}
+                      {% for return_item in return.return_items %}
+                      <div>{{ return_item.code }}{% if return_item.quantity %} x {{ return_item.quantity }}{% endif %}{% if return_item.price %} - {{ return_item.price }}{% endif %}</div>
+                      {% endfor %}
+                      {% else %}
+                      {{ return.product }}
+                      {% endif %}
+                    </td>
                     <td class="text-left">{{ return.model }}</td>
                     <td class="text-left">{{ return.return_status }}</td>
                     <td class="text-left">{{ return.date_added }}</td>
@@ -321,4 +330,4 @@ $('.date').datetimepicker({
 });
 //--></script> 
 </div>
-{{ footer }} 
+{{ footer }}
