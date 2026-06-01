@@ -349,6 +349,27 @@ class ControllerProductProduct extends Controller {
 				);
 			}
 
+			$data['color_variants'] = array();
+
+			$color_variants = $this->model_catalog_product->getProductColorVariants($this->request->get['product_id']);
+
+			foreach ($color_variants as $variant) {
+				if ($variant['image']) {
+					$variant_image = $this->model_tool_image->resize($variant['image'], 70, 105);
+				} else {
+					$variant_image = $this->model_tool_image->resize('placeholder.png', 70, 105);
+				}
+
+				$data['color_variants'][] = array(
+					'product_id' => $variant['product_id'],
+					'name'       => $variant['name'],
+					'model'      => $variant['model'],
+					'thumb'      => $variant_image,
+					'active'     => (int)$variant['product_id'] === (int)$data['product_id'],
+					'href'       => $this->url->link('product/product', 'product_id=' . $variant['product_id'])
+				);
+			}
+
 			if ($this->customer->isLogged() || !$this->config->get('config_customer_price')) {
 				$data['price'] = $this->currency->format($this->tax->calculate($product_info['price'], $product_info['tax_class_id'], $this->config->get('config_tax')), $this->session->data['currency']);
                        if($product_info['price_ponuda'] > 0){

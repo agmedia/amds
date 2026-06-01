@@ -144,6 +144,19 @@
                             <p class="meta_description">{{ meta_description }}</p>
                         {% endif %}
 
+                        {% if color_variants %}
+                            <div class="product-color-variants">
+                                <label class="control-label vt-title">Varijante u bojama</label>
+                                <div class="product-color-variant-list">
+                                    {% for variant in color_variants %}
+                                        <a href="{{ variant.href }}" class="product-color-variant{% if variant.active %} active{% endif %}" title="{{ variant.name }}" aria-label="{{ variant.name }}">
+                                            <img src="{{ variant.thumb }}" alt="{{ variant.name }}" width="70" height="105">
+                                        </a>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        {% endif %}
+
 
                         <div id="product">
 

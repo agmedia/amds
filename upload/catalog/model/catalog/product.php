@@ -424,6 +424,40 @@ class ModelCatalogProduct extends Model {
 		return $query->rows;
 	}
 
+	public function getProductColorVariants($product_id) {
+		$product_query = $this->db->query("SELECT pd.name FROM " . DB_PREFIX . "product p LEFT JOIN " . DB_PREFIX . "product_description pd ON (p.product_id = pd.product_id) WHERE p.product_id = '" . (int)$product_id . "' AND pd.language_id = '" . (int)$this->config->get('config_language_id') . "' LIMIT 1");
+
+		if (!$product_query->num_rows) {
+			return array();
+		}
+
+		$variant_base = $this->getProductColorVariantBase($product_query->row['name']);
+
+		if (!$variant_base) {
+			return array();
+		}
+
+		$query = $this->db->query("SELECT p.product_id, p.model, p.image, pd.name FROM " . DB_PREFIX . "product p LEFT JOIN " . DB_PREFIX . "product_description pd ON (p.product_id = pd.product_id) LEFT JOIN " . DB_PREFIX . "product_to_store p2s ON (p.product_id = p2s.product_id) WHERE pd.language_id = '" . (int)$this->config->get('config_language_id') . "' AND p.status = '1' AND p.quantity > '0' AND p.date_available <= NOW() AND p2s.store_id = '" . (int)$this->config->get('config_store_id') . "' AND pd.name LIKE '%" . $this->db->escape($variant_base . '-') . "%' ORDER BY pd.name ASC");
+
+		$variants = array();
+
+		foreach ($query->rows as $row) {
+			if ($this->getProductColorVariantBase($row['name']) === $variant_base) {
+				$variants[] = $row;
+			}
+		}
+
+		return count($variants) > 1 ? $variants : array();
+	}
+
+	private function getProductColorVariantBase($name) {
+		if (preg_match('/\b([A-Z][0-9]{2}[A-Z0-9]+)-[A-Z0-9]+\b/u', $name, $matches)) {
+			return $matches[1];
+		}
+
+		return '';
+	}
+
     public function getProductRelated($product_id, $price) {
 
         $product_data = array();
