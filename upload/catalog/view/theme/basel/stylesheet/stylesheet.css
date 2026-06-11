@@ -6099,7 +6099,8 @@ h4.tstores::before {
 	transition:all 750ms;
 }
 .single-product .image .badge,
-.main-image .badge {
+.main-image .badge,
+.cd-images .cd-image .badge {
 	position: absolute;
 	z-index: 3;
 	display: table;
@@ -6110,15 +6111,18 @@ h4.tstores::before {
 	border-radius: 0;
 }
 .single-product .image .badge + .badge,
-.main-image .badge + .badge {
+.main-image .badge + .badge,
+.cd-images .cd-image .badge + .badge {
 	top:60px;
 }
 .single-product .image .badge + .badge + .badge,
-.main-image .badge + .badge + .badge {
+.main-image .badge + .badge + .badge,
+.cd-images .cd-image .badge + .badge + .badge {
 	top:115px;
 }
 .single-product .image .badge i,
-.main-image .badge i {
+.main-image .badge i,
+.cd-images .cd-image .badge i {
 	font-style:normal;
 	display:table-cell;
 	vertical-align:middle;
