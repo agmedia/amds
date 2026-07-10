@@ -19,7 +19,6 @@ use Agmedia\Models\Product\Product;
 use Agmedia\Models\Product\ProductCategory;
 use Agmedia\Models\Product\ProductOption;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
 
 /**
  * Class LOC_Order
@@ -61,7 +60,12 @@ class LOC_Order
     /**
      * @var array
      */
-    private $call_raspis = true;
+    private $shouldCreateRaspis = true;
+
+    /**
+     * @var string
+     */
+    private $raspisDecisionReason = 'not_evaluated';
 
     /**
      * @var int
@@ -170,9 +174,11 @@ class LOC_Order
                 );
             }
 
-            // 3) Raspis samo ako nije već
-            if (empty($orderRow->row['luceed_raspis_uid'])) {
+            $raspisUid = $orderRow->row['luceed_raspis_uid'] ?? null;
+            $this->logRaspisDecision($luceedUid, $raspisUid);
 
+            // 3) Raspis samo ako je potreban i nije već napravljen
+            if (!$raspisUid && $this->shouldCreateRaspis) {
                 $this->log('Calling orderWrit for luceed_uid: ' . $luceedUid);
 
                 $raspis = json_decode($this->service->orderWrit($luceedUid));
@@ -187,9 +193,14 @@ class LOC_Order
                     );
 
                     $this->log('Raspis OK', $raspis);
+                    $this->logRaspisDecision($luceedUid, $raspisUid);
                 } else {
                     $this->log('Raspis ERROR', $raspis);
                 }
+            } elseif ($raspisUid) {
+                $this->log('Skipping orderWrit because luceed_raspis_uid already exists: ' . $raspisUid);
+            } else {
+                $this->log('Skipping orderWrit because scenario does not require additional raspis.');
             }
 
             // COMMIT
@@ -240,7 +251,8 @@ class LOC_Order
             //$this->order['skl_dokument'] = 'MSO';
             $this->order['vrsta_isporuke_uid']    = '4-2987';
             $this->order['korisnik__partner_uid'] = $this->customer_uid;
-            $this->call_raspis                    = false;
+            $this->shouldCreateRaspis             = false;
+            $this->raspisDecisionReason           = 'all_items_in_main_warehouse';
         }
 
         if ( ! $this->has_all_in_main_warehouse && $this->has_all_in_warehouses/* && isset($this->has_all_in_warehouses[0])*/) {
@@ -249,11 +261,14 @@ class LOC_Order
             $this->order['skl_dokument']          = 'MS';
             $this->order['vrsta_isporuke_uid']    = '4-2987';
             $this->order['korisnik__partner_uid'] = $this->customer_uid;
+            $this->shouldCreateRaspis             = false;
+            $this->raspisDecisionReason           = 'all_items_in_single_source_warehouse';
         }
 
         if ( ! $this->has_all_in_main_warehouse && ! $this->has_all_in_warehouses) {
             $this->order['korisnik__partner_uid'] = $this->customer_uid;
-            $this->call_raspis                    = false;
+            $this->shouldCreateRaspis             = true;
+            $this->raspisDecisionReason           = 'split_or_external_fulfilment_requires_raspis';
         }
 
         if (
@@ -276,6 +291,8 @@ class LOC_Order
                 unset($this->order['vrsta_isporuke_uid']);
             }
         }
+
+        $this->setDefaultRaspisDecisionReason();
 
         $this->log('Order create method: $this->>order - LOC_Order #156', $this->order);
     }
@@ -534,6 +551,11 @@ class LOC_Order
 
     public function collectProductsFromWarehouses(): bool
     {
+        $this->has_all_in_main_warehouse = false;
+        $this->has_all_in_warehouses = null;
+        $this->shouldCreateRaspis = true;
+        $this->raspisDecisionReason = 'awaiting_availability_scan';
+
         $availables     = [];
         $order_products = OrderProduct::where('order_id', $this->oc_order['order_id'])->get();
 
@@ -1108,6 +1130,60 @@ class LOC_Order
         if ($data) {
             Log::store($data, 'procces_order_' . $this->oc_order['order_id']);
         }
+    }
+
+
+    /**
+     * Ensure we always log an explicit raspis decision after order shaping.
+     */
+    private function setDefaultRaspisDecisionReason(): void
+    {
+        if ($this->raspisDecisionReason !== 'awaiting_availability_scan'
+            && $this->raspisDecisionReason !== 'not_evaluated'
+        ) {
+            return;
+        }
+
+        if ($this->has_all_in_main_warehouse) {
+            $this->shouldCreateRaspis = false;
+            $this->raspisDecisionReason = 'all_items_in_main_warehouse';
+
+            return;
+        }
+
+        if ($this->has_all_in_warehouses) {
+            $this->shouldCreateRaspis = false;
+            $this->raspisDecisionReason = 'all_items_in_single_source_warehouse';
+
+            return;
+        }
+
+        $this->shouldCreateRaspis = true;
+        $this->raspisDecisionReason = 'split_or_external_fulfilment_requires_raspis';
+    }
+
+
+    /**
+     * Store the selected fulfilment scenario for easier production forensics.
+     *
+     * @param string|null $luceedUid
+     * @param string|null $raspisUid
+     *
+     * @return void
+     */
+    private function logRaspisDecision(?string $luceedUid, ?string $raspisUid): void
+    {
+        $this->log('Raspis decision', [
+            'order_id' => $this->oc_order['order_id'] ?? null,
+            'reason' => $this->raspisDecisionReason,
+            'should_create_raspis' => $this->shouldCreateRaspis,
+            'source_warehouse_uid' => $this->has_all_in_warehouses,
+            'all_in_main_warehouse' => $this->has_all_in_main_warehouse,
+            'shipping_method' => $this->oc_order['shipping_method'] ?? null,
+            'boxnow' => !empty($this->oc_order['boxnow'] ?? null),
+            'luceed_uid' => $luceedUid,
+            'luceed_raspis_uid' => $raspisUid,
+        ]);
     }
 
 }
