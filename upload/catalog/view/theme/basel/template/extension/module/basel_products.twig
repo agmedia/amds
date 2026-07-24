@@ -41,7 +41,7 @@
                         {% endif %}
                     </a>
 
-                    {% if product.price_ponuda and not product.special and has_ljetni and product.ljetni.discount %}
+                    {% if product.price_ponuda and  product.special and has_ljetni and product.ljetni.discount %}
                         <span class="badge sale_badge"><i>{{ product.ljetni.discount }}%</i></span>
                     {% endif %}
 
@@ -112,7 +112,8 @@
                                 {% else %}
                                     <span>{{ product.price }} </span>
                                     {% if product.price_ponuda and not show_nc_30_price %}
-                                        <span class="price-old">{{ product.price_ponuda }} </span>
+                                        <!--   <span class="price-old">{{ product.price_ponuda }} </span>-->
+                                        <span><small style="font-weight:400">NC 30 dana: {{ product.price_ponuda }}</small></span>
                                     {% endif %}
                                 {% endif %}
                                 {% if product.tax %}
