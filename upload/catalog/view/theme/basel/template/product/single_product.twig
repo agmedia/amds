@@ -109,18 +109,5 @@
 <a class="icon is_wishlist link-hover-color" onclick="wishlist.add('{{ product.product_id }}');"><span class="icon-heart"></span> {{ button_wishlist }}</a>
 </div><!-- .plain-links-->
 </div><!-- .caption-->
-{% if product.sale_end_date and countdown_status %}
-<script>
-  $(function() {
-	$(".sale-counter.id{{ product.product_id }}").countdown("{{ product.sale_end_date }}").on('update.countdown', function(event) {
-  var $this = $(this).html(event.strftime(''
-    + '<div>'
-    + '%D<i>{{ basel_text_days }}</i></div><div>'
-    + '%H <i>{{ basel_text_hours }}</i></div><div>'
-    + '%M <i>{{ basel_text_mins }}</i></div><div>'
-    + '%S <i>{{ basel_text_secs }}</i></div></div>'));
-});
-});
-</script>
-{% endif %}
+
 </div><!-- .single-product ends -->
