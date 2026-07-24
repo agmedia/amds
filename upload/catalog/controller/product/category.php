@@ -319,6 +319,7 @@ class ControllerProductCategory extends Controller {
 
                 $is_ljetni = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::isLjetni($result['product_id']);
                 $is_badge = \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::isBadge($result['product_id']);
+                $is_new = $this->model_catalog_product->isNovoProduct((int)$result['product_id']);
 
                 $lowest_price_30d = '';
                 $lowest_price_30d_value = 0.0;
@@ -359,6 +360,7 @@ class ControllerProductCategory extends Controller {
                     'cat'             => $cat,
                     'ljetni'          => $is_ljetni,
                     'badge'           => $is_badge,
+                    'new_label'       => $is_new,
                     'tax'             => $tax,
                     'minimum'         => $result['minimum'] > 0 ? $result['minimum'] : 1,
                     'rating'          => $result['rating'],
