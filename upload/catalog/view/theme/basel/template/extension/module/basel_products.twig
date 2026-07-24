@@ -40,6 +40,10 @@
                             <img loading="lazy" class="thumb2" src="{{ product.thumb2 }}" alt="{{ product.name }}" title="{{ product.name }}" />
                         {% endif %}
                     </a>
+                    {% if product.price_ponuda  %}
+
+                        <span class="badge sale_badge" style="background-color: red"><i>SNIŽENO</i></span>
+                    {% endif %}
 
                     {% if product.price_ponuda and  product.special and has_ljetni and product.ljetni.discount %}
                         <span class="badge sale_badge"><i>{{ product.ljetni.discount }}%</i></span>

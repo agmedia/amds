@@ -13,6 +13,11 @@
   <span class="badge sale_badge"><i>{{ product.sale_badge }}</i></span>
 {% endif %}
 
+    {% if product.price_ponuda  %}
+
+        <span class="badge sale_badge" style="background-color: red"><i>SNIŽENO</i></span>
+    {% endif %}
+
     {% if  product.cat =='1' %}
   <!-- <span class="badge sale_badge"><i>-30%</i></span>-->
     {% endif %}
