@@ -168,6 +168,7 @@ class ModelCheckoutOrder extends Model {
             return array(
                 'order_id'                => $order_query->row['order_id'],
                 'luceed_uid'              => $order_query->row['luceed_uid'],
+                'luceed_raspis_uid'       => $order_query->row['luceed_raspis_uid'],
                 'invoice_no'              => $order_query->row['invoice_no'],
                 'invoice_prefix'          => $order_query->row['invoice_prefix'],
                 'store_id'                => $order_query->row['store_id'],

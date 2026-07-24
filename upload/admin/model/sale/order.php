@@ -75,6 +75,7 @@ class ModelSaleOrder extends Model {
 				'invoice_no'              => $order_query->row['invoice_no'],
                 'invoice_prefix'          => $order_query->row['invoice_prefix'],
                 'luceed_uid'              => $order_query->row['luceed_uid'],
+                'luceed_raspis_uid'       => $order_query->row['luceed_raspis_uid'],
 				'store_id'                => $order_query->row['store_id'],
 				'store_name'              => $order_query->row['store_name'],
 				'store_url'               => $order_query->row['store_url'],
