@@ -24,7 +24,7 @@
         <i>{{ product.lowest_price_30d_pct }}%</i>
     </span> -->
     {% endif %}
-    {% if product.price_ponuda and not product.special and has_ljetni and product.ljetni.discount %}
+    {% if product.price_ponuda and product.special and has_ljetni and product.ljetni.discount %}
         <span class="badge sale_badge"><i>{{ product.ljetni.discount }}%</i></span>
     {% endif %}
 
