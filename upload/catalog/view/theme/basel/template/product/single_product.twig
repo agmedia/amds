@@ -92,13 +92,14 @@
     <span>{{ product.price }} </span>
         {% if product.price_ponuda and not show_nc_30_price %}
          <!--   <span class="price-old">{{ product.price_ponuda }} </span>-->
+            <span><small>NC 30 dana: {{ product.price_ponuda }}</small></span>
         {% endif %}
     {% endif %}
     {% if product.tax %}
     <span class="price-tax">{{ text_tax }} {{ product.tax }}</span>
     {% endif %}
 </div><!-- .price -->
-{% if product.price_ponuda  %}
+{% if show_nc_30_price %}
     <p style="margin-bottom:5px"><small>NC 30 dana: {{ product.price_ponuda }}</small></p>
 {% endif %}
 {% endif %}
