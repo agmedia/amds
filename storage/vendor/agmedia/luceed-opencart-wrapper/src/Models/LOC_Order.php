@@ -87,6 +87,11 @@ class LOC_Order
      */
     private $has_all_in_warehouses = null;
 
+    /**
+     * @var string|null
+     */
+    private $storeLockKey = null;
+
 
     /**
      * LOC_Order constructor.
@@ -130,13 +135,17 @@ class LOC_Order
     public function store()
     {
         $this->db = new Database(DB_DATABASE);
+        $qid = (int) $this->oc_order['order_id'];
 
         try {
+            if (!$this->acquireOrderStoreLock($qid)) {
+                $this->log('Store skipped: concurrent order processing already in progress.');
+
+                return false;
+            }
+
             // START TRANSACTION
             $this->db->query("START TRANSACTION");
-
-            // 1) Zaključaj red u order tablici
-            $qid = (int) $this->oc_order['order_id'];
 
             $orderRow = $this->db->query(
                 "SELECT * FROM `" . DB_PREFIX . "order` WHERE order_id = {$qid} FOR UPDATE"
@@ -161,7 +170,10 @@ class LOC_Order
                 $this->log('Store order response', $this->response);
 
                 if (!isset($this->response->result[0])) {
+                    $errorMessage = $this->extractLuceedErrorMessage($this->response);
+                    $this->log('Store createOrder hard stop: ' . $errorMessage);
                     $this->db->query("ROLLBACK");
+
                     return false;
                 }
 
@@ -211,6 +223,8 @@ class LOC_Order
             $this->db->query("ROLLBACK");
             $this->log('Store ERROR: ' . $e->getMessage());
             throw $e;
+        } finally {
+            $this->releaseOrderStoreLock($qid);
         }
     }
 
@@ -1177,6 +1191,7 @@ class LOC_Order
             'order_id' => $this->oc_order['order_id'] ?? null,
             'reason' => $this->raspisDecisionReason,
             'should_create_raspis' => $this->shouldCreateRaspis,
+            'lock_key' => $this->storeLockKey,
             'source_warehouse_uid' => $this->has_all_in_warehouses,
             'all_in_main_warehouse' => $this->has_all_in_main_warehouse,
             'shipping_method' => $this->oc_order['shipping_method'] ?? null,
@@ -1184,6 +1199,99 @@ class LOC_Order
             'luceed_uid' => $luceedUid,
             'luceed_raspis_uid' => $raspisUid,
         ]);
+    }
+
+
+    /**
+     * Acquire a per-order advisory lock that also works on MyISAM tables.
+     *
+     * @param int $orderId
+     *
+     * @return bool
+     */
+    private function acquireOrderStoreLock(int $orderId): bool
+    {
+        $this->storeLockKey = 'luceed_order_store_' . $orderId;
+        $lockKey = $this->db->escape($this->storeLockKey);
+
+        $result = $this->db->query(
+            "SELECT GET_LOCK('" . $lockKey . "', 3) AS lock_status"
+        );
+
+        $status = (string) ($result->row['lock_status'] ?? '');
+
+        if ($status !== '1') {
+            $this->log('Order store lock skipped', [
+                'order_id' => $orderId,
+                'lock_key' => $this->storeLockKey,
+                'lock_status' => $status,
+            ]);
+
+            return false;
+        }
+
+        $this->log('Order store lock acquired', [
+            'order_id' => $orderId,
+            'lock_key' => $this->storeLockKey,
+        ]);
+
+        return true;
+    }
+
+
+    /**
+     * Release advisory lock acquired for current order processing.
+     *
+     * @param int $orderId
+     *
+     * @return void
+     */
+    private function releaseOrderStoreLock(int $orderId): void
+    {
+        if (!$this->storeLockKey) {
+            return;
+        }
+
+        try {
+            $lockKey = $this->db->escape($this->storeLockKey);
+            $result = $this->db->query(
+                "SELECT RELEASE_LOCK('" . $lockKey . "') AS release_status"
+            );
+
+            $this->log('Order store lock released', [
+                'order_id' => $orderId,
+                'lock_key' => $this->storeLockKey,
+                'release_status' => (string) ($result->row['release_status'] ?? ''),
+            ]);
+        } catch (\Throwable $e) {
+            $this->log('Order store lock release failed: ' . $e->getMessage(), [
+                'order_id' => $orderId,
+                'lock_key' => $this->storeLockKey,
+            ]);
+        } finally {
+            $this->storeLockKey = null;
+        }
+    }
+
+
+    /**
+     * Extract a stable error message from Luceed response payload.
+     *
+     * @param mixed $response
+     *
+     * @return string
+     */
+    private function extractLuceedErrorMessage($response): string
+    {
+        if (is_object($response) && isset($response->error) && $response->error) {
+            return (string) $response->error;
+        }
+
+        if (is_array($response) && isset($response['error']) && $response['error']) {
+            return (string) $response['error'];
+        }
+
+        return 'Unknown createOrder error.';
     }
 
 }
