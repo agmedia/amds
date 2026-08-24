@@ -6120,6 +6120,25 @@ h4.tstores::before {
 .cd-images .cd-image .badge + .badge + .badge {
 	top:115px;
 }
+.single-product .image .badge + .badge + .badge + .badge,
+.main-image .badge + .badge + .badge + .badge,
+.cd-images .cd-image .badge + .badge + .badge + .badge {
+	top:170px;
+}
+.single-product .image .badge + .badge + .badge + .badge + .badge,
+.main-image .badge + .badge + .badge + .badge + .badge,
+.cd-images .cd-image .badge + .badge + .badge + .badge + .badge {
+	top:225px;
+}
+.single-product .image .coupon_badge,
+.main-image .coupon_badge,
+.cd-images .cd-image .coupon_badge {
+	width:auto;
+	max-width:calc(100% - 20px);
+	height:auto;
+	min-height:20px;
+	padding:6px 10px;
+}
 .single-product .image .badge i,
 .main-image .badge i,
 .cd-images .cd-image .badge i {

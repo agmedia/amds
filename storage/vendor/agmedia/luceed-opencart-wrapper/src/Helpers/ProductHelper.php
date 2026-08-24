@@ -896,14 +896,29 @@ class ProductHelper
      */
     public static function isBadge(int $product_id): bool
     {
-        $db = new Database(DB_DATABASE);
-        $query = $db->query("SELECT `product_id` FROM `" . DB_PREFIX . "coupon_product` WHERE `coupon_id` = 112 AND `product_id` = '" . (int)$product_id . "'");
+        static $badge_products = null;
 
-        if ($query->num_rows && date("d") > 13) {
-            return true;
+        if ($badge_products === null) {
+            $badge_products = [];
+
+            $db = new Database(DB_DATABASE);
+            $query = $db->query(
+                "SELECT cp.`product_id` " .
+                "FROM `" . DB_PREFIX . "coupon_product` cp " .
+                "INNER JOIN `" . DB_PREFIX . "coupon` c ON c.`coupon_id` = cp.`coupon_id` " .
+                "WHERE cp.`coupon_id` = 80 " .
+                "AND c.`code` = 'AMDS20' " .
+                "AND ((c.`date_start` = '0000-00-00' OR c.`date_start` < NOW()) " .
+                "AND (c.`date_end` = '0000-00-00' OR c.`date_end` > NOW())) " .
+                "AND c.`status` = 1"
+            );
+
+            foreach ($query->rows as $row) {
+                $badge_products[(int)$row['product_id']] = true;
+            }
         }
 
-        return false;
+        return isset($badge_products[$product_id]);
     }
 
 

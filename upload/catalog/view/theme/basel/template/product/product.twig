@@ -27,6 +27,9 @@
 
                                     <span class="badge sale_badge" style="background-color: red"><i>SNIŽENO</i></span>
                                 {% endif %}
+                                {% if is_badge %}
+                                    <span class="badge new_badge coupon_badge"><i>-20% uz kod AMDS20</i></span>
+                                {% endif %}
                                 <a href="{{ popup }}" class="link product-gallery cloud-zoom "  rel="position:'inside', showTitle: false" >
                                     <picture>
                                         <source srcset="{{ thumb }}" media="(max-width: 760px)">
@@ -124,11 +127,6 @@
 
                         {% if lowest_price_30d %}
                             <p class="meta_description">{{ lowest_price_30d }}</p>
-                        {% endif %}
-
-
-                        {% if is_badge =='1' %}
-                            <!-- <p><span class="badge new_badge outlet"><i>-20% uz kod BLACK20</i></span></p> -->
                         {% endif %}
 
 
