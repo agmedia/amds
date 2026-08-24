@@ -2,6 +2,9 @@
 class ControllerCheckoutCart extends Controller {
 	public function index() {
 		$this->load->language('checkout/cart');
+		$this->load->language('basel/basel_theme');
+
+		$data['basel_text_new'] = $this->language->get('basel_text_new');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
@@ -125,6 +128,7 @@ class ControllerCheckoutCart extends Controller {
 
                         $data['related'][] = array(
                             'product_id'  => $result['product_id'],
+							'new_label'   => $this->model_catalog_product->isNovoProduct((int)$result['product_id']),
                             'thumb'       => $image,
                             'name'        => $result['name'],
                             'price'       => $price,

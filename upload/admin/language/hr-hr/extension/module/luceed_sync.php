@@ -29,8 +29,8 @@ $_['text_success_payments']          = 'Uspjeh..! Nova lista načina plaćanja j
 $_['text_warning_payments']          = 'Upozorenje..! Greška kod osvježavanja liste načina plaćanja!';
 $_['text_success_orders']            = 'Uspjeh..! Statusi narudžbi su obnovljeni!';
 $_['text_warning_orders']            = 'Upozorenje..! Nema novih statusa za obnoviti..!';
-$_['text_success_novo_products']      = 'A26 artikli su obrađeni. U kategoriju Novo dodano: %s od %s pronađenih artikala.';
-$_['text_warning_novo_products']      = 'Nijedan artikl s oznakom A26 nije pronađen za dodavanje u kategoriju Novo.';
+$_['text_success_novo_products']      = 'B26 artikli su obrađeni. U kategoriju Novo dodano: %s od %s pronađenih artikala. Uklonjeno iz ostalih sezona: %s.';
+$_['text_warning_novo_products']      = 'Nijedan artikl s oznakom B26 nije pronađen. Uklonjeno starih oznaka Novo: %s.';
 $_['text_success_products_csv_sync']  = 'Sinkronizirano %s od %s artikala iz CSV-a.';
 $_['text_warning_products_csv_sync']  = 'Nije sinkroniziran nijedan artikl iz CSV-a (%s od %s).';
 $_['text_products_csv_sync_started']    = 'CSV je učitan. Pokrećem sinkronizaciju u batchovima po %s artikala. Ukupno za obradu: %s.';
@@ -61,7 +61,7 @@ $_['btn_products_update_q']       = 'Update Količina';
 $_['btn_categories_import']       = 'Import Novih Kategorija';
 $_['btn_categories_active']       = 'Provjera Minimalnog Stanja';
 $_['btn_manufacturer_import']     = 'Import Novih Proizvođača';
-$_['btn_novo_products_sync']       = 'A26 -> Novo';
+$_['btn_novo_products_sync']       = 'B26 -> Novo';
 $_['btn_products_csv_sync']        = 'Pokreni CSV Sync';
 $_['btn_web_coupon_export']          = 'Export Web Kupona';
 $_['btn_importing']               = 'Importing... <i class="fa fa-spinner fa-spin"></i>';
@@ -72,14 +72,14 @@ $_['btn_checking']                = 'Provjera... <i class="fa fa-spinner fa-spin
 $_['help_products_import']     = 'Import se radi samo novih proizvoda. Proizvodi već importani neće se dirati.';
 $_['help_products_active']     = 'Provjerava se stanje svih artikala s obzirom na vrijednost Min_Kol_Web parametra u Luceed atributima.';
 $_['help_products_actions']    = 'Postojeće akcije se brišu. Radi se novi import svih važećih akcija iz Luceed-a.';
-$_['help_products_csv_sync']    = 'Upload CSV-a s modelima iz products tablice. Podržan je header `model`, `artikl`, `sifra` ili `sku`, kao i obična prva kolona bez headera. Ako CSV ima drugu kolonu, samo redovi s vrijednosti `A26` dobivaju kategoriju Novo. Obrada ide u batchovima po 5 artikala po requestu da veliki CSV ne puca. Za svaki model radi se direktan Luceed poziv i odmah se osvježavaju opcije i količine.';
+$_['help_products_csv_sync']    = 'Upload CSV-a s modelima iz products tablice. Podržan je header `model`, `artikl`, `sifra` ili `sku`, kao i obična prva kolona bez headera. Ako CSV ima drugu kolonu, samo redovi s vrijednosti `B26` dobivaju kategoriju Novo. Obrada ide u batchovima po 5 artikala po requestu da veliki CSV ne puca. Za svaki model radi se direktan Luceed poziv i odmah se osvježavaju opcije i količine.';
 $_['help_products_update_pq']  = 'Update cijena i količina se vrši na svim proizvodima.';
 $_['help_products_update_p']   = 'Update cijena se vrši na svim proizvodima.';
 $_['help_products_update_q']   = 'Update količina se vrši na svim proizvodima.';
 $_['help_categories_import']   = 'Import se radi samo novih kategorija.<br>Kategorije već importane neće se dirati.';
 $_['help_categories_active']   = 'Provjerava se stanje svih kategorija s obzirom na vrijednost Min_Kol_Web parametra u proizvodu u Luceed atributima.';
 $_['help_manufacturer_import'] = 'Import se radi samo novih proizvođača.<br>Proizvođači već importani neće se dirati.';
-$_['help_novo_products_sync']    = 'Pregleda sve artikle i svaki proizvod koji u nazivu ili modelu sadrži A26 dodaje u kategoriju Novo (ID 153), bez micanja iz postojećih kategorija.';
+$_['help_novo_products_sync']    = 'Usklađuje kategoriju Novo (ID 153): dodaje sve B26 artikle, a uklanja oznaku Novo sa svih ostalih sezona.';
 $_['help_web_coupon_export']    = 'Export narudžbi po odabranom rasponu datuma u Excel-kompatibilan CSV. Obrada ide u batchovima po 1000 narudžbi da veći export ne puca.';
 
 // Error

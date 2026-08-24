@@ -185,11 +185,9 @@ class ModelExtensionBaselBaselMegamenu extends Model {
 			} else {
 				$date_end = false;
 			}
-			if (!empty($product['date_available']) && strtotime($product['date_available']) > strtotime('-' . $this->config->get('newlabel_status') . ' day')) {
-				$is_new = true;
-			} else {
-				$is_new = false;
-			}
+			$is_new = $product
+				? $model->isNovoProduct((int)$content['product']['id'])
+				: false;
 			
 			$description = false;
             $description_array = unserialize($row['description']);

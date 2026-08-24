@@ -64,16 +64,18 @@ class ControllerExtensionModuleBaselInstaller extends Controller {
 			'id' => 'basel_theme',
 			'extension_install_id' => 'basel_theme',
             'author' => 'Openthemer.com',
-            'version' => 'v. 1.3.1.0',
+            'version' => 'v. 1.3.1.1',
             'xml' => $xml,
             'link' => '',
             'status' => '1',
         );
 		
 		$mod = $this->$modification_prefix->getModificationByCode('basel_theme');
-        if (!$mod) {
+        if ($mod) {
+            $this->$modification_prefix->deleteModification($mod['modification_id']);
+        }
+
         $this->$modification_prefix->addModification($data);
-		}
 		
 		
 		// ##################################

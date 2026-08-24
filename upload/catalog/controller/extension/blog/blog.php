@@ -199,6 +199,7 @@ class ControllerExtensionBlogBlog extends Controller {
 			// Related products
 			
 			$this->load->model('extension/basel/basel');
+			$this->load->model('catalog/product');
 			$this->load->language('basel/basel_theme');
 			$data['basel_button_quickview'] = $this->language->get('basel_button_quickview');
 			$data['basel_text_sale'] = $this->language->get('basel_text_sale');
@@ -268,11 +269,7 @@ class ControllerExtensionBlogBlog extends Controller {
 				} else {
 					$rating = false;
 				}
-				if (strtotime($result['date_available']) > strtotime('-' . $this->config->get('newlabel_status') . ' day')) {
-					$is_new = true;
-				} else {
-					$is_new = false;
-				}
+				$is_new = $this->model_catalog_product->isNovoProduct((int)$result['product_id']);
 
 				$data['products'][] = array(
 					'product_id'  => $result['product_id'],

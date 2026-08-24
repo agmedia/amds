@@ -4,8 +4,10 @@ class ControllerExtensionModuleRecentlyViewed extends Controller {
 		static $module = 0;
 		
 		$this->load->language('extension/module/recently_viewed');
+		$this->load->language('basel/basel_theme');
 
 		$data['heading_title'] = $this->language->get('heading_title');
+		$data['basel_text_new'] = $this->language->get('basel_text_new');
 
 		$data['text_tax'] = $this->language->get('text_tax');
 
@@ -144,6 +146,7 @@ class ControllerExtensionModuleRecentlyViewed extends Controller {
 
                 $data['products'][] = array(
 					'product_id'  => $result['product_id'],
+					'new_label'   => $this->model_catalog_product->isNovoProduct((int)$result['product_id']),
 					'badge'       => \Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper::isBadge((int)$result['product_id']),
 					'thumb'       => $image,
 					'name'        => $result['name'],

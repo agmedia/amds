@@ -195,7 +195,9 @@ class ControllerProductManufacturer extends Controller {
 					'tax'         => $tax,
 					'minimum'     => $result['minimum'] > 0 ? $result['minimum'] : 1,
 					'rating'      => $result['rating'],
-					'href'        => $this->url->link('product/product', 'manufacturer_id=' . $result['manufacturer_id'] . '&product_id=' . $result['product_id'] . $url)
+					'href'        => $this->url->link('product/product', 'manufacturer_id=' . $result['manufacturer_id'] . '&product_id=' . $result['product_id'] . $url),
+					// Keep this after fields injected by legacy Basel OCMOD.
+					'new_label'   => $this->model_catalog_product->isNovoProduct((int)$result['product_id'])
 				);
 			}
 

@@ -36,7 +36,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
     private const CSV_SYNC_BATCH_SIZE = 5;
     private const WEB_COUPON_EXPORT_BATCH_SIZE = 1000;
     private const NOVO_CATEGORY_ID = 153;
-    private const NOVO_SEASON_MARKER = 'A26';
+    private const NOVO_SEASON_MARKER = 'B26';
 
     private $error = array();
     private $product_columns = null;
@@ -353,8 +353,15 @@ class ControllerExtensionModuleLuceedSync extends Controller
                 if ($product->getProducts()->count()) {
                     $product_array = collect($product->getProducts()->first())->toArray();
                     $cats_arr      = ProductHelper::getCategoriesFromAttributes($product_array);
+                    $should_assign_novo = $this->shouldAssignNovoCategory($product_array);
 
                     if ($cats_arr && ! empty($cats_arr)) {
+                        $category_payload = $this->applyNovoCategoryAssignment(
+                            ['product_category' => $cats_arr],
+                            $should_assign_novo
+                        );
+                        $cats_arr = $category_payload['product_category'];
+
                         $this->db->query("DELETE FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int) $id . "'");
 
                         foreach ($cats_arr as $cat_id) {
@@ -364,6 +371,18 @@ class ControllerExtensionModuleLuceedSync extends Controller
                                 $this->db->query("INSERT INTO " . DB_PREFIX . "product_to_category SET product_id = '" . (int) $id . "', category_id = '" . (int) $cat_id . "'");
                             }
                         }
+                    } elseif ($should_assign_novo) {
+                        $this->db->query(
+                            "INSERT IGNORE INTO " . DB_PREFIX . "product_to_category
+                             SET product_id = '" . (int)$id . "',
+                                 category_id = '" . (int)$this->getNovoCategoryId() . "'"
+                        );
+                    } else {
+                        $this->db->query(
+                            "DELETE FROM " . DB_PREFIX . "product_to_category
+                             WHERE product_id = '" . (int)$id . "'
+                               AND category_id = '" . (int)$this->getNovoCategoryId() . "'"
+                        );
                     }
                 }
             }
@@ -397,47 +416,59 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
 
     /**
-     * Add all A26 season products to the Novo category without removing any existing categories.
+     * Keep the Novo category assigned exclusively to the current B26 season.
      *
-     * @return array{matched:int, added:int}
+     * @return array{matched:int, added:int, removed:int}
      */
     public function setNovoProducts(): array
     {
         $cat_id = $this->getNovoCategoryId();
         $like   = '%' . $this->db->escape(self::NOVO_SEASON_MARKER) . '%';
-
-        $matched_query = $this->db->query(
-            "SELECT COUNT(DISTINCT p.product_id) AS total
+        $matching_products_sql =
+            "SELECT DISTINCT p.product_id
              FROM " . DB_PREFIX . "product p
              LEFT JOIN " . DB_PREFIX . "product_description pd ON (p.product_id = pd.product_id)
              WHERE UPPER(COALESCE(p.model, '')) LIKE UPPER('" . $like . "')
-                OR UPPER(COALESCE(pd.name, '')) LIKE UPPER('" . $like . "')"
+                OR UPPER(COALESCE(pd.name, '')) LIKE UPPER('" . $like . "')";
+
+        $matched_query = $this->db->query(
+            "SELECT COUNT(*) AS total FROM (" . $matching_products_sql . ") novo_products"
         );
 
         $matched = (int)($matched_query->row['total'] ?? 0);
+        $added = 0;
 
-        if (!$matched) {
-            return ['matched' => 0, 'added' => 0];
+        if ($matched) {
+            $this->db->query(
+                "INSERT INTO " . DB_PREFIX . "product_to_category (product_id, category_id)
+                 SELECT novo_products.product_id, '" . (int)$cat_id . "'
+                 FROM (" . $matching_products_sql . ") novo_products
+                 LEFT JOIN " . DB_PREFIX . "product_to_category p2c
+                    ON (p2c.product_id = novo_products.product_id AND p2c.category_id = '" . (int)$cat_id . "')
+                 WHERE p2c.product_id IS NULL"
+            );
+
+            $added = (int)$this->db->countAffected();
         }
 
         $this->db->query(
-            "INSERT INTO " . DB_PREFIX . "product_to_category (product_id, category_id)
-             SELECT a26.product_id, '" . (int)$cat_id . "'
-             FROM (
-                SELECT DISTINCT p.product_id
-                FROM " . DB_PREFIX . "product p
-                LEFT JOIN " . DB_PREFIX . "product_description pd ON (p.product_id = pd.product_id)
-                WHERE UPPER(COALESCE(p.model, '')) LIKE UPPER('" . $like . "')
-                   OR UPPER(COALESCE(pd.name, '')) LIKE UPPER('" . $like . "')
-             ) a26
-             LEFT JOIN " . DB_PREFIX . "product_to_category p2c
-                ON (p2c.product_id = a26.product_id AND p2c.category_id = '" . (int)$cat_id . "')
-             WHERE p2c.product_id IS NULL"
+            "DELETE p2c
+             FROM " . DB_PREFIX . "product_to_category p2c
+             LEFT JOIN (" . $matching_products_sql . ") novo_products
+                ON novo_products.product_id = p2c.product_id
+             WHERE p2c.category_id = '" . (int)$cat_id . "'
+               AND novo_products.product_id IS NULL"
         );
+
+        $removed = (int)$this->db->countAffected();
+
+        $this->cache->delete('product');
+        $this->cache->delete('megamenu');
 
         return [
             'matched' => $matched,
-            'added'   => (int)$this->db->countAffected()
+            'added'   => $added,
+            'removed' => $removed
         ];
     }
 
@@ -460,8 +491,11 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
         if (!$result['matched']) {
             return $this->output([
-                'status'  => 300,
-                'message' => $this->language->get('text_warning_novo_products')
+                'status'  => 200,
+                'message' => sprintf(
+                    $this->language->get('text_warning_novo_products'),
+                    $result['removed']
+                )
             ]);
         }
 
@@ -470,7 +504,8 @@ class ControllerExtensionModuleLuceedSync extends Controller
             'message' => sprintf(
                 $this->language->get('text_success_novo_products'),
                 $result['added'],
-                $result['matched']
+                $result['matched'],
+                $result['removed']
             )
         ]);
     }
@@ -631,8 +666,14 @@ class ControllerExtensionModuleLuceedSync extends Controller
                 $this->load->model('catalog/product');
 
                 foreach ($new_products->all() as $product) {
+                    $payload = $_loc->make($product);
+                    $payload = $this->applyNovoCategoryAssignment(
+                        $payload,
+                        $this->shouldAssignNovoCategory($payload)
+                    );
+
                     $this->model_catalog_product->addProduct(
-                        $_loc->make($product)
+                        $payload
                     );
 
                     $count++;
@@ -1396,22 +1437,24 @@ class ControllerExtensionModuleLuceedSync extends Controller
                 $payload = $_loc->make($luceed_product);
                 $payload = $this->applyImmediateQuantityState($payload, $luceed_product->opcije);
                 $payload['sku'] = $model;
+                $should_assign_novo = $this->shouldAssignNovoCategoryFromCsvRow($item, $payload);
 
                 if ($oc_product) {
                     $payload = array_merge($payload, $this->resolveOldProductData(['product_id' => $oc_product->product_id]));
-
-                    if ($this->shouldAssignNovoCategoryFromCsvRow($item, $oc_product)) {
-                        $payload = $this->appendNovoCategory($payload);
-                    }
+                    $payload = $this->applyNovoCategoryAssignment(
+                        $payload,
+                        $should_assign_novo
+                    );
 
                     $this->model_catalog_product->editProduct((int)$oc_product->product_id, $payload);
                     $this->markProductAsSynced((int)$oc_product->product_id, $luceed_product);
 
                     $updated++;
                 } else {
-                    if ($this->shouldAssignNovoCategoryFromCsvRow($item)) {
-                        $payload = $this->appendNovoCategory($payload);
-                    }
+                    $payload = $this->applyNovoCategoryAssignment(
+                        $payload,
+                        $should_assign_novo
+                    );
 
                     $product_id = (int)$this->model_catalog_product->addProduct($payload);
 
@@ -1435,6 +1478,11 @@ class ControllerExtensionModuleLuceedSync extends Controller
                     'luceed_csv_sync_product_error'
                 );
             }
+        }
+
+        if ($updated || $imported) {
+            $this->cache->delete('product');
+            $this->cache->delete('megamenu');
         }
 
         return [
@@ -1586,13 +1634,14 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
 
     /**
-     * Ensure matching products are assigned to the Novo category.
+     * Apply the current-season Novo assignment while removing stale assignments.
      *
      * @param array $payload
+     * @param bool  $should_assign
      *
      * @return array
      */
-    private function appendNovoCategory(array $payload): array
+    private function applyNovoCategoryAssignment(array $payload, bool $should_assign): array
     {
         $novo_category_id = $this->getNovoCategoryId();
 
@@ -1600,15 +1649,23 @@ class ControllerExtensionModuleLuceedSync extends Controller
             $payload['product_category'] = [];
         }
 
-        $payload['product_category'][] = $novo_category_id;
-        $payload['product_category'] = array_values(array_unique(array_map('intval', $payload['product_category'])));
+        $payload['product_category'] = array_values(array_filter(
+            array_unique(array_map('intval', $payload['product_category'])),
+            function ($category_id) use ($novo_category_id) {
+                return $category_id !== $novo_category_id;
+            }
+        ));
+
+        if ($should_assign) {
+            $payload['product_category'][] = $novo_category_id;
+        }
 
         return $payload;
     }
 
 
     /**
-     * Assign the Novo category only to A26 season products.
+     * Assign the Novo category only to B26 season products.
      *
      * @param mixed $product
      *
@@ -1617,16 +1674,29 @@ class ControllerExtensionModuleLuceedSync extends Controller
     private function shouldAssignNovoCategory($product): bool
     {
         if (is_array($product)) {
-            return $this->containsNovoSeasonMarker($product['name'] ?? '')
-                || $this->containsNovoSeasonMarker($product['model'] ?? '')
-                || $this->containsNovoSeasonMarker($product['sku'] ?? '');
+            foreach (['name', 'naziv', 'naziv_artikla', 'model', 'sku', 'artikl', 'sezona_naziv'] as $key) {
+                if ($this->containsNovoSeasonMarker($product[$key] ?? '')) {
+                    return true;
+                }
+            }
+
+            if (!empty($product['product_description']) && is_array($product['product_description'])) {
+                foreach ($product['product_description'] as $description) {
+                    if (is_array($description) && $this->containsNovoSeasonMarker($description['name'] ?? '')) {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         if (is_object($product)) {
-            return $this->containsNovoSeasonMarker($product->name ?? '')
-                || $this->containsNovoSeasonMarker($product->model ?? '')
-                || $this->containsNovoSeasonMarker($product->sku ?? '')
-                || $this->containsNovoSeasonMarker($product->artikl ?? '');
+            foreach (['name', 'naziv', 'naziv_artikla', 'model', 'sku', 'artikl', 'sezona_naziv'] as $key) {
+                if ($this->containsNovoSeasonMarker($product->{$key} ?? '')) {
+                    return true;
+                }
+            }
         }
 
         return false;
@@ -1635,7 +1705,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
     /**
      * Decide Novo assignment for CSV sync rows.
-     * If CSV has a second column, only rows with value A26 should get Novo.
+     * If CSV has a second column, only rows with value B26 should get Novo.
      * Otherwise fall back to checking the product/model data for the same marker.
      *
      * @param array $row
