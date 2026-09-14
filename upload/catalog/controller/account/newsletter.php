@@ -10,15 +10,18 @@ class ControllerAccountNewsletter extends Controller {
 		$this->load->language('account/newsletter');
 
 		$this->document->setTitle($this->language->get('heading_title'));
+		$error_warning = '';
 
 		if ($this->request->server['REQUEST_METHOD'] == 'POST') {
 			$this->load->model('account/customer');
 
-			$this->model_account_customer->editNewsletter($this->request->post['newsletter']);
+			if ($this->model_account_customer->editNewsletter($this->request->post['newsletter'])) {
+				$this->session->data['success'] = $this->language->get('text_success');
 
-			$this->session->data['success'] = $this->language->get('text_success');
-
-			$this->response->redirect($this->url->link('account/account', '', true));
+				$this->response->redirect($this->url->link('account/account', '', true));
+			} else {
+				$error_warning = $this->language->get('error_newsletter_unavailable');
+			}
 		}
 
 		$data['breadcrumbs'] = array();
@@ -39,6 +42,7 @@ class ControllerAccountNewsletter extends Controller {
 		);
 
 		$data['action'] = $this->url->link('account/newsletter', '', true);
+		$data['error_warning'] = $error_warning;
 
 		$data['newsletter'] = $this->customer->getNewsletter();
 

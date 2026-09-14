@@ -1,0 +1,20 @@
+CREATE TABLE IF NOT EXISTS `oc_klaviyo_consent_queue` (
+  `klaviyo_consent_queue_id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `email_hash` char(64) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `email` varchar(96) NOT NULL,
+  `desired_subscribed` tinyint(1) unsigned NOT NULL,
+  `state_token` char(32) CHARACTER SET ascii COLLATE ascii_bin NOT NULL,
+  `in_flight_subscribed` tinyint(1) unsigned DEFAULT NULL,
+  `in_flight_token` char(32) CHARACTER SET ascii COLLATE ascii_bin DEFAULT NULL,
+  `submitted_at` datetime DEFAULT NULL,
+  `attempts` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `next_attempt_at` datetime NOT NULL,
+  `last_attempt_at` datetime DEFAULT NULL,
+  `last_http_status` smallint(5) unsigned DEFAULT NULL,
+  `last_error` varchar(160) DEFAULT NULL,
+  `date_added` datetime NOT NULL,
+  `date_modified` datetime NOT NULL,
+  PRIMARY KEY (`klaviyo_consent_queue_id`),
+  UNIQUE KEY `uniq_klaviyo_consent_email_hash` (`email_hash`),
+  KEY `idx_klaviyo_consent_due` (`next_attempt_at`, `klaviyo_consent_queue_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
