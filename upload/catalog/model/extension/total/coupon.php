@@ -98,83 +98,117 @@ class ModelExtensionTotalCoupon extends Model {
 	public function getTotal($total) {
 		if (isset($this->session->data['coupon'])) {
 			$this->load->language('extension/total/coupon', 'coupon');
+			$this->load->model('catalog/product');
 
 			$coupon_info = $this->getCoupon($this->session->data['coupon']);
 
 			if ($coupon_info) {
+				$products = $this->cart->getProducts();
+				$details = array();
+				$eligible = array();
+				$sub_total = 0;
+
+				foreach ($products as $index => $product) {
+					if (!isset($details[$product['product_id']])) {
+						$details[$product['product_id']] = $this->model_catalog_product->getProduct($product['product_id']);
+					}
+
+					// Preserve the shop's rule: coupons do not apply to active sale items.
+					$eligible[$index] = (!$coupon_info['product'] || in_array($product['product_id'], $coupon_info['product']))
+						&& empty($details[$product['product_id']]['special']);
+
+					if ($eligible[$index]) {
+						$sub_total += $product['total'];
+					}
+				}
+
+				$fixed_discount = min(max(0, (float)$coupon_info['discount']), $sub_total);
+				$percentage = min(100, max(0, (float)$coupon_info['discount']));
+				$allocation = array(
+					'version' => 1,
+					'code' => $coupon_info['code'],
+					'type' => $coupon_info['type'],
+					'products' => array(),
+					'shipping_discount' => 0,
+					'shipping_price' => isset($this->session->data['shipping_method']) ? (float)$this->session->data['shipping_method']['cost'] : 0,
+					'shipping_tax' => isset($this->session->data['shipping_method']) ? $this->tax->getTax($this->session->data['shipping_method']['cost'], !empty($this->session->data['shipping_method']['tax_class_id']) ? $this->session->data['shipping_method']['tax_class_id'] : 0) : 0
+				);
 				$discount_total = 0;
 
-				if (!$coupon_info['product']) {
-					$sub_total = $this->cart->getSubTotal();
-				} else {
-					$sub_total = 0;
-
-					foreach ($this->cart->getProducts() as $product) {
-						if (in_array($product['product_id'], $coupon_info['product'])) {
-							$sub_total += $product['total'];
-						}
-					}
-				}
-
-				if ($coupon_info['type'] == 'F') {
-					$coupon_info['discount'] = min($coupon_info['discount'], $sub_total);
-				}
-
-				foreach ($this->cart->getProducts() as $product) {
-					$discount = 0;
-
-					if (!$coupon_info['product']) {
-						$status = true;
-					} else {
-						$status = in_array($product['product_id'], $coupon_info['product']);
-					}
+				foreach ($products as $index => $product) {
+					$status = $eligible[$index];
+					$allocation['products'][$index] = array(
+						'key' => \Agmedia\LuceedOpencartWrapper\Helpers\CouponAllocation::productKey($product),
+						'product_id' => (int)$product['product_id'],
+						'quantity' => (int)$product['quantity'],
+						'price' => (float)$product['price'],
+						'base_price' => max((float)$product['price'], isset($product['base_price']) ? (float)$product['base_price'] : (float)$product['price']),
+						'price_tax' => $this->tax->getTax($product['price'], $product['tax_class_id']),
+						'base_price_tax' => $this->tax->getTax(isset($product['base_price']) ? $product['base_price'] : $product['price'], $product['tax_class_id']),
+						'discount' => 0,
+						'discount_tax' => 0
+					);
 
 					if ($status) {
-						if ($coupon_info['type'] == 'F') {
-							$discount = $coupon_info['discount'] * ($product['total'] / $sub_total);
+						if ($coupon_info['type'] == 'F' && $sub_total > 0) {
+							$allocation['products'][$index]['discount'] = $fixed_discount * ($product['total'] / $sub_total);
 						} elseif ($coupon_info['type'] == 'P') {
-							$discount = $product['total'] / 100 * $coupon_info['discount'];
+							$allocation['products'][$index]['discount'] = $product['total'] / 100 * $percentage;
 						}
+					}
 
+					$discount_total += $allocation['products'][$index]['discount'];
+				}
+
+				if ($coupon_info['shipping'] && isset($this->session->data['shipping_method'])) {
+					$allocation['shipping_discount'] = max(0, (float)$this->session->data['shipping_method']['cost']);
+					$discount_total += $allocation['shipping_discount'];
+				}
+
+				// Apply the same cap to the allocation and its tax reductions.
+				$scale = $discount_total > 0 ? min(1, max(0, $total['total']) / $discount_total) : 0;
+				$discount_total = round($discount_total * $scale, 4);
+
+				if ($discount_total > 0) {
+					foreach ($products as $index => $product) {
+						$allocation['products'][$index]['discount'] *= $scale;
 						if ($product['tax_class_id']) {
-							$tax_rates = $this->tax->getRates($product['total'] - ($product['total'] - $discount), $product['tax_class_id']);
-
+							$tax_rates = $this->tax->getRates($allocation['products'][$index]['discount'], $product['tax_class_id']);
 							foreach ($tax_rates as $tax_rate) {
 								if ($tax_rate['type'] == 'P') {
 									$total['taxes'][$tax_rate['tax_rate_id']] -= $tax_rate['amount'];
+									$allocation['products'][$index]['discount_tax'] += $tax_rate['amount'];
 								}
 							}
 						}
 					}
 
-					$discount_total += $discount;
-				}
-
-				if ($coupon_info['shipping'] && isset($this->session->data['shipping_method'])) {
-					if (!empty($this->session->data['shipping_method']['tax_class_id'])) {
-						$tax_rates = $this->tax->getRates($this->session->data['shipping_method']['cost'], $this->session->data['shipping_method']['tax_class_id']);
-
+					$allocation['shipping_discount'] *= $scale;
+					$allocation['shipping_discount_tax'] = 0;
+					if ($allocation['shipping_discount'] > 0 && !empty($this->session->data['shipping_method']['tax_class_id'])) {
+						$tax_rates = $this->tax->getRates($allocation['shipping_discount'], $this->session->data['shipping_method']['tax_class_id']);
 						foreach ($tax_rates as $tax_rate) {
 							if ($tax_rate['type'] == 'P') {
 								$total['taxes'][$tax_rate['tax_rate_id']] -= $tax_rate['amount'];
+								$allocation['shipping_discount_tax'] += $tax_rate['amount'];
 							}
 						}
 					}
 
-					$discount_total += $this->session->data['shipping_method']['cost'];
-				}
+					$allocation['amount'] = $discount_total;
+					$allocation = \Agmedia\LuceedOpencartWrapper\Helpers\CouponAllocation::finalize($allocation);
+					$gross_allocation = \Agmedia\LuceedOpencartWrapper\Helpers\CouponAllocation::taxInclusive($allocation);
+					foreach ($gross_allocation['products'] as $index => $gross_product) {
+						$allocation['products'][$index]['gross_net_total'] = $gross_product['net_total'];
+						$allocation['products'][$index]['gross_discount_amount'] = $gross_product['discount_amount'];
+					}
 
-				// If discount greater than total
-				if ($discount_total > $total['total']) {
-					$discount_total = $total['total'];
-				}
-
-				if ($discount_total > 0) {
 					$total['totals'][] = array(
-						'code'       => 'coupon',
-						'title'      => sprintf($this->language->get('coupon')->get('text_coupon'), $this->session->data['coupon']),
-						'value'      => -$discount_total,
-						'sort_order' => $this->config->get('total_coupon_sort_order')
+						'code' => 'coupon',
+						'title' => sprintf($this->language->get('coupon')->get('text_coupon'), $this->session->data['coupon']),
+						'value' => -$discount_total,
+						'sort_order' => $this->config->get('total_coupon_sort_order'),
+						'coupon_allocation' => $allocation
 					);
 
 					$total['total'] -= $discount_total;

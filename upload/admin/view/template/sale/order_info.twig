@@ -177,7 +177,14 @@
                 <td class="text-left">{{ product.model }}</td>
                 <td class="text-right">{{ product.quantity }}</td>
                 <td class="text-right">{{ product.price }}</td>
-                <td class="text-right">{{ product.total }}</td>
+                <td class="text-right">{{ product.total }}
+                  {% if product.coupon %}
+                    {% if product.coupon.discounted %}
+                      <br/><small>{{ text_coupon_discount }} ({{ product.coupon.code|escape }}): {{ product.coupon.rate }}% / −{{ product.coupon.discount }}</small>
+                    {% endif %}
+                    <br/><strong>{{ text_coupon_net_total }}: {{ product.coupon.total }}</strong>
+                  {% endif %}
+                </td>
               </tr>
             {% endfor %}
             {% for voucher in vouchers %}

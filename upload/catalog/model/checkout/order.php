@@ -6,11 +6,14 @@ class ModelCheckoutOrder extends Model {
         $order_id = $this->db->getLastId();
 
         // Products
+        $saved_products = array();
         if (isset($data['products'])) {
             foreach ($data['products'] as $product) {
                 $this->db->query("INSERT INTO " . DB_PREFIX . "order_product SET order_id = '" . (int)$order_id . "', product_id = '" . (int)$product['product_id'] . "', name = '" . $this->db->escape($product['name']) . "', model = '" . $this->db->escape($product['model']) . "', quantity = '" . (int)$product['quantity'] . "', price = '" . (float)$product['price'] . "', total = '" . (float)$product['total'] . "', tax = '" . (float)$product['tax'] . "', reward = '" . (int)$product['reward'] . "'");
 
                 $order_product_id = $this->db->getLastId();
+                $product['order_product_id'] = $order_product_id;
+                $saved_products[] = $product;
 
                 foreach ($product['option'] as $option) {
                     $this->db->query("INSERT INTO " . DB_PREFIX . "order_option SET order_id = '" . (int)$order_id . "', order_product_id = '" . (int)$order_product_id . "', product_option_id = '" . (int)$option['product_option_id'] . "', product_option_value_id = '" . (int)$option['product_option_value_id'] . "', name = '" . $this->db->escape($option['name']) . "', `value` = '" . $this->db->escape($option['value']) . "', `type` = '" . $this->db->escape($option['type']) . "'");
@@ -37,7 +40,7 @@ class ModelCheckoutOrder extends Model {
         // Totals
         if (isset($data['totals'])) {
             foreach ($data['totals'] as $total) {
-                $this->db->query("INSERT INTO " . DB_PREFIX . "order_total SET order_id = '" . (int)$order_id . "', code = '" . $this->db->escape($total['code']) . "', title = '" . $this->db->escape($total['title']) . "', `value` = '" . (float)$total['value'] . "', sort_order = '" . (int)$total['sort_order'] . "'");
+                $this->saveOrderTotal($order_id, $total, $saved_products);
             }
         }
 
@@ -54,11 +57,14 @@ class ModelCheckoutOrder extends Model {
         $this->db->query("DELETE FROM " . DB_PREFIX . "order_option WHERE order_id = '" . (int)$order_id . "'");
 
         // Products
+        $saved_products = array();
         if (isset($data['products'])) {
             foreach ($data['products'] as $product) {
                 $this->db->query("INSERT INTO " . DB_PREFIX . "order_product SET order_id = '" . (int)$order_id . "', product_id = '" . (int)$product['product_id'] . "', name = '" . $this->db->escape($product['name']) . "', model = '" . $this->db->escape($product['model']) . "', quantity = '" . (int)$product['quantity'] . "', price = '" . (float)$product['price'] . "', total = '" . (float)$product['total'] . "', tax = '" . (float)$product['tax'] . "', reward = '" . (int)$product['reward'] . "'");
 
                 $order_product_id = $this->db->getLastId();
+                $product['order_product_id'] = $order_product_id;
+                $saved_products[] = $product;
 
                 foreach ($product['option'] as $option) {
                     $this->db->query("INSERT INTO " . DB_PREFIX . "order_option SET order_id = '" . (int)$order_id . "', order_product_id = '" . (int)$order_product_id . "', product_option_id = '" . (int)$option['product_option_id'] . "', product_option_value_id = '" . (int)$option['product_option_value_id'] . "', name = '" . $this->db->escape($option['name']) . "', `value` = '" . $this->db->escape($option['value']) . "', `type` = '" . $this->db->escape($option['type']) . "'");
@@ -91,9 +97,31 @@ class ModelCheckoutOrder extends Model {
 
         if (isset($data['totals'])) {
             foreach ($data['totals'] as $total) {
-                $this->db->query("INSERT INTO " . DB_PREFIX . "order_total SET order_id = '" . (int)$order_id . "', code = '" . $this->db->escape($total['code']) . "', title = '" . $this->db->escape($total['title']) . "', `value` = '" . (float)$total['value'] . "', sort_order = '" . (int)$total['sort_order'] . "'");
+                $this->saveOrderTotal($order_id, $total, $saved_products);
             }
         }
+    }
+
+    /**
+     * Persist the checkout allocation with stable order-product IDs. Never
+     * reconstruct historical discounts from the current coupon or catalogue.
+     */
+    private function saveOrderTotal($order_id, array $total, array $products) {
+        $allocation_sql = '';
+
+        if ($total['code'] === 'coupon' && isset($total['coupon_allocation'])) {
+            $allocation = \Agmedia\LuceedOpencartWrapper\Helpers\CouponAllocation::bindProducts($total['coupon_allocation'], $products);
+            if (abs(round($allocation['amount'], 4) + round((float)$total['value'], 4)) > 0.00001) {
+                throw new \LogicException('Coupon allocation does not match the order discount.');
+            }
+            $encoded = json_encode($allocation);
+            if ($encoded === false) {
+                throw new \LogicException('Unable to encode the order coupon allocation.');
+            }
+            $allocation_sql = ", coupon_allocation = '" . $this->db->escape($encoded) . "'";
+        }
+
+        $this->db->query("INSERT INTO `" . DB_PREFIX . "order_total` SET order_id = '" . (int)$order_id . "', code = '" . $this->db->escape($total['code']) . "', title = '" . $this->db->escape($total['title']) . "', `value` = '" . (float)$total['value'] . "', sort_order = '" . (int)$total['sort_order'] . "'" . $allocation_sql);
     }
 
     public function deleteOrder($order_id) {

@@ -1115,6 +1115,34 @@ class ControllerSaleOrder extends Controller {
 			// Uploaded files
 			$this->load->model('tool/upload');
 
+			$totals = $this->model_sale_order->getOrderTotals($this->request->get['order_id']);
+			$coupon_products = array();
+			$coupon_code = '';
+
+			foreach ($totals as $total) {
+				if ($total['code'] != 'coupon' || empty($total['coupon_allocation'])) {
+					continue;
+				}
+
+				$allocation = json_decode($total['coupon_allocation'], true);
+
+				if (!is_array($allocation) || !isset($allocation['version']) || $allocation['version'] != 1 || !isset($allocation['code']) || !is_string($allocation['code']) || !isset($allocation['products']) || !is_array($allocation['products'])) {
+					continue;
+				}
+
+				$coupon_code = $allocation['code'];
+
+				foreach ($allocation['products'] as $coupon_product) {
+					if (!is_array($coupon_product) || !isset($coupon_product['order_product_id'], $coupon_product['price'], $coupon_product['quantity'], $coupon_product['discount_amount'], $coupon_product['net_total']) || !is_numeric($coupon_product['order_product_id']) || !is_numeric($coupon_product['price']) || !is_numeric($coupon_product['quantity']) || !is_numeric($coupon_product['discount_amount']) || !is_numeric($coupon_product['net_total'])) {
+						continue;
+					}
+
+					if ($coupon_product['price'] >= 0 && $coupon_product['quantity'] > 0 && $coupon_product['discount_amount'] >= 0 && $coupon_product['net_total'] >= 0) {
+						$coupon_products[(int)$coupon_product['order_product_id']] = $coupon_product;
+					}
+				}
+			}
+
 			$data['products'] = array();
 
 			$products = $this->model_sale_order->getOrderProducts($this->request->get['order_id']);
@@ -1145,6 +1173,33 @@ class ControllerSaleOrder extends Controller {
 					}
 				}
 
+				$coupon_data = array();
+
+				if (isset($coupon_products[$product['order_product_id']])) {
+					$coupon_product = $coupon_products[$product['order_product_id']];
+					$discount_tax = isset($coupon_product['discount_tax']) && is_numeric($coupon_product['discount_tax']) ? (float)$coupon_product['discount_tax'] : 0;
+					$discount = (float)$coupon_product['discount_amount'];
+					$net_total = (float)$coupon_product['net_total'];
+
+					if ($this->config->get('config_tax')) {
+						if (isset($coupon_product['gross_discount_amount'], $coupon_product['gross_net_total']) && is_numeric($coupon_product['gross_discount_amount']) && is_numeric($coupon_product['gross_net_total']) && $coupon_product['gross_discount_amount'] >= 0 && $coupon_product['gross_net_total'] >= 0) {
+							$discount = (float)$coupon_product['gross_discount_amount'];
+							$net_total = (float)$coupon_product['gross_net_total'];
+						} else {
+							$discount += $discount_tax;
+							$net_total += $product['tax'] * $product['quantity'] - $discount_tax;
+						}
+					}
+
+					$coupon_data = array(
+						'code'       => $coupon_code,
+						'discounted' => $discount > 0,
+						'rate'       => number_format($net_total + $discount > 0 ? $discount / ($net_total + $discount) * 100 : 0, 2, $this->language->get('decimal_point'), $this->language->get('thousand_point')),
+						'discount'   => $this->currency->format($discount, $order_info['currency_code'], $order_info['currency_value']),
+						'total'      => $this->currency->format($net_total, $order_info['currency_code'], $order_info['currency_value'])
+					);
+				}
+
 				$data['products'][] = array(
 					'order_product_id' => $product['order_product_id'],
 					'product_id'       => $product['product_id'],
@@ -1154,6 +1209,7 @@ class ControllerSaleOrder extends Controller {
 					'quantity'		   => $product['quantity'],
 					'price'    		   => $this->currency->format($product['price'] + ($this->config->get('config_tax') ? $product['tax'] : 0), $order_info['currency_code'], $order_info['currency_value']),
 					'total'    		   => $this->currency->format($product['total'] + ($this->config->get('config_tax') ? ($product['tax'] * $product['quantity']) : 0), $order_info['currency_code'], $order_info['currency_value']),
+					'coupon'           => $coupon_data,
 					'href'     		   => $this->url->link('catalog/product/edit', 'user_token=' . $this->session->data['user_token'] . '&product_id=' . $product['product_id'], true)
 				);
 			}
@@ -1171,8 +1227,6 @@ class ControllerSaleOrder extends Controller {
 			}
 
 			$data['totals'] = array();
-
-			$totals = $this->model_sale_order->getOrderTotals($this->request->get['order_id']);
 
 			foreach ($totals as $total) {
 				$data['totals'][] = array(

@@ -7,8 +7,8 @@ use Agmedia\Helpers\Log;
 use Agmedia\Luceed\Facade\LuceedProduct;
 use Agmedia\Luceed\Luceed;
 use Agmedia\LuceedOpencartWrapper\Helpers\Helper;
+use Agmedia\LuceedOpencartWrapper\Helpers\CouponAllocation;
 use Agmedia\LuceedOpencartWrapper\Helpers\ProductHelper;
-use Agmedia\Models\Coupon;
 use Agmedia\Models\Location;
 use Agmedia\Models\Order\Order;
 use Agmedia\Models\Order\OrderOption;
@@ -76,6 +76,12 @@ class LOC_Order
      * @var array
      */
     private $coupon_item = [];
+
+    /** @var array|null Immutable allocation captured at checkout. */
+    private $coupon_allocation = null;
+
+    /** @var array|null Allocation on the Luceed price/tax basis. */
+    private $coupon_export_allocation = null;
 
     /**
      * @var bool
@@ -876,6 +882,9 @@ class LOC_Order
         $this->log('$order_products', $order_products->toArray());
 
         if ($order_products->isEmpty()) {
+            if ($this->coupon_allocation !== null) {
+                throw new \LogicException('Coupon allocation has no matching order products.');
+            }
             if ($this->discount) {
                 $response[] = $this->coupon_item;
             }
@@ -900,13 +909,50 @@ class LOC_Order
                 ->keyBy('product_option_value_id')
             : collect();
 
-        $productsById = Product::query()
-            ->whereIn('product_id', $productIds)
-            ->get()
-            ->keyBy('product_id');
+        $productsById = $this->coupon_allocation === null
+            ? Product::query()->whereIn('product_id', $productIds)->get()->keyBy('product_id')
+            : collect();
+
+        $allocatedProducts = [];
+        if ($this->coupon_allocation !== null) {
+            foreach ($this->coupon_export_allocation['products'] as $product) {
+                $id = isset($product['order_product_id']) ? (int)$product['order_product_id'] : 0;
+                if ($id <= 0 || isset($allocatedProducts[$id])) {
+                    throw new \LogicException('Coupon allocation has invalid order-product IDs.');
+                }
+                $allocatedProducts[$id] = $product;
+            }
+            if (count($allocatedProducts) !== $order_products->count()) {
+                throw new \LogicException('Coupon allocation does not cover all order products.');
+            }
+        }
 
         // --- Build stavke ---
         foreach ($order_products as $order_product) {
+            if ($this->coupon_allocation !== null) {
+                $id = (int)$order_product->order_product_id;
+                if (!isset($allocatedProducts[$id])) {
+                    throw new \LogicException('Order product is missing its coupon allocation.');
+                }
+                $product = $allocatedProducts[$id];
+                $saved_price = (float)$product['price'] - (agconf('luceed.with_tax') === 'D' && isset($product['price_tax']) ? (float)$product['price_tax'] : 0);
+                if ((int)$product['product_id'] !== (int)$order_product->product_id
+                    || (int)$product['quantity'] !== (int)$order_product->quantity
+                    || abs($saved_price - (float)$order_product->price) > 0.00005) {
+                    throw new \LogicException('Coupon allocation differs from the saved order product.');
+                }
+
+                $article = ['artikl' => $order_product->model];
+                $option = $orderOptions->get($id);
+                $po = $option ? $productOptionsByPov->get($option->product_option_value_id) : null;
+                if ($po && !empty($po->sku)) {
+                    $article = ['artikl_uid' => $po->sku];
+                }
+                foreach (CouponAllocation::buildLines($product) as $line) {
+                    $response[] = array_merge($article, $line);
+                }
+                continue;
+            }
 
             $final_price = (float) number_format((float) $order_product->price, 2, '.', '');
 
@@ -974,7 +1020,7 @@ class LOC_Order
             ];
         }
 
-        if ($this->discount) {
+        if ($this->discount && $this->coupon_allocation === null) {
             $response[] = $this->coupon_item;
         }
 
@@ -991,34 +1037,48 @@ class LOC_Order
     private function resolveCouponDiscount(): void
     {
         $this->discount = 0;
-        $order_total    = OrderTotal::where('order_id', $this->oc_order['order_id'])->get();
+        $this->coupon_item = [];
+        $this->coupon_allocation = null;
+        $this->coupon_export_allocation = null;
+        if (empty($this->oc_order['order_id'])) {
+            return;
+        }
 
+        $order_total = OrderTotal::where('order_id', $this->oc_order['order_id'])->get();
         $this->log('$order_total', $order_total->toArray());
 
         foreach ($order_total as $item) {
-            if ($item->code == 'coupon') {
-                preg_match('#\((.*?)\)#', $item->title, $code);
-
-                $coupon = Coupon::where('code', $code[1])->first();
-
-                if ($coupon) {
-                    $this->log('$coupon', $coupon->toArray());
-
-                    $this->discount = $coupon->discount;
-
-                    $this->coupon_item = [
-                        'artikl_uid' => '668150-2987',
-                        'kolicina'   => 1,
-                        'cijena'     => (float) number_format($item->value, 2, '.', ''),
-                        'rabat'      => 0,
-                    ];
-
-                    $this->log('$this->discount', $this->discount);
-                }
+            if ($item->code !== 'coupon' || (float)$item->value >= 0) {
+                continue;
             }
+            if ($this->discount) {
+                throw new \LogicException('Multiple coupon totals cannot be exported safely.');
+            }
+            $this->discount = abs((float)$item->value);
+
+            if (!empty($item->coupon_allocation)) {
+                $snapshot = json_decode($item->coupon_allocation, true);
+                if (!is_array($snapshot) || !isset($snapshot['amount'])
+                    || abs(round((float)$snapshot['amount'], 4) + round((float)$item->value, 4)) > 0.00001) {
+                    throw new \LogicException('Saved coupon allocation does not match the order discount.');
+                }
+                $this->coupon_allocation = CouponAllocation::finalize($snapshot);
+                $this->coupon_export_allocation = agconf('luceed.with_tax') === 'D'
+                    ? CouponAllocation::taxInclusive($this->coupon_allocation)
+                    : $this->coupon_allocation;
+                continue;
+            }
+
+            // Orders predating allocation retain their recorded total discount,
+            // even if the coupon has subsequently expired or been deleted.
+            $this->coupon_item = [
+                'artikl_uid' => '668150-2987',
+                'kolicina' => 1,
+                'cijena' => (float)number_format($item->value, 2, '.', ''),
+                'rabat' => 0,
+            ];
         }
     }
-
 
     /**
      * Apply the coupon discount on a price.
@@ -1043,7 +1103,7 @@ class LOC_Order
      */
     private function getShippingProduct()
     {
-        $shipping_amount = agconf('default_shipping_price');
+        $shipping_amount = $this->coupon_allocation !== null ? 0 : agconf('default_shipping_price');
 
         /*if ($this->oc_order['total'] > agconf('free_shipping_amount')) {
             $shipping_amount = 0;
@@ -1055,6 +1115,15 @@ class LOC_Order
             if ($item->code == 'shipping') {
                 $shipping_amount = $item->value;
             }
+        }
+
+        if ($this->coupon_allocation !== null) {
+            $saved_shipping = isset($this->coupon_allocation['shipping_price'])
+                ? (float)$this->coupon_allocation['shipping_price'] : (float)$shipping_amount;
+            if (abs($saved_shipping - (float)$shipping_amount) > 0.00005) {
+                throw new \LogicException('Coupon allocation differs from the saved shipping charge.');
+            }
+            $shipping_amount = $this->coupon_export_allocation['shipping_net_total'];
         }
 
         return [
