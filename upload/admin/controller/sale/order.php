@@ -412,11 +412,14 @@ class ControllerSaleOrder extends Controller {
 
 		$results = $this->model_sale_order->getOrders($filter_data);
 
+		$order_products = $this->model_sale_order->getOrderProductsForOrders(array_column($results, 'order_id'));
+
 		foreach ($results as $result) {
 			$data['orders'][] = array(
 				'order_id'      => $result['order_id'],
                 'luceed_uid'    => $result['luceed_uid'],
 				'customer'      => $result['customer'],
+				'products'      => isset($order_products[$result['order_id']]) ? $order_products[$result['order_id']] : array(),
 				'order_status'  => $result['order_status'] ? $result['order_status'] : $this->language->get('text_missing'),
 				'total'         => $this->currency->format($result['total'], $result['currency_code'], $result['currency_value']),
 				'date_added'    => date($this->language->get('date_format_short'), strtotime($result['date_added'])),

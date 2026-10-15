@@ -157,6 +157,8 @@ $_['text_picklist']              = 'Napomena za otpremu';
 // Column
 $_['column_order_id']            = 'Broj narudžbe';
 $_['column_customer']            = 'Kupac';
+$_['column_order_products']      = 'Naručeni artikli';
+$_['text_product_code']          = 'Šifra:';
 $_['column_status']              = 'Status';
 $_['column_date_added']          = 'Datum dodavanja';
 $_['column_date_modified']       = 'Datum ažuriranja';

@@ -234,6 +234,26 @@ class ModelSaleOrder extends Model {
 		return $query->rows;
 	}
 
+	public function getOrderProductsForOrders($order_ids) {
+		$products = array();
+		$order_ids = array_unique(array_map('intval', $order_ids));
+
+		if (!$order_ids) {
+			return $products;
+		}
+
+		$query = $this->db->query("SELECT order_id, name, model FROM " . DB_PREFIX . "order_product WHERE order_id IN (" . implode(',', $order_ids) . ") ORDER BY order_id, order_product_id");
+
+		foreach ($query->rows as $product) {
+			$products[$product['order_id']][] = array(
+				'name'  => $product['name'],
+				'model' => $product['model']
+			);
+		}
+
+		return $products;
+	}
+
 	public function getOrderOptions($order_id, $order_product_id) {
 		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_option WHERE order_id = '" . (int)$order_id . "' AND order_product_id = '" . (int)$order_product_id . "'");
 
