@@ -208,6 +208,8 @@ class ControllerSaleOrder extends Controller {
 
 		$results = $this->model_sale_order->getOrders($filter_data);
 
+		$order_products = $this->model_sale_order->getOrderProductsForOrders(array_column($results, 'order_id'));
+
 		require_once DIR_SYSTEM . 'library/me_order_manager/PHPExcel.php';
 
 		$objPHPExcel = new PHPExcel();
@@ -224,11 +226,22 @@ class ControllerSaleOrder extends Controller {
 		$sheet->setCellValue('E1', $this->language->get('column_date_added'));
 		$sheet->setCellValue('F1', $this->language->get('column_date_modified'));
 		$sheet->setCellValue('G1', 'Luceed UID');
-		$sheet->getStyle('A1:G1')->getFont()->setBold(true);
+		$sheet->setCellValue('H1', $this->language->get('column_order_products'));
+		$sheet->setCellValue('I1', $this->language->get('column_product_codes'));
+		$sheet->getStyle('A1:I1')->getFont()->setBold(true);
 
 		$row = 2;
 
 		foreach ($results as $result) {
+			$products = isset($order_products[$result['order_id']]) ? $order_products[$result['order_id']] : array();
+			$product_names = array();
+			$product_codes = array();
+
+			foreach ($products as $product) {
+				$product_names[] = str_replace(array("\r", "\n"), ' ', html_entity_decode($product['name'], ENT_QUOTES, 'UTF-8'));
+				$product_codes[] = str_replace(array("\r", "\n"), ' ', html_entity_decode($product['model'], ENT_QUOTES, 'UTF-8'));
+			}
+
 			$sheet->setCellValueExplicit('A' . $row, (string)$result['order_id'], PHPExcel_Cell_DataType::TYPE_STRING);
 			$sheet->setCellValue('B' . $row, $result['customer']);
 			$sheet->setCellValue('C' . $row, $result['order_status'] ? $result['order_status'] : $this->language->get('text_missing'));
@@ -236,8 +249,15 @@ class ControllerSaleOrder extends Controller {
 			$sheet->setCellValue('E' . $row, date($this->language->get('date_format_short'), strtotime($result['date_added'])));
 			$sheet->setCellValue('F' . $row, date($this->language->get('date_format_short'), strtotime($result['date_modified'])));
 			$sheet->setCellValueExplicit('G' . $row, (string)$result['luceed_uid'], PHPExcel_Cell_DataType::TYPE_STRING);
+			$sheet->setCellValueExplicit('H' . $row, implode("\n", $product_names), PHPExcel_Cell_DataType::TYPE_STRING);
+			$sheet->setCellValueExplicit('I' . $row, implode("\n", $product_codes), PHPExcel_Cell_DataType::TYPE_STRING);
 			$row++;
 		}
+
+		$sheet->getStyle('H1:I' . ($row - 1))->getAlignment()->setWrapText(true);
+		$sheet->getStyle('A1:I' . ($row - 1))->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+		$sheet->getColumnDimension('H')->setWidth(60);
+		$sheet->getColumnDimension('I')->setWidth(20);
 
 		foreach (range('A', 'G') as $column) {
 			$sheet->getColumnDimension($column)->setAutoSize(true);

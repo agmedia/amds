@@ -67,6 +67,7 @@ $_['text_picklist']              = 'Dispatch Note';
 $_['column_order_id']            = 'Order ID';
 $_['column_customer']            = 'Customer';
 $_['column_order_products']      = 'Ordered products';
+$_['column_product_codes']       = 'Product codes';
 $_['text_product_code']          = 'Code:';
 $_['column_status']              = 'Status';
 $_['column_date_added']          = 'Date Added';
