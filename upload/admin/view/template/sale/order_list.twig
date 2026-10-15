@@ -109,6 +109,7 @@
                     <td style="width: 1px;" class="text-center"><input type="checkbox" onclick="$('input[name*=\'selected\']').prop('checked', this.checked);" /></td>
                     <td class="text-right">{% if sort == 'o.order_id' %} <a href="{{ sort_order }}" class="{{ order|lower }}">{{ column_order_id }}</a> {% else %} <a href="{{ sort_order }}">{{ column_order_id }}</a> {% endif %}</td>
                     <td class="text-left">{% if sort == 'customer' %} <a href="{{ sort_customer }}" class="{{ order|lower }}">{{ column_customer }}</a> {% else %} <a href="{{ sort_customer }}">{{ column_customer }}</a> {% endif %}</td>
+                    <td class="text-left">{{ column_order_products }}</td>
                     <td class="text-left">{% if sort == 'order_status' %} <a href="{{ sort_status }}" class="{{ order|lower }}">{{ column_status }}</a> {% else %} <a href="{{ sort_status }}">{{ column_status }}</a> {% endif %}</td>
                     <td class="text-right">{% if sort == 'o.total' %} <a href="{{ sort_total }}" class="{{ order|lower }}">{{ column_total }}</a> {% else %} <a href="{{ sort_total }}">{{ column_total }}</a> {% endif %}</td>
                     <td class="text-left">{% if sort == 'o.date_added' %} <a href="{{ sort_date_added }}" class="{{ order|lower }}">{{ column_date_added }}</a> {% else %} <a href="{{ sort_date_added }}">{{ column_date_added }}</a> {% endif %}</td>
@@ -130,6 +131,16 @@
                     <input type="hidden" name="shipping_code[]" value="{{ order.shipping_code }}" /></td>
                   <td class="text-right">{{ order.order_id }}</td>
                   <td class="text-left">{{ order.customer }}</td>
+                  <td class="text-left" style="min-width: 220px; overflow-wrap: anywhere;">
+                    {% for product in order.products %}
+                    <div{% if not loop.last %} style="margin-bottom: 10px;"{% endif %}>
+                      <div>{{ product.name|escape }}</div>
+                      <small class="text-muted">{{ text_product_code }} {{ product.model|escape }}</small>
+                    </div>
+                    {% else %}
+                    &mdash;
+                    {% endfor %}
+                  </td>
                   <td class="text-left">{{ order.order_status }}</td>
                   <td class="text-right">{{ order.total }}</td>
                   <td class="text-left">{{ order.date_added }}</td>
@@ -148,7 +159,7 @@
                 {% endfor %}
                 {% else %}
                 <tr>
-                  <td class="text-center" colspan="9">{{ text_no_results }}</td>
+                  <td class="text-center" colspan="10">{{ text_no_results }}</td>
                 </tr>
                 {% endif %}
                   </tbody>
