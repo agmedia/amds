@@ -242,16 +242,122 @@ class ModelSaleOrder extends Model {
 			return $products;
 		}
 
-		$query = $this->db->query("SELECT order_id, name, model FROM " . DB_PREFIX . "order_product WHERE order_id IN (" . implode(',', $order_ids) . ") ORDER BY order_id, order_product_id");
+		$query = $this->db->query("SELECT order_id, order_product_id, name, model, quantity, price, tax FROM " . DB_PREFIX . "order_product WHERE order_id IN (" . implode(',', $order_ids) . ") ORDER BY order_id, order_product_id");
 
 		foreach ($query->rows as $product) {
 			$products[$product['order_id']][] = array(
-				'name'  => $product['name'],
-				'model' => $product['model']
+				'order_product_id' => (int)$product['order_product_id'],
+				'name'             => $product['name'],
+				'model'            => $product['model'],
+				'quantity'         => (int)$product['quantity'],
+				'price'            => $product['price'],
+				'tax'              => $product['tax']
 			);
 		}
 
 		return $products;
+	}
+
+	public function getOrderDiscountsForOrders($order_ids, $order_products) {
+		$discounts = array();
+		$order_ids = array_unique(array_map('intval', $order_ids));
+
+		if (!$order_ids) {
+			return $discounts;
+		}
+
+		// SELECT * also supports older databases without coupon_allocation.
+		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_total WHERE code = 'coupon' AND order_id IN (" . implode(',', $order_ids) . ") ORDER BY order_id, sort_order, order_total_id");
+
+		foreach ($query->rows as $total) {
+			$order_id = (int)$total['order_id'];
+
+			if (!isset($discounts[$order_id])) {
+				$discounts[$order_id] = array('coupons' => array(), 'products' => array());
+			}
+
+			$coupon_index = count($discounts[$order_id]['coupons']);
+			$discounts[$order_id]['coupons'][] = array(
+				'title'                => (string)$total['title'],
+				'value'                => (float)$total['value'],
+				'allocation_available' => false
+			);
+
+			if (empty($total['coupon_allocation']) || !is_string($total['coupon_allocation'])) {
+				continue;
+			}
+
+			$allocation = json_decode($total['coupon_allocation'], true);
+
+			if (!is_array($allocation) || !isset($allocation['version']) || $allocation['version'] !== 1 || !isset($allocation['code']) || !is_string($allocation['code']) || trim($allocation['code']) === '' || empty($allocation['products']) || !is_array($allocation['products'])) {
+				continue;
+			}
+
+			if (!isset($allocation['amount']) || !is_numeric($allocation['amount']) || !is_finite((float)$allocation['amount']) || (float)$allocation['amount'] < 0 || abs((float)$allocation['amount'] - abs((float)$total['value'])) > 0.0001) {
+				continue;
+			}
+
+			$title_code = array();
+			if (preg_match('/\(([^()]+)\)\s*$/u', html_entity_decode($total['title'], ENT_QUOTES, 'UTF-8'), $title_code) && strcasecmp(trim($title_code[1]), trim($allocation['code'])) !== 0) {
+				continue;
+			}
+
+			$saved_products = array();
+			foreach (isset($order_products[$order_id]) ? $order_products[$order_id] : array() as $product) {
+				$saved_products[(int)$product['order_product_id']] = $product;
+			}
+
+			if (count($allocation['products']) !== count($saved_products)) {
+				continue;
+			}
+
+			$product_discounts = array();
+			foreach ($allocation['products'] as $product) {
+				if (!is_array($product)) {
+					continue 2;
+				}
+
+				foreach (array('order_product_id', 'quantity', 'price', 'base_price', 'discount_amount', 'net_total') as $field) {
+					if (!isset($product[$field]) || !is_numeric($product[$field]) || !is_finite((float)$product[$field]) || (float)$product[$field] < 0) {
+						continue 3;
+					}
+				}
+
+				$id = (int)$product['order_product_id'];
+				$quantity = (int)$product['quantity'];
+
+				if ($id < 1 || (float)$product['order_product_id'] != $id || $quantity < 1 || (float)$product['quantity'] != $quantity || !isset($saved_products[$id]) || isset($product_discounts[$id]) || $quantity !== (int)$saved_products[$id]['quantity'] || abs((float)$product['price'] - (float)$saved_products[$id]['price']) > 0.0001 || (float)$product['base_price'] < (float)$product['price']) {
+					continue 2;
+				}
+
+				$gross_discount = null;
+				if (isset($product['gross_discount_amount']) && is_numeric($product['gross_discount_amount']) && is_finite((float)$product['gross_discount_amount']) && (float)$product['gross_discount_amount'] >= 0) {
+					$gross_discount = (float)$product['gross_discount_amount'];
+				} elseif (isset($product['discount_tax']) && is_numeric($product['discount_tax']) && is_finite((float)$product['discount_tax']) && (float)$product['discount_tax'] >= 0 && is_finite((float)$product['discount_amount'] + (float)$product['discount_tax'])) {
+					$gross_discount = (float)$product['discount_amount'] + (float)$product['discount_tax'];
+				}
+
+				$product_discounts[$id] = array(
+					'sale'    => (float)$product['base_price'] > (float)$product['price'] + 0.0001,
+					'coupons' => array(array(
+						'code'                  => $allocation['code'],
+						'discount_amount'       => (float)$product['discount_amount'],
+						'gross_discount_amount' => $gross_discount
+					))
+				);
+			}
+
+			$discounts[$order_id]['coupons'][$coupon_index]['allocation_available'] = true;
+			foreach ($product_discounts as $id => $product_discount) {
+				if (!isset($discounts[$order_id]['products'][$id])) {
+					$discounts[$order_id]['products'][$id] = array('sale' => false, 'coupons' => array());
+				}
+				$discounts[$order_id]['products'][$id]['sale'] = $discounts[$order_id]['products'][$id]['sale'] || $product_discount['sale'];
+				$discounts[$order_id]['products'][$id]['coupons'] = array_merge($discounts[$order_id]['products'][$id]['coupons'], $product_discount['coupons']);
+			}
+		}
+
+		return $discounts;
 	}
 
 	public function getOrderOptions($order_id, $order_product_id) {

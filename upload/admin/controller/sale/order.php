@@ -210,6 +210,8 @@ class ControllerSaleOrder extends Controller {
 
 		$order_products = $this->model_sale_order->getOrderProductsForOrders(array_column($results, 'order_id'));
 
+		$order_discounts = $this->model_sale_order->getOrderDiscountsForOrders(array_column($results, 'order_id'), $order_products);
+
 		require_once DIR_SYSTEM . 'library/me_order_manager/PHPExcel.php';
 
 		$objPHPExcel = new PHPExcel();
@@ -228,18 +230,52 @@ class ControllerSaleOrder extends Controller {
 		$sheet->setCellValue('G1', 'Luceed UID');
 		$sheet->setCellValue('H1', $this->language->get('column_order_products'));
 		$sheet->setCellValue('I1', $this->language->get('column_product_codes'));
-		$sheet->getStyle('A1:I1')->getFont()->setBold(true);
+		$sheet->setCellValue('J1', $this->language->get('column_product_prices'));
+		$sheet->setCellValue('K1', $this->language->get('column_product_discounts'));
+		$sheet->setCellValue('L1', $this->language->get('column_order_coupons'));
+		$sheet->getStyle('A1:L1')->getFont()->setBold(true);
 
 		$row = 2;
 
 		foreach ($results as $result) {
 			$products = isset($order_products[$result['order_id']]) ? $order_products[$result['order_id']] : array();
+			$discounts = isset($order_discounts[$result['order_id']]) ? $order_discounts[$result['order_id']] : array('products' => array(), 'coupons' => array());
 			$product_names = array();
 			$product_codes = array();
+			$product_prices = array();
+			$product_discounts = array();
+			$coupon_notes = array();
 
 			foreach ($products as $product) {
 				$product_names[] = str_replace(array("\r", "\n"), ' ', html_entity_decode($product['name'], ENT_QUOTES, 'UTF-8'));
 				$product_codes[] = str_replace(array("\r", "\n"), ' ', html_entity_decode($product['model'], ENT_QUOTES, 'UTF-8'));
+				$product_prices[] = $this->currency->format($product['price'] + ($this->config->get('config_tax') ? $product['tax'] : 0), $result['currency_code'], $result['currency_value']);
+				$discount_info = isset($discounts['products'][$product['order_product_id']]) ? $discounts['products'][$product['order_product_id']] : null;
+				$notes = array($this->language->get($discount_info ? ($discount_info['sale'] ? 'text_export_sale_price' : 'text_export_regular_price') : 'text_export_sale_unknown'));
+
+				if ($discount_info) {
+					foreach ($discount_info['coupons'] as $coupon) {
+						$discount_amount = $this->config->get('config_tax') ? $coupon['gross_discount_amount'] : $coupon['discount_amount'];
+
+						if (($discount_amount !== null && $discount_amount <= 0) || ($discount_amount === null && $coupon['discount_amount'] <= 0)) {
+							continue;
+						}
+
+						$notes[] = $discount_amount === null
+							? sprintf($this->language->get('text_export_item_coupon_unknown'), $coupon['code'])
+							: sprintf($this->language->get('text_export_item_coupon'), $coupon['code'], $this->currency->format($discount_amount, $result['currency_code'], $result['currency_value']));
+					}
+				}
+
+				$product_discounts[] = html_entity_decode($product['model'], ENT_QUOTES, 'UTF-8') . ': ' . implode('; ', $notes);
+			}
+
+			foreach ($discounts['coupons'] as $coupon) {
+				$coupon_notes[] = html_entity_decode($coupon['title'], ENT_QUOTES, 'UTF-8') . ': ' . $this->currency->format($coupon['value'], $result['currency_code'], $result['currency_value']);
+
+				if (empty($coupon['allocation_available'])) {
+					$coupon_notes[] = $this->language->get('text_export_coupon_allocation_unknown');
+				}
 			}
 
 			$sheet->setCellValueExplicit('A' . $row, (string)$result['order_id'], PHPExcel_Cell_DataType::TYPE_STRING);
@@ -251,13 +287,19 @@ class ControllerSaleOrder extends Controller {
 			$sheet->setCellValueExplicit('G' . $row, (string)$result['luceed_uid'], PHPExcel_Cell_DataType::TYPE_STRING);
 			$sheet->setCellValueExplicit('H' . $row, implode("\n", $product_names), PHPExcel_Cell_DataType::TYPE_STRING);
 			$sheet->setCellValueExplicit('I' . $row, implode("\n", $product_codes), PHPExcel_Cell_DataType::TYPE_STRING);
+			$sheet->setCellValueExplicit('J' . $row, implode("\n", $product_prices), PHPExcel_Cell_DataType::TYPE_STRING);
+			$sheet->setCellValueExplicit('K' . $row, implode("\n", $product_discounts), PHPExcel_Cell_DataType::TYPE_STRING);
+			$sheet->setCellValueExplicit('L' . $row, implode("\n", $coupon_notes), PHPExcel_Cell_DataType::TYPE_STRING);
 			$row++;
 		}
 
-		$sheet->getStyle('H1:I' . ($row - 1))->getAlignment()->setWrapText(true);
-		$sheet->getStyle('A1:I' . ($row - 1))->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
+		$sheet->getStyle('H1:L' . ($row - 1))->getAlignment()->setWrapText(true);
+		$sheet->getStyle('A1:L' . ($row - 1))->getAlignment()->setVertical(PHPExcel_Style_Alignment::VERTICAL_TOP);
 		$sheet->getColumnDimension('H')->setWidth(60);
 		$sheet->getColumnDimension('I')->setWidth(20);
+		$sheet->getColumnDimension('J')->setWidth(24);
+		$sheet->getColumnDimension('K')->setWidth(60);
+		$sheet->getColumnDimension('L')->setWidth(40);
 
 		foreach (range('A', 'G') as $column) {
 			$sheet->getColumnDimension($column)->setAutoSize(true);
