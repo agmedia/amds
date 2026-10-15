@@ -46,13 +46,29 @@ class Cart {
 				$option_weight = 0;
 
 				$option_data = array();
+				$selected_options = json_decode($cart['option'], true);
+				if (!is_array($selected_options)) {
+					$selected_options = array();
+					$stock = false;
+				}
 
-				foreach (json_decode($cart['option']) as $product_option_id => $value) {
+				$required_options = $this->db->query("SELECT po.product_option_id FROM " . DB_PREFIX . "product_option po WHERE po.product_id = '" . (int)$cart['product_id'] . "' AND po.required = '1'");
+				foreach ($required_options->rows as $required_option) {
+					if (empty($selected_options[$required_option['product_option_id']])) {
+						$stock = false;
+					}
+				}
+
+				foreach ($selected_options as $product_option_id => $value) {
 					$option_query = $this->db->query("SELECT po.product_option_id, po.option_id, od.name, o.type FROM " . DB_PREFIX . "product_option po LEFT JOIN `" . DB_PREFIX . "option` o ON (po.option_id = o.option_id) LEFT JOIN " . DB_PREFIX . "option_description od ON (o.option_id = od.option_id) WHERE po.product_option_id = '" . (int)$product_option_id . "' AND po.product_id = '" . (int)$cart['product_id'] . "' AND od.language_id = '" . (int)$this->config->get('config_language_id') . "'");
 
 					if ($option_query->num_rows) {
 						if ($option_query->row['type'] == 'select' || $option_query->row['type'] == 'radio') {
-							$option_value_query = $this->db->query("SELECT pov.option_value_id, ovd.name, pov.quantity, pov.subtract, pov.price, pov.price_prefix, pov.points, pov.points_prefix, pov.weight, pov.weight_prefix FROM " . DB_PREFIX . "product_option_value pov LEFT JOIN " . DB_PREFIX . "option_value ov ON (pov.option_value_id = ov.option_value_id) LEFT JOIN " . DB_PREFIX . "option_value_description ovd ON (ov.option_value_id = ovd.option_value_id) WHERE pov.product_option_value_id = '" . (int)$value . "' AND pov.product_option_id = '" . (int)$product_option_id . "' AND ovd.language_id = '" . (int)$this->config->get('config_language_id') . "'");
+							if (!OptionStock::isValueId($value)) {
+								$stock = false;
+								continue;
+							}
+							$option_value_query = $this->db->query("SELECT pov.option_value_id, pov.sku, ovd.name, pov.quantity, pov.subtract, pov.price, pov.price_prefix, pov.points, pov.points_prefix, pov.weight, pov.weight_prefix FROM " . DB_PREFIX . "product_option_value pov LEFT JOIN " . DB_PREFIX . "option_value ov ON (pov.option_value_id = ov.option_value_id) LEFT JOIN " . DB_PREFIX . "option_value_description ovd ON (ov.option_value_id = ovd.option_value_id) WHERE pov.product_option_value_id = '" . (int)$value . "' AND pov.product_option_id = '" . (int)$product_option_id . "' AND pov.product_id = '" . (int)$cart['product_id'] . "' AND ovd.language_id = '" . (int)$this->config->get('config_language_id') . "'");
 
 							if ($option_value_query->num_rows) {
 								if ($option_value_query->row['price_prefix'] == '+') {
@@ -73,7 +89,8 @@ class Cart {
 									$option_weight -= $option_value_query->row['weight'];
 								}
 
-								if ($option_value_query->row['subtract'] && (!$option_value_query->row['quantity'] || ($option_value_query->row['quantity'] < $cart['quantity']))) {
+								$requested_quantity = OptionStock::cartQuantity($cart_query->rows, $cart['product_id'], $product_option_id, $value);
+								if (OptionStock::tracksQuantity($option_query->row, $option_value_query->row) && (float)$option_value_query->row['quantity'] < $requested_quantity) {
 									$stock = false;
 								}
 
@@ -94,10 +111,18 @@ class Cart {
 									'weight'                  => $option_value_query->row['weight'],
 									'weight_prefix'           => $option_value_query->row['weight_prefix']
 								);
+							} else {
+								$stock = false;
 							}
 						} elseif ($option_query->row['type'] == 'checkbox' && is_array($value)) {
+							$seen_values = array();
 							foreach ($value as $product_option_value_id) {
-								$option_value_query = $this->db->query("SELECT pov.option_value_id, pov.quantity, pov.subtract, pov.price, pov.price_prefix, pov.points, pov.points_prefix, pov.weight, pov.weight_prefix, ovd.name FROM " . DB_PREFIX . "product_option_value pov LEFT JOIN " . DB_PREFIX . "option_value_description ovd ON (pov.option_value_id = ovd.option_value_id) WHERE pov.product_option_value_id = '" . (int)$product_option_value_id . "' AND pov.product_option_id = '" . (int)$product_option_id . "' AND ovd.language_id = '" . (int)$this->config->get('config_language_id') . "'");
+								if (!OptionStock::isValueId($product_option_value_id) || isset($seen_values[(int)$product_option_value_id])) {
+									$stock = false;
+									continue;
+								}
+								$seen_values[(int)$product_option_value_id] = true;
+								$option_value_query = $this->db->query("SELECT pov.option_value_id, pov.sku, pov.quantity, pov.subtract, pov.price, pov.price_prefix, pov.points, pov.points_prefix, pov.weight, pov.weight_prefix, ovd.name FROM " . DB_PREFIX . "product_option_value pov LEFT JOIN " . DB_PREFIX . "option_value_description ovd ON (pov.option_value_id = ovd.option_value_id) WHERE pov.product_option_value_id = '" . (int)$product_option_value_id . "' AND pov.product_option_id = '" . (int)$product_option_id . "' AND pov.product_id = '" . (int)$cart['product_id'] . "' AND ovd.language_id = '" . (int)$this->config->get('config_language_id') . "'");
 
 								if ($option_value_query->num_rows) {
 									if ($option_value_query->row['price_prefix'] == '+') {
@@ -118,7 +143,8 @@ class Cart {
 										$option_weight -= $option_value_query->row['weight'];
 									}
 
-									if ($option_value_query->row['subtract'] && (!$option_value_query->row['quantity'] || ($option_value_query->row['quantity'] < $cart['quantity']))) {
+									$requested_quantity = OptionStock::cartQuantity($cart_query->rows, $cart['product_id'], $product_option_id, $product_option_value_id);
+									if (OptionStock::tracksQuantity($option_query->row, $option_value_query->row) && (float)$option_value_query->row['quantity'] < $requested_quantity) {
 										$stock = false;
 									}
 
@@ -139,9 +165,15 @@ class Cart {
 										'weight'                  => $option_value_query->row['weight'],
 										'weight_prefix'           => $option_value_query->row['weight_prefix']
 									);
+								} else {
+									$stock = false;
 								}
 							}
 						} elseif ($option_query->row['type'] == 'text' || $option_query->row['type'] == 'textarea' || $option_query->row['type'] == 'file' || $option_query->row['type'] == 'date' || $option_query->row['type'] == 'datetime' || $option_query->row['type'] == 'time') {
+							if (!is_scalar($value)) {
+								$stock = false;
+								continue;
+							}
 							$option_data[] = array(
 								'product_option_id'       => $product_option_id,
 								'product_option_value_id' => '',
@@ -159,7 +191,11 @@ class Cart {
 								'weight'                  => '',
 								'weight_prefix'           => ''
 							);
+						} else {
+							$stock = false;
 						}
+					} else {
+						$stock = false;
 					}
 				}
 
@@ -211,7 +247,7 @@ class Cart {
 				}
 
 				// Stock
-				if (!$product_query->row['quantity'] || ($product_query->row['quantity'] < $cart['quantity'])) {
+				if ((float)$product_query->row['quantity'] < OptionStock::cartQuantity($cart_query->rows, $cart['product_id'])) {
 					$stock = false;
 				}
 
@@ -268,6 +304,22 @@ class Cart {
 		}
 
 		return $product_data;
+	}
+
+	public function getOptionStockErrors($product_id, $quantity, array $option, array $product_options, $available_quantity = null) {
+		$cart_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "cart WHERE api_id = '" . (isset($this->session->data['api_id']) ? (int)$this->session->data['api_id'] : 0) . "' AND customer_id = '" . (int)$this->customer->getId() . "' AND session_id = '" . $this->db->escape($this->session->getId()) . "'");
+
+		$errors = OptionStock::invalidSelections($product_options, $option, $quantity, $cart_query->rows, $product_id);
+		if ($available_quantity !== null && ((int)$quantity < 1 || (float)$available_quantity < (int)$quantity + OptionStock::cartQuantity($cart_query->rows, $product_id))) {
+			foreach ($product_options as $product_option) {
+				$errors[] = $product_option['product_option_id'];
+			}
+			if (!$product_options) {
+				$errors[] = 0;
+			}
+		}
+
+		return array_unique($errors);
 	}
 
 	public function add($product_id, $quantity = 1, $option = array(), $recurring_id = 0) {

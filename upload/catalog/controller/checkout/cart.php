@@ -376,17 +376,27 @@ class ControllerCheckoutCart extends Controller {
 				$quantity = 1;
 			}
 
-			if (isset($this->request->post['option'])) {
+			if (isset($this->request->post['option']) && is_array($this->request->post['option'])) {
 				$option = array_filter($this->request->post['option']);
 			} else {
 				$option = array();
 			}
 
-			$product_options = $this->model_catalog_product->getProductOptions($this->request->post['product_id']);
+			$product_options = $this->model_catalog_product->getProductOptions($this->request->post['product_id'], false);
 
 			foreach ($product_options as $product_option) {
 				if ($product_option['required'] && empty($option[$product_option['product_option_id']])) {
 					$json['error']['option'][$product_option['product_option_id']] = sprintf($this->language->get('error_required'), $product_option['name']);
+				}
+			}
+
+			foreach ($this->cart->getOptionStockErrors($product_id, $quantity, $option, $product_options, $product_info['quantity']) as $product_option_id) {
+				if (!$product_option_id) {
+					$json['error']['warning'] = $this->language->get('error_stock');
+					continue;
+				}
+				if (!isset($json['error']['option'][$product_option_id])) {
+					$json['error']['option'][$product_option_id] = $this->language->get('error_stock');
 				}
 			}
 

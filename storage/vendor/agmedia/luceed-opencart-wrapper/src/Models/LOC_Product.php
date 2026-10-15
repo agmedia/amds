@@ -158,7 +158,7 @@ class LOC_Product
      *
      * @return $this
      */
-    public function sortForUpdate(string $products = null)
+    public function sortForUpdate(?string $products = null)
     {
         $start = microtime(true);
         // List of existing product identifiers.
@@ -173,9 +173,20 @@ class LOC_Product
         $response = [];
 
         $product_options = $full_list->where('osnovni__artikl', '!=', null)->groupBy('osnovni__artikl')->all();
+        $products_by_code = [];
+        foreach ($full_list as $product) {
+            $products_by_code[$this->productLookupKey($product->artikl)][] = $product;
+        }
 
         for ($i = 0; $i < count($this->existing); $i++) {
-            $main = $full_list->where('artikl', '==', $this->existing[$i])->first();
+            $main = null;
+            foreach (($products_by_code[$this->productLookupKey($this->existing[$i])] ?? []) as $candidate) {
+                // Keep the original loose comparison and first-match behavior.
+                if ($candidate->artikl == $this->existing[$i]) {
+                    $main = $candidate;
+                    break;
+                }
+            }
 
             if (isset($main->artikl)) {
                 $response[$this->existing[$i]]         = $main;
@@ -198,6 +209,14 @@ class LOC_Product
     }
 
 
+    private function productLookupKey($identifier): string
+    {
+        return is_numeric($identifier)
+            ? 'number:' . serialize((float)$identifier + 0.0)
+            : 'string:' . (string)$identifier;
+    }
+
+
     /**
      * @param string $type
      *
@@ -206,7 +225,12 @@ class LOC_Product
      */
     public function update(string $type = 'all')
     {
+        if (!$this->products_to_add) {
+            throw new \UnexpectedValueException('No local products matched the Luceed inventory response; stock was not changed.');
+        }
+
         $db = new Database(DB_DATABASE);
+        $updated = false;
         // Sort the temporary products DB import string.
         // (uid, price, quantity, stock_id)
         $query_str = '';
@@ -237,8 +261,14 @@ class LOC_Product
 
         Log::store($query_str, 'query_string');
 
-        if ($query_str != '') {
-            $db->query("INSERT INTO " . DB_PREFIX . "product_temp (uid, price, quantity, stock_id, status) VALUES " . substr($query_str, 0, -1) . ";");
+        $start = microtime(true);
+        $db->query('START TRANSACTION');
+        try {
+            // Remove leftovers from an interrupted job before using this shared table.
+            $db->query("DELETE FROM `" . DB_PREFIX . "product_temp`");
+            if ($query_str != '') {
+                $db->query("INSERT INTO " . DB_PREFIX . "product_temp (uid, price, quantity, stock_id, status) VALUES " . substr($query_str, 0, -1) . ";");
+            }
             // Check wich type of update to conduct.
             // Price and quantity or each individualy?
             if ($type == 'all') {
@@ -253,14 +283,15 @@ class LOC_Product
                 $db->query("UPDATE " . DB_PREFIX . "product p SET p.quantity = 0, p.status = 0");
                 $updated = $db->query("UPDATE " . DB_PREFIX . "product p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.model = pt.uid SET p.quantity = pt.quantity, p.stock_status_id = pt.stock_id, p.status = pt.status");
             }
+            // DELETE avoids TRUNCATE's metadata lock while still clearing the temp table.
+            $db->query("DELETE FROM `" . DB_PREFIX . "product_temp`");
+
+            $this->updateOptions($type, $db);
+            $db->query('COMMIT');
+        } catch (\Throwable $exception) {
+            $db->query('ROLLBACK');
+            throw $exception;
         }
-
-        $start = microtime(true);
-
-        // DELETE avoids TRUNCATE's metadata lock while still clearing the temp table.
-        $db->query("DELETE FROM `" . DB_PREFIX . "product_temp`");
-
-        $this->updateOptions($type);
 
         $end = microtime(true);
         $time = number_format(($end - $start), 2, ',', '.');
@@ -282,9 +313,9 @@ class LOC_Product
      * @return bool
      * @throws \Exception
      */
-    private function updateOptions(string $type = '')
+    private function updateOptions(string $type = '', ?Database $db = null)
     {
-        $db = new Database(DB_DATABASE);
+        $db = $db ?: new Database(DB_DATABASE);
         $updated = false;
         $query_str = '';
 
@@ -300,10 +331,11 @@ class LOC_Product
             }
         }
 
+        // A valid all-zero snapshot must also clear previously available sizes.
+        $db->query("UPDATE " . DB_PREFIX . "product_option_value p SET p.quantity = 0");
         if ($query_str != '') {
             $db->query("INSERT INTO " . DB_PREFIX . "product_temp (uid, price, quantity, stock_id) VALUES " . substr($query_str, 0, -1) . ";");
 
-            $db->query("UPDATE " . DB_PREFIX . "product_option_value p SET p.quantity = 0");
             $updated = $db->query("UPDATE " . DB_PREFIX . "product_option_value p INNER JOIN " . DB_PREFIX . "product_temp pt ON p.sku = pt.uid SET p.quantity = pt.quantity");
 
             $db->query("DELETE FROM `" . DB_PREFIX . "product_temp`");
@@ -512,6 +544,30 @@ class LOC_Product
     private function setProducts($products): array
     {
         $prods = json_decode($products);
+
+        if (json_last_error() !== JSON_ERROR_NONE || !isset($prods->result[0]->artikli)
+            || !is_array($prods->result[0]->artikli) || !$prods->result[0]->artikli) {
+            throw new \UnexpectedValueException('Luceed returned an invalid or empty product list; stock was not changed.');
+        }
+
+        foreach ($prods->result[0]->artikli as $product) {
+            if (!is_object($product)) {
+                throw new \UnexpectedValueException('Luceed returned an invalid product row; stock was not changed.');
+            }
+            foreach (['artikl', 'naziv', 'enabled', 'webshop', 'osnovni__artikl', 'raspolozivo_kol'] as $field) {
+                if (!property_exists($product, $field)) {
+                    throw new \UnexpectedValueException('Luceed product data is missing ' . $field . '; stock was not changed.');
+                }
+            }
+            if (($product->raspolozivo_kol !== null && !is_numeric($product->raspolozivo_kol))
+                || (isset($product->mpc) && !is_numeric($product->mpc))) {
+                throw new \UnexpectedValueException('Luceed returned an invalid stock quantity or price; stock was not changed.');
+            }
+            if ($product->enabled !== 'N' && $product->webshop !== 'N'
+                && $product->artikl !== '' && $product->naziv !== '' && !isset($product->mpc)) {
+                throw new \UnexpectedValueException('Luceed returned a product without its price; stock was not changed.');
+            }
+        }
 
         return $prods->result[0]->artikli;
     }

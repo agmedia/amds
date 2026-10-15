@@ -14,6 +14,17 @@ class ControllerExtensionPaymentBankTransfer extends Controller {
 		$json = array();
 		
 		if (isset($this->session->data['payment_method']['code']) && $this->session->data['payment_method']['code'] == 'bank_transfer') {
+			$this->load->model('checkout/order');
+			if (empty($this->session->data['order_id']) || !\Cart\PaymentStock::isReady(
+				$this->cart, $this->model_checkout_order, $this->session->data['order_id'], !empty($this->session->data['vouchers']))) {
+				$this->load->language('checkout/cart');
+				$this->session->data['error'] = $this->language->get('error_stock');
+				$json['redirect'] = $this->url->link('checkout/cart', '', true);
+				$this->response->addHeader('Content-Type: application/json');
+				$this->response->setOutput(json_encode($json));
+				return;
+			}
+
 			$this->load->language('extension/payment/bank_transfer');
 
 			$this->load->model('checkout/order');
