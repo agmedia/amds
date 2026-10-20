@@ -12,6 +12,8 @@ class ReturnIbanTest extends ControllerAccountReturn {
 $controller = new ReturnIbanTest();
 foreach (array(
     'HR1210010051863000160' => true,
+    'HR121001005–1863000160' => true,
+    '121001005-1863000160' => true,
     '1210010051863000160' => true,
     'hr12 1001 0051 8630 0016 0' => true,
     'HR1210010051863000161' => false,
@@ -25,7 +27,7 @@ foreach (array(
         throw new RuntimeException('Unexpected validation result: ' . $value);
     }
 }
-echo "IBAN validation: 9 cases passed\n";
+echo "IBAN validation: 11 cases passed\n";
 
 $controller->language = new class {
     public function get($key) { return $key; }

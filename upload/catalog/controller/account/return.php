@@ -613,7 +613,7 @@ class ControllerAccountReturn extends Controller {
 	}
 
 	protected function normalizeRefundIban($value) {
-		$value = strtoupper(preg_replace('/\s+/', '', $value));
+		$value = strtoupper(preg_replace('/[\s–—-]+/u', '', $value));
 		return preg_match('/^[0-9]{19}$/D', $value) ? 'HR' . $value : $value;
 	}
 

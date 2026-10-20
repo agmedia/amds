@@ -148,7 +148,10 @@
             <div class="col-sm-10">
               <div class="refund-iban-entry">
                 <span aria-hidden="true">HR</span>
+                <div class="refund-iban-cells">
+                  <div class="refund-iban-guides" aria-hidden="true">{% for digit in 1..19 %}<span></span>{% endfor %}</div>
                 <input type="text" name="refund_iban" value="{{ refund_iban_digits|e }}" id="input-refund-iban" aria-label="{{ entry_refund_iban }} HR" aria-describedby="help-refund-iban" inputmode="numeric" pattern="[0-9]{19}" required autocomplete="off" />
+                </div>
               </div>
               <p id="help-refund-iban" class="help-block">{{ help_refund_iban }}</p>
               {% if error_refund_iban %}
@@ -196,16 +199,21 @@
 <style>
 .refund-iban-entry { display: flex; align-items: center; gap: 10px; max-width: 100%; }
 .refund-iban-entry > span { font-weight: 600; color: #444; }
-.refund-iban-entry input { font: 16px/44px monospace; letter-spacing: 1ch; width: 37.5ch; padding: 0 0 0 .5ch; border: 1px solid #ccc; border-radius: 4px; color: #333; background: repeating-linear-gradient(to right, #fff 0, #fff calc(2ch - 1px), #ddd calc(2ch - 1px), #ddd 2ch); box-sizing: content-box; min-width: 0; flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(0,0,0,.05); }
-.refund-iban-entry input:focus { border-color: #666; outline: 2px solid #ddd; outline-offset: 2px; }
+.refund-iban-cells { --cell: min(32px, calc((100vw - 72px) / 19)); position: relative; width: calc(19 * var(--cell)); height: 46px; border: 1px solid #ccc; border-radius: 4px; box-sizing: content-box; overflow: clip; flex-shrink: 0; }
+.refund-iban-guides { position: absolute; inset: 0; display: grid; grid-template-columns: repeat(19, 1fr); pointer-events: none; }
+.refund-iban-guides span { display: flex; align-items: center; justify-content: center; color: #bbb; font: 14px monospace; }
+.refund-iban-guides span + span { border-left: 1px solid #ddd; }
+.refund-iban-entry .refund-iban-cells input { position: absolute; inset: 0; width: calc(100% + var(--cell) / 2); height: 100%; font: 16px/46px monospace; letter-spacing: calc(var(--cell) - 1ch); padding: 0 0 0 calc((var(--cell) - 1ch) / 2); margin: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; box-sizing: border-box; color: #333; }
+.refund-iban-cells:focus-within { border-color: #666; outline: 2px solid #ddd; outline-offset: 2px; }
+.refund-iban-entry .refund-iban-cells input:focus { outline: none; box-shadow: none; }
 .refund-confirmation { display: flex; align-items: flex-start; gap: 10px; font-weight: normal; cursor: pointer; line-height: 1.6; }
 .refund-confirmation input { flex: 0 0 auto; margin: 5px 0 0; }
-@media (max-width: 480px) { .refund-iban-entry { gap: 8px; } .refund-iban-entry input { font-size: 11px; } }
+@media (max-width: 480px) { .refund-iban-entry { gap: 8px; } .refund-iban-entry .refund-iban-cells input { font-size: 11px; } }
 </style>
 <script><!--
 $('#input-refund-iban').on('input', function() {
-    this.value = this.value.replace(/\s/g, '').replace(/^HR/i, '');
-});
+    this.value = this.value.replace(/[\s–—-]/g, '').replace(/^HR/i, '');
+}).trigger('input');
 $('.date').datetimepicker({
 	language: '{{ datepicker }}',
 	pickTime: false
