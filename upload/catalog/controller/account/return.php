@@ -466,6 +466,10 @@ class ControllerAccountReturn extends Controller {
 			$data['refund_iban'] = '';
 		}
 
+		$data['refund_account_holder'] = isset($this->request->post['refund_account_holder']) ? $this->request->post['refund_account_holder'] : '';
+		$data['error_refund_account_holder'] = isset($this->error['refund_account_holder']) ? $this->error['refund_account_holder'] : '';
+		$data['refund_iban_digits'] = preg_replace('/^HR/i', '', preg_replace('/\s+/', '', $data['refund_iban']));
+
 		// Captcha
 		if ($this->config->get('captcha_' . $this->config->get('config_captcha') . '_status') && in_array('return', (array)$this->config->get('config_captcha_page'))) {
 			$data['captcha'] = $this->load->controller('extension/captcha/' . $this->config->get('config_captcha'), $this->error);
@@ -514,7 +518,8 @@ class ControllerAccountReturn extends Controller {
 		$data['return_items'] = json_encode($return_products, JSON_UNESCAPED_UNICODE);
 		$data['invoice_number'] = $invoice_number;
 		$data['invoice_date'] = isset($data['invoice_date']) ? trim($data['invoice_date']) : '';
-		$data['refund_iban'] = isset($data['refund_iban']) ? trim($data['refund_iban']) : '';
+		$data['refund_iban'] = $this->normalizeRefundIban(isset($data['refund_iban']) ? $data['refund_iban'] : '');
+		$data['refund_account_holder'] = trim($data['refund_account_holder']);
 		$data['customer_comment'] = isset($data['comment']) ? trim($data['comment']) : '';
 		$data['order_id'] = (int)preg_replace('/\D+/', '', $invoice_number);
 		$data['date_ordered'] = $data['invoice_date'];
@@ -583,6 +588,7 @@ class ControllerAccountReturn extends Controller {
 
 		$lines[] = $this->language->get('entry_invoice_number') . ': ' . $data['invoice_number'];
 		$lines[] = $this->language->get('entry_invoice_date') . ': ' . $data['invoice_date'];
+		$lines[] = $this->language->get('entry_refund_account_holder') . ': ' . $data['refund_account_holder'];
 		$lines[] = $this->language->get('entry_refund_iban') . ': ' . $data['refund_iban'];
 		$lines[] = '';
 		$lines[] = $this->language->get('text_return_products_title') . ':';
@@ -598,6 +604,23 @@ class ControllerAccountReturn extends Controller {
 		}
 
 		return implode("\n", $lines);
+	}
+
+	protected function normalizeRefundIban($value) {
+		$value = strtoupper(preg_replace('/\s+/', '', $value));
+		return preg_match('/^[0-9]{19}$/D', $value) ? 'HR' . $value : $value;
+	}
+
+	protected function isValidRefundIban($iban) {
+		if (!preg_match('/^HR[0-9]{19}$/D', $iban)) {
+			return false;
+		}
+		$digits = substr($iban, 4) . '1727' . substr($iban, 2, 2);
+		$remainder = 0;
+		foreach (str_split($digits) as $digit) {
+			$remainder = ($remainder * 10 + (int)$digit) % 97;
+		}
+		return $remainder === 1;
 	}
 
 	protected function validate() {
@@ -629,11 +652,16 @@ class ControllerAccountReturn extends Controller {
 			$this->error['return_products'] = $this->language->get('error_return_products');
 		}
 
+		$holder = isset($this->request->post['refund_account_holder']) ? trim($this->request->post['refund_account_holder']) : '';
+		if (utf8_strlen($holder) < 1 || utf8_strlen($holder) > 128 || preg_match('/[\r\n]/', $holder)) {
+			$this->error['refund_account_holder'] = $this->language->get('error_refund_account_holder');
+		}
+
 		if (empty($this->request->post['return_reason_id'])) {
 			$this->error['reason'] = $this->language->get('error_reason');
 		}
 
-		if (empty($this->request->post['refund_iban']) || (utf8_strlen(preg_replace('/\s+/', '', $this->request->post['refund_iban'])) < 15)) {
+		if (!$this->isValidRefundIban($this->normalizeRefundIban(isset($this->request->post['refund_iban']) ? $this->request->post['refund_iban'] : ''))) {
 			$this->error['refund_iban'] = $this->language->get('error_refund_iban');
 		}
 
@@ -729,6 +757,7 @@ class ControllerAccountReturn extends Controller {
 			$this->language->get('entry_email') => isset($data['email']) ? $data['email'] : '',
 			$this->language->get('entry_telephone') => isset($data['telephone']) ? $data['telephone'] : '',
 			$this->language->get('entry_reason') => $return_reason,
+			$this->language->get('entry_refund_account_holder') => isset($data['refund_account_holder']) ? $data['refund_account_holder'] : '',
 			$this->language->get('entry_refund_iban') => isset($data['refund_iban']) ? $data['refund_iban'] : ''
 		);
 

@@ -75,5 +75,9 @@ $_['error_product']      = 'Product Name must be greater than 3 and less than 25
 $_['error_model']        = 'Product Model must be greater than 3 and less than 64 characters!';
 $_['error_reason']       = 'You must select a return product reason!';
 $_['error_return_products'] = 'Enter at least one return item with product code, quantity, and price.';
-$_['error_refund_iban']     = 'Refund IBAN required!';
+$_['error_refund_iban'] = 'Enter a valid Croatian IBAN: HR and 19 digits.';
 $_['error_agree']        = 'Warning: You must agree to the %s!';
+
+$_['entry_refund_account_holder'] = 'Account holder full name';
+$_['error_refund_account_holder'] = 'Enter the account holder full name (up to 128 characters).';
+$_['help_refund_iban'] = 'Enter the 19 digits after HR. You can paste the complete IBAN.';

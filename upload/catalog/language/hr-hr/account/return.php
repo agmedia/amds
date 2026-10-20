@@ -78,6 +78,10 @@ $_['error_product']      = 'Naziv artikla mora imati više od 3 i manje od 255 z
 $_['error_model']        = 'Model artikla mora imati više od 3 i manje od 64 znaka!';
 $_['error_reason']       = 'Morate odabrati razlog povrata artikla!';
 $_['error_return_products'] = 'Unesite barem jedan artikl za povrat sa šifrom, količinom i cijenom.';
-$_['error_refund_iban']     = 'IBAN za povrat sredstava je obavezan podatak!';
+$_['error_refund_iban'] = 'Unesite ispravan hrvatski IBAN: HR i 19 znamenki.';
 // $_['error_captcha']      = 'Kod za provjeru (verifikaciju) ne odgovara onom sa slike!'; // postojalo u verziji OC 2.0.3.1
 $_['error_agree']        = 'Upozorenje: Morate prihvatiti (složiti se s) %s!';
+
+$_['entry_refund_account_holder'] = 'Ime i prezime vlasnika računa';
+$_['error_refund_account_holder'] = 'Unesite ime i prezime vlasnika računa (do 128 znakova).';
+$_['help_refund_iban'] = 'Unesite 19 znamenki nakon HR. Možete zalijepiti cijeli IBAN.';

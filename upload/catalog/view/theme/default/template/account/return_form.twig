@@ -137,9 +137,20 @@
               {% endif %} </div>
           </div>
           <div class="form-group required">
+            <label class="col-sm-2 control-label" for="input-refund-account-holder">{{ entry_refund_account_holder }}</label>
+            <div class="col-sm-10">
+              <input type="text" name="refund_account_holder" value="{{ refund_account_holder|e }}" id="input-refund-account-holder" class="form-control" maxlength="128" required />
+              {% if error_refund_account_holder %}<div class="text-danger">{{ error_refund_account_holder }}</div>{% endif %}
+            </div>
+          </div>
+          <div class="form-group required">
             <label class="col-sm-2 control-label" for="input-refund-iban">{{ entry_refund_iban }}</label>
             <div class="col-sm-10">
-              <input type="text" name="refund_iban" value="{{ refund_iban }}" placeholder="{{ entry_refund_iban }}" id="input-refund-iban" class="form-control" />
+              <div class="refund-iban-entry">
+                <span aria-hidden="true">HR</span>
+                <input type="text" name="refund_iban" value="{{ refund_iban_digits|e }}" id="input-refund-iban" aria-label="{{ entry_refund_iban }} HR" aria-describedby="help-refund-iban" inputmode="numeric" pattern="[0-9]{19}" required autocomplete="off" />
+              </div>
+              <p id="help-refund-iban" class="help-block">{{ help_refund_iban }}</p>
               {% if error_refund_iban %}
               <div class="text-danger">{{ error_refund_iban }}</div>
               {% endif %}
@@ -177,7 +188,15 @@
       {{ content_bottom }}</div>
     {{ column_right }}</div>
 </div>
-<script type="text/javascript"><!--
+<style>
+.refund-iban-entry { display: flex; align-items: center; gap: 8px; }
+.refund-iban-entry input { font: 16px/36px monospace; letter-spacing: .5ch; width: 28.25ch; padding: 0 0 0 .25ch; border: 1px solid #aaa; border-radius: 0; background: repeating-linear-gradient(to right, transparent 0, transparent calc(1.5ch - 1px), #aaa calc(1.5ch - 1px), #aaa 1.5ch); box-sizing: content-box; min-width: 0; }
+@media (max-width: 380px) { .refund-iban-entry input { font-size: 13px; } }
+</style>
+<script><!--
+$('#input-refund-iban').on('input', function() {
+    this.value = this.value.replace(/\s/g, '').replace(/^HR/i, '');
+});
 $('.date').datetimepicker({
 	language: '{{ datepicker }}',
 	pickTime: false
