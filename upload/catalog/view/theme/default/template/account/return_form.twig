@@ -157,6 +157,15 @@
             </div>
           </div>
           <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+              <label class="refund-confirmation" for="input-refund-confirmed">
+                <input type="checkbox" name="refund_confirmed" value="1" id="input-refund-confirmed" required {% if refund_confirmed %}checked="checked"{% endif %} />
+                <span>{{ text_refund_confirmation }}</span>
+              </label>
+              {% if error_refund_confirmed %}<div class="text-danger">{{ error_refund_confirmed }}</div>{% endif %}
+            </div>
+          </div>
+          <div class="form-group">
             <label class="col-sm-2 control-label" for="input-comment">{{ entry_fault_detail }}</label>
             <div class="col-sm-10">
               <textarea name="comment" rows="10" placeholder="{{ entry_fault_detail }}" id="input-comment" class="form-control">{{ comment }}</textarea>
@@ -189,9 +198,13 @@
     {{ column_right }}</div>
 </div>
 <style>
-.refund-iban-entry { display: flex; align-items: center; gap: 8px; }
-.refund-iban-entry input { font: 16px/36px monospace; letter-spacing: .5ch; width: 28.25ch; padding: 0 0 0 .25ch; border: 1px solid #aaa; border-radius: 0; background: repeating-linear-gradient(to right, transparent 0, transparent calc(1.5ch - 1px), #aaa calc(1.5ch - 1px), #aaa 1.5ch); box-sizing: content-box; min-width: 0; }
-@media (max-width: 380px) { .refund-iban-entry input { font-size: 13px; } }
+.refund-iban-entry { display: flex; align-items: center; gap: 10px; max-width: 100%; }
+.refund-iban-entry > span { font-weight: 600; color: #444; }
+.refund-iban-entry input { font: 16px/44px monospace; letter-spacing: 1ch; width: 37.5ch; padding: 0 0 0 .5ch; border: 1px solid #ccc; border-radius: 4px; color: #333; background: repeating-linear-gradient(to right, #fff 0, #fff calc(2ch - 1px), #ddd calc(2ch - 1px), #ddd 2ch); box-sizing: content-box; min-width: 0; flex-shrink: 0; box-shadow: inset 0 1px 1px rgba(0,0,0,.05); }
+.refund-iban-entry input:focus { border-color: #666; outline: 2px solid #ddd; outline-offset: 2px; }
+.refund-confirmation { display: flex; align-items: flex-start; gap: 10px; font-weight: normal; cursor: pointer; line-height: 1.6; }
+.refund-confirmation input { flex: 0 0 auto; margin: 5px 0 0; }
+@media (max-width: 480px) { .refund-iban-entry { gap: 8px; } .refund-iban-entry input { font-size: 11px; } }
 </style>
 <script><!--
 $('#input-refund-iban').on('input', function() {

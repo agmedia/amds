@@ -81,3 +81,6 @@ $_['error_agree']        = 'Warning: You must agree to the %s!';
 $_['entry_refund_account_holder'] = 'Account holder full name';
 $_['error_refund_account_holder'] = 'Enter the account holder full name (up to 128 characters).';
 $_['help_refund_iban'] = 'Enter the 19 digits after HR. You can paste the complete IBAN.';
+
+$_['text_refund_confirmation'] = 'I confirm that the information provided is correct and agree to receive the refund to the bank account above, even if it belongs to another person.';
+$_['error_refund_confirmed'] = 'Confirm that the details are correct and that you agree to the refund to the specified account.';

@@ -466,6 +466,8 @@ class ControllerAccountReturn extends Controller {
 			$data['refund_iban'] = '';
 		}
 
+		$data['refund_confirmed'] = isset($this->request->post['refund_confirmed']) && $this->request->post['refund_confirmed'] === '1';
+		$data['error_refund_confirmed'] = isset($this->error['refund_confirmed']) ? $this->error['refund_confirmed'] : '';
 		$data['refund_account_holder'] = isset($this->request->post['refund_account_holder']) ? $this->request->post['refund_account_holder'] : '';
 		$data['error_refund_account_holder'] = isset($this->error['refund_account_holder']) ? $this->error['refund_account_holder'] : '';
 		$data['refund_iban_digits'] = preg_replace('/^HR/i', '', preg_replace('/\s+/', '', $data['refund_iban']));
@@ -520,6 +522,7 @@ class ControllerAccountReturn extends Controller {
 		$data['invoice_date'] = isset($data['invoice_date']) ? trim($data['invoice_date']) : '';
 		$data['refund_iban'] = $this->normalizeRefundIban(isset($data['refund_iban']) ? $data['refund_iban'] : '');
 		$data['refund_account_holder'] = trim($data['refund_account_holder']);
+		$data['refund_confirmed'] = isset($data['refund_confirmed']) && $data['refund_confirmed'] === '1';
 		$data['customer_comment'] = isset($data['comment']) ? trim($data['comment']) : '';
 		$data['order_id'] = (int)preg_replace('/\D+/', '', $invoice_number);
 		$data['date_ordered'] = $data['invoice_date'];
@@ -590,6 +593,9 @@ class ControllerAccountReturn extends Controller {
 		$lines[] = $this->language->get('entry_invoice_date') . ': ' . $data['invoice_date'];
 		$lines[] = $this->language->get('entry_refund_account_holder') . ': ' . $data['refund_account_holder'];
 		$lines[] = $this->language->get('entry_refund_iban') . ': ' . $data['refund_iban'];
+		if (!empty($data['refund_confirmed'])) {
+			$lines[] = $this->language->get('text_refund_confirmation');
+		}
 		$lines[] = '';
 		$lines[] = $this->language->get('text_return_products_title') . ':';
 
@@ -650,6 +656,10 @@ class ControllerAccountReturn extends Controller {
 
 		if (!$this->validateReturnProducts($this->getReturnProducts($this->request->post))) {
 			$this->error['return_products'] = $this->language->get('error_return_products');
+		}
+
+		if (!isset($this->request->post['refund_confirmed']) || $this->request->post['refund_confirmed'] !== '1') {
+			$this->error['refund_confirmed'] = $this->language->get('error_refund_confirmed');
 		}
 
 		$holder = isset($this->request->post['refund_account_holder']) ? trim($this->request->post['refund_account_holder']) : '';
@@ -765,6 +775,10 @@ class ControllerAccountReturn extends Controller {
 
 		foreach ($fields as $label => $value) {
 			$message .= $label . ': ' . html_entity_decode(strip_tags((string)$value), ENT_QUOTES, 'UTF-8') . "\n";
+		}
+
+		if (!empty($data['refund_confirmed'])) {
+			$message .= $this->language->get('text_refund_confirmation') . "\n";
 		}
 
 		$message .= "\n" . $this->language->get('text_return_products_title') . ":\n";

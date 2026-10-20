@@ -32,10 +32,13 @@ $controller->language = new class {
 };
 $data = $controller->prepare(array(
     'refund_account_holder' => '  Ana Horvat  ',
+    'refund_confirmed' => '1',
     'refund_iban' => '1210010051863000160',
     'return_products' => array(array('code' => 'SKU', 'quantity' => '1', 'price' => '10'))
 ));
-if ($data['refund_iban'] !== 'HR1210010051863000160'
+if (strpos($data['comment'], 'text_refund_confirmation') === false
+    || strpos($controller->email($data), 'text_refund_confirmation') === false
+    || $data['refund_iban'] !== 'HR1210010051863000160'
     || strpos($data['comment'], 'entry_refund_account_holder: Ana Horvat') === false
     || strpos($controller->email($data), 'entry_refund_account_holder: Ana Horvat') === false) {
     throw new RuntimeException('Account holder or normalized IBAN missing from return details');

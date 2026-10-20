@@ -85,3 +85,6 @@ $_['error_agree']        = 'Upozorenje: Morate prihvatiti (složiti se s) %s!';
 $_['entry_refund_account_holder'] = 'Ime i prezime vlasnika računa';
 $_['error_refund_account_holder'] = 'Unesite ime i prezime vlasnika računa (do 128 znakova).';
 $_['help_refund_iban'] = 'Unesite 19 znamenki nakon HR. Možete zalijepiti cijeli IBAN.';
+
+$_['text_refund_confirmation'] = 'Potvrđujem da su navedeni podaci točni te sam suglasan/suglasna da se povrat sredstava izvrši na gore navedeni bankovni račun, čak i ako glasi na ime druge osobe.';
+$_['error_refund_confirmed'] = 'Potvrdite točnost podataka i suglasnost za povrat na navedeni račun.';
