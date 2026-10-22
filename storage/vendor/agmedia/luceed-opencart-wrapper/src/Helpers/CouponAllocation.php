@@ -341,7 +341,7 @@ class CouponAllocation
             }
 
             $expected = $total * $percentage / 100;
-            $tolerance = max(0.0000001, $expected * 0.000000001);
+            $tolerance = max(0.0000001, $expected * 2.220446049250313e-16 * 8);
 
             return abs($discount - $expected) <= $tolerance ? $percentage : null;
         }
