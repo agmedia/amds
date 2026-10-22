@@ -15,10 +15,9 @@ class ControllerProductCategory extends Controller {
 			$filter = '';
 		}
 
-		// NOVO supports manual priority; other categories keep newest-first sorting.
+		// Category listings support manual priority, with newest products first within it.
         $categorySorts = array(
-            'default'   => array('sort' => 'p.date_added', 'order' => 'DESC'),
-            153         => array('sort' => 'p.sort_order', 'order' => 'ASC')
+            'default'   => array('sort' => 'p.sort_order', 'order' => 'ASC')
         );
 
         $default = $categorySorts['default'];

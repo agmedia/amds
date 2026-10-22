@@ -183,7 +183,7 @@ class ModelCatalogProduct extends Model {
 			$sql .= " ORDER BY p.sort_order";
 		}
 
-		if ((int)(isset($data['filter_category_id']) ? $data['filter_category_id'] : 0) === 153
+		if (!empty($data['filter_category_id'])
             && isset($data['sort']) && $data['sort'] === 'p.sort_order') {
             $direction = isset($data['order']) && $data['order'] === 'DESC' ? 'DESC' : 'ASC';
             $sql .= " " . $direction . ", p.date_added DESC, p.product_id DESC";
