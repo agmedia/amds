@@ -15,9 +15,10 @@ class ControllerProductCategory extends Controller {
 			$filter = '';
 		}
 
-		//sortiranje unutar poseba ponuda po sort_order, defaultno ostaje kako je i bilo (date_added).
+		// NOVO supports manual priority; other categories keep newest-first sorting.
         $categorySorts = array(
-            'default'   => array('sort' => 'p.date_added', 'order' => 'DESC')
+            'default'   => array('sort' => 'p.date_added', 'order' => 'DESC'),
+            153         => array('sort' => 'p.sort_order', 'order' => 'ASC')
         );
 
         $default = $categorySorts['default'];

@@ -183,7 +183,11 @@ class ModelCatalogProduct extends Model {
 			$sql .= " ORDER BY p.sort_order";
 		}
 
-		if (isset($data['order']) && ($data['order'] == 'DESC')) {
+		if ((int)(isset($data['filter_category_id']) ? $data['filter_category_id'] : 0) === 153
+            && isset($data['sort']) && $data['sort'] === 'p.sort_order') {
+            $direction = isset($data['order']) && $data['order'] === 'DESC' ? 'DESC' : 'ASC';
+            $sql .= " " . $direction . ", p.date_added DESC, p.product_id DESC";
+        } elseif (isset($data['order']) && ($data['order'] == 'DESC')) {
 			$sql .= " DESC, LCASE(pd.name) DESC";
 		} else {
 			$sql .= " ASC, LCASE(pd.name) ASC";

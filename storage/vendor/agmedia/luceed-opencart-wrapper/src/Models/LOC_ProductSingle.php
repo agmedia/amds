@@ -273,6 +273,8 @@ class LOC_ProductSingle
         }
 
         $product                     = $this->make();
+        // Preserve the priority chosen in the webshop admin during synchronization.
+        $product['sort_order']       = (int)$this->product_to_update['sort_order'];
         $product['product_discount'] = $old_product['product_discount'];
         $product['product_special']  = $old_product['product_special'];
         $product['product_download'] = $old_product['product_download'];
@@ -359,7 +361,7 @@ class LOC_ProductSingle
             'weight'              => '',
             'weight_class_id'     => 1,
             'status'              => $status,
-            'sort_order'          => 0,
+            'sort_order'          => 1,
             'manufacturer'        => $manufacturer['name'],
             'manufacturer_id'     => $manufacturer['id'],
             'category'            => '',
