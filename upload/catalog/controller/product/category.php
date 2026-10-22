@@ -17,7 +17,8 @@ class ControllerProductCategory extends Controller {
 
 		// Category listings support manual priority, with newest products first within it.
         $categorySorts = array(
-            'default'   => array('sort' => 'p.sort_order', 'order' => 'ASC')
+            'default'   => array('sort' => 'p.sort_order', 'order' => 'ASC'),
+            153         => array('sort' => 'p.date_added', 'order' => 'DESC')
         );
 
         $default = $categorySorts['default'];
@@ -382,8 +383,8 @@ class ControllerProductCategory extends Controller {
 
 			$data['sorts'][] = array(
 				'text'  => $this->language->get('text_default'),
-				'value' => 'p.sort_order-ASC',
-				'href'  => $this->url->link('product/category', 'path=' . $this->request->get['path'] . '&sort=p.sort_order&order=ASC' . $url)
+				'value' => $default['sort'] . '-' . $default['order'],
+				'href'  => $this->url->link('product/category', 'path=' . $this->request->get['path'] . '&sort=' . $default['sort'] . '&order=' . $default['order'] . $url)
 			);
 
 			$data['sorts'][] = array(
