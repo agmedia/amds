@@ -154,6 +154,7 @@ class ModelExtensionTotalCoupon extends Model {
 							$allocation['products'][$index]['discount'] = $fixed_discount * ($product['total'] / $sub_total);
 						} elseif ($coupon_info['type'] == 'P') {
 							$allocation['products'][$index]['discount'] = $product['total'] / 100 * $percentage;
+							$allocation['products'][$index]['coupon_percentage'] = $percentage;
 						}
 					}
 

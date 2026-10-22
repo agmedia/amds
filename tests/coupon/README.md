@@ -30,6 +30,17 @@ amount can differ from independently rounding that total. For example, 19.95 EUR
 at 10 percent stores a raw 1.9950 EUR discount, pays 17.96 EUR and assigns 1.99 EUR
 of effective item discount. Net and gross allocations are captured separately.
 
+Percentage coupons retain their saved nominal percentage when that percentage
+reproduces the already allocated paid cents. The supplied 24 percent examples
+cover all six prices (17.85, 12.60, 13.20, 75.99, 29.99 and 34.99 EUR) with a
+140.31 EUR payment, and the five-line PDF with a 130.28 EUR payment. Historical
+percentage metadata can recover the rate from its raw discount and price. Fixed
+coupons keep their exact effective rebate. Tests also cover fractional rates,
+caps, excluded items, combined sale discounts, tax, quantity chunks and coupon
+changes/deletion. A rounding-sensitive pair of 10.02 EUR products verifies that
+the nominal rate yields to exact cents when necessary to preserve the 15.23 EUR
+payment.
+
 It also exercises actual order creation/edit persistence, records new product IDs
 in the stored JSON, rejects stale metadata, and reapplies the two coupon hooks
 observed in this shop's local OCMOD cache against the updated source.
