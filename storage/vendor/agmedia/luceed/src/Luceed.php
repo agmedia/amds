@@ -167,8 +167,12 @@ class Luceed
      *
      * @return mixed
      */
-    public function getProductsShortList(array $query = null)
+    public function getProductsShortList(?array $query = null, bool $validateResponse = false)
     {
+        if ($validateResponse) {
+            return $this->service->getValidated($this->end_points['product_short_list'] . ($query ?: ''));
+        }
+
         return $this->service->get($this->end_points['product_short_list'] . ($query ?: ''));
     }
 

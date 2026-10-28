@@ -989,7 +989,7 @@ class ControllerExtensionModuleLuceedSync extends Controller
         return $this->runGuardedSync(__FUNCTION__, function () {
             $start = microtime(true);
 
-            $_loc = new LOC_Product(LuceedProduct::shortList());
+            $_loc = new LOC_Product(LuceedProduct::shortList(true));
 
             $end = microtime(true);
             $time = number_format(($end - $start), 2, ',', '.');
@@ -1010,12 +1010,14 @@ class ControllerExtensionModuleLuceedSync extends Controller
      */
     public function updatePrices()
     {
-        $_loc = new LOC_Action(LuceedProduct::getActions());
+        return $this->runGuardedSync(__FUNCTION__, function () {
+            $_loc = new LOC_Action(LuceedProduct::getActions());
 
-        $updated = $_loc->collectWebPrices()
-                        ->update();
+            $updated = $_loc->collectWebPrices()
+                            ->update();
 
-        return $this->response($updated, 'update');
+            return $this->response($updated, 'update');
+        });
     }
 
 
@@ -1025,19 +1027,21 @@ class ControllerExtensionModuleLuceedSync extends Controller
      */
     public function updateQuantities()
     {
-        $_loc = new LOC_Stock();
+        return $this->runGuardedSync(__FUNCTION__, function () {
+            $_loc = new LOC_Stock();
 
-        $_loc->setSkladista(
-            LuceedProduct::getWarehouseStock(agconf('import.warehouse.default'))
-        )->sort();
+            $_loc->setSkladista(
+                LuceedProduct::getWarehouseStock(agconf('import.warehouse.default'))
+            )->sort();
 
-        $_loc->setDobavljaci(
-            LuceedProduct::getSuplierStock()
-        )->sort();
+            $_loc->setDobavljaci(
+                LuceedProduct::getSuplierStock()
+            )->sort();
 
-        $updated = $_loc->createQuery()->update();
+            $updated = $_loc->createQuery()->update();
 
-        return $this->response($updated, 'update_stock');
+            return $this->response($updated, 'update_stock');
+        });
     }
 
 
@@ -2232,9 +2236,25 @@ class ControllerExtensionModuleLuceedSync extends Controller
             ]);
         }
 
+        // Price-only and quantity-only updates use the same staging table.
+        $inventoryLock = in_array($lockName, ['updatePricesAndQuantities', 'updatePrices', 'updateQuantities', 'importActions'], true)
+            ? 'product_inventory' : null;
+        if ($inventoryLock !== null && !$this->acquireSyncLock($inventoryLock)) {
+            $this->releaseSyncLock($lockName);
+            Log::store('Skipped overlapping inventory sync for ' . $lockName, 'luceed_sync_lock');
+
+            return $this->output(['status' => 300, 'message' => 'Inventory sync already running.']);
+        }
+
         try {
             return $callback();
+        } catch (\Throwable $exception) {
+            Log::store('Failed ' . $lockName . ': ' . $exception->getMessage(), 'luceed_sync_lock');
+            throw $exception;
         } finally {
+            if ($inventoryLock !== null) {
+                $this->releaseSyncLock($inventoryLock);
+            }
             $this->releaseSyncLock($lockName);
         }
     }

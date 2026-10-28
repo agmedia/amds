@@ -50,6 +50,33 @@ class ControllerExtensionPaymentWSPay extends Controller
 
     /** ========== 1) PLAĆANJE – prikaz WSPay forme ========== */
     public function index() {
+        return $this->renderPaymentForm(false);
+    }
+
+    /** Check stock again when a previously rendered payment button is submitted. */
+    public function start() {
+        $expected = isset($this->session->data['wspay_payment_token']) ? $this->session->data['wspay_payment_token'] : '';
+        $provided = isset($this->request->post['payment_token']) && is_string($this->request->post['payment_token'])
+            ? $this->request->post['payment_token'] : '';
+        $orderId = isset($this->session->data['order_id']) ? (int)$this->session->data['order_id'] : 0;
+
+        if (($this->request->server['REQUEST_METHOD'] ?? '') !== 'POST' || !$orderId
+            || ($this->session->data['payment_method']['code'] ?? '') !== 'wspay'
+            || (int)($this->request->post['order_id'] ?? 0) !== $orderId
+            || (int)($this->session->data['wspay_payment_order_id'] ?? 0) !== $orderId
+            || $expected === '' || $provided === '' || !hash_equals($expected, $provided)) {
+            $this->response->redirect($this->url->link('checkout/cart', '', true));
+            return;
+        }
+
+        $form = $this->renderPaymentForm(true);
+        $this->response->addHeader('Content-Type: text/html; charset=utf-8');
+        $this->response->addHeader('Cache-Control: no-store');
+        $this->response->setOutput('<!doctype html><html><head><meta charset="utf-8"></head><body>'
+            . $form . '<script>if(document.forms.pay){document.forms.pay.submit();}</script></body></html>');
+    }
+
+    private function renderPaymentForm($gatewaySubmission) {
         $this->load->language('extension/payment/wspay');
         $this->load->model('checkout/order');
 
@@ -59,6 +86,37 @@ class ControllerExtensionPaymentWSPay extends Controller
 
         $order = $this->model_checkout_order->getOrder($this->session->data['order_id']);
         if (!$order) return '';
+        if ((int)$order['order_status_id'] !== 0 || $order['payment_code'] !== 'wspay') {
+            return '';
+        }
+
+        // Bind payment to the saved order as well as the current cart and stock.
+        if (!\Cart\PaymentStock::isReady($this->cart, $this->model_checkout_order,
+            $order['order_id'], !empty($this->session->data['vouchers']))) {
+            $this->load->language('checkout/cart');
+            $message = $this->language->get('error_stock');
+            $this->session->data['error'] = $message;
+
+            return '<div class="alert alert-danger">' . htmlspecialchars($message, ENT_QUOTES, 'UTF-8')
+                . '</div><a class="btn btn-primary" href="'
+                . htmlspecialchars($this->url->link('checkout/cart', '', true), ENT_QUOTES, 'UTF-8')
+                . '">' . htmlspecialchars($this->language->get('heading_title'), ENT_QUOTES, 'UTF-8') . '</a>';
+        }
+
+        if (!$gatewaySubmission) {
+            if (empty($this->session->data['wspay_payment_token'])
+                || (int)($this->session->data['wspay_payment_order_id'] ?? 0) !== (int)$order['order_id']) {
+                $this->session->data['wspay_payment_token'] = bin2hex(random_bytes(32));
+                $this->session->data['wspay_payment_order_id'] = (int)$order['order_id'];
+            }
+
+            return $this->load->view('extension/payment/wspay_start', array(
+                'action' => $this->url->link('extension/payment/wspay/start', '', true),
+                'order_id' => (int)$order['order_id'],
+                'payment_token' => $this->session->data['wspay_payment_token'],
+                'button_confirm' => $this->language->get('button_confirm')
+            ));
+        }
 
         $shopId    = $this->config->get('payment_wspay_merchant');
         $secretKey = $this->config->get('payment_wspay_password');

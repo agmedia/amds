@@ -23,11 +23,11 @@ class LuceedProduct extends Facade
     /**
      * @return mixed
      */
-    public static function shortList()
+    public static function shortList(bool $validateResponse = false)
     {
         $luceed = new Luceed();
 
-        return $luceed->getProductsShortList();
+        return $luceed->getProductsShortList(null, $validateResponse);
     }
     
     

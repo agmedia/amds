@@ -78,6 +78,54 @@ class LuceedService
     }
 
 
+    /** Fetch a complete response before an inventory update may change stock. */
+    public function getValidated(string $url): string
+    {
+        $this->logRequest('GET', $url);
+
+        if ($this->env === 'local') {
+            $response = @file_get_contents(DIR_UPLOAD . 'luceed_json/' . $url);
+            if (!is_string($response) || trim($response) === '') {
+                throw new \RuntimeException('Luceed inventory fixture is missing or empty.');
+            }
+
+            return $response;
+        }
+
+        $ch = curl_init($this->base_url . $url);
+        if ($ch === false) {
+            throw new \RuntimeException('Could not initialize the Luceed inventory request.');
+        }
+
+        try {
+            curl_setopt_array($ch, [
+                CURLOPT_USERPWD => $this->username . ':' . $this->password,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_CONNECTTIMEOUT => 10,
+                CURLOPT_TIMEOUT => 180,
+            ]);
+
+            $response = curl_exec($ch);
+            $error = curl_errno($ch);
+            $status = (int)curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+            if ($response === false || $error !== 0) {
+                throw new \RuntimeException('Luceed inventory request failed (cURL error ' . $error . ').');
+            }
+            if ($status < 200 || $status >= 300) {
+                throw new \RuntimeException('Luceed inventory request returned HTTP ' . $status . '.');
+            }
+            if (trim($response) === '') {
+                throw new \RuntimeException('Luceed inventory response is empty.');
+            }
+
+            return $response;
+        } finally {
+            curl_close($ch);
+        }
+    }
+
+
     /**
      * @param string $url
      * @param array  $body
