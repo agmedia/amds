@@ -1203,6 +1203,7 @@ class ControllerSaleOrder extends Controller {
 					}
 
 					if ($coupon_product['price'] >= 0 && $coupon_product['quantity'] > 0 && $coupon_product['discount_amount'] >= 0 && $coupon_product['net_total'] >= 0) {
+						$coupon_product['coupon_type'] = isset($allocation['type']) && is_string($allocation['type']) ? $allocation['type'] : '';
 						$coupon_products[(int)$coupon_product['order_product_id']] = $coupon_product;
 					}
 				}
@@ -1256,10 +1257,30 @@ class ControllerSaleOrder extends Controller {
 						}
 					}
 
+					$coupon_rate = $net_total + $discount > 0 ? $discount / ($net_total + $discount) * 100 : 0;
+
+					try {
+						$nominal_rate = \Agmedia\LuceedOpencartWrapper\Helpers\CouponAllocation::couponPercentage($coupon_product, $coupon_product['coupon_type']);
+
+						if ($nominal_rate !== null) {
+							$raw_price = (float)$coupon_product['price'];
+							if ($this->config->get('config_tax')) {
+								$raw_price += isset($coupon_product['price_tax']) && is_numeric($coupon_product['price_tax']) ? (float)$coupon_product['price_tax'] : (float)$product['tax'];
+							}
+
+							$nominal_total = $raw_price * $coupon_product['quantity'] * (1 - $nominal_rate / 100);
+							if (is_finite($nominal_total) && $this->currency->format($nominal_total, $order_info['currency_code'], $order_info['currency_value']) === $this->currency->format($net_total, $order_info['currency_code'], $order_info['currency_value'])) {
+								$coupon_rate = $nominal_rate;
+							}
+						}
+					} catch (\Throwable $e) {
+						// Keep the effective rate when legacy metadata cannot supply a valid nominal rate.
+					}
+
 					$coupon_data = array(
 						'code'       => $coupon_code,
 						'discounted' => $discount > 0,
-						'rate'       => number_format($net_total + $discount > 0 ? $discount / ($net_total + $discount) * 100 : 0, 2, $this->language->get('decimal_point'), $this->language->get('thousand_point')),
+						'rate'       => number_format($coupon_rate, 2, $this->language->get('decimal_point'), $this->language->get('thousand_point')),
 						'discount'   => $this->currency->format($discount, $order_info['currency_code'], $order_info['currency_value']),
 						'total'      => $this->currency->format($net_total, $order_info['currency_code'], $order_info['currency_value'])
 					);

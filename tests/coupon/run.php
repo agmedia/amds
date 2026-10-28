@@ -162,10 +162,10 @@ class CouponFixtureTax
     }
     public function getRates($amount, $class)
     {
-        $rates = array(1 => 25, 2 => 13, 3 => 5);
+        $rates = array(1 => 25, 2 => 13, 3 => 5, 4 => 25);
         return array(
             array('type' => 'P', 'tax_rate_id' => $class, 'amount' => $amount * $rates[$class] / 100),
-            array('type' => 'F', 'tax_rate_id' => 99, 'amount' => 2),
+            array('type' => 'F', 'tax_rate_id' => 99, 'amount' => $class === 4 ? 0 : 2),
         );
     }
 }
@@ -284,6 +284,9 @@ function snapshot(array $products, array $discounts, $amount = null, $shipping =
             'base_price' => isset($product['base_price']) ? $product['base_price'] : $product['price'],
             'discount' => $discounts[$index], 'discount_tax' => 0,
         );
+        if (array_key_exists('coupon_percentage', $product)) {
+            $items[$index]['coupon_percentage'] = $product['coupon_percentage'];
+        }
     }
     return array('version' => 1, 'code' => 'TEST', 'type' => $type,
         'amount' => $amount === null ? array_sum($discounts) + $shipping : $amount,
@@ -345,7 +348,7 @@ function checkout(array $products, array $coupon = array(), array $details = arr
     $model->model_catalog_product = new CouponFixtureCatalog($details);
     $total = $model->cart->getSubTotal() + ($shipping === null ? 0 : $shipping['cost']);
     $totals = array();
-    $taxes = array(1 => 100, 2 => 100, 3 => 100, 99 => 100);
+    $taxes = array(1 => 100, 2 => 100, 3 => 100, 4 => 100, 99 => 100);
     if ($limit !== null) { $total = $limit; }
     $model->getTotal(array('totals' => &$totals, 'taxes' => &$taxes, 'total' => &$total));
     return array('totals' => $totals, 'taxes' => $taxes, 'total' => $total);
@@ -404,6 +407,204 @@ scenario('Receipt: 21.00 at 20 percent yields 16.80', function () {
     money(4.20, $allocation['products'][0]['discount_amount'], 'Dress discount');
     money(16.80, $allocation['products'][0]['net_total'], 'Dress refund');
     money(20, CouponAllocation::buildLines($allocation['products'][0])[0]['rabat'], 'Visible dress rebate');
+});
+
+scenario('Supplied six-item receipt keeps nominal 24 percent and paid total 140.31', function () {
+    $prices = array(17.85, 12.60, 13.20, 75.99, 29.99, 34.99);
+    $expected = array(13.57, 9.58, 10.03, 57.75, 22.79, 26.59);
+    $products = array();
+    foreach ($prices as $id => $price) { $products[] = product($id + 1, $price); }
+    $result = checkout($products, array('discount' => 24));
+    $allocation = $result['totals'][0]['coupon_allocation'];
+    assertAllocation($allocation);
+    money(140.31, round($result['total'], 2), 'Supplied receipt payment');
+    moneyArray($expected, array_column($allocation['products'], 'net_total'), 'Supplied receipt item refunds');
+    foreach ($allocation['products'] as $item) {
+        money(24, $item['coupon_percentage'], 'Checkout stores configured percentage');
+        same('P', $item['coupon_type'], 'Finalized item retains percentage type');
+        money(24, CouponAllocation::couponPercentage($item, 'P'), 'Nominal coupon percentage');
+    }
+    $object = exporter($products, $allocation, $result['totals'][0]['value']);
+    $lines = invokePrivate($object, 'getRegularProducts');
+    same(6, count($lines), 'One exported receipt row per product');
+    same(14031, lineCents($lines), 'Supplied receipt export payment');
+    same(14031, lineTotalCents($lines), 'Supplied receipt extended-line payment');
+    foreach ($lines as $index => $line) {
+        money($prices[$index], $line['cijena'], 'Original receipt price');
+        money(24, $line['rabat'], 'Visible configured 24 percent rebate');
+        same((int) round($expected[$index] * 100), lineCents(array($line)), 'Exported item refund');
+    }
+});
+
+scenario('Supplied five-item PDF keeps nominal 24 percent and paid total 130.28', function () {
+    $prices = array(17.85, 12.60, 75.99, 29.99, 34.99);
+    $expected = array(13.57, 9.58, 57.75, 22.79, 26.59);
+    $products = array();
+    foreach ($prices as $id => $price) { $products[] = product($id + 1, $price); }
+    $result = checkout($products, array('discount' => 24));
+    $allocation = $result['totals'][0]['coupon_allocation'];
+    assertAllocation($allocation);
+    moneyArray($expected, array_column($allocation['products'], 'net_total'), 'PDF item refunds');
+    $object = exporter($products, $allocation, $result['totals'][0]['value']);
+    $lines = invokePrivate($object, 'getRegularProducts');
+    same(5, count($lines), 'Five PDF product rows');
+    same(13028, lineCents($lines), 'PDF export paid amount');
+    same(13028, lineTotalCents($lines), 'PDF extended-line paid amount');
+    money(130.28, round($result['total'], 2), 'PDF checkout paid amount');
+    foreach ($lines as $line) { money(24, $line['rabat'], 'PDF displays configured percentage'); }
+});
+
+scenario('Historical percentage snapshots derive nominal rate from raw discount only', function () {
+    $products = array(product(1, 17.85));
+    $raw = snapshot($products, array(4.284));
+    foreach ($raw['products'] as $item) { check(!isset($item['coupon_percentage']), 'Historical input has no nominal metadata'); }
+    $allocation = CouponAllocation::finalize($raw);
+    assertAllocation($allocation);
+    foreach ($allocation['products'] as $item) {
+        money(24, CouponAllocation::couponPercentage($item, 'P'), 'Historical rate derives from unrounded discount');
+        $roundedOnly = $item;
+        $roundedOnly['discount_amount'] = 1.23;
+        $roundedOnly['discount_percent'] = 99;
+        money(24, CouponAllocation::couponPercentage($roundedOnly, 'P'), 'Finalized cent fields do not redefine nominal rate');
+    }
+    $object = exporter($products, $allocation, -$raw['amount']);
+    $lines = invokePrivate($object, 'getRegularProducts');
+    foreach ($lines as $line) { money(24, $line['rabat'], 'Historical percentage export retains nominal rate'); }
+    same(1357, lineCents($lines), 'Historical cent amounts unchanged');
+});
+
+scenario('Fixed discounts equivalent to 24 percent keep their exact monetary rebate', function () {
+    $result = checkout(array(product(1, 17.85)), array('type' => 'F', 'discount' => 4.284));
+    $allocation = $result['totals'][0]['coupon_allocation'];
+    assertAllocation($allocation);
+    $item = $allocation['products'][0];
+    same('F', $item['coupon_type'], 'Fixed coupon type retained');
+    check(!isset($item['coupon_percentage']), 'Fixed checkout stores no percentage metadata');
+    same(null, CouponAllocation::couponPercentage($item, 'F'), 'Fixed raw ratio is not a nominal percentage');
+    $item['coupon_percentage'] = 24;
+    same(null, CouponAllocation::couponPercentage($item, 'F'), 'Fixed coupon ignores stray percentage metadata');
+    $lines = CouponAllocation::buildLines($item);
+    money(23.9776, $lines[0]['rabat'], 'Fixed coupon retains exact rounded-money rebate');
+    same(1357, lineCents($lines), 'Fixed coupon paid amount');
+    $object = exporter(array(product(1, 17.85)), $allocation, $result['totals'][0]['value']);
+    $exported = invokePrivate($object, 'getRegularProducts');
+    money(23.9776, $exported[0]['rabat'], 'Fixed export is not rounded to 24 percent');
+});
+
+scenario('Fractional nominal percentages remain fractional in exported rebates', function () {
+    $products = array(product(1, 79.99));
+    $result = checkout($products, array('discount' => 12.5));
+    $allocation = $result['totals'][0]['coupon_allocation'];
+    assertAllocation($allocation);
+    money(12.5, $allocation['products'][0]['coupon_percentage'], 'Stored fractional coupon percentage');
+    money(12.5, CouponAllocation::couponPercentage($allocation['products'][0], 'P'), 'Resolved fractional percentage');
+    $object = exporter($products, $allocation, $result['totals'][0]['value']);
+    $lines = invokePrivate($object, 'getRegularProducts');
+    money(12.5, $lines[0]['rabat'], 'Export displays fractional nominal percentage');
+    same(6999, lineCents($lines), 'Fractional coupon conserves payment');
+});
+
+scenario('Capped and excluded products cannot acquire an incorrect nominal rebate', function () {
+    $result = checkout(array(product(1, 10)), array('discount' => 50), array(), null, 2);
+    $item = $result['totals'][0]['coupon_allocation']['products'][0];
+    money(50, $item['coupon_percentage'], 'Original nominal rate remains saved after cap');
+    same(null, CouponAllocation::couponPercentage($item, 'P'), 'Cap mismatch disables nominal export');
+    $line = CouponAllocation::buildLines($item)[0];
+    money(20, $line['rabat'], 'Capped rebate follows actual paid amount');
+    same(800, lineCents(array($line)), 'Capped item remains paid 8.00');
+    $products = array(product(1, 17.85), product(2, 12.60), product(3, 10));
+    $result = checkout($products, array('discount' => 24, 'product' => array(1, 3)), array(3 => array('special' => 10)));
+    $allocation = $result['totals'][0]['coupon_allocation'];
+    assertAllocation($allocation);
+    money(24, $allocation['products'][0]['coupon_percentage'], 'Eligible product stores nominal percentage');
+    foreach (array(1, 2) as $index) {
+        check(!isset($allocation['products'][$index]['coupon_percentage']), 'Excluded product has no nominal percentage');
+        same(null, CouponAllocation::couponPercentage($allocation['products'][$index], 'P'), 'Excluded product resolves no coupon rate');
+    }
+    $object = exporter($products, $allocation, $result['totals'][0]['value']);
+    $lines = invokePrivate($object, 'getRegularProducts');
+    money(24, $lines[0]['rabat'], 'Eligible exported rebate');
+    money(0, $lines[1]['rabat'], 'Product restriction excludes rebate');
+    money(0, $lines[2]['rabat'], 'Sale restriction excludes rebate');
+});
+
+scenario('Gross prices retain nominal percentage only when actual taxed cents agree', function () {
+    $products = array(product(1, 17.85, 1, array('tax_class_id' => 4)));
+    $result = checkout($products, array('discount' => 24));
+    $allocation = $result['totals'][0]['coupon_allocation'];
+    $gross = CouponAllocation::taxInclusive($allocation);
+    assertAllocation($gross);
+    money(24, CouponAllocation::couponPercentage($gross['products'][0], 'P'), 'Gross proportional tax retains nominal rate');
+    $object = exporter($products, $allocation, $result['totals'][0]['value']);
+    $lines = invokePrivate($object, 'getRegularProducts');
+    money(24, $lines[0]['rabat'], 'Gross export nominal rebate');
+    same(1696, lineCents($lines), 'Gross exported payment');
+    $products = array(product(1, 10, 1, array('tax_class_id' => 1)));
+    $result = checkout($products, array('discount' => 24));
+    $allocation = $result['totals'][0]['coupon_allocation'];
+    $gross = CouponAllocation::taxInclusive($allocation);
+    same(null, CouponAllocation::couponPercentage($gross['products'][0], 'P'), 'Fixed tax prevents applying coupon rate to whole gross price');
+    $object = exporter($products, $allocation, $result['totals'][0]['value']);
+    $lines = invokePrivate($object, 'getRegularProducts');
+    check(abs($lines[0]['rabat'] - 24) > 0.0001, 'Fixed-tax export uses exact effective rebate');
+    same(1150, lineCents($lines), 'Fixed tax remains paid');
+});
+
+scenario('Sale price and nominal coupon combine into a 28 percent rebate', function () {
+    $products = array(product(1, 16.80, 1, array('base_price' => 21, 'coupon_percentage' => 10)));
+    $allocation = CouponAllocation::finalize(snapshot($products, array(1.68)));
+    assertAllocation($allocation);
+    money(10, CouponAllocation::couponPercentage($allocation['products'][0], 'P'), 'Coupon rate excludes existing sale');
+    $object = exporter($products, $allocation, -1.68);
+    $line = invokePrivate($object, 'getRegularProducts')[0];
+    money(21, $line['cijena'], 'Original price remains visible');
+    money(28, $line['rabat'], 'Sale and coupon combine multiplicatively');
+    same(1512, lineCents(array($line)), 'Combined sale and coupon paid amount');
+});
+
+scenario('Nominal percentage yields to exact cents when per-item rounding differs', function () {
+    $products = array(product(1, 10.02), product(2, 10.02));
+    $result = checkout($products, array('discount' => 24));
+    $allocation = $result['totals'][0]['coupon_allocation'];
+    assertAllocation($allocation);
+    $object = exporter($products, $allocation, $result['totals'][0]['value']);
+    $lines = invokePrivate($object, 'getRegularProducts');
+    same(1523, lineCents($lines), 'Rounding-sensitive order remains paid 15.23');
+    same(1523, lineTotalCents($lines), 'Rounding-sensitive extended-line payment');
+    $nominal = 0;
+    foreach ($lines as $line) { if (abs($line['rabat'] - 24) < 0.0000001) { $nominal++; } }
+    same(1, $nominal, 'Only the line whose cents permit it displays 24 percent');
+});
+
+scenario('Nominal percentage does not disturb quantity chunks or cent conservation', function () {
+    $products = array(product(1, 99.99, 1000));
+    $result = checkout($products, array('discount' => 24));
+    $allocation = $result['totals'][0]['coupon_allocation'];
+    assertAllocation($allocation);
+    money(24, CouponAllocation::couponPercentage($allocation['products'][0], 'P'), 'Saved high-quantity percentage');
+    $object = exporter($products, $allocation, $result['totals'][0]['value']);
+    $lines = invokePrivate($object, 'getRegularProducts');
+    same(1000, array_sum(array_column($lines, 'kolicina')), 'High-quantity export retains all units');
+    same(7599240, lineCents($lines), 'High-quantity unit-rounding total');
+    same(7599240, lineTotalCents($lines), 'High-quantity extended-line total');
+    check(count($lines) > 1, 'Cent-safe quantity groups remain available');
+});
+
+scenario('Saved nominal percentages survive current coupon changes and deletion', function () {
+    $products = array(product(1, 17.85));
+    $result = checkout($products, array('discount' => 24));
+    $allocation = $result['totals'][0]['coupon_allocation'];
+    $object = exporter($products, $allocation, $result['totals'][0]['value']);
+    $savedJson = CouponFixtures::$tables['order_total'][0]['coupon_allocation'];
+    foreach (array(array(array('code' => 'TEST', 'type' => 'P', 'discount' => 99)), array()) as $currentCoupon) {
+        CouponFixtures::$tables['coupon'] = $currentCoupon;
+        invokePrivate($object, 'resolveCouponDiscount');
+        $lines = invokePrivate($object, 'getRegularProducts');
+        money(24, $lines[0]['rabat'], 'Saved nominal rate survives mutable coupon records');
+        same(1357, lineCents($lines), 'Historical refund remains unchanged');
+        same($savedJson, CouponFixtures::$tables['order_total'][0]['coupon_allocation'], 'Historical metadata remains immutable');
+    }
+    check(!in_array('coupon', CouponFixtures::$queries), 'Nominal export never reads current coupon configuration');
 });
 
 scenario('Fixed coupon applies only to eligible products', function () {

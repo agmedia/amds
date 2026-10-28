@@ -265,6 +265,7 @@ class CouponAllocation
         }
 
         foreach ($indexes as $position => $index) {
+            $snapshot['products'][$index]['coupon_type'] = $snapshot['type'];
             $snapshot['products'][$index]['charged_amount'] = ($paid[$position] + $allocation[$position]) / 100;
             $snapshot['products'][$index]['discount_amount'] = $allocation[$position] / 100;
             $snapshot['products'][$index]['net_total'] = $paid[$position] / 100;
@@ -310,6 +311,49 @@ class CouponAllocation
     }
 
     /**
+     * Recover an applied percentage from immutable checkout data. A saved
+     * nominal rate is authoritative only while it agrees with the raw amount;
+     * a checkout cap must retain the effective, cent-exact rebate instead.
+     */
+    public static function couponPercentage(array $product, string $type): ?float
+    {
+        if ($type !== 'P') {
+            return null;
+        }
+
+        $quantity = self::integer(self::required($product, 'quantity'), 'quantity', 1);
+        $price = self::number(self::required($product, 'price'), 'price');
+        $discount = self::number(self::required($product, 'discount'), 'discount');
+        $total = $price * $quantity;
+
+        if (!is_finite($total)) {
+            throw new \InvalidArgumentException('Coupon product amount is out of range.');
+        }
+
+        if ($total <= 0 || $discount <= 0) {
+            return null;
+        }
+
+        if (array_key_exists('coupon_percentage', $product)) {
+            $percentage = self::number($product['coupon_percentage'], 'coupon_percentage');
+            if ($percentage > 100) {
+                throw new \InvalidArgumentException('Coupon percentage must not exceed 100.');
+            }
+
+            $expected = $total * $percentage / 100;
+            $tolerance = max(0.0000001, $expected * 2.220446049250313e-16 * 8);
+
+            return abs($discount - $expected) <= $tolerance ? $percentage : null;
+        }
+
+        // Historical snapshots predate the nominal field. Their raw discount
+        // still records the applied rate before currency-cent allocation.
+        $percentage = round($discount / $total * 100, 4);
+
+        return $percentage <= 100 ? $percentage : null;
+    }
+
+    /**
      * Build rebate groups when rounding assigns different unit cents. Large
      * quantities are chunked so unit rounding and line rounding give the same
      * cents, despite Luceed's four-decimal percentage precision.
@@ -318,7 +362,8 @@ class CouponAllocation
     {
         $quantity = self::integer(self::required($product, 'quantity'), 'quantity', 1);
         $price = self::number(self::required($product, 'price'), 'price');
-        $base = self::cents(self::number(self::required($product, 'base_price'), 'base_price')) / 100;
+        $rawBase = self::number(self::required($product, 'base_price'), 'base_price');
+        $base = self::cents($rawBase) / 100;
         $discount = self::number(self::required($product, 'discount_amount'), 'discount_amount');
         $net = self::number(self::required($product, 'net_total'), 'net_total');
         $rawChargedCents = self::cents($price * $quantity);
@@ -354,9 +399,31 @@ class CouponAllocation
 
         $lines = array();
         $exportedCents = 0;
+        $type = isset($product['coupon_type']) ? $product['coupon_type'] : '';
+        if (!is_string($type)) {
+            throw new \InvalidArgumentException('Coupon product type must be a string.');
+        }
+        $percentage = self::couponPercentage($product, $type);
+        $nominalRebate = $percentage !== null && $rawBase > 0
+            ? round(100 * (1 - ($price / $rawBase) * (1 - $percentage / 100)), 4)
+            : null;
 
         foreach ($groups as $group) {
-            $rebate = self::rebateForUnit($base, $group[1]);
+            $rebate = null;
+            if ($nominalRebate !== null && $nominalRebate >= 0 && $nominalRebate <= 100) {
+                $nominalUnit = $base * (1 - $nominalRebate / 100);
+                // Preserve both currency-first and multiplication-first rounding
+                // at half-cent boundaries, for the unit and its whole group.
+                if (self::cents($nominalUnit) === $group[1]
+                    && (int) round($nominalUnit * 100, 0, PHP_ROUND_HALF_UP) === $group[1]
+                    && self::cents($nominalUnit * $group[0]) === $group[1] * $group[0]
+                    && (int) round($nominalUnit * $group[0] * 100, 0, PHP_ROUND_HALF_UP) === $group[1] * $group[0]) {
+                    $rebate = $nominalRebate;
+                }
+            }
+            if ($rebate === null) {
+                $rebate = self::rebateForUnit($base, $group[1]);
+            }
             $rawUnit = $base * (1 - $rebate / 100);
             $unitError = abs($rawUnit - $group[1] / 100);
             $chunkLimit = $unitError > 0
