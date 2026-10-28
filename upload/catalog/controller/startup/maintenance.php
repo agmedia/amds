@@ -1,6 +1,12 @@
 <?php
 class ControllerStartupMaintenance extends Controller {
 	public function index() {
+		// The consent worker is an authenticated-by-context CLI route. It must keep
+		// draining queued consent changes while the storefront is in maintenance.
+		if (php_sapi_name() === 'cli' && isset($this->request->get['route']) && $this->request->get['route'] === 'extension/cron/klaviyo_consent') {
+			return;
+		}
+
 		if ($this->config->get('config_maintenance')) {
 			// Route
 			if (isset($this->request->get['route']) && $this->request->get['route'] != 'startup/router') {

@@ -46,6 +46,7 @@ $_['basel_subscribe_success'] 			= 'Uspješno ste prijavljeni';
 $_['basel_subscribe_email_exist'] 		= 'Email je već registriran';
 $_['basel_unsubscribe_not_found'] 		= 'E-mail nije pronađen';
 $_['basel_unsubscribe_unsubscribed'] 	= 'Uspješno ste se odjavili.';
+$_['basel_newsletter_temporarily_unavailable'] = 'Promjenu trenutačno nije moguće spremiti. Pokušajte ponovno.';
 
 // Product Questions and Answers
 $_['basel_button_ask']     				= 'Pošaljite upit';

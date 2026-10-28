@@ -15,6 +15,9 @@
     {% set class = 'col-sm-12' %}
     {% endif %}
     <div id="content" class="{{ class }}">{{ content_top }}
+      {% if error_warning %}
+      <div class="alert alert-danger alert-dismissible"><i class="fa fa-exclamation-circle"></i> {{ error_warning }}</div>
+      {% endif %}
       <h1 id="page-title">{{ heading_title }}</h1>
       <legend>{{ entry_newsletter }}</legend>
       <form action="{{ action }}" method="post" enctype="multipart/form-data" class="form-horizontal">

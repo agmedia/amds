@@ -514,56 +514,67 @@ public function total_amount() {
 
 // Newsletter Subscribe
 public function subscribe() {
-	
 	$this->load->language('basel/basel_theme');
-	
-		$json = array();
-		if ($this->request->server['REQUEST_METHOD'] == 'POST') {
-			if(!filter_var($this->request->post['email'], FILTER_VALIDATE_EMAIL)){
-				$json['error'] = $this->language->get('basel_subscribe_invalid_email');
-			}
-			if (!isset($json['error'])) {
-				$this->load->model('extension/basel/newsletter'); 
-			if($this->model_extension_basel_newsletter->checkRegistered($this->request->post)){
-			   	$this->model_extension_basel_newsletter->UpdateRegistered($this->request->post,1);
-				$json['success'] = $this->language->get('basel_subscribe_success');
-			} else if ($this->model_extension_basel_newsletter->checkExist($this->request->post)){
-				$json['error'] = $this->language->get('basel_subscribe_email_exist');
-			} else {
-				$this->model_extension_basel_newsletter->subscribe($this->request->post);
-				$json['success'] = $this->language->get('basel_subscribe_success');
-		   	} 
-		  }
+
+	$json = array();
+
+	if ($this->request->server['REQUEST_METHOD'] == 'POST') {
+		if (empty($this->request->post['email']) || !filter_var($this->request->post['email'], FILTER_VALIDATE_EMAIL)) {
+			$json['error'] = $this->language->get('basel_subscribe_invalid_email');
 		}
-		$this->response->addHeader('Content-Type: application/json');
-		$this->response->setOutput(json_encode($json));
+
+		if (!isset($json['error'])) {
+			$this->load->model('extension/basel/newsletter');
+
+			if ($this->model_extension_basel_newsletter->checkRegistered($this->request->post)) {
+				$queued = $this->model_extension_basel_newsletter->UpdateRegistered($this->request->post, 1);
+			} else {
+				$queued = $this->model_extension_basel_newsletter->subscribe($this->request->post);
+			}
+
+			if ($queued) {
+				$json['success'] = $this->language->get('basel_subscribe_success');
+			} else {
+				$json['error'] = $this->language->get('basel_newsletter_temporarily_unavailable');
+			}
+		}
+	}
+
+	$this->response->addHeader('Content-Type: application/json');
+	$this->response->setOutput(json_encode($json));
 }
-	
+
 // Newsletter Unsubscribe
 public function unsubscribe() {
-	
 	$this->load->language('basel/basel_theme');
-	
-		$json = array();
-		if ($this->request->server['REQUEST_METHOD'] == 'POST') {
-			if(!filter_var($this->request->post['email'], FILTER_VALIDATE_EMAIL)){
-				$json['error'] = $this->language->get('basel_subscribe_invalid_email');
-			}
-			if (!isset($json['error'])) {
-				$this->load->model('extension/basel/newsletter'); 
-			if($this->model_extension_basel_newsletter->checkRegistered($this->request->post)){
-			   	$this->model_extension_basel_newsletter->UpdateRegistered($this->request->post,0);
-				$json['success'] = $this->language->get('basel_unsubscribe_unsubscribed');
-			} else if (!$this->model_extension_basel_newsletter->checkExist($this->request->post)){
-				$json['error'] = $this->language->get('basel_unsubscribe_not_found');
-			} else {
-				$this->model_extension_basel_newsletter->unsubscribe($this->request->post);
-				$json['success'] = $this->language->get('basel_unsubscribe_unsubscribed');
-		   	} 
-		  }
+
+	$json = array();
+
+	if ($this->request->server['REQUEST_METHOD'] == 'POST') {
+		if (empty($this->request->post['email']) || !filter_var($this->request->post['email'], FILTER_VALIDATE_EMAIL)) {
+			$json['error'] = $this->language->get('basel_subscribe_invalid_email');
 		}
-		$this->response->addHeader('Content-Type: application/json');
-		$this->response->setOutput(json_encode($json));
+
+		if (!isset($json['error'])) {
+			$this->load->model('extension/basel/newsletter');
+
+			if ($this->model_extension_basel_newsletter->checkRegistered($this->request->post)) {
+				$queued = $this->model_extension_basel_newsletter->UpdateRegistered($this->request->post, 0);
+			} else {
+				// Queue every explicit unsubscribe, including Klaviyo-only profiles.
+				$queued = $this->model_extension_basel_newsletter->unsubscribe($this->request->post);
+			}
+
+			if ($queued) {
+				$json['success'] = $this->language->get('basel_unsubscribe_unsubscribed');
+			} else {
+				$json['error'] = $this->language->get('basel_newsletter_temporarily_unavailable');
+			}
+		}
+	}
+
+	$this->response->addHeader('Content-Type: application/json');
+	$this->response->setOutput(json_encode($json));
 }
 
 // Contact Form Captcha

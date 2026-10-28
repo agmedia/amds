@@ -9,3 +9,6 @@ $_['text_success']     = 'Success: Your newsletter subscription has been success
 
 // Entry
 $_['entry_newsletter'] = 'Subscribe';
+
+// Error
+$_['error_newsletter_unavailable'] = 'The change could not be saved right now. Please try again.';

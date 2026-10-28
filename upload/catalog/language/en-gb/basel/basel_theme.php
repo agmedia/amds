@@ -49,6 +49,7 @@ $_['basel_subscribe_success'] 			= 'Successfully subscribed';
 $_['basel_subscribe_email_exist'] 		= 'E-mail already subscribed';
 $_['basel_unsubscribe_not_found'] 		= 'E-mail not found';
 $_['basel_unsubscribe_unsubscribed'] 	= 'Successfully unsubscribed';
+$_['basel_newsletter_temporarily_unavailable'] = 'The change could not be saved right now. Please try again.';
 
 // Product Questions and Answers
 $_['basel_button_ask']     				= 'Ask a Question';
