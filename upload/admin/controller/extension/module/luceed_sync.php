@@ -688,6 +688,75 @@ class ControllerExtensionModuleLuceedSync extends Controller
 
 
     /**
+     * Remove only safe product SEO URL duplicates:
+     * - product URLs in a duplicate keyword group whose product is missing, and
+     * - exact duplicate URLs for the same existing product (keeping the oldest row).
+     *
+     * @return mixed
+     */
+    public function cleanupDuplicateProductSeoUrls()
+    {
+        return $this->runGuardedSync(__FUNCTION__, function () {
+            $this->load->language('extension/module/luceed_sync');
+
+            if ($this->request->server['REQUEST_METHOD'] !== 'POST') {
+                return $this->output([
+                    'status' => 300,
+                    'message' => $this->language->get('error_seo_cleanup_method')
+                ]);
+            }
+
+            if (!$this->validateModifyPermission()) {
+                return $this->output([
+                    'status' => 300,
+                    'message' => $this->error['warning']
+                ]);
+            }
+
+            $orphan_ids = $this->getOrphanDuplicateProductSeoUrlIds();
+            $exact_duplicate_ids = $this->getExactDuplicateProductSeoUrlIds();
+            $ids = array_values(array_unique(array_merge($orphan_ids, $exact_duplicate_ids)));
+
+            if (!$ids) {
+                return $this->output([
+                    'status' => 300,
+                    'message' => $this->language->get('text_warning_seo_cleanup')
+                ]);
+            }
+
+            try {
+                $this->db->query('START TRANSACTION');
+                $deleted = $this->deleteSeoUrlsById($ids);
+                $this->db->query('COMMIT');
+            } catch (\Throwable $exception) {
+                $this->db->query('ROLLBACK');
+
+                Log::store([
+                    'message' => $exception->getMessage(),
+                    'orphan_ids' => $orphan_ids,
+                    'exact_duplicate_ids' => $exact_duplicate_ids
+                ], 'luceed_seo_cleanup_error');
+
+                return $this->output([
+                    'status' => 300,
+                    'message' => sprintf($this->language->get('error_seo_cleanup'), $exception->getMessage())
+                ]);
+            }
+
+            return $this->output([
+                'status' => 200,
+                'message' => sprintf(
+                    $this->language->get('text_success_seo_cleanup'),
+                    $deleted,
+                    count($orphan_ids),
+                    count(array_diff($exact_duplicate_ids, $orphan_ids))
+                )
+            ]);
+        });
+    }
+
+
+    /**
      * @return mixed
      * @throws Exception
      */
@@ -2059,6 +2128,82 @@ class ControllerExtensionModuleLuceedSync extends Controller
         if (function_exists('set_time_limit')) {
             @set_time_limit(0);
         }
+    }
+
+
+    /**
+     * @return array<int>
+     */
+    private function getOrphanDuplicateProductSeoUrlIds(): array
+    {
+        $seo_url = DB_PREFIX . 'seo_url';
+        $product = DB_PREFIX . 'product';
+        $query = $this->db->query("
+            SELECT su.seo_url_id
+            FROM `{$seo_url}` AS su
+            INNER JOIN (
+                SELECT store_id, language_id, keyword
+                FROM `{$seo_url}`
+                WHERE keyword <> ''
+                GROUP BY store_id, language_id, keyword
+                HAVING COUNT(*) > 1
+            ) AS duplicate_keyword
+                ON duplicate_keyword.store_id = su.store_id
+               AND duplicate_keyword.language_id = su.language_id
+               AND duplicate_keyword.keyword = su.keyword
+            LEFT JOIN `{$product}` AS p
+                ON p.product_id = CAST(SUBSTRING(su.query, CHAR_LENGTH('product_id=') + 1) AS UNSIGNED)
+            WHERE su.query REGEXP '^product_id=[0-9]+$'
+              AND p.product_id IS NULL
+        ");
+
+        return array_map('intval', array_column($query->rows, 'seo_url_id'));
+    }
+
+
+    /**
+     * @return array<int>
+     */
+    private function getExactDuplicateProductSeoUrlIds(): array
+    {
+        $seo_url = DB_PREFIX . 'seo_url';
+        $query = $this->db->query("
+            SELECT duplicate.seo_url_id
+            FROM `{$seo_url}` AS duplicate
+            INNER JOIN (
+                SELECT store_id, language_id, query, keyword, MIN(seo_url_id) AS retained_seo_url_id
+                FROM `{$seo_url}`
+                WHERE query REGEXP '^product_id=[0-9]+$'
+                  AND keyword <> ''
+                GROUP BY store_id, language_id, query, keyword
+                HAVING COUNT(*) > 1
+            ) AS exact_duplicate
+                ON exact_duplicate.store_id = duplicate.store_id
+               AND exact_duplicate.language_id = duplicate.language_id
+               AND exact_duplicate.query = duplicate.query
+               AND exact_duplicate.keyword = duplicate.keyword
+            WHERE duplicate.seo_url_id <> exact_duplicate.retained_seo_url_id
+        ");
+
+        return array_map('intval', array_column($query->rows, 'seo_url_id'));
+    }
+
+
+    /**
+     * @param array<int> $ids
+     * @return int
+     */
+    private function deleteSeoUrlsById(array $ids): int
+    {
+        $seo_url = DB_PREFIX . 'seo_url';
+        $deleted = 0;
+
+        foreach (array_chunk($ids, 500) as $chunk) {
+            $this->db->query("DELETE FROM `{$seo_url}` WHERE seo_url_id IN (" . implode(',', array_map('intval', $chunk)) . ')');
+            $deleted += $this->db->countAffected();
+        }
+
+        return $deleted;
     }
 
 

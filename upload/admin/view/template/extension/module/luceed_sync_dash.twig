@@ -168,6 +168,13 @@
                                     <p class="col-sm-8" style="margin-top: 9px;">{{ help_products_import }}</p>
                                 </div>
 
+                                <div class="form-group">
+                                    <div class="col-sm-4 text-center">
+                                        <button type="button" id="cleanup-duplicate-product-seo-urls" data-toggle="tooltip" title="{{ help_products_seo_cleanup }}" class="btn btn-danger btn-block">{{ btn_products_seo_cleanup }}</button>
+                                    </div>
+                                    <p class="col-sm-8" style="margin-top: 9px;">{{ help_products_seo_cleanup }}</p>
+                                </div>
+
                                 {#<div class="form-group">
                             <div class="col-sm-4 text-center">
                                 <a href="javascript:void(0)" id="import-detail-product" data-toggle="tooltip" title="Import Detalja Novih Proizvoda" class="btn btn-info btn-block" style="margin-top: 9px;">Import Detalja Novih Proizvoda</a>
@@ -431,6 +438,7 @@
             $('#import-new-warehouse')      .on('click', e => { callApi(e, 'importWarehouses'); });
             $('#import-new-payments')       .on('click', e => { callApi(e, 'importPayments'); });
             $('#import-new-products')       .on('click', e => { callApi(e, 'importProducts'); });
+            $('#cleanup-duplicate-product-seo-urls').on('click', cleanupDuplicateProductSeoUrls);
             $('#import-detail-product')     .on('click', e => { callApi(e, 'importProduct'); });
             $('#import-new-actions')        .on('click', e => { callApi(e, 'importActions'); });
             $('#check-active-min')          .on('click', e => { callApi(e, 'checkMinQty'); });
@@ -631,6 +639,32 @@
                     }
                 });
             }
+        }
+
+        function cleanupDuplicateProductSeoUrls() {
+            if (!window.confirm('{{ confirm_products_seo_cleanup }}')) {
+                return;
+            }
+
+            let button = $('#cleanup-duplicate-product-seo-urls');
+            let originalHtml = button.html();
+
+            button.prop('disabled', true).html('{{ btn_checking }}');
+
+            $.ajax({
+                url: 'index.php?route=extension/module/luceed_sync/cleanupDuplicateProductSeoUrls&user_token={{ user_token }}',
+                type: 'POST',
+                dataType: 'json',
+                success: function(json) {
+                    checkResult(json);
+                },
+                error: function(xhr) {
+                    AG_alert.warning(extractAjaxError(xhr, '{{ error_seo_cleanup_generic }}'));
+                },
+                complete: function() {
+                    button.prop('disabled', false).html(originalHtml);
+                }
+            });
         }
 
 

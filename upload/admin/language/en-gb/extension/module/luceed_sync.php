@@ -50,6 +50,8 @@ $_['text_web_coupon_export_panel']     = 'Web kuponi export';
 $_['text_success_product']          = 'Uspjeh..! %s novih proizvoda dodano!';
 $_['text_warning_product']          = 'Upozorenje..! Nema novih proizvoda za dodati!';
 $_['text_danger_product']           = 'Upozorenje..! Imate još novih proizvoda za dodati..!';
+$_['text_success_seo_cleanup']       = 'Deleted SEO URLs: %s (orphaned: %s, exact duplicates: %s).';
+$_['text_warning_seo_cleanup']       = 'There are no safe duplicate SEO URLs to remove.';
 
 // Btn
 $_['btn_products_import']         = 'Import Novih Proizvoda';
@@ -58,6 +60,7 @@ $_['btn_products_actions_import'] = 'Import Novih Akcija';
 $_['btn_products_update_pq']      = 'Update Cijena i Količina';
 $_['btn_products_update_p']       = 'Update Cijena';
 $_['btn_products_update_q']       = 'Update Količina';
+$_['btn_products_seo_cleanup']     = 'Remove Safe Duplicate SEO URLs';
 $_['btn_categories_import']       = 'Import Novih Kategorija';
 $_['btn_categories_active']       = 'Provjera Minimalnog Stanja';
 $_['btn_manufacturer_import']     = 'Import Novih Proizvođača';
@@ -70,6 +73,7 @@ $_['btn_checking']                = 'Provjera... <i class="fa fa-spinner fa-spin
 
 // Helper
 $_['help_products_import']     = 'Import se radi samo novih proizvoda. Proizvodi već importani neće se dirati.';
+$_['help_products_seo_cleanup'] = 'Removes only SEO URLs for missing products within a duplicate keyword group and exact duplicates for the same product. Duplicate keywords for different existing products are preserved.';
 $_['help_products_active']     = 'Provjerava se stanje svih artikala s obzirom na vrijednost Min_Kol_Web parametra u Luceed atributima.';
 $_['help_products_actions']    = 'Postojeće akcije se brišu. Radi se novi import svih važećih akcija iz Luceed-a.';
 $_['help_products_csv_sync']    = 'Upload a CSV containing product models. Supported headers are `model`, `artikl`, `sifra`, or `sku`, as well as a plain first column without a header. If the CSV has a second column, only rows marked `B26` receive the Novo category. Processing runs in batches of five products per request.';
@@ -94,6 +98,10 @@ $_['error_csv_empty']  = 'CSV ne sadrži nijedan model za obradu.';
 $_['error_csv_sync']   = 'Greška pri CSV syncu: %s';
 $_['error_csv_sync_state'] = 'CSV sync stanje nije dostupno ili je isteklo. Ponovno uploadajte CSV.';
 $_['error_csv_sync_generic'] = 'Greška pri CSV syncu.';
+$_['error_seo_cleanup'] = 'SEO URL cleanup failed: %s';
+$_['error_seo_cleanup_generic'] = 'SEO URL cleanup failed.';
+$_['error_seo_cleanup_method'] = 'SEO URL cleanup must be started from the administration panel.';
+$_['confirm_products_seo_cleanup'] = 'Remove only safe duplicate SEO URLs? This action cannot be automatically undone.';
 $_['error_web_coupon_export'] = 'Greška pri exportu web kupona: %s';
 $_['error_web_coupon_export_dates'] = 'Odaberite valjan raspon datuma za export web kupona.';
 $_['error_web_coupon_export_file'] = 'Nije moguće pripremiti datoteku za export web kupona.';
