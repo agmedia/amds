@@ -21,8 +21,11 @@ the future. Other pages omit modification dates rather than claim a crawl or
 generation time as a content change. The feed is generated from current catalog
 data on each request.
 
-The reserved paths are resolved before database SEO aliases, so no `.htaccess`
-change or SEO alias insertion is required. The previous `sitemap.xml` and
+The reserved paths are resolved by `startup/google_sitemap` before the existing
+SEO controller. The startup action is registered in `system/config/catalog.php`,
+which OpenCart reads directly. This also works when an existing OpenCart
+modification shadows the SEO controller; no modification cache refresh,
+`.htaccess` change or SEO alias insertion is required. The previous `sitemap.xml` and
 `index.php?route=extension/feed/google_sitemap` entry points remain compatible.
 Disabled feeds and invalid product shard numbers return HTTP 404.
 
@@ -34,15 +37,31 @@ fast-forward the reviewed revision through the project's Git release procedure;
 inspect and preserve server changes before updating. Do not copy individual
 source files to the server.
 
-After the PHP changes are present, apply
-`storage/migrations/40_enable_google_sitemap.sql` through the release's database
-tooling. Check the installation's table prefix first. The migration enables and
-registers the feed for store 0; rerunning it does not duplicate settings or the
-extension registration. Explicit overrides belonging to other stores are kept.
+After the PHP changes are present, run the tracked CLI command from the
+repository root with the site's PHP CLI:
 
-Check whether OpenCart Modifications shadows either updated controller. Refresh
-Modifications through the normal administrative workflow when needed; never
-hand-edit generated modification files.
+```sh
+php bin/google-sitemap.php --check
+php bin/google-sitemap.php --apply
+php bin/google-sitemap.php --check
+```
+
+`--check` only reads the database and reports the default store's feed state as
+JSON; an unconfigured or disabled feed is a successful check with
+`"enabled": false`. `--apply` reads
+`storage/migrations/40_enable_google_sitemap.sql`, uses the table prefix from
+`upload/config.php`, applies every statement, and verifies that store 0 has one
+enabled setting and exactly one feed registration. It exits unsuccessfully if
+verification fails. Both modes omit database credentials from output.
+
+The migration enables and registers the feed for store 0; rerunning it does not
+duplicate settings or the extension registration. Explicit overrides belonging
+to other stores are kept. The command requires the `mysqli` PHP extension and
+the installation's existing `upload/config.php` configuration.
+
+The release preserves existing OpenCart modification copies. Check that no
+generated copy unexpectedly shadows the new `startup/google_sitemap` or feed
+controller/model; do not hand-edit generated modification files.
 
 Verify the public index, every referenced child sitemap and `robots.txt` after
 release. Expect HTTP 200 and `application/xml; charset=UTF-8` for sitemap files,

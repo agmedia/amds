@@ -9,19 +9,6 @@ class ControllerStartupSeoUrl extends Controller {
             $this->url->addRewrite($this);
         }
 
-        // Reserved sitemap URLs work without database SEO aliases.
-        if (isset($this->request->get['_route_']) && is_string($this->request->get['_route_'])) {
-            $sitemap_path = $this->request->get['_route_'];
-            if ($sitemap_path === 'site-map.xml' || $sitemap_path === 'sitemap.xml' || $sitemap_path === 'site-map-pages.xml'
-                || preg_match('/^site-map-products-([1-9][0-9]*)\.xml$/D', $sitemap_path, $sitemap_match)) {
-                $this->request->get['route'] = 'extension/feed/google_sitemap';
-                $this->request->get['type'] = ($sitemap_path === 'site-map.xml' || $sitemap_path === 'sitemap.xml') ? 'index' : ($sitemap_path === 'site-map-pages.xml' ? 'pages' : 'products');
-                $this->request->get['page'] = isset($sitemap_match[1]) ? $sitemap_match[1] : '1';
-                unset($this->request->get['_route_']);
-                return;
-            }
-        }
-
         // Decode URL
         if (isset($this->request->get['_route_'])) {
             $parts = explode('/', $this->request->get['_route_']);

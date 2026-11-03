@@ -13,6 +13,7 @@ require $root . '/upload/system/engine/controller.php';
 require $root . '/upload/system/library/config.php';
 require $root . '/upload/system/library/url.php';
 require $root . '/upload/catalog/controller/extension/feed/google_sitemap.php';
+require $root . '/upload/catalog/controller/startup/google_sitemap.php';
 require $root . '/upload/catalog/controller/startup/seo_url.php';
 
 class SitemapResponse {
@@ -226,14 +227,44 @@ foreach (array(
     foreach (array(true, false) as $seoEnabled) {
         $registry = sitemapFixture(array('_route_' => $path, 'type' => array('untrusted'), 'page' => '-999'));
         $registry->get('config')->set('config_seo_url', $seoEnabled);
-        $controller = new ControllerStartupSeoUrl($registry);
+        $controller = new ControllerStartupGoogleSitemap($registry);
         $controller->index();
+        $legacySeo = new ControllerStartupSeoUrl($registry);
+        $legacySeo->index();
         $get = $registry->get('request')->get;
         sitemapAssert(isset($get['route']) && $get['route'] === 'extension/feed/google_sitemap', $path . ': public alias resolves without SEO database dependency');
+        sitemapAssert(!isset($get['_route_']), $path . ': legacy SEO decoder receives no reserved path');
         foreach ($expected as $key => $value) {
             sitemapAssert(isset($get[$key]) && (string)$get[$key] === (string)$value, $path . ': canonical alias overrides untrusted ' . $key);
         }
     }
 }
+
+foreach (array('catalog/jeans', 'site-map-products-0.xml', 'sitemap-products-1.xml', 'site-map-products-1.xml/', array('site-map.xml')) as $path) {
+    $get = array('_route_' => $path, 'route' => 'existing/route', 'page' => '7', 'filter' => 'blue');
+    $registry = sitemapFixture($get);
+    $controller = new ControllerStartupGoogleSitemap($registry);
+    $controller->index();
+    sitemapAssert($registry->get('request')->get === $get, 'Sitemap startup leaves nonreserved routes untouched');
+}
+
+// Include configuration in a local scope with synthetic constants only.
+foreach (array(
+    'HTTP_SERVER' => 'http://shop.example/', 'HTTPS_SERVER' => 'https://shop.example/',
+    'DB_DRIVER' => 'mysqli', 'DB_HOSTNAME' => 'fixture.invalid', 'DB_USERNAME' => 'fixture',
+    'DB_PASSWORD' => 'fixture', 'DB_DATABASE' => 'fixture', 'DB_PORT' => '3306'
+) as $constant => $value) {
+    if (!defined($constant)) { define($constant, $value); }
+}
+function sitemapCatalogPreactions($file) {
+    $_ = array();
+    require $file;
+    return $_['action_pre_action'];
+}
+$preactions = sitemapCatalogPreactions($root . '/upload/system/config/catalog.php');
+$sitemapPosition = array_search('startup/google_sitemap', $preactions, true);
+sitemapAssert($sitemapPosition !== false, 'Catalog registers dedicated sitemap startup');
+sitemapAssert(count(array_keys($preactions, 'startup/google_sitemap', true)) === 1, 'Sitemap startup is registered once');
+sitemapAssert(isset($preactions[$sitemapPosition + 1]) && $preactions[$sitemapPosition + 1] === 'startup/seo_url', 'Sitemap startup runs immediately before legacy SEO decoding');
 
 echo 'Sitemap regressions passed (' . $assertions . " assertions).\n";
