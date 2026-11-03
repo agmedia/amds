@@ -12,6 +12,7 @@ require $root . '/upload/system/engine/registry.php';
 require $root . '/upload/system/engine/controller.php';
 require $root . '/upload/system/library/config.php';
 require $root . '/upload/system/library/url.php';
+require $root . '/upload/system/library/response.php';
 require $root . '/upload/catalog/controller/extension/feed/google_sitemap.php';
 require $root . '/upload/catalog/controller/startup/google_sitemap.php';
 require $root . '/upload/catalog/controller/startup/seo_url.php';
@@ -139,7 +140,7 @@ function sitemapLocs($xml, $xpath) {
 function sitemapNotFound($registry, $label) {
     $response = sitemapRun($registry);
     sitemapAssert((bool)preg_grep('/\b404\b/', $response->headers), $label . ': HTTP 404');
-    sitemapAssert($response->output === '', $label . ': no misleading empty XML sitemap');
+    sitemapAssert($response->output === 'Not Found', $label . ': nonempty plain response sends HTTP error headers');
     sitemapAssert(!$registry->get('model_extension_feed_google_sitemap')->calls, $label . ': no product page query');
 }
 
@@ -266,5 +267,13 @@ $sitemapPosition = array_search('startup/google_sitemap', $preactions, true);
 sitemapAssert($sitemapPosition !== false, 'Catalog registers dedicated sitemap startup');
 sitemapAssert(count(array_keys($preactions, 'startup/google_sitemap', true)) === 1, 'Sitemap startup is registered once');
 sitemapAssert(isset($preactions[$sitemapPosition + 1]) && $preactions[$sitemapPosition + 1] === 'startup/seo_url', 'Sitemap startup runs immediately before legacy SEO decoding');
+
+$registry = sitemapFixture(array('type' => 'products', 'page' => '999999'));
+$registry->set('response', new Response());
+sitemapRun($registry);
+ob_start();
+$registry->get('response')->output();
+$errorBody = ob_get_clean();
+sitemapAssert($errorBody === 'Not Found', 'Real OpenCart Response emits the error body and queued headers');
 
 echo 'Sitemap regressions passed (' . $assertions . " assertions).\n";

@@ -123,6 +123,8 @@ class ControllerExtensionFeedGoogleSitemap extends Controller {
 
 	private function notFound() {
 		$this->response->addHeader('HTTP/1.1 404 Not Found');
-		$this->response->setOutput('');
+		$this->response->addHeader('Content-Type: text/plain; charset=UTF-8');
+		// OpenCart only sends queued headers when the response body is nonempty.
+		$this->response->setOutput('Not Found');
 	}
 }
