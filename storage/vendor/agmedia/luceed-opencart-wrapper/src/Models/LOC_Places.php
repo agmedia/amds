@@ -127,7 +127,12 @@ class LOC_Places
 
         if ( ! empty($list)) {
             for ($i = 1; $i < count($list); $i++) {
-                if ( ! in_array($list[$i][1], $this->list_excluded_numbers)/* && ! in_array($list[$i][1], $this->list_excluded_numbers)*/) {
+                // Biograd shares postal code 23210 with excluded Vrgada.
+                $is_biograd = $list[$i][0] === 'HR'
+                    && (string) $list[$i][1] === '23210'
+                    && strcasecmp((string) $list[$i][2], 'Biograd na moru') === 0;
+
+                if ($is_biograd || ! in_array($list[$i][1], $this->list_excluded_numbers)) {
                     $response[] = [
                         $list[0][0] => $list[$i][0],
                         $list[0][1] => $list[$i][1],
